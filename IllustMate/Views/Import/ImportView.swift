@@ -50,6 +50,7 @@ struct ImportView: View {
                     }
                     Task {
                         var illustrations: [Illustration] = []
+                        UIApplication.shared.isIdleTimerDisabled = true
                         for selectedPhotoItem in selectedPhotoItems {
                             debugPrint(selectedPhotoItem.itemIdentifier ?? "Image")
                             if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
@@ -66,6 +67,7 @@ struct ImportView: View {
                         for illustration in illustrations {
                             modelContext.insert(illustration)
                         }
+                        UIApplication.shared.isIdleTimerDisabled = false
                         withAnimation(.easeOut.speed(2)) {
                             selectedPhotoItems.removeAll()
                             isImporting = false
