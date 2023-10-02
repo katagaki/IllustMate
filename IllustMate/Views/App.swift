@@ -11,6 +11,9 @@ import SwiftData
 @main
 struct IllustMateApp: App {
 
+    @StateObject var tabManager = TabManager()
+    @StateObject var navigationManager = NavigationManager()
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Album.self, Illustration.self
@@ -28,6 +31,8 @@ struct IllustMateApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .environmentObject(tabManager)
+                .environmentObject(navigationManager)
         }
         .modelContainer(sharedModelContainer)
     }

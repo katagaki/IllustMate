@@ -37,6 +37,10 @@ final class Illustration {
         }
         self.dateAdded = .now
     }
+
+    func image() -> UIImage? {
+        return UIImage(data: data)
+    }
 }
 
 enum IllustrationFormat: Codable {

@@ -12,6 +12,7 @@ import SwiftData
 struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var navigationManager: NavigationManager
     @Query(sort: \Album.name,
            order: .forward,
            animation: .snappy.speed(2)) var albums: [Album]
@@ -31,7 +32,7 @@ struct AlbumView: View {
                                             GridItem(.flexible(), spacing: 2.0)]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationManager.collectionViewPath) {
             ScrollView(.vertical) {
                 // Albums
                 HStack(alignment: .center, spacing: 8.0) {
@@ -46,17 +47,24 @@ struct AlbumView: View {
                 .padding([.leading, .trailing, .top], 20.0)
                 Divider()
                     .padding([.leading], 20.0)
-                LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-                    if let currentAlbum = currentAlbum {
-                        ForEach(currentAlbum.albums()) { album in
-                            albumItem(album)
-                        }
-                    } else {
-                        ForEach(albums) { album in
-                            if album.parentAlbum == nil {
-                                albumItem(album)
+                Group {
+                    if currentlyDisplayedAlbumHasAlbums() {
+                        LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
+                            if let currentAlbum = currentAlbum {
+                                ForEach(currentAlbum.albums()) { album in
+                                    albumItem(album)
+                                }
+                            } else {
+                                ForEach(albums) { album in
+                                    if album.parentAlbum == nil {
+                                        albumItem(album)
+                                    }
+                                }
                             }
                         }
+                    } else {
+                        Text("Albums.NoAlbums")
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding([.leading, .trailing], 20.0)
@@ -79,26 +87,42 @@ struct AlbumView: View {
                     }
                 }
                 .padding([.leading, .trailing, .top], 20.0)
-                LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                    if let currentAlbum = currentAlbum {
-                        ForEach(currentAlbum.illustrations()) { illustration in
-                            illustrationItem(illustration)
-                        }
-                    } else {
-                        ForEach(illustrations) { illustration in
-                            if let albums = illustration.containingAlbums, albums.isEmpty {
-                                illustrationItem(illustration)
+                Group {
+                    if currentlyDisplayedAlbumHasIllustrations() {
+                        LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
+                            if let currentAlbum = currentAlbum {
+                                ForEach(currentAlbum.illustrations()) { illustration in
+                                    illustrationItem(illustration)
+                                }
+                            } else {
+                                ForEach(illustrations) { illustration in
+                                    if let albums = illustration.containingAlbums, albums.isEmpty {
+                                        illustrationItem(illustration)
+                                    }
+                                }
                             }
                         }
+                    } else {
+                        Divider()
+                            .padding([.leading], 20.0)
+                        Text("Albums.NoIllustrations")
+                            .foregroundStyle(.secondary)
                     }
                 }
+                .padding([.bottom], 20.0)
             }
+            .navigationDestination(for: ViewPath.self, destination: { viewPath in
+                switch viewPath {
+                case .album(let album): AlbumView(currentAlbum: album)
+                case .illustrationViewer(let illustration): IllustrationViewerView(illustration: illustration)
+                }
+            })
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isAddingAlbum = true
                     } label: {
-                        Image(systemName: "plus")
+                        Image(systemName: "rectangle.stack.badge.plus")
                     }
                 }
             }
@@ -113,11 +137,30 @@ struct AlbumView: View {
         }
     }
 
+    func currentlyDisplayedAlbumHasAlbums() -> Bool {
+        if let currentAlbum = currentAlbum {
+            return !currentAlbum.albums().isEmpty
+        } else {
+            return !albums.filter({ $0.parentAlbum == nil }).isEmpty
+        }
+    }
+
+    func currentlyDisplayedAlbumHasIllustrations() -> Bool {
+        if let currentAlbum = currentAlbum {
+            return !currentAlbum.illustrations().isEmpty
+        } else {
+            return !illustrations.filter({ illustration in
+                if let album = illustration.containingAlbums {
+                    return album.isEmpty
+                }
+                return true
+            }).isEmpty
+        }
+    }
+
     @ViewBuilder
     func albumItem(_ album: Album) -> some View {
-        NavigationLink {
-            AlbumView(currentAlbum: album)
-        } label: {
+        NavigationLink(value: ViewPath.album(album: album)) {
             VStack(alignment: .leading, spacing: 8.0) {
                 Group {
                     if let coverPhotoData = album.coverPhoto,
@@ -144,7 +187,7 @@ struct AlbumView: View {
         }
         .contextMenu {
             Button {
-                // TODO
+                // TODO: Rename album
             } label: {
                 Text("Shared.Rename")
                 Image(systemName: "pencil")
@@ -160,14 +203,43 @@ struct AlbumView: View {
 
     @ViewBuilder
     func illustrationItem(_ illustration: Illustration) -> some View {
-        if illustration.thumbnail.count > 0, let uiImage = UIImage(data: illustration.thumbnail) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(1.0, contentMode: .fill)
-        } else if let uiImage = UIImage(data: illustration.data) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(1.0, contentMode: .fill)
+        Button {
+            navigationManager.push(ViewPath.illustrationViewer(illustration: illustration), for: .collection)
+        } label: {
+            if illustration.thumbnail.count > 0, let uiImage = UIImage(data: illustration.thumbnail) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(1.0, contentMode: .fill)
+            } else if let uiImage = UIImage(data: illustration.data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(1.0, contentMode: .fill)
+            }
+        }
+        .contextMenu {
+            Menu {
+                if let currentAlbum = currentAlbum {
+                    ForEach(currentAlbum.albums()) { album in
+                        Button {
+                            album.addChildIllustration(illustration)
+                            currentAlbum.removeChildIllustration(illustration)
+                        } label: {
+                            Text(album.name)
+                        }
+                    }
+                } else {
+                    ForEach(albums) { album in
+                        Button {
+                            album.addChildIllustration(illustration)
+                        } label: {
+                            Text(album.name)
+                        }
+                    }
+                }
+            } label: {
+                Text("Shared.AddToAlbum")
+                Image(systemName: "rectangle.stack.badge.plus")
+            }
         }
     }
 

@@ -52,6 +52,57 @@
         }
       }
     },
+    "Albums.NoAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No albums found"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムがありません"
+          }
+        }
+      }
+    },
+    "Albums.NoIllustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No illustrations found"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イラストがありません"
+          }
+        }
+      }
+    },
+    "Illustration.Error.CouldNotOpen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could Not Open Illustration"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イラストが開けませんでした"
+          }
+        }
+      }
+    },
     "More.DeleteAll" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -65,6 +116,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのデータを消去"
+          }
+        }
+      }
+    },
+    "Shared.AddToAlbum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add To Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムに追加"
           }
         }
       }

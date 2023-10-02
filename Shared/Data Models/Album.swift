@@ -34,4 +34,12 @@ final class Album {
     func addChildAlbum(_ album: Album) {
         childAlbums?.append(album)
     }
+
+    func addChildIllustration(_ illustration: Illustration) {
+        childIllustrations?.append(illustration)
+    }
+
+    func removeChildIllustration(_ illustration: Illustration) {
+        childIllustrations?.removeAll(where: { $0.id == illustration.id })
+    }
 }
