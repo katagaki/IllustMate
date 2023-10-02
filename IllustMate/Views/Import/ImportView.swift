@@ -57,10 +57,10 @@ struct ImportView: View {
                                 let illustration = Illustration(name: selectedPhotoItem.itemIdentifier ?? "",
                                                                    data: data)
                                 illustrations.append(illustration)
-                                DispatchQueue.main.async {
-                                    currentProgress += 1
-                                    percentage = currentProgress / total
-                                }
+                            }
+                            DispatchQueue.main.async {
+                                currentProgress += 1
+                                percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
                             }
                         }
                         for illustration in illustrations {
