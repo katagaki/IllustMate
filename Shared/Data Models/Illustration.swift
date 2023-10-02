@@ -31,15 +31,39 @@ final class Illustration {
             self.data = data
             self.format = .heic
         }
-        if let image = UIImage(data: data)?
-            .preparingThumbnail(of: CGSize(width: 200.0, height: 200.0)) {
-            thumbnail = image.pngData() ?? Data()
+        if let thumbnailData = Illustration.makeThumbnail(data) {
+            thumbnail = thumbnailData
         }
         self.dateAdded = .now
     }
 
     func image() -> UIImage? {
         return UIImage(data: data)
+    }
+
+    static func makeThumbnail(_ data: Data?) -> Data? {
+        if let data = data, let sourceImage = UIImage(data: data) {
+            let shortSideLength = min(sourceImage.size.width, sourceImage.size.height)
+            let xOffset = (sourceImage.size.width - shortSideLength) / 2.0
+            let yOffset = (sourceImage.size.height - shortSideLength) / 2.0
+            let cropRect = CGRect(x: xOffset, y: yOffset, width: shortSideLength, height: shortSideLength)
+            let imageRendererFormat = sourceImage.imageRendererFormat
+            imageRendererFormat.opaque = false
+            let croppedImage = UIGraphicsImageRenderer(size: cropRect.size,
+                                                             format: imageRendererFormat).image { _ in
+                sourceImage.draw(in: CGRect(origin: CGPoint(x: -xOffset, y: -yOffset), size: sourceImage.size))
+            }.cgImage!
+            let length = 300
+            let context = CGContext(data: nil, width: length, height: length, bitsPerComponent: 8,
+                                    bytesPerRow: length * croppedImage.bitsPerPixel / 8,
+                                    space: croppedImage.colorSpace!,
+                                    bitmapInfo: croppedImage.bitmapInfo.rawValue)!
+            context.interpolationQuality = .high
+            context.draw(croppedImage, in: CGRect(origin: CGPoint.zero,
+                                                        size: CGSize(width: length, height: length)))
+            return context.makeImage().flatMap { UIImage(cgImage: $0) }?.pngData()
+        }
+        return nil
     }
 }
 

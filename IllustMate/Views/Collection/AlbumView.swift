@@ -206,7 +206,7 @@ struct AlbumView: View {
         Button {
             navigationManager.push(ViewPath.illustrationViewer(illustration: illustration), for: .collection)
         } label: {
-            if illustration.thumbnail.count > 0, let uiImage = UIImage(data: illustration.thumbnail) {
+            if let uiImage = UIImage(data: illustration.thumbnail) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(1.0, contentMode: .fill)
