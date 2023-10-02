@@ -10,16 +10,41 @@ import SwiftUI
 struct IllustrationItem: View {
 
     var illustration: Illustration
+    @State var image: UIImage?
+    @State var isInitialLoadCompleted: Bool = false
 
     var body: some View {
-        if let uiImage = UIImage(data: illustration.thumbnail) {
-            Image(uiImage: uiImage)
+        if let image = image {
+            Image(uiImage: image)
                 .resizable()
                 .aspectRatio(1.0, contentMode: .fill)
-        } else if let uiImage = UIImage(data: illustration.data) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(1.0, contentMode: .fill)
+                .transition(.opacity.animation(.snappy.speed(2)))
+        } else {
+            if !isInitialLoadCompleted {
+                Rectangle()
+                    .foregroundStyle(.clear)
+                    .aspectRatio(1.0, contentMode: .fill)
+                    .overlay {
+                        ZStack(alignment: .center) {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        }
+                    }
+                    .task {
+                        if let uiImage = UIImage(data: illustration.thumbnail) {
+                            image = uiImage
+                        } else if let uiImage = UIImage(data: illustration.data) {
+                            image = uiImage
+                        }
+                        isInitialLoadCompleted = true
+                    }
+            } else {
+                Image(systemName: "xmark.octagon.fill")
+                    .symbolRenderingMode(.hierarchical)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28.0, height: 28.0)
+            }
         }
     }
 }
