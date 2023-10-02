@@ -5,24 +5,50 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import SwiftData
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController {
 
+    @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var progressLabel: UILabel!
+
+    var currentProgress: Int = 0
+    var total: Int = 0
+
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            Album.self, Illustration.self
+        ])
+        let modelConfiguration = ModelConfiguration(schema: schema,
+                                                    isStoredInMemoryOnly: false,
+                                                    cloudKitDatabase: .automatic)
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Get shared items
+        let modelContext = ModelContext(sharedModelContainer)
         if let item = extensionContext?.inputItems.first as? NSExtensionItem {
-            for attachment: NSItemProvider in item.attachments ?? [] where
-            attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            let attachments = (item.attachments ?? [])
+                .filter({ $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) })
+            total = attachments.count
+            for attachment: NSItemProvider in attachments {
                 attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { fileURL, _ in
-                    // Load images
                     if let fileURL = fileURL as? URL,
                        let image = UIImage(contentsOfFile: fileURL.path(percentEncoded: false)) {
-                        debugPrint(image)
+                        let illustration = Illustration(name: fileURL.lastPathComponent, image: image)
+                        modelContext.insert(illustration)
                     }
+                    self.incrementProgress()
+                    self.dismissIfCompleted()
                 }
             }
         }
@@ -32,5 +58,21 @@ class ShareViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        progressLabel.text = NSLocalizedString("Importer.ProgressText", comment: "")
+    }
+
+    func incrementProgress() {
+        DispatchQueue.main.async { [self] in
+            currentProgress += 1
+            progressView.progress = Float(currentProgress) / Float(total)
+        }
+    }
+
+    func dismissIfCompleted() {
+        DispatchQueue.main.async { [self] in
+            if currentProgress == total {
+                extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+            }
+        }
     }
 }

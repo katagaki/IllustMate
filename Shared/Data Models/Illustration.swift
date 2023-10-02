@@ -7,25 +7,41 @@
 
 import Foundation
 import SwiftData
+import UIKit
 
 @Model
 final class Illustration {
     var id = UUID().uuidString
-    var name: String
-    var data: Data
-    var format: IllustrationFormat
-    @Relationship(deleteRule: .nullify, inverse: \Album.illustrations) var containingAlbums: [Album]? = []
-    var dateAdded: Date
+    var name: String = ""
+    var data: Data = Data()
+    var thumbnail: Data = Data()
+    var format: IllustrationFormat = IllustrationFormat.unknown
+    @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbums: [Album]? = []
+    var dateAdded: Date = Date.now
 
-    init(name: String, data: Data, format: IllustrationFormat, dateAdded: Date) {
+    init(name: String, image: UIImage) {
         self.name = name
-        self.data = data
-        self.format = format
-        self.dateAdded = dateAdded
+        if let data = image.pngData() {
+            self.data = data
+            self.format = .png
+        } else if let data = image.jpegData(compressionQuality: 1.0) {
+            self.data = data
+            self.format = .jpg
+        } else if let data = image.heicData() {
+            self.data = data
+            self.format = .heic
+        }
+        if let image = UIImage(data: data)?
+            .preparingThumbnail(of: CGSize(width: 200.0, height: 200.0)) {
+            thumbnail = image.pngData() ?? Data()
+        }
+        self.dateAdded = .now
     }
 }
 
 enum IllustrationFormat: Codable {
+    case unknown
     case png
     case jpg
+    case heic
 }

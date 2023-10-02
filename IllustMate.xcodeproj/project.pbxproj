@@ -8,16 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		E4614CE72ACA86C900D751FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* App.swift */; };
-		E4614CE92ACA86C900D751FB /* AlbumsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumsView.swift */; };
+		E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumView.swift */; };
 		E4614CEB2ACA86C900D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
 		E4614CED2ACA86CA00D751FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4614CEC2ACA86CA00D751FB /* Assets.xcassets */; };
 		E4614CFF2ACA86EC00D751FB /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CFE2ACA86EC00D751FB /* ShareViewController.swift */; };
 		E4614D062ACA86ED00D751FB /* Importer.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4614CFC2ACA86EC00D751FB /* Importer.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4614D0E2ACA9FFF00D751FB /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */; };
 		E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D112ACAA7B100D751FB /* Illustration.swift */; };
-		E4614D152ACAB57D00D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D142ACAB57D00D751FB /* AlbumView.swift */; };
 		E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D162ACAB66600D751FB /* MainTabView.swift */; };
 		E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4614D192ACAB6AD00D751FB /* Komponents */; };
+		E4614D1C2ACAF42000D751FB /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4614D1B2ACAF42000D751FB /* Localizable.xcstrings */; };
+		E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */; };
+		E4614D202ACAFF5E00D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
+		E4614D212ACAFF6000D751FB /* Illustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D112ACAA7B100D751FB /* Illustration.swift */; };
+		E4614D242ACB048000D751FB /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D232ACB048000D751FB /* MoreView.swift */; };
+		E4614D262ACB08E600D751FB /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4614D252ACB08E600D751FB /* Localizable.xcstrings */; };
+		E4614D282ACB0CAE00D751FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4614D272ACB0CAE00D751FB /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,7 +53,7 @@
 /* Begin PBXFileReference section */
 		E4614CE32ACA86C900D751FB /* IllustMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IllustMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4614CE62ACA86C900D751FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
-		E4614CE82ACA86C900D751FB /* AlbumsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsView.swift; sourceTree = "<group>"; };
+		E4614CE82ACA86C900D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
 		E4614CEA2ACA86C900D751FB /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		E4614CEC2ACA86CA00D751FB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4614CF12ACA86CA00D751FB /* IllustMate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IllustMate.entitlements; sourceTree = "<group>"; };
@@ -57,8 +63,13 @@
 		E4614D032ACA86ED00D751FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		E4614D112ACAA7B100D751FB /* Illustration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Illustration.swift; sourceTree = "<group>"; };
-		E4614D142ACAB57D00D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
 		E4614D162ACAB66600D751FB /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		E4614D1B2ACAF42000D751FB /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAlbumView.swift; sourceTree = "<group>"; };
+		E4614D222ACB00B200D751FB /* Importer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Importer.entitlements; sourceTree = "<group>"; };
+		E4614D232ACB048000D751FB /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		E4614D252ACB08E600D751FB /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		E4614D272ACB0CAE00D751FB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,10 +116,12 @@
 				E4614CF12ACA86CA00D751FB /* IllustMate.entitlements */,
 				E4614CF22ACA86CA00D751FB /* Info.plist */,
 				E4614CEC2ACA86CA00D751FB /* Assets.xcassets */,
+				E4614D1B2ACAF42000D751FB /* Localizable.xcstrings */,
 				E4614CE62ACA86C900D751FB /* App.swift */,
 				E4614D162ACAB66600D751FB /* MainTabView.swift */,
-				E4614CE82ACA86C900D751FB /* AlbumsView.swift */,
-				E4614D142ACAB57D00D751FB /* AlbumView.swift */,
+				E4614CE82ACA86C900D751FB /* AlbumView.swift */,
+				E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */,
+				E4614D232ACB048000D751FB /* MoreView.swift */,
 			);
 			path = IllustMate;
 			sourceTree = "<group>";
@@ -116,8 +129,11 @@
 		E4614CFD2ACA86EC00D751FB /* Importer */ = {
 			isa = PBXGroup;
 			children = (
-				E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */,
+				E4614D222ACB00B200D751FB /* Importer.entitlements */,
 				E4614D032ACA86ED00D751FB /* Info.plist */,
+				E4614D272ACB0CAE00D751FB /* Assets.xcassets */,
+				E4614D252ACB08E600D751FB /* Localizable.xcstrings */,
+				E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */,
 				E4614CFE2ACA86EC00D751FB /* ShareViewController.swift */,
 			);
 			path = Importer;
@@ -151,6 +167,7 @@
 				E4614CE02ACA86C900D751FB /* Frameworks */,
 				E4614CE12ACA86C900D751FB /* Resources */,
 				E4614D0A2ACA86ED00D751FB /* Embed Foundation Extensions */,
+				E4614D1F2ACAFCF200D751FB /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -207,6 +224,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ja,
 			);
 			mainGroup = E4614CDA2ACA86C900D751FB;
 			packageReferences = (
@@ -227,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4614D1C2ACAF42000D751FB /* Localizable.xcstrings in Resources */,
 				E4614CED2ACA86CA00D751FB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,21 +254,45 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4614D262ACB08E600D751FB /* Localizable.xcstrings in Resources */,
+				E4614D282ACB0CAE00D751FB /* Assets.xcassets in Resources */,
 				E4614D0E2ACA9FFF00D751FB /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		E4614D1F2ACAFCF200D751FB /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E4614CDF2ACA86C900D751FB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4614CE92ACA86C900D751FB /* AlbumsView.swift in Sources */,
+				E4614D242ACB048000D751FB /* MoreView.swift in Sources */,
+				E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */,
 				E4614CEB2ACA86C900D751FB /* Album.swift in Sources */,
 				E4614CE72ACA86C900D751FB /* App.swift in Sources */,
-				E4614D152ACAB57D00D751FB /* AlbumView.swift in Sources */,
+				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 			);
@@ -260,6 +303,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4614CFF2ACA86EC00D751FB /* ShareViewController.swift in Sources */,
+				E4614D212ACAFF6000D751FB /* Illustration.swift in Sources */,
+				E4614D202ACAFF5E00D751FB /* Album.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,6 +449,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IllustMate/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -435,6 +481,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IllustMate/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -458,6 +505,7 @@
 		E4614D082ACA86ED00D751FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Importer/Importer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
@@ -483,6 +531,7 @@
 		E4614D092ACA86ED00D751FB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Importer/Importer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
