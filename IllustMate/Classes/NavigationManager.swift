@@ -10,11 +10,13 @@ import Foundation
 class NavigationManager: ObservableObject {
 
     @Published var collectionTabPath: [ViewPath] = []
+    @Published var importerTabPath: [ViewPath] = []
     @Published var searchTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
 
     func popAll() {
         collectionTabPath.removeAll()
+        importerTabPath.removeAll()
         searchTabPath.removeAll()
         moreTabPath.removeAll()
     }
@@ -23,6 +25,8 @@ class NavigationManager: ObservableObject {
         switch tab {
         case .collection:
             collectionTabPath.removeAll()
+        case .importer:
+            importerTabPath.removeAll()
         case .search:
             searchTabPath.removeAll()
         case .more:
@@ -34,6 +38,8 @@ class NavigationManager: ObservableObject {
         switch tab {
         case .collection:
             collectionTabPath.append(viewPath)
+        case .importer:
+            importerTabPath.append(viewPath)
         case .search:
             searchTabPath.append(viewPath)
         case .more:

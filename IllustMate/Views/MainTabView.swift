@@ -16,9 +16,14 @@ struct MainTabView: View {
         TabView(selection: $tabManager.selectedTab) {
             CollectionView()
                 .tabItem {
-                    Label("TabTitle.Collection", systemImage: "photo.stack.fill")
+                    Label("TabTitle.Collection", image: "Tab.Collection")
                 }
                 .tag(TabType.collection)
+            ImportView()
+                .tabItem {
+                    Label("TabTitle.Import", image: "Tab.Import")
+                }
+                .tag(TabType.importer)
             Color.clear
                 .tabItem {
                     Label("TabTitle.Search", systemImage: "magnifyingglass")

@@ -43,8 +43,8 @@ class ShareViewController: UIViewController {
             for attachment: NSItemProvider in attachments {
                 attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { fileURL, _ in
                     if let fileURL = fileURL as? URL,
-                       let image = UIImage(contentsOfFile: fileURL.path(percentEncoded: false)) {
-                        let illustration = Illustration(name: fileURL.lastPathComponent, image: image)
+                       let imageData = try? Data(contentsOf: fileURL) {
+                        let illustration = Illustration(name: fileURL.lastPathComponent, data: imageData)
                         modelContext.insert(illustration)
                     }
                     self.incrementProgress()
