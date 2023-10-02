@@ -40,6 +40,7 @@ struct CollectionView: View {
                 }
                 .padding([.top, .bottom], 20.0)
             }
+            .background(Color.init(uiColor: .systemGroupedBackground))
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
                 case .album(let album): AlbumView(currentAlbum: album)
