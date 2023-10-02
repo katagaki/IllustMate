@@ -240,6 +240,12 @@ struct AlbumView: View {
                 Text("Shared.AddToAlbum")
                 Image(systemName: "rectangle.stack.badge.plus")
             }
+            Button(role: .destructive) {
+                modelContext.delete(illustration)
+            } label: {
+                Text("Shared.Delete")
+                Image(systemName: "trash")
+            }
         }
     }
 
