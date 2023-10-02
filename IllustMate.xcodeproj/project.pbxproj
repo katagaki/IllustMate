@@ -33,6 +33,8 @@
 		E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D392ACB274700D751FB /* CollectionView.swift */; };
 		E4614D3C2ACB27E100D751FB /* AlbumItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D3B2ACB27E100D751FB /* AlbumItem.swift */; };
 		E4614D3E2ACB281700D751FB /* IllustrationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D3D2ACB281700D751FB /* IllustrationItem.swift */; };
+		E4614D412ACB2DF300D751FB /* AlbumsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D402ACB2DF300D751FB /* AlbumsSection.swift */; };
+		E4614D432ACB2DFB00D751FB /* IllustrationsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D422ACB2DFB00D751FB /* IllustrationsSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +90,8 @@
 		E4614D392ACB274700D751FB /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		E4614D3B2ACB27E100D751FB /* AlbumItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumItem.swift; sourceTree = "<group>"; };
 		E4614D3D2ACB281700D751FB /* IllustrationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationItem.swift; sourceTree = "<group>"; };
+		E4614D402ACB2DF300D751FB /* AlbumsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsSection.swift; sourceTree = "<group>"; };
+		E4614D422ACB2DFB00D751FB /* IllustrationsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationsSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +222,8 @@
 		E4614D3F2ACB2B7D00D751FB /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E4614D402ACB2DF300D751FB /* AlbumsSection.swift */,
+				E4614D422ACB2DFB00D751FB /* IllustrationsSection.swift */,
 				E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */,
 			);
 			path = Shared;
@@ -363,11 +369,13 @@
 				E4614D3E2ACB281700D751FB /* IllustrationItem.swift in Sources */,
 				E4614CE72ACA86C900D751FB /* App.swift in Sources */,
 				E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */,
+				E4614D412ACB2DF300D751FB /* AlbumsSection.swift in Sources */,
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D3C2ACB27E100D751FB /* AlbumItem.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
+				E4614D432ACB2DFB00D751FB /* IllustrationsSection.swift in Sources */,
 				E4614D2E2ACB0FF500D751FB /* TabType.swift in Sources */,
 				E4614D362ACB11C800D751FB /* IllustrationViewerView.swift in Sources */,
 				E4614D302ACB100B00D751FB /* NavigationManager.swift in Sources */,
