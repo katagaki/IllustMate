@@ -7,15 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E4614CE72ACA86C900D751FB /* IllustMateApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* IllustMateApp.swift */; };
-		E4614CE92ACA86C900D751FB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* ContentView.swift */; };
+		E4614CE72ACA86C900D751FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* App.swift */; };
+		E4614CE92ACA86C900D751FB /* AlbumsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumsView.swift */; };
 		E4614CEB2ACA86C900D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
 		E4614CED2ACA86CA00D751FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4614CEC2ACA86CA00D751FB /* Assets.xcassets */; };
-		E4614CF02ACA86CA00D751FB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4614CEF2ACA86CA00D751FB /* Preview Assets.xcassets */; };
 		E4614CFF2ACA86EC00D751FB /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CFE2ACA86EC00D751FB /* ShareViewController.swift */; };
 		E4614D062ACA86ED00D751FB /* Importer.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4614CFC2ACA86EC00D751FB /* Importer.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4614D0E2ACA9FFF00D751FB /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */; };
 		E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D112ACAA7B100D751FB /* Illustration.swift */; };
+		E4614D152ACAB57D00D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D142ACAB57D00D751FB /* AlbumView.swift */; };
+		E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D162ACAB66600D751FB /* MainTabView.swift */; };
+		E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4614D192ACAB6AD00D751FB /* Komponents */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,11 +46,10 @@
 
 /* Begin PBXFileReference section */
 		E4614CE32ACA86C900D751FB /* IllustMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IllustMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4614CE62ACA86C900D751FB /* IllustMateApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustMateApp.swift; sourceTree = "<group>"; };
-		E4614CE82ACA86C900D751FB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E4614CE62ACA86C900D751FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		E4614CE82ACA86C900D751FB /* AlbumsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsView.swift; sourceTree = "<group>"; };
 		E4614CEA2ACA86C900D751FB /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		E4614CEC2ACA86CA00D751FB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E4614CEF2ACA86CA00D751FB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		E4614CF12ACA86CA00D751FB /* IllustMate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IllustMate.entitlements; sourceTree = "<group>"; };
 		E4614CF22ACA86CA00D751FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4614CFC2ACA86EC00D751FB /* Importer.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Importer.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,6 +57,8 @@
 		E4614D032ACA86ED00D751FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		E4614D112ACAA7B100D751FB /* Illustration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Illustration.swift; sourceTree = "<group>"; };
+		E4614D142ACAB57D00D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
+		E4614D162ACAB66600D751FB /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,26 +105,19 @@
 				E4614CF12ACA86CA00D751FB /* IllustMate.entitlements */,
 				E4614CF22ACA86CA00D751FB /* Info.plist */,
 				E4614CEC2ACA86CA00D751FB /* Assets.xcassets */,
-				E4614CE62ACA86C900D751FB /* IllustMateApp.swift */,
-				E4614CE82ACA86C900D751FB /* ContentView.swift */,
-				E4614CEE2ACA86CA00D751FB /* Preview Content */,
+				E4614CE62ACA86C900D751FB /* App.swift */,
+				E4614D162ACAB66600D751FB /* MainTabView.swift */,
+				E4614CE82ACA86C900D751FB /* AlbumsView.swift */,
+				E4614D142ACAB57D00D751FB /* AlbumView.swift */,
 			);
 			path = IllustMate;
-			sourceTree = "<group>";
-		};
-		E4614CEE2ACA86CA00D751FB /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				E4614CEF2ACA86CA00D751FB /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		E4614CFD2ACA86EC00D751FB /* Importer */ = {
 			isa = PBXGroup;
 			children = (
-				E4614D032ACA86ED00D751FB /* Info.plist */,
 				E4614D0D2ACA9FFF00D751FB /* MainInterface.storyboard */,
+				E4614D032ACA86ED00D751FB /* Info.plist */,
 				E4614CFE2ACA86EC00D751FB /* ShareViewController.swift */,
 			);
 			path = Importer;
@@ -161,6 +158,9 @@
 				E4614D052ACA86ED00D751FB /* PBXTargetDependency */,
 			);
 			name = IllustMate;
+			packageProductDependencies = (
+				E4614D192ACAB6AD00D751FB /* Komponents */,
+			);
 			productName = IllustMate;
 			productReference = E4614CE32ACA86C900D751FB /* IllustMate.app */;
 			productType = "com.apple.product-type.application";
@@ -209,6 +209,9 @@
 				Base,
 			);
 			mainGroup = E4614CDA2ACA86C900D751FB;
+			packageReferences = (
+				E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */,
+			);
 			productRefGroup = E4614CE42ACA86C900D751FB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -224,7 +227,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4614CF02ACA86CA00D751FB /* Preview Assets.xcassets in Resources */,
 				E4614CED2ACA86CA00D751FB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -244,10 +246,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4614CE92ACA86C900D751FB /* ContentView.swift in Sources */,
+				E4614CE92ACA86C900D751FB /* AlbumsView.swift in Sources */,
 				E4614CEB2ACA86C900D751FB /* Album.swift in Sources */,
-				E4614CE72ACA86C900D751FB /* IllustMateApp.swift in Sources */,
+				E4614CE72ACA86C900D751FB /* App.swift in Sources */,
+				E4614D152ACAB57D00D751FB /* AlbumView.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
+				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,7 +402,6 @@
 				CODE_SIGN_ENTITLEMENTS = IllustMate/IllustMate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"IllustMate/Preview Content\"";
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -406,8 +409,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -430,7 +433,6 @@
 				CODE_SIGN_ENTITLEMENTS = IllustMate/IllustMate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"IllustMate/Preview Content\"";
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -438,8 +440,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -534,6 +536,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/katagaki/Komponents";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E4614D192ACAB6AD00D751FB /* Komponents */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */;
+			productName = Komponents;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E4614CDB2ACA86C900D751FB /* Project object */;
 }

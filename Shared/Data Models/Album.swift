@@ -12,6 +12,7 @@ import SwiftData
 final class Album {
     var id = UUID().uuidString
     var name: String
+    var coverPhoto: Data? = nil
     var illustrations: [Illustration] = []
     var dateCreated: Date
 

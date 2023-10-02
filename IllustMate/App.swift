@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct IllustMateApp: App {
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Album.self, Illustration.self
@@ -25,7 +26,7 @@ struct IllustMateApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
         .modelContainer(sharedModelContainer)
     }
