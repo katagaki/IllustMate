@@ -218,8 +218,6 @@
 				E4614D392ACB274700D751FB /* CollectionView.swift */,
 				E4614CE82ACA86C900D751FB /* AlbumView.swift */,
 				E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */,
-				E4614D3B2ACB27E100D751FB /* AlbumItem.swift */,
-				E4614D3D2ACB281700D751FB /* IllustrationItem.swift */,
 			);
 			path = Collection;
 			sourceTree = "<group>";
@@ -228,7 +226,9 @@
 			isa = PBXGroup;
 			children = (
 				E4614D402ACB2DF300D751FB /* AlbumsSection.swift */,
+				E4614D3B2ACB27E100D751FB /* AlbumItem.swift */,
 				E4614D422ACB2DFB00D751FB /* IllustrationsSection.swift */,
+				E4614D3D2ACB281700D751FB /* IllustrationItem.swift */,
 				E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */,
 				E4614D472ACB46D700D751FB /* ProgressAlert.swift */,
 			);

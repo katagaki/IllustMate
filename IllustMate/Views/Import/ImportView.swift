@@ -49,17 +49,22 @@ struct ImportView: View {
                         isImporting = true
                     }
                     Task {
+                        var illustrations: [Illustration] = []
                         for selectedPhotoItem in selectedPhotoItems {
+                            debugPrint(selectedPhotoItem.itemIdentifier ?? "Image")
                             if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
+                                // TODO: Generate illustration name
+                                let illustration = Illustration(name: selectedPhotoItem.itemIdentifier ?? "",
+                                                                   data: data)
+                                illustrations.append(illustration)
                                 DispatchQueue.main.async {
-                                    // TODO: Generate illustration name
-                                    let newIllustration = Illustration(name: selectedPhotoItem.itemIdentifier ?? "",
-                                                                       data: data)
-                                    modelContext.insert(newIllustration)
                                     currentProgress += 1
                                     percentage = currentProgress / total
                                 }
                             }
+                        }
+                        for illustration in illustrations {
+                            modelContext.insert(illustration)
                         }
                         withAnimation(.easeOut.speed(2)) {
                             selectedPhotoItems.removeAll()

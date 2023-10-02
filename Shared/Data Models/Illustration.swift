@@ -44,16 +44,7 @@ final class Illustration {
                                                              format: imageRendererFormat).image { _ in
                 sourceImage.draw(in: CGRect(origin: CGPoint(x: -xOffset, y: -yOffset), size: sourceImage.size))
             }.cgImage!
-            let length = 300
-            if let context = CGContext(data: nil, width: length, height: length, bitsPerComponent: 8,
-                                    bytesPerRow: length * croppedImage.bitsPerPixel / 8,
-                                    space: croppedImage.colorSpace!,
-                                       bitmapInfo: croppedImage.bitmapInfo.rawValue) {
-                context.interpolationQuality = .high
-                context.draw(croppedImage, in: CGRect(origin: CGPoint.zero,
-                                                      size: CGSize(width: length, height: length)))
-                return context.makeImage().flatMap { UIImage(cgImage: $0) }?.pngData()
-            }
+            return UIImage(cgImage: croppedImage).preparingThumbnail(of: CGSize(width: 300.0, height: 300.0))?.pngData()
         }
         return nil
     }

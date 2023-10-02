@@ -33,17 +33,21 @@ struct IllustrationItem: View {
                     .task {
                         if let uiImage = UIImage(data: illustration.thumbnail) {
                             image = uiImage
-                        } else if let uiImage = UIImage(data: illustration.data) {
-                            image = uiImage
                         }
                         isInitialLoadCompleted = true
                     }
             } else {
-                Image(systemName: "xmark.octagon.fill")
-                    .symbolRenderingMode(.hierarchical)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 28.0, height: 28.0)
+                Rectangle()
+                    .foregroundStyle(.clear)
+                    .aspectRatio(1.0, contentMode: .fill)
+                    .overlay {
+                        Image(systemName: "xmark.octagon.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28.0, height: 28.0)
+                            .tint(.secondary)
+                    }
             }
         }
     }
