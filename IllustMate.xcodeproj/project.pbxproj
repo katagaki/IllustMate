@@ -29,6 +29,7 @@
 		E4614D302ACB100B00D751FB /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D2F2ACB100B00D751FB /* NavigationManager.swift */; };
 		E4614D322ACB103200D751FB /* TabManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D312ACB103200D751FB /* TabManager.swift */; };
 		E4614D362ACB11C800D751FB /* IllustrationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */; };
+		E4614D382ACB1C9800D751FB /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 		E4614D2F2ACB100B00D751FB /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		E4614D312ACB103200D751FB /* TabManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabManager.swift; sourceTree = "<group>"; };
 		E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewerView.swift; sourceTree = "<group>"; };
+		E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +128,7 @@
 				E4614CF12ACA86CA00D751FB /* IllustMate.entitlements */,
 				E4614CF22ACA86CA00D751FB /* Info.plist */,
 				E4614CEC2ACA86CA00D751FB /* Assets.xcassets */,
+				E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */,
 				E4614D1B2ACAF42000D751FB /* Localizable.xcstrings */,
 				E4614D332ACB11A100D751FB /* Views */,
 				E4614D292ACB0FC500D751FB /* Classes */,
@@ -292,6 +295,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4614D382ACB1C9800D751FB /* InfoPlist.xcstrings in Resources */,
 				E4614D1C2ACAF42000D751FB /* Localizable.xcstrings in Resources */,
 				E4614CED2ACA86CA00D751FB /* Assets.xcassets in Resources */,
 			);
