@@ -9,18 +9,22 @@ import Foundation
 
 class NavigationManager: ObservableObject {
 
-    @Published var collectionViewPath: [ViewPath] = []
+    @Published var collectionTabPath: [ViewPath] = []
+    @Published var searchTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
 
     func popAll() {
-        collectionViewPath.removeAll()
+        collectionTabPath.removeAll()
+        searchTabPath.removeAll()
         moreTabPath.removeAll()
     }
 
     func popToRoot(for tab: TabType) {
         switch tab {
         case .collection:
-            collectionViewPath.removeAll()
+            collectionTabPath.removeAll()
+        case .search:
+            searchTabPath.removeAll()
         case .more:
             moreTabPath.removeAll()
         }
@@ -29,7 +33,9 @@ class NavigationManager: ObservableObject {
     func push(_ viewPath: ViewPath, for tab: TabType) {
         switch tab {
         case .collection:
-            collectionViewPath.append(viewPath)
+            collectionTabPath.append(viewPath)
+        case .search:
+            searchTabPath.append(viewPath)
         case .more:
             moreTabPath.append(viewPath)
         }

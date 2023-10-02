@@ -31,6 +31,14 @@ final class Album {
         return childIllustrations ?? []
     }
 
+    func hasAlbums() -> Bool {
+        return !albums().isEmpty
+    }
+
+    func hasIllustrations() -> Bool {
+        return !illustrations().isEmpty
+    }
+
     func addChildAlbum(_ album: Album) {
         childAlbums?.append(album)
     }

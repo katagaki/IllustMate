@@ -254,6 +254,23 @@
         }
       }
     },
+    "TabTitle.Search" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検索"
+          }
+        }
+      }
+    },
     "ViewTitle.Albums.Create" : {
       "extractionState" : "manual",
       "localizations" : {

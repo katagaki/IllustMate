@@ -14,11 +14,16 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $tabManager.selectedTab) {
-            AlbumView()
+            CollectionView()
                 .tabItem {
                     Label("TabTitle.Collection", systemImage: "photo.stack.fill")
                 }
                 .tag(TabType.collection)
+            Color.clear
+                .tabItem {
+                    Label("TabTitle.Search", systemImage: "magnifyingglass")
+                }
+                .tag(TabType.search)
             MoreView()
                 .tabItem {
                     Label("TabTitle.More", systemImage: "ellipsis")

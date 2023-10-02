@@ -16,38 +16,42 @@ struct NewAlbumView: View {
     @State var newAlbumName: String = ""
 
     var body: some View {
-        List {
-            Section {
-                TextField("Albums.Create.Placeholder", text: $newAlbumName)
-                    .textInputAutocapitalization(.words)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(role: .cancel) {
-                    newAlbumName = ""
-                    dismiss()
-                } label: {
-                    Text("Shared.Cancel")
+        NavigationStack {
+            List {
+                Section {
+                    TextField("Albums.Create.Placeholder", text: $newAlbumName)
+                        .textInputAutocapitalization(.words)
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces),
-                                         dateCreated: .now)
-                    if let albumToAddTo = albumToAddTo {
-                        albumToAddTo.addChildAlbum(newAlbum)
-                    } else {
-                        modelContext.insert(newAlbum)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .cancel) {
+                        newAlbumName = ""
+                        dismiss()
+                    } label: {
+                        Text("Shared.Cancel")
                     }
-                    dismiss()
-                } label: {
-                    Text("Shared.Create")
                 }
-                .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces),
+                                             dateCreated: .now)
+                        if let albumToAddTo = albumToAddTo {
+                            albumToAddTo.addChildAlbum(newAlbum)
+                        } else {
+                            modelContext.insert(newAlbum)
+                        }
+                        dismiss()
+                    } label: {
+                        Text("Shared.Create")
+                    }
+                    .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
+                }
             }
+            .navigationTitle("ViewTitle.Albums.Create")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("ViewTitle.Albums.Create")
-        .navigationBarTitleDisplayMode(.inline)
+        .presentationDetents([.medium])
+        .interactiveDismissDisabled()
     }
 }

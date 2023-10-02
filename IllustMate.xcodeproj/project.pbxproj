@@ -30,6 +30,9 @@
 		E4614D322ACB103200D751FB /* TabManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D312ACB103200D751FB /* TabManager.swift */; };
 		E4614D362ACB11C800D751FB /* IllustrationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */; };
 		E4614D382ACB1C9800D751FB /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */; };
+		E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D392ACB274700D751FB /* CollectionView.swift */; };
+		E4614D3C2ACB27E100D751FB /* AlbumItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D3B2ACB27E100D751FB /* AlbumItem.swift */; };
+		E4614D3E2ACB281700D751FB /* IllustrationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D3D2ACB281700D751FB /* IllustrationItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +85,9 @@
 		E4614D312ACB103200D751FB /* TabManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabManager.swift; sourceTree = "<group>"; };
 		E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewerView.swift; sourceTree = "<group>"; };
 		E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		E4614D392ACB274700D751FB /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
+		E4614D3B2ACB27E100D751FB /* AlbumItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumItem.swift; sourceTree = "<group>"; };
+		E4614D3D2ACB281700D751FB /* IllustrationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +197,7 @@
 				E4614CE62ACA86C900D751FB /* App.swift */,
 				E4614D162ACAB66600D751FB /* MainTabView.swift */,
 				E4614D342ACB11AC00D751FB /* Collection */,
+				E4614D3F2ACB2B7D00D751FB /* Shared */,
 				E4614D232ACB048000D751FB /* MoreView.swift */,
 			);
 			path = Views;
@@ -199,11 +206,21 @@
 		E4614D342ACB11AC00D751FB /* Collection */ = {
 			isa = PBXGroup;
 			children = (
+				E4614D392ACB274700D751FB /* CollectionView.swift */,
 				E4614CE82ACA86C900D751FB /* AlbumView.swift */,
 				E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */,
-				E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */,
+				E4614D3B2ACB27E100D751FB /* AlbumItem.swift */,
+				E4614D3D2ACB281700D751FB /* IllustrationItem.swift */,
 			);
 			path = Collection;
+			sourceTree = "<group>";
+		};
+		E4614D3F2ACB2B7D00D751FB /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -343,9 +360,12 @@
 				E4614D2C2ACB0FD800D751FB /* ViewPath.swift in Sources */,
 				E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */,
 				E4614CEB2ACA86C900D751FB /* Album.swift in Sources */,
+				E4614D3E2ACB281700D751FB /* IllustrationItem.swift in Sources */,
 				E4614CE72ACA86C900D751FB /* App.swift in Sources */,
+				E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */,
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
+				E4614D3C2ACB27E100D751FB /* AlbumItem.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 				E4614D2E2ACB0FF500D751FB /* TabType.swift in Sources */,
@@ -520,9 +540,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.IllustMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -552,9 +575,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.IllustMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -578,9 +604,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.IllustMate.Importer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -604,9 +633,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.IllustMate.Importer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
