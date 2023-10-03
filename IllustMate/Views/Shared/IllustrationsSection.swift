@@ -26,10 +26,12 @@ struct IllustrationsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0.0) {
             HStack(alignment: .center, spacing: 16.0) {
-                ListSectionHeader(text: "Albums.Illustrations")
-                if !illustrations.isEmpty {
-                    Text("(\(illustrations.count))")
-                        .foregroundStyle(.secondary)
+                HStack(alignment: .center, spacing: 8.0) {
+                    ListSectionHeader(text: "Albums.Illustrations")
+                    if !illustrations.isEmpty {
+                        Text("(\(illustrations.count))")
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Spacer()
                 if isSelectingIllustrations {

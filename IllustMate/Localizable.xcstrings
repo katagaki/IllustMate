@@ -2,7 +2,14 @@
   "sourceLanguage" : "en",
   "strings" : {
     "(%lld)" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "Albums.Albums" : {
       "extractionState" : "manual",
@@ -190,9 +197,6 @@
           }
         }
       }
-    },
-    "Safe Area Here!" : {
-
     },
     "Shared.AddToAlbum" : {
       "extractionState" : "manual",
