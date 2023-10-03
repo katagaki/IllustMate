@@ -51,12 +51,7 @@ struct AlbumsSection: View {
                                     }
                                     .dropDestination(for: IllustrationTransferable.self) { items, _ in
                                         for item in items {
-                                            let fetchDescriptor = FetchDescriptor<Illustration>(
-                                                predicate: #Predicate<Illustration> { $0.id == item.id }
-                                            )
-                                            if let illustrations = try? modelContext.fetch(fetchDescriptor) {
-                                                album.moveChildIllustrations(illustrations)
-                                            }
+                                            moveIllustrationToAlbum(item, to: album)
                                         }
                                         return true
                                     }
@@ -95,6 +90,15 @@ struct AlbumsSection: View {
                 }
             }
             .padding([.leading, .trailing, .top], 20.0)
+        }
+    }
+
+    func moveIllustrationToAlbum(_ illustration: IllustrationTransferable, to album: Album) {
+        let fetchDescriptor = FetchDescriptor<Illustration>(
+            predicate: #Predicate<Illustration> { $0.id == illustration.id }
+        )
+        if let illustrations = try? modelContext.fetch(fetchDescriptor) {
+            album.moveChildIllustrations(illustrations)
         }
     }
 }
