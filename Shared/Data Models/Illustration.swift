@@ -13,7 +13,7 @@ import UIKit
 final class Illustration {
     var id = UUID().uuidString
     var name: String = ""
-    var data: Data = Data()
+    var data: IllustrationData?
     var thumbnail: Data = Data()
     var format: IllustrationFormat = IllustrationFormat.unknown
     @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbums: [Album]? = []
@@ -21,7 +21,7 @@ final class Illustration {
 
     init(name: String, data: Data) {
         self.name = name
-        self.data = data
+        self.data = IllustrationData(id: self.id, data: data)
         if let thumbnailData = Illustration.makeThumbnail(data) {
             thumbnail = thumbnailData
         }
@@ -29,7 +29,10 @@ final class Illustration {
     }
 
     func image() -> UIImage? {
-        return UIImage(data: data)
+        if let data = data {
+            return UIImage(data: data.data)
+        }
+        return nil
     }
 
     static func makeThumbnail(_ data: Data?) -> Data? {

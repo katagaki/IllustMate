@@ -37,7 +37,29 @@ struct AlbumsSection: View {
                     LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
                         ForEach(albums) { album in
                             NavigationLink(value: ViewPath.album(album: album)) {
-                                AlbumItem(album: album)
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    Group {
+                                        if let coverPhotoData = album.coverPhoto,
+                                           let coverPhoto = UIImage(data: coverPhotoData) {
+                                            Image(uiImage: coverPhoto)
+                                                .resizable()
+                                        } else {
+                                            Image("Album.Generic")
+                                                .resizable()
+                                        }
+                                    }
+                                    .aspectRatio(1.0, contentMode: .fill)
+                                    .foregroundStyle(.accent)
+                                    .background(.primary)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                                    .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                                    VStack(alignment: .leading, spacing: 2.0) {
+                                        Text(album.name)
+                                            .tint(.primary)
+                                        Text(String(album.illustrations().count))
+                                            .tint(.secondary)
+                                    }
+                                }
                             }
                             .contextMenu {
                                 Button {

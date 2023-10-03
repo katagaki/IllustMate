@@ -45,7 +45,25 @@ struct IllustrationsSection: View {
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
                         ForEach(illustrations) { illustration in
                             NavigationLink(value: ViewPath.illustrationViewer(illustration: illustration)) {
-                                IllustrationItem(illustration: illustration)
+//                                IllustrationItem(illustration: illustration)
+                                if let image = UIImage(data: illustration.thumbnail) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .aspectRatio(1.0, contentMode: .fill)
+                                        .transition(.opacity.animation(.snappy.speed(2)))
+                                } else {
+                                    Rectangle()
+                                        .foregroundStyle(.clear)
+                                        .aspectRatio(1.0, contentMode: .fill)
+                                        .overlay {
+                                            Image(systemName: "xmark.octagon.fill")
+                                                .symbolRenderingMode(.hierarchical)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 28.0, height: 28.0)
+                                                .tint(.secondary)
+                                        }
+                                }
                             }
                             .contextMenu {
                                 Menu {

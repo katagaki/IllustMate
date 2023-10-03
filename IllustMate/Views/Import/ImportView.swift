@@ -7,6 +7,7 @@
 
 import Komponents
 import PhotosUI
+import SwiftData
 import SwiftUI
 
 struct ImportView: View {
@@ -20,6 +21,7 @@ struct ImportView: View {
     @State var currentProgress: Int = 0
     @State var total: Int = 0
     @State var percentage: Int = 0
+    @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
 
     var body: some View {
         NavigationStack(path: $navigationManager.importerTabPath) {
@@ -52,12 +54,13 @@ struct ImportView: View {
                         var illustrations: [Illustration] = []
                         UIApplication.shared.isIdleTimerDisabled = true
                         for selectedPhotoItem in selectedPhotoItems {
-                            debugPrint(selectedPhotoItem.itemIdentifier ?? "Image")
+                            debugPrint("Importing \(selectedPhotoItem.itemIdentifier ?? "Image") as illustration \(runningNumberForImageName)")
                             if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                                // TODO: Generate illustration name
-                                let illustration = Illustration(name: selectedPhotoItem.itemIdentifier ?? "",
-                                                                   data: data)
+                                let illustration = Illustration(
+                                    name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
+                                    data: data)
                                 illustrations.append(illustration)
+                                runningNumberForImageName += 1
                             }
                             DispatchQueue.main.async {
                                 currentProgress += 1
