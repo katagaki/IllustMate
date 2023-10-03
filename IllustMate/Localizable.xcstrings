@@ -232,6 +232,22 @@
         }
       }
     },
+    "Shared.Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像をコピー"
+          }
+        }
+      }
+    },
     "Shared.Create" : {
       "extractionState" : "manual",
       "localizations" : {

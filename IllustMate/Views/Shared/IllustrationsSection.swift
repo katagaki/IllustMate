@@ -189,11 +189,27 @@ struct IllustrationsSection: View {
                 Text("Shared.AddToAlbum")
                 Image(systemName: "rectangle.stack.badge.plus")
             }
+            Button {
+                if let illustrationData = illustration.illustrationData,
+                   let uiImage = UIImage(data: illustrationData.data) {
+                    UIPasteboard.general.image = uiImage
+                }
+            } label: {
+                Text("Shared.Copy")
+                Image(systemName: "doc.on.doc")
+            }
             Button(role: .destructive) {
                 modelContext.delete(illustration)
             } label: {
                 Text("Shared.Delete")
                 Image(systemName: "trash")
+            }
+        } preview: {
+            if let illustrationData = illustration.illustrationData,
+               let uiImage = UIImage(data: illustrationData.data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
             }
         }
     }
