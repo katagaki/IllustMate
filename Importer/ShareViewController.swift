@@ -20,7 +20,7 @@ class ShareViewController: UIViewController {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Album.self, Illustration.self
+            Album.self, Illustration.self, IllustrationData.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema,
                                                     isStoredInMemoryOnly: false,
@@ -41,11 +41,19 @@ class ShareViewController: UIViewController {
                 .filter({ $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) })
             total = attachments.count
             for attachment: NSItemProvider in attachments {
-                attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { fileURL, _ in
-                    if let fileURL = fileURL as? URL,
-                       let imageData = try? Data(contentsOf: fileURL) {
-                        let illustration = Illustration(name: fileURL.lastPathComponent, data: imageData)
+                attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { file, _ in
+                    if let url = file as? URL,
+                       let imageData = try? Data(contentsOf: url) {
+                        let illustration = Illustration(name: url.lastPathComponent, data: imageData)
                         modelContext.insert(illustration)
+                    } else if let image = file as? UIImage {
+                        if let pngData = image.pngData() {
+                            let illustration = Illustration(name: UUID().uuidString, data: pngData)
+                            modelContext.insert(illustration)
+                        } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
+                            let illustration = Illustration(name: UUID().uuidString, data: jpgData)
+                            modelContext.insert(illustration)
+                        }
                     }
                     self.incrementProgress()
                     self.dismissIfCompleted()
