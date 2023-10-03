@@ -39,6 +39,14 @@ struct IllustrationViewerView: View {
             self.name = illustration.name
             isInitialLoadCompleted = true
         }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if let uiImage = image {
+                    let image = Image(uiImage: uiImage)
+                    ShareLink(item: image, preview: SharePreview(name, image: image))
+                }
+            }
+        }
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
     }

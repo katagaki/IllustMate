@@ -189,6 +189,7 @@ struct IllustrationsSection: View {
                 Text("Shared.AddToAlbum")
                 Image(systemName: "rectangle.stack.badge.plus")
             }
+            Divider()
             Button {
                 if let illustrationData = illustration.illustrationData,
                    let uiImage = UIImage(data: illustrationData.data) {
