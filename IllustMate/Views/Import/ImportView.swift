@@ -28,6 +28,7 @@ struct ImportView: View {
             List {
                 Section {
                     Text("Import.Instructions")
+                        .padding([.top, .bottom], 2.0)
                         .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
                             0
                         })
