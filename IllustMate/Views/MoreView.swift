@@ -81,11 +81,11 @@ struct MoreView: View {
                 }
                 Section {
                     Button {
-                        for illustrationData in illustrationData {
-                            modelContext.delete(illustrationData)
-                        }
                         for illustration in illustrations {
                             modelContext.delete(illustration)
+                        }
+                        for illustrationData in illustrationData {
+                            modelContext.delete(illustrationData)
                         }
                         for album in albums {
                             modelContext.delete(album)
