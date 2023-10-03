@@ -11,6 +11,9 @@
         }
       }
     },
+    "%lld" : {
+
+    },
     "Albums.Albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -346,6 +349,23 @@
         }
       }
     },
+    "Shared.Albums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
+          }
+        }
+      }
+    },
     "Shared.Cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -408,6 +428,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除"
+          }
+        }
+      }
+    },
+    "Shared.Illustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Illustrations"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イラスト"
           }
         }
       }
