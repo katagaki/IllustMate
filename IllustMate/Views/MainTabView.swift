@@ -35,7 +35,7 @@ struct MainTabView: View {
                     Label("TabTitle.Import", image: "Tab.Import")
                 }
                 .tag(TabType.importer)
-            Color.clear
+            SearchView()
                 .tabItem {
                     Label("TabTitle.Search", systemImage: "magnifyingglass")
                 }
