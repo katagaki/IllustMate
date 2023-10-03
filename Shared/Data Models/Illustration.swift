@@ -47,7 +47,9 @@ final class Illustration {
                                                              format: imageRendererFormat).image { _ in
                 sourceImage.draw(in: CGRect(origin: CGPoint(x: -xOffset, y: -yOffset), size: sourceImage.size))
             }.cgImage!
-            return UIImage(cgImage: croppedImage).preparingThumbnail(of: CGSize(width: 300.0, height: 300.0))?.pngData()
+            return UIImage(cgImage: croppedImage)
+                .preparingThumbnail(of: CGSize(width: 200.0, height: 200.0))?
+                .jpegData(compressionQuality: 1.0)
         }
         return nil
     }
