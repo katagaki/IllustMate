@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController {
 
+    @IBOutlet weak var heroImage: UIImageView!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var progressLabel: UILabel!
 
@@ -34,6 +35,8 @@ class ShareViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Configure navigation controller
+        navigationController!.title = NSLocalizedString("Importer.Title", comment: "")
         // Get shared items
         let modelContext = ModelContext(sharedModelContainer)
         if let item = extensionContext?.inputItems.first as? NSExtensionItem {
@@ -79,7 +82,11 @@ class ShareViewController: UIViewController {
     func dismissIfCompleted() {
         DispatchQueue.main.async { [self] in
             if currentProgress == total {
-                extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                progressLabel.text = NSLocalizedString("Importer.DoneText", comment: "")
+                heroImage.image = UIImage(systemName: "checkmark.circle.fill")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [self] in
+                    extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                }
             }
         }
     }
