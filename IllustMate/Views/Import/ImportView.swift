@@ -17,10 +17,10 @@ struct ImportView: View {
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
 
-    @State var isImporting: Bool = false
-    @State var currentProgress: Int = 0
-    @State var total: Int = 0
-    @State var percentage: Int = 0
+    @Binding var isImporting: Bool
+    @Binding var currentProgress: Int
+    @Binding var total: Int
+    @Binding var percentage: Int
     @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
 
     var body: some View {
@@ -51,23 +51,19 @@ struct ImportView: View {
                         isImporting = true
                     }
                     Task {
-                        var illustrations: [Illustration] = []
                         UIApplication.shared.isIdleTimerDisabled = true
                         for selectedPhotoItem in selectedPhotoItems {
                             if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                                 let illustration = Illustration(
                                     name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
                                     data: data)
-                                illustrations.append(illustration)
+                                modelContext.insert(illustration)
                                 runningNumberForImageName += 1
                             }
                             DispatchQueue.main.async {
                                 currentProgress += 1
                                 percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
                             }
-                        }
-                        for illustration in illustrations {
-                            modelContext.insert(illustration)
                         }
                         UIApplication.shared.isIdleTimerDisabled = false
                         withAnimation(.easeOut.speed(2)) {
@@ -93,11 +89,6 @@ struct ImportView: View {
                 .disabled(selectedPhotoItems.isEmpty)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay {
-                if isImporting {
-                    ProgressAlert(title: "Import.Importing", percentage: $percentage)
-                }
-            }
             .navigationTitle("ViewTitle.Import")
         }
     }

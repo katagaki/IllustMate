@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/03.
 //
 
-import CloudKitSyncMonitor
 import Komponents
 import SwiftUI
 import SwiftData
@@ -14,7 +13,6 @@ struct CollectionView: View {
 
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
-    @ObservedObject var syncMonitor = SyncMonitor.shared
     @Query(sort: \Album.name,
            order: .forward,
            animation: .snappy.speed(2)) var albums: [Album]
@@ -50,15 +48,6 @@ struct CollectionView: View {
             })
             .sheet(isPresented: $isAddingAlbum) {
                 NewAlbumView(albumToAddTo: nil)
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if syncMonitor.syncStateSummary.inProgress {
-                        Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                            .resizable()
-                            .symbolRenderingMode(.hierarchical)
-                    }
-                }
             }
             .navigationTitle("ViewTitle.Collection")
         }
