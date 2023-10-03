@@ -63,10 +63,17 @@ struct IllustrationsSection: View {
                 if !illustrations.isEmpty {
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
                         ForEach(illustrations) { illustration in
-                            if isSelectingIllustrations {
-                                selectableIllustrationItem(illustration)
-                            } else {
-                                nonSelectableIllustrationItem(illustration)
+                            Group {
+                                if isSelectingIllustrations {
+                                    selectableIllustrationItem(illustration)
+                                } else {
+                                    nonSelectableIllustrationItem(illustration)
+                                }
+                            }
+                            .draggable(IllustrationTransferable(illustration)) {
+                                illustrationLabel(illustration)
+                                    .frame(width: 100.0, height: 100.0)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
                             }
                         }
                     }
@@ -110,33 +117,8 @@ struct IllustrationsSection: View {
         .contextMenu {
             if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
                 Menu {
-                    if !isRootAlbum {
-                        if let parentAlbum = parentAlbum {
-                            Button {
-                                parentAlbum.moveChildIllustrations(selectedIllustrations)
-                            } label: {
-                                Text(parentAlbum.name)
-                            }
-                        } else {
-                            Button {
-                                selectedIllustrations.forEach { illustration in
-                                    illustration.containingAlbums?.forEach({ album in
-                                        album.removeChildIllustration(illustration)
-                                    })
-                                }
-                            } label: {
-                                Text("Shared.MoveOutOfAlbum")
-                            }
-                        }
-                        Divider()
-                    }
-                    ForEach(selectableAlbums) { album in
-                        Button {
-                            album.moveChildIllustrations(selectedIllustrations)
-                            selectedIllustrations.removeAll()
-                        } label: {
-                            Text(album.name)
-                        }
+                    moveToAlbumMenu(selectedIllustrations) {
+                        selectedIllustrations.removeAll()
                     }
                 } label: {
                     Text("Shared.AddToAlbum")
@@ -161,31 +143,7 @@ struct IllustrationsSection: View {
         }
         .contextMenu {
             Menu {
-                if !isRootAlbum {
-                    if let parentAlbum = parentAlbum {
-                        Button {
-                            parentAlbum.moveChildIllustration(illustration)
-                        } label: {
-                            Text(parentAlbum.name)
-                        }
-                    } else {
-                        Button {
-                            illustration.containingAlbums?.forEach({ album in
-                                album.removeChildIllustration(illustration)
-                            })
-                        } label: {
-                            Text("Shared.MoveOutOfAlbum")
-                        }
-                    }
-                    Divider()
-                }
-                ForEach(selectableAlbums) { album in
-                    Button {
-                        album.moveChildIllustration(illustration)
-                    } label: {
-                        Text(album.name)
-                    }
-                }
+                moveToAlbumMenu([illustration]) { }
             } label: {
                 Text("Shared.AddToAlbum")
                 Image(systemName: "rectangle.stack.badge.plus")
@@ -221,6 +179,40 @@ struct IllustrationsSection: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
+            }
+        }
+    }
+
+    @ViewBuilder
+    func moveToAlbumMenu(_ illustrations: [Illustration], postMoveAction: @escaping () -> Void) -> some View {
+        if !isRootAlbum {
+            if let parentAlbum = parentAlbum {
+                Button {
+                    parentAlbum.moveChildIllustrations(illustrations)
+                    postMoveAction()
+                } label: {
+                    Text(parentAlbum.name)
+                }
+            } else {
+                Button {
+                    illustrations.forEach { illustration in
+                        illustration.containingAlbums?.forEach({ album in
+                            album.removeChildIllustration(illustration)
+                        })
+                    }
+                    postMoveAction()
+                } label: {
+                    Text("Shared.MoveOutOfAlbum")
+                }
+            }
+            Divider()
+        }
+        ForEach(selectableAlbums) { album in
+            Button {
+                album.moveChildIllustrations(illustrations)
+                postMoveAction()
+            } label: {
+                Text(album.name)
             }
         }
     }

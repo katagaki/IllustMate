@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 
 struct AlbumsSection: View {
@@ -47,6 +48,17 @@ struct AlbumsSection: View {
                                             Image("Album.Generic")
                                                 .resizable()
                                         }
+                                    }
+                                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                                        for item in items {
+                                            let fetchDescriptor = FetchDescriptor<Illustration>(
+                                                predicate: #Predicate<Illustration> { $0.id == item.id }
+                                            )
+                                            if let illustrations = try? modelContext.fetch(fetchDescriptor) {
+                                                album.moveChildIllustrations(illustrations)
+                                            }
+                                        }
+                                        return true
                                     }
                                     .aspectRatio(1.0, contentMode: .fill)
                                     .foregroundStyle(.accent)

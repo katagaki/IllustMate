@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 import UIKit
 
 @Model
@@ -49,5 +50,19 @@ final class Illustration {
             return UIImage(cgImage: croppedImage).preparingThumbnail(of: CGSize(width: 300.0, height: 300.0))?.pngData()
         }
         return nil
+    }
+}
+
+struct IllustrationTransferable: Codable, Transferable {
+
+    var id = UUID().uuidString
+
+    init(_ illustration: Illustration) {
+        self.id = illustration.id
+    }
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(for: IllustrationTransferable.self, contentType: .image)
+        ProxyRepresentation(exporting: \.id)
     }
 }
