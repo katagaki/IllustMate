@@ -43,6 +43,7 @@ struct CollectionView: View {
                 switch viewPath {
                 case .album(let album): AlbumView(currentAlbum: album)
                 case .illustrationViewer(let illustration): IllustrationViewerView(illustration: illustration)
+                default: Color.clear
                 }
             })
             .sheet(isPresented: $isAddingAlbum) {

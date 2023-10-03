@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "cloudkitsyncmonitor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ggruen/CloudKitSyncMonitor",
+      "state" : {
+        "revision" : "8f8de8e71928df27bf023cc6ed808a8b6270a0d3",
+        "version" : "1.2.1"
+      }
+    },
+    {
       "identity" : "komponents",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/katagaki/Komponents",

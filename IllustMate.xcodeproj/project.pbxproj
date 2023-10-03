@@ -37,6 +37,7 @@
 		E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D472ACB46D700D751FB /* ProgressAlert.swift */; };
 		E468B98B2ACBD06900251BF7 /* IllustrationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E468B98A2ACBD06900251BF7 /* IllustrationData.swift */; };
 		E468B98C2ACBD06900251BF7 /* IllustrationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E468B98A2ACBD06900251BF7 /* IllustrationData.swift */; };
+		E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */,
+				E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +264,7 @@
 			name = IllustMate;
 			packageProductDependencies = (
 				E4614D192ACAB6AD00D751FB /* Komponents */,
+				E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */,
 			);
 			productName = IllustMate;
 			productReference = E4614CE32ACA86C900D751FB /* IllustMate.app */;
@@ -314,6 +317,7 @@
 			mainGroup = E4614CDA2ACA86C900D751FB;
 			packageReferences = (
 				E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */,
+				E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
 			);
 			productRefGroup = E4614CE42ACA86C900D751FB /* Products */;
 			projectDirPath = "";
@@ -705,6 +709,14 @@
 				kind = branch;
 			};
 		};
+		E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ggruen/CloudKitSyncMonitor";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -712,6 +724,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */;
 			productName = Komponents;
+		};
+		E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */;
+			productName = CloudKitSyncMonitor;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
