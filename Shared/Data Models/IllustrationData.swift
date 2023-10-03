@@ -12,7 +12,8 @@ import SwiftData
 final class IllustrationData {
     var id = UUID().uuidString
     var data: Data = Data()
-    @Relationship(deleteRule: .cascade, inverse: \Illustration.data) var illustration: Illustration?
+    @Relationship(deleteRule: .cascade,
+                  inverse: \Illustration.illustrationData) var illustration: Illustration?
 
     init(id: String, data: Data) {
         self.id = id

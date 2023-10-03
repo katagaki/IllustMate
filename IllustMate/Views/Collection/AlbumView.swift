@@ -15,17 +15,16 @@ struct AlbumView: View {
     @State var currentAlbum: Album
 
     @State var isAddingAlbum: Bool = false
-    @State var isSelectingIllustrations: Bool = false
 
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 20.0) {
                 AlbumsSection(albums: currentAlbum.albums(), isAddingAlbum: $isAddingAlbum)
                 IllustrationsSection(illustrations: currentAlbum.illustrations(),
-                                     selectableAlbums: currentAlbum.albums(),
-                                     isSelectingIllustrations: $isSelectingIllustrations)
+                                     parentAlbum: currentAlbum.parentAlbum,
+                                     selectableAlbums: currentAlbum.albums())
             }
-            .padding([.top, .bottom], 20.0)
+            .padding([.top], 20.0)
         }
         .sheet(isPresented: $isAddingAlbum) {
             NewAlbumView(albumToAddTo: currentAlbum)

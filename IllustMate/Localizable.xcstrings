@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "(%lld)" : {
+
+    },
     "Albums.Albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -188,6 +191,9 @@
         }
       }
     },
+    "Safe Area Here!" : {
+
+    },
     "Shared.AddToAlbum" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -255,6 +261,23 @@
         }
       }
     },
+    "Shared.MoveOutOfAlbum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Out of Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コレクションに戻す"
+          }
+        }
+      }
+    },
     "Shared.Rename" : {
       "localizations" : {
         "en" : {
@@ -284,6 +307,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択"
+          }
+        }
+      }
+    },
+    "Shared.SelectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてを選択"
           }
         }
       }

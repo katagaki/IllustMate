@@ -13,15 +13,14 @@ import UIKit
 final class Illustration {
     var id = UUID().uuidString
     var name: String = ""
-    var data: IllustrationData?
+    var illustrationData: IllustrationData?
     var thumbnail: Data = Data()
-    var format: IllustrationFormat = IllustrationFormat.unknown
     @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbums: [Album]? = []
     var dateAdded: Date = Date.now
 
     init(name: String, data: Data) {
         self.name = name
-        self.data = IllustrationData(id: self.id, data: data)
+        self.illustrationData = IllustrationData(id: self.id, data: data)
         if let thumbnailData = Illustration.makeThumbnail(data) {
             thumbnail = thumbnailData
         }
@@ -29,7 +28,7 @@ final class Illustration {
     }
 
     func image() -> UIImage? {
-        if let data = data {
+        if let data = illustrationData {
             return UIImage(data: data.data)
         }
         return nil
@@ -51,11 +50,4 @@ final class Illustration {
         }
         return nil
     }
-}
-
-enum IllustrationFormat: Codable {
-    case unknown
-    case png
-    case jpg
-    case heic
 }

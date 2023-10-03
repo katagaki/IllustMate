@@ -14,6 +14,7 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @Query var albums: [Album]
     @Query var illustrations: [Illustration]
+    @Query var illustrationData: [IllustrationData]
 
     var body: some View {
         NavigationStack {
@@ -22,6 +23,9 @@ struct MoreView: View {
                     Button {
                         for album in albums {
                             modelContext.delete(album)
+                        }
+                        for illustrationData in illustrationData {
+                            modelContext.delete(illustrationData)
                         }
                         for illustration in illustrations {
                             modelContext.delete(illustration)

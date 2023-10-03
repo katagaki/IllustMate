@@ -43,8 +43,20 @@ final class Album {
         childAlbums?.append(album)
     }
 
-    func addChildIllustration(_ illustration: Illustration) {
+    func moveChildIllustration(_ illustration: Illustration) {
+        illustration.containingAlbums?.forEach({ album in
+            album.removeChildIllustration(illustration)
+        })
         childIllustrations?.append(illustration)
+    }
+
+    func moveChildIllustrations(_ illustrations: [Illustration]) {
+        illustrations.forEach { illustration in
+            illustration.containingAlbums?.forEach({ album in
+                album.removeChildIllustration(illustration)
+            })
+        }
+        childIllustrations?.append(contentsOf: illustrations)
     }
 
     func removeChildIllustration(_ illustration: Illustration) {

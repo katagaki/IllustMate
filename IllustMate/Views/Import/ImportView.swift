@@ -54,7 +54,6 @@ struct ImportView: View {
                         var illustrations: [Illustration] = []
                         UIApplication.shared.isIdleTimerDisabled = true
                         for selectedPhotoItem in selectedPhotoItems {
-                            debugPrint("Importing \(selectedPhotoItem.itemIdentifier ?? "Image") as illustration \(runningNumberForImageName)")
                             if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                                 let illustration = Illustration(
                                     name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",

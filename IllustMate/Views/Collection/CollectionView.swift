@@ -21,7 +21,6 @@ struct CollectionView: View {
            animation: .snappy.speed(2)) var illustrations: [Illustration]
 
     @State var isAddingAlbum: Bool = false
-    @State var isSelectingIllustrations: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
@@ -36,11 +35,10 @@ struct CollectionView: View {
                             return false
                         }),
                         selectableAlbums: albums.filter({ $0.parentAlbum == nil }),
-                        isSelectingIllustrations: $isSelectingIllustrations)
+                        isRootAlbum: true)
                 }
-                .padding([.top, .bottom], 20.0)
+                .padding([.top], 20.0)
             }
-            .background(Color.init(uiColor: .systemGroupedBackground))
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
                 switch viewPath {
                 case .album(let album): AlbumView(currentAlbum: album)

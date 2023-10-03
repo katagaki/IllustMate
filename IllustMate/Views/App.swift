@@ -16,7 +16,7 @@ struct IllustMateApp: App {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Album.self, Illustration.self
+            Album.self, Illustration.self, IllustrationData.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema,
                                                     isStoredInMemoryOnly: false,
