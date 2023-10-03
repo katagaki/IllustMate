@@ -462,6 +462,22 @@
         }
       }
     },
+    "Shared.SetAsCover" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set As Album Cover"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムカバーに設定"
+          }
+        }
+      }
+    },
     "TabTitle.Collection" : {
       "extractionState" : "manual",
       "localizations" : {

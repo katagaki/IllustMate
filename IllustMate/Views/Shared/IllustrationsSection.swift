@@ -12,6 +12,7 @@ struct IllustrationsSection: View {
 
     @Environment(\.modelContext) var modelContext
     var illustrations: [Illustration]
+    var currentAlbum: Album?
     var parentAlbum: Album?
     var selectableAlbums: [Album]
     var isRootAlbum: Bool = false
@@ -190,6 +191,15 @@ struct IllustrationsSection: View {
                 Image(systemName: "rectangle.stack.badge.plus")
             }
             Divider()
+            if let currentAlbum = currentAlbum, let illustrationData = illustration.illustrationData {
+                Button {
+                    currentAlbum.coverPhoto = Album.makeCover(illustrationData.data)
+                } label: {
+                    Text("Shared.SetAsCover")
+                    Image(systemName: "photo.stack")
+                }
+                Divider()
+            }
             Button {
                 if let illustrationData = illustration.illustrationData,
                    let uiImage = UIImage(data: illustrationData.data) {

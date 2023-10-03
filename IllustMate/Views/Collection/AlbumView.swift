@@ -21,6 +21,7 @@ struct AlbumView: View {
             VStack(alignment: .leading, spacing: 20.0) {
                 AlbumsSection(albums: currentAlbum.albums(), isAddingAlbum: $isAddingAlbum)
                 IllustrationsSection(illustrations: currentAlbum.illustrations(),
+                                     currentAlbum: currentAlbum,
                                      parentAlbum: currentAlbum.parentAlbum,
                                      selectableAlbums: currentAlbum.albums())
             }

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import UIKit
 
 @Model
 final class Album {
@@ -61,5 +62,22 @@ final class Album {
 
     func removeChildIllustration(_ illustration: Illustration) {
         childIllustrations?.removeAll(where: { $0.id == illustration.id })
+    }
+
+    static func makeCover(_ data: Data?) -> Data? {
+        if let data = data, let sourceImage = UIImage(data: data) {
+            let shortSideLength = min(sourceImage.size.width, sourceImage.size.height)
+            let xOffset = (sourceImage.size.width - shortSideLength) / 2.0
+            let yOffset = (sourceImage.size.height - shortSideLength) / 2.0
+            let cropRect = CGRect(x: xOffset, y: yOffset, width: shortSideLength, height: shortSideLength)
+            let imageRendererFormat = sourceImage.imageRendererFormat
+            imageRendererFormat.opaque = false
+            let croppedImage = UIGraphicsImageRenderer(size: cropRect.size,
+                                                             format: imageRendererFormat).image { _ in
+                sourceImage.draw(in: CGRect(origin: CGPoint(x: -xOffset, y: -yOffset), size: sourceImage.size))
+            }.cgImage!
+            return UIImage(cgImage: croppedImage).preparingThumbnail(of: CGSize(width: 500.0, height: 500.0))?.pngData()
+        }
+        return nil
     }
 }
