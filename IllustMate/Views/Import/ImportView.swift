@@ -25,70 +25,59 @@ struct ImportView: View {
 
     var body: some View {
         NavigationStack(path: $navigationManager.importerTabPath) {
-            VStack(alignment: .center, spacing: 16.0) {
-                PhotosPicker(selection: $selectedPhotoItems, matching: .images, photoLibrary: .shared()) {
-                    HStack(alignment: .center, spacing: 4.0) {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 18.0, height: 18.0)
-                        Text("Import.SelectPhotos")
-                            .bold()
+            List {
+                Section {
+                    Text("Import.Instructions")
+                        .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
+                            0
+                        })
+                    PhotosPicker(selection: $selectedPhotoItems, matching: .images, photoLibrary: .shared()) {
+                        ListRow(image: "ListIcon.Photos", title: "Import.SelectPhotos")
                     }
-                    .frame(minHeight: 24.0)
-                    .frame(maxWidth: .infinity)
+                } header: {
+                    Text(verbatim: " ")
                 }
-                .buttonStyle(.borderedProminent)
-                .clipShape(RoundedRectangle(cornerRadius: 99))
-                .padding([.leading, .trailing], 20.0)
-                Text(NSLocalizedString("Import.SelectedPhotos", comment: "")
-                    .replacingOccurrences(of: "%1", with: String(selectedPhotoItems.count)))
-                Button {
-                    currentProgress = 0
-                    total = selectedPhotoItems.count
-                    percentage = 0
-                    withAnimation(.easeOut.speed(2)) {
-                        isImporting = true
-                    }
-                    Task {
-                        UIApplication.shared.isIdleTimerDisabled = true
-                        for selectedPhotoItem in selectedPhotoItems {
-                            if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                                let illustration = Illustration(
-                                    name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
-                                    data: data)
-                                modelContext.insert(illustration)
-                                runningNumberForImageName += 1
-                            }
-                            DispatchQueue.main.async {
-                                currentProgress += 1
-                                percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                            }
-                        }
-                        UIApplication.shared.isIdleTimerDisabled = false
+                Section {
+                    Button {
+                        currentProgress = 0
+                        total = selectedPhotoItems.count
+                        percentage = 0
                         withAnimation(.easeOut.speed(2)) {
-                            selectedPhotoItems.removeAll()
-                            isImporting = false
+                            isImporting = true
                         }
-                    }
-                } label: {
-                    HStack(alignment: .center, spacing: 4.0) {
-                        Image(systemName: "square.and.arrow.down.on.square")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 18.0, height: 18.0)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            Task {
+                                UIApplication.shared.isIdleTimerDisabled = true
+                                for selectedPhotoItem in selectedPhotoItems {
+                                    if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
+                                        let illustration = Illustration(
+                                            name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
+                                            data: data)
+                                        modelContext.insert(illustration)
+                                        runningNumberForImageName += 1
+                                    }
+                                    DispatchQueue.main.async {
+                                        currentProgress += 1
+                                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                                    }
+                                }
+                                UIApplication.shared.isIdleTimerDisabled = false
+                                withAnimation(.easeOut.speed(2)) {
+                                    selectedPhotoItems.removeAll()
+                                    isImporting = false
+                                }
+                            }
+                        }
+                    } label: {
                         Text("Import.StartImport")
-                            .bold()
                     }
-                    .frame(minHeight: 24.0)
-                    .frame(maxWidth: .infinity)
+                    .disabled(selectedPhotoItems.isEmpty)
+                } footer: {
+                    Text(NSLocalizedString("Import.SelectedPhotos", comment: "")
+                        .replacingOccurrences(of: "%1", with: String(selectedPhotoItems.count)))
+                    .font(.body)
                 }
-                .buttonStyle(.borderedProminent)
-                .clipShape(RoundedRectangle(cornerRadius: 99))
-                .padding([.leading, .trailing], 20.0)
-                .disabled(selectedPhotoItems.isEmpty)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationTitle("ViewTitle.Import")
         }
     }

@@ -130,19 +130,36 @@
         }
       }
     },
+    "Import.Instructions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select photos to import from your Photos app, then select Start Import."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「写真」アプリからインポートしたい写真を選択し、「インポートを開始」をタップしてください。"
+          }
+        }
+      }
+    },
     "Import.SelectedPhotos" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1 Photo(s) Selected"
+            "value" : "%1 photo(s) will be imported."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1枚の写真が選択されています"
+            "value" : "%1枚の写真がインポートされます。"
           }
         }
       }
