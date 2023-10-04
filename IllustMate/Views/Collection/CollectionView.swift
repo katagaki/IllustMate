@@ -13,11 +13,12 @@ struct CollectionView: View {
 
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
-    @Query(sort: \Album.name,
+    @Query(filter: #Predicate<Album> { $0.parentAlbum == nil },
+           sort: \Album.name,
            order: .forward,
            animation: .snappy.speed(2)) var albums: [Album]
     @Query(sort: \Illustration.dateAdded,
-           order: .forward,
+           order: .reverse,
            animation: .snappy.speed(2)) var illustrations: [Illustration]
 
     @State var isAddingAlbum: Bool = false
@@ -27,17 +28,12 @@ struct CollectionView: View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 20.0) {
-                    AlbumsSection(albums: albums.filter({ $0.parentAlbum == nil}),
+                    AlbumsSection(albums: albums,
                                   isAddingAlbum: $isAddingAlbum,
                                   albumToRename: $albumToRename)
                     IllustrationsSection(
-                        illustrations: illustrations.filter({ illustration in
-                            if let albums = illustration.containingAlbums, albums.isEmpty {
-                                return true
-                            }
-                            return false
-                        }),
-                        selectableAlbums: albums.filter({ $0.parentAlbum == nil }),
+                        illustrations: illustrations.filter({ $0.isInAnyAlbum() }),
+                        selectableAlbums: albums,
                         isRootAlbum: true)
                 }
                 .padding([.top], 20.0)

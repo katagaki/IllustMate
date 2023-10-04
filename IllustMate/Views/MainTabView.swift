@@ -42,23 +42,13 @@ struct MainTabView: View {
                 .tag(TabType.search)
             MoreView()
                 .tabItem {
-                    Label("TabTitle.More", systemImage: "ellipsis")
+                    if syncMonitor.syncStateSummary.inProgress {
+                        Label("TabTitle.More", systemImage: "arrow.triangle.2.circlepath.icloud.fill")
+                    } else {
+                        Label("TabTitle.More", systemImage: "ellipsis")
+                    }
                 }
                 .tag(TabType.more)
-        }
-        .overlay {
-            ZStack(alignment: .topTrailing) {
-                Color.clear
-                if syncMonitor.syncStateSummary.inProgress {
-                    Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28.0, height: 28.0)
-                        .symbolRenderingMode(.hierarchical)
-                        .padding([.trailing], 20.0)
-                        .padding([.top], 2.0)
-                }
-            }
         }
         .overlay {
             if isImporting {

@@ -58,6 +58,10 @@ final class Illustration {
         }
     }
 
+    func isInAnyAlbum() -> Bool {
+        containingAlbums?.isEmpty ?? false
+    }
+
     func addToAlbum(_ album: Album) {
         containingAlbums?.append(album)
     }

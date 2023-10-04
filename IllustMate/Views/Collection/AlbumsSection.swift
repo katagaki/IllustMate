@@ -12,7 +12,7 @@ import SwiftUI
 struct AlbumsSection: View {
 
     @Environment(\.modelContext) var modelContext
-    var albums: [Album]
+    var albums: [Album] // TODO: Tie this to the album's actual child albums (may crash if @State is removed)
     @Binding var isAddingAlbum: Bool
     @Binding var albumToRename: Album?
 
