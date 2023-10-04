@@ -297,24 +297,39 @@ struct AlbumView: View {
 
     @ViewBuilder
     func illustrationLabel(_ illustration: Illustration) -> some View {
-        if let thumbnailImage = illustration.thumbnail() {
-            Image(uiImage: thumbnailImage)
-                .resizable()
-                .aspectRatio(1.0, contentMode: .fill)
-                .transition(.opacity.animation(.snappy.speed(2)))
-        } else {
-            Rectangle()
-                .foregroundStyle(.clear)
-                .aspectRatio(1.0, contentMode: .fill)
-                .overlay {
-                    Image(systemName: "xmark.octagon.fill")
-                        .symbolRenderingMode(.hierarchical)
+        var shouldDisplay: Bool = true
+        ZStack {
+            if shouldDisplay {
+                Text(verbatim: "true")
+                if let thumbnailImage = illustration.thumbnail() {
+                    Image(uiImage: thumbnailImage)
                         .resizable()
-                        .scaledToFit()
-                        .frame(width: 28.0, height: 28.0)
-                        .tint(.secondary)
+                } else {
+                    Rectangle()
+                        .foregroundStyle(.clear)
+                        .overlay {
+                            Image(systemName: "xmark.octagon.fill")
+                                .symbolRenderingMode(.hierarchical)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 28.0, height: 28.0)
+                                .tint(.secondary)
+                        }
                 }
+            } else {
+                Text(verbatim: "false")
+                Rectangle()
+                    .foregroundStyle(.clear)
+            }
         }
+        .aspectRatio(1.0, contentMode: .fill)
+        .onAppear {
+            shouldDisplay = true
+        }
+        .onDisappear {
+            shouldDisplay = false
+        }
+        .transition(.opacity.animation(.snappy.speed(2)))
     }
 
     @ViewBuilder
