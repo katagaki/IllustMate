@@ -33,8 +33,8 @@ struct IllustrationsSection: View {
             HStack(alignment: .center, spacing: 16.0) {
                 HStack(alignment: .center, spacing: 8.0) {
                     ListSectionHeader(text: "Albums.Illustrations")
-                    if !illustrations.isEmpty {
-                        Text("(\(illustrations.count))")
+                    if !illustrations.filter({ $0.isInAlbum(currentAlbum) }).isEmpty {
+                        Text("(\(illustrations.filter({ $0.isInAlbum(currentAlbum) }).count))")
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -42,7 +42,7 @@ struct IllustrationsSection: View {
                 if isSelectingIllustrations {
                     Button {
                         selectedIllustrations.removeAll()
-                        selectedIllustrations.append(contentsOf: illustrations)
+                        selectedIllustrations.append(contentsOf: illustrations.filter({ $0.isInAlbum(currentAlbum) }))
                     } label: {
                         Text("Shared.SelectAll")
                     }
