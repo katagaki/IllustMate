@@ -58,7 +58,15 @@ final class Illustration {
         }
     }
 
-    func isInAnyAlbum() -> Bool {
+    func isInAlbum(_ album: Album?) -> Bool {
+        if let album = album {
+            return containingAlbums?.contains(album) ?? false
+        } else {
+            return isNotInAnyAlbums()
+        }
+    }
+
+    func isNotInAnyAlbums() -> Bool {
         containingAlbums?.isEmpty ?? false
     }
 

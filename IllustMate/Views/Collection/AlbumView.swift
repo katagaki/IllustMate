@@ -12,7 +12,18 @@ import SwiftData
 struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
-    @State var currentAlbum: Album
+
+    // Root
+    @Query(filter: #Predicate<Album> { $0.parentAlbum == nil },
+           sort: \Album.name,
+           order: .forward,
+           animation: .snappy.speed(2)) var albums: [Album]
+    @Query(sort: \Illustration.dateAdded,
+           order: .reverse,
+           animation: .snappy.speed(2)) var illustrations: [Illustration]
+
+    // Selected album
+    var currentAlbum: Album?
 
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
@@ -20,13 +31,19 @@ struct AlbumView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 20.0) {
-                AlbumsSection(albums: currentAlbum.albums(),
-                              isAddingAlbum: $isAddingAlbum,
-                              albumToRename: $albumToRename)
-                IllustrationsSection(illustrations: currentAlbum.illustrations(),
-                                     currentAlbum: currentAlbum,
-                                     parentAlbum: currentAlbum.parentAlbum,
-                                     selectableAlbums: currentAlbum.albums())
+                if let currentAlbum = currentAlbum {
+                    AlbumsSection(currentAlbum: currentAlbum,
+                                  isAddingAlbum: $isAddingAlbum,
+                                  albumToRename: $albumToRename)
+                    IllustrationsSection(currentAlbum: currentAlbum,
+                                         selectableAlbums: currentAlbum.albums())
+                } else {
+                    AlbumsSection(currentAlbum: currentAlbum,
+                                  isAddingAlbum: $isAddingAlbum,
+                                  albumToRename: $albumToRename)
+                    IllustrationsSection(currentAlbum: currentAlbum,
+                                         selectableAlbums: albums)
+                }
             }
             .padding([.top], 20.0)
         }
@@ -36,6 +53,6 @@ struct AlbumView: View {
         .sheet(item: $albumToRename) { album in
             RenameAlbumView(album: album)
         }
-        .navigationTitle(currentAlbum.name)
+        .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 }

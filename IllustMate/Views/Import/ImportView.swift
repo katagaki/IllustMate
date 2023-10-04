@@ -74,8 +74,7 @@ struct ImportView: View {
                     }
                     .disabled(selectedPhotoItems.isEmpty)
                 } footer: {
-                    Text(NSLocalizedString("Import.SelectedPhotos", comment: "")
-                        .replacingOccurrences(of: "%1", with: String(selectedPhotoItems.count)))
+                    Text("Import.SelectedPhotos.\(selectedPhotoItems.count)")
                     .font(.body)
                 }
             }

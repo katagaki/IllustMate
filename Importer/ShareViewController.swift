@@ -61,7 +61,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        progressLabel.text = NSLocalizedString("Importer.ProgressText", comment: "")
+        progressLabel.text = String(localized: "Importer.ProgressText")
     }
 
     @IBAction func startImport(_ sender: Any) {
@@ -100,7 +100,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         var configuration = UIListContentConfiguration.cell()
         switch indexPath.row {
         case 0:
-            configuration.text = NSLocalizedString("Importer.Album.None", comment: "")
+            configuration.text = String(localized: "Importer.Album.None")
             if selectedAlbum == nil {
                 cell.accessoryType = .checkmark
             } else {
@@ -169,7 +169,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func dismissIfCompleted() {
         DispatchQueue.main.async { [self] in
             if currentProgress == total {
-                progressLabel.text = NSLocalizedString("Importer.DoneText", comment: "")
+                progressLabel.text = String(localized: "Importer.DoneText")
                 heroImage.image = UIImage(systemName: "checkmark.circle.fill")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [self] in
                     extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)

@@ -32,6 +32,18 @@ final class Album {
         return childIllustrations ?? []
     }
 
+    func isInAlbum(_ album: Album?) -> Bool {
+        if let album = album {
+            return parentAlbum == album
+        } else {
+            return isNotInAnyAlbums()
+        }
+    }
+
+    func isNotInAnyAlbums() -> Bool {
+        parentAlbum == nil
+    }
+
     func hasAlbums() -> Bool {
         return !albums().isEmpty
     }

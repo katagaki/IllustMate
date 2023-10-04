@@ -6,17 +6,20 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 
 struct IllustrationsSection: View {
 
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
-    var illustrations: [Illustration] // TODO: Tie this to the album's actual illustrations (will crash if @State is removed)
+
+    @Query(sort: \Illustration.dateAdded,
+           order: .reverse,
+           animation: .snappy.speed(2)) var illustrations: [Illustration]
+
     var currentAlbum: Album?
-    var parentAlbum: Album?
     var selectableAlbums: [Album]
-    var isRootAlbum: Bool = false
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
 
@@ -63,7 +66,7 @@ struct IllustrationsSection: View {
             Group {
                 if !illustrations.isEmpty {
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                        ForEach(illustrations, id: \.id) { illustration in
+                        ForEach(illustrations.filter({ $0.isInAlbum(currentAlbum) }), id: \.id) { illustration in
                             illustrationItem(illustration)
                         }
                     }
@@ -79,21 +82,48 @@ struct IllustrationsSection: View {
     }
 
     @ViewBuilder
+    func illustrationLabel(_ illustration: Illustration) -> some View {
+        if let thumbnailImage = illustration.thumbnail() {
+            Image(uiImage: thumbnailImage)
+                .resizable()
+                .aspectRatio(1.0, contentMode: .fill)
+                .transition(.opacity.animation(.snappy.speed(2)))
+        } else {
+            Rectangle()
+                .foregroundStyle(.clear)
+                .aspectRatio(1.0, contentMode: .fill)
+                .overlay {
+                    Image(systemName: "xmark.octagon.fill")
+                        .symbolRenderingMode(.hierarchical)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28.0, height: 28.0)
+                        .tint(.secondary)
+                }
+        }
+    }
+
+    @ViewBuilder
+    func selectionOverlay() -> some View {
+        Rectangle()
+            .foregroundStyle(.black)
+            .opacity(0.5)
+            .overlay {
+                Image(systemName: "checkmark.circle.fill")
+                    .symbolRenderingMode(.hierarchical)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32.0, height: 32.0)
+                    .tint(.white)
+            }
+    }
+
+    @ViewBuilder
     func illustrationItem(_ illustration: Illustration) -> some View {
         illustrationLabel(illustration)
             .overlay {
                 if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                    Rectangle()
-                        .foregroundStyle(.black)
-                        .opacity(0.5)
-                        .overlay {
-                            Image(systemName: "checkmark.circle.fill")
-                                .symbolRenderingMode(.hierarchical)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 32.0, height: 32.0)
-                                .tint(.white)
-                        }
+                    selectionOverlay()
                 }
             }
             .onTapGesture {
@@ -108,59 +138,7 @@ struct IllustrationsSection: View {
                 }
             }
             .contextMenu {
-                if isSelectingIllustrations {
-                    if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                        Menu {
-                            moveToAlbumMenu(selectedIllustrations) {
-                                selectedIllustrations.removeAll()
-                            }
-                        } label: {
-                            Text("Shared.AddToAlbum")
-                            Image(systemName: "rectangle.stack.badge.plus")
-                        }
-                        Button(role: .destructive) {
-                            for illustration in selectedIllustrations {
-                                illustration.prepareForDeletion()
-                                modelContext.delete(illustration)
-                            }
-                        } label: {
-                            Text("Shared.Delete")
-                            Image(systemName: "trash")
-                        }
-                    }
-                } else {
-                    Menu {
-                        moveToAlbumMenu([illustration]) { }
-                    } label: {
-                        Text("Shared.AddToAlbum")
-                        Image(systemName: "rectangle.stack.badge.plus")
-                    }
-                    Divider()
-                    if let currentAlbum = currentAlbum, let image = illustration.image() {
-                        Button {
-                            currentAlbum.coverPhoto = Album.makeCover(image.pngData())
-                        } label: {
-                            Text("Shared.SetAsCover")
-                            Image(systemName: "photo.stack")
-                        }
-                        Divider()
-                    }
-                    Button {
-                        if let image = illustration.image() {
-                            UIPasteboard.general.image = image
-                        }
-                    } label: {
-                        Text("Shared.Copy")
-                        Image(systemName: "doc.on.doc")
-                    }
-                    Button(role: .destructive) {
-                        illustration.prepareForDeletion()
-                        modelContext.delete(illustration)
-                    } label: {
-                        Text("Shared.Delete")
-                        Image(systemName: "trash")
-                    }
-                }
+                contextMenu(illustration)
             } preview: {
                 if let image = illustration.image() {
                     Image(uiImage: image)
@@ -176,9 +154,60 @@ struct IllustrationsSection: View {
     }
 
     @ViewBuilder
+    func contextMenu(_ illustration: Illustration) -> some View {
+        if isSelectingIllustrations {
+            if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                Menu {
+                    moveToAlbumMenu(selectedIllustrations) {
+                        selectedIllustrations.removeAll()
+                    }
+                } label: {
+                    Label("Shared.AddToAlbum", systemImage: "rectangle.stack.badge.plus")
+                }
+                Button(role: .destructive) {
+                    for illustration in selectedIllustrations {
+                        illustration.prepareForDeletion()
+                        modelContext.delete(illustration)
+                    }
+                } label: {
+                    Label("Shared.Delete", systemImage: "trash")
+                }
+            }
+        } else {
+            Menu {
+                moveToAlbumMenu([illustration]) { }
+            } label: {
+                Label("Shared.AddToAlbum", systemImage: "rectangle.stack.badge.plus")
+            }
+            Divider()
+            if let currentAlbum = currentAlbum, let image = illustration.image() {
+                Button {
+                    currentAlbum.coverPhoto = Album.makeCover(image.pngData())
+                } label: {
+                    Label("Shared.SetAsCover", systemImage: "photo.stack")
+                }
+                Divider()
+            }
+            Button {
+                if let image = illustration.image() {
+                    UIPasteboard.general.image = image
+                }
+            } label: {
+                Label("Shared.Copy", systemImage: "doc.on.doc")
+            }
+            Button(role: .destructive) {
+                illustration.prepareForDeletion()
+                modelContext.delete(illustration)
+            } label: {
+                Label("Shared.Delete", systemImage: "trash")
+            }
+        }
+    }
+
+    @ViewBuilder
     func moveToAlbumMenu(_ illustrations: [Illustration], postMoveAction: @escaping () -> Void) -> some View {
-        if !isRootAlbum {
-            if let parentAlbum = parentAlbum {
+        if let currentAlbum = currentAlbum {
+            if let parentAlbum = currentAlbum.parentAlbum {
                 Button {
                     parentAlbum.moveChildIllustrations(illustrations)
                     postMoveAction()
@@ -206,28 +235,6 @@ struct IllustrationsSection: View {
             } label: {
                 Text(album.name)
             }
-        }
-    }
-
-    @ViewBuilder
-    func illustrationLabel(_ illustration: Illustration) -> some View {
-        if let image = illustration.thumbnail() {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(1.0, contentMode: .fill)
-                .transition(.opacity.animation(.snappy.speed(2)))
-        } else {
-            Rectangle()
-                .foregroundStyle(.clear)
-                .aspectRatio(1.0, contentMode: .fill)
-                .overlay {
-                    Image(systemName: "xmark.octagon.fill")
-                        .symbolRenderingMode(.hierarchical)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28.0, height: 28.0)
-                        .tint(.secondary)
-                }
         }
     }
 }

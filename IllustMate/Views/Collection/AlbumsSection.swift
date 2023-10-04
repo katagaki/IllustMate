@@ -12,7 +12,13 @@ import SwiftUI
 struct AlbumsSection: View {
 
     @Environment(\.modelContext) var modelContext
-    var albums: [Album] // TODO: Tie this to the album's actual child albums (may crash if @State is removed)
+
+    @Query(sort: \Album.name,
+           order: .forward,
+           animation: .snappy.speed(2)) var albums: [Album]
+
+    var currentAlbum: Album?
+
     @Binding var isAddingAlbum: Bool
     @Binding var albumToRename: Album?
 
@@ -37,7 +43,7 @@ struct AlbumsSection: View {
             Group {
                 if !albums.isEmpty {
                     LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-                        ForEach(albums, id: \.id) { album in
+                        ForEach(albums.filter({ $0.isInAlbum(currentAlbum) }), id: \.id) { album in
                             NavigationLink(value: ViewPath.album(album: album)) {
                                 VStack(alignment: .leading, spacing: 8.0) {
                                     Group {
@@ -63,24 +69,23 @@ struct AlbumsSection: View {
                                     .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                                     VStack(alignment: .leading, spacing: 2.0) {
                                         Text(album.name)
-                                            .tint(.primary)
-                                        Text(String(album.illustrations().count))
-                                            .tint(.secondary)
+                                            .foregroundStyle(.primary)
+                                        Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
+                                            .foregroundStyle(.secondary)
                                     }
                                 }
                             }
+                            .buttonStyle(.plain)
                             .contextMenu {
                                 Button {
                                     albumToRename = album
                                 } label: {
-                                    Text("Shared.Rename")
-                                    Image(systemName: "pencil")
+                                    Label("Shared.Rename", systemImage: "pencil")
                                 }
                                 Button(role: .destructive) {
                                     modelContext.delete(album)
                                 } label: {
-                                    Text("Shared.Delete")
-                                    Image(systemName: "trash")
+                                    Label("Shared.Delete", systemImage: "trash")
                                 }
                             }
                         }
