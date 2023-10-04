@@ -28,6 +28,30 @@
             "state" : "new",
             "value" : "Button"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "eaA-Ek-xqg.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Importing large images? Use the importer in-app.\"; ObjectID = \"eaA-Ek-xqg\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Importing large images? Use the importer in-app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大きい画像をインポートする場合、アプリ内インポート機能のご利用を推薦します。"
+          }
         }
       }
     },
