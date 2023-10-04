@@ -24,7 +24,7 @@ final class Album {
     }
 
     func albums() -> [Album] {
-        return childAlbums ?? []
+        return childAlbums?.sorted(by: { $0.name < $1.name }) ?? []
     }
 
     func illustrations() -> [Illustration] {
