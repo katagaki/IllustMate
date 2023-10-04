@@ -12,7 +12,14 @@
       }
     },
     "%lld" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "Albums.Albums" : {
       "extractionState" : "manual",
@@ -612,7 +619,24 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新規アルバム"
+            "value" : "アルバムを作成"
+          }
+        }
+      }
+    },
+    "ViewTitle.Albums.Rename" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムの名前を変更"
           }
         }
       }

@@ -14,6 +14,7 @@ struct AlbumsSection: View {
     @Environment(\.modelContext) var modelContext
     var albums: [Album]
     @Binding var isAddingAlbum: Bool
+    @Binding var albumToRename: Album?
 
     let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
                                     GridItem(.flexible(), spacing: 20.0)]
@@ -70,7 +71,7 @@ struct AlbumsSection: View {
                             }
                             .contextMenu {
                                 Button {
-                                    // TODO: Rename album
+                                    albumToRename = album
                                 } label: {
                                     Text("Shared.Rename")
                                     Image(systemName: "pencil")

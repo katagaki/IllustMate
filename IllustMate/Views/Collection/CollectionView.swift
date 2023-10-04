@@ -21,12 +21,15 @@ struct CollectionView: View {
            animation: .snappy.speed(2)) var illustrations: [Illustration]
 
     @State var isAddingAlbum: Bool = false
+    @State var albumToRename: Album?
 
     var body: some View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 20.0) {
-                    AlbumsSection(albums: albums.filter({ $0.parentAlbum == nil}), isAddingAlbum: $isAddingAlbum)
+                    AlbumsSection(albums: albums.filter({ $0.parentAlbum == nil}),
+                                  isAddingAlbum: $isAddingAlbum,
+                                  albumToRename: $albumToRename)
                     IllustrationsSection(
                         illustrations: illustrations.filter({ illustration in
                             if let albums = illustration.containingAlbums, albums.isEmpty {
@@ -48,6 +51,9 @@ struct CollectionView: View {
             })
             .sheet(isPresented: $isAddingAlbum) {
                 NewAlbumView(albumToAddTo: nil)
+            }
+            .sheet(item: $albumToRename) { album in
+                RenameAlbumView(album: album)
             }
             .navigationTitle("ViewTitle.Collection")
         }

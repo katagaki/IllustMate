@@ -15,11 +15,14 @@ struct AlbumView: View {
     @State var currentAlbum: Album
 
     @State var isAddingAlbum: Bool = false
+    @State var albumToRename: Album?
 
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 20.0) {
-                AlbumsSection(albums: currentAlbum.albums(), isAddingAlbum: $isAddingAlbum)
+                AlbumsSection(albums: currentAlbum.albums(),
+                              isAddingAlbum: $isAddingAlbum,
+                              albumToRename: $albumToRename)
                 IllustrationsSection(illustrations: currentAlbum.illustrations(),
                                      currentAlbum: currentAlbum,
                                      parentAlbum: currentAlbum.parentAlbum,
@@ -29,6 +32,9 @@ struct AlbumView: View {
         }
         .sheet(isPresented: $isAddingAlbum) {
             NewAlbumView(albumToAddTo: currentAlbum)
+        }
+        .sheet(item: $albumToRename) { album in
+            RenameAlbumView(album: album)
         }
         .navigationTitle(currentAlbum.name)
     }

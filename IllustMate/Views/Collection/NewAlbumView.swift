@@ -51,7 +51,7 @@ struct NewAlbumView: View {
             .navigationTitle("ViewTitle.Albums.Create")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.fraction(0.25)])
         .interactiveDismissDisabled()
     }
 }
