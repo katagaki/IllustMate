@@ -69,6 +69,10 @@ final class Illustration {
         containingAlbum = album
     }
 
+    func removeFromAlbum() {
+        containingAlbum = nil
+    }
+
     func prepareForDeletion() {
         if let illustrationPath = illustrationPath() {
             try? FileManager.default.removeItem(atPath: illustrationPath)
