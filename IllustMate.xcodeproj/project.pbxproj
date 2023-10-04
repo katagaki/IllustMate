@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
+		E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */; };
 		E4614CE72ACA86C900D751FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* App.swift */; };
 		E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumView.swift */; };
 		E4614CEB2ACA86C900D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
@@ -67,6 +68,7 @@
 
 /* Begin PBXFileReference section */
 		E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
+		E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRow.swift; sourceTree = "<group>"; };
 		E4614CE32ACA86C900D751FB /* IllustMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IllustMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4614CE62ACA86C900D751FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4614CE82ACA86C900D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 			children = (
 				E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */,
 				E4614D472ACB46D700D751FB /* ProgressAlert.swift */,
+				E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 				E4CA0B8E2ACD17190063F06C /* FileManager.swift in Sources */,
 				E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */,
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
+				E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,

@@ -23,28 +23,7 @@ struct SearchView: View {
                     if !albumsFound().isEmpty {
                         Section {
                             ForEach(albumsFound()) { album in
-                                HStack(alignment: .center, spacing: 16.0) {
-                                    Group {
-                                        if let coverPhotoData = album.coverPhoto,
-                                           let coverPhoto = UIImage(data: coverPhotoData) {
-                                            Image(uiImage: coverPhoto)
-                                                .resizable()
-                                        } else {
-                                            Image("Album.Generic")
-                                                .resizable()
-                                        }
-                                    }
-                                    .frame(width: 30.0, height: 30.0)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
-                                    VStack(alignment: .leading, spacing: 2.0) {
-                                        Text(album.name)
-                                            .font(.body)
-                                        Text("\(album.illustrations().count)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    Spacer()
-                                }
+                                AlbumRow(album: album)
                             }
                         } header: {
                             ListSectionHeader(text: "Shared.Albums")

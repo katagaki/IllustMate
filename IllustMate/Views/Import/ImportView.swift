@@ -17,6 +17,9 @@ struct ImportView: View {
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
 
+    @Query(sort: \Album.name, animation: .snappy.speed(2)) var albums: [Album]
+    @State var selectedAlbum: Album?
+
     @Binding var isImporting: Bool
     @Binding var currentProgress: Int
     @Binding var total: Int
@@ -39,6 +42,25 @@ struct ImportView: View {
                     Text(verbatim: " ")
                 }
                 Section {
+                    Picker(selection: $selectedAlbum) {
+                        Text("Import.Album.None")
+                            .tag(nil as Album?)
+                        ForEach(albums, id: \.id) { album in
+                            AlbumRow(album: album)
+                                .tag(album as Album?)
+                        }
+                    } label: {
+                        HStack(alignment: .center, spacing: 8.0) {
+                            Text("Import.Album")
+                            Spacer(minLength: 0)
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+                } header: {
+                    ListSectionHeader(text: "Import.SelectAlbum")
+                        .font(.body)
+                }
+                Section {
                     Button {
                         currentProgress = 0
                         total = selectedPhotoItems.count
@@ -47,27 +69,7 @@ struct ImportView: View {
                             isImporting = true
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            Task {
-                                UIApplication.shared.isIdleTimerDisabled = true
-                                for selectedPhotoItem in selectedPhotoItems {
-                                    if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                                        let illustration = Illustration(
-                                            name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
-                                            data: data)
-                                        modelContext.insert(illustration)
-                                        runningNumberForImageName += 1
-                                    }
-                                    DispatchQueue.main.async {
-                                        currentProgress += 1
-                                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                                    }
-                                }
-                                UIApplication.shared.isIdleTimerDisabled = false
-                                withAnimation(.easeOut.speed(2)) {
-                                    selectedPhotoItems.removeAll()
-                                    isImporting = false
-                                }
-                            }
+                            importPhotos()
                         }
                     } label: {
                         Text("Import.StartImport")
@@ -79,6 +81,33 @@ struct ImportView: View {
                 }
             }
             .navigationTitle("ViewTitle.Import")
+        }
+    }
+
+    func importPhotos() {
+        Task {
+            UIApplication.shared.isIdleTimerDisabled = true
+            for selectedPhotoItem in selectedPhotoItems {
+                if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
+                    let illustration = Illustration(
+                        name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
+                        data: data)
+                    if let selectedAlbum = selectedAlbum {
+                        selectedAlbum.addChildIllustration(illustration)
+                    }
+                    modelContext.insert(illustration)
+                    runningNumberForImageName += 1
+                }
+                DispatchQueue.main.async {
+                    currentProgress += 1
+                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                }
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            withAnimation(.easeOut.speed(2)) {
+                selectedPhotoItems.removeAll()
+                isImporting = false
+            }
         }
     }
 }

@@ -11,16 +11,6 @@
         }
       }
     },
-    "%lld" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "Albums.Albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -246,6 +236,39 @@
         }
       }
     },
+    "Import.Album" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
+          }
+        }
+      }
+    },
+    "Import.Album.None" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムなし"
+          }
+        }
+      }
+    },
     "Import.Importing" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -276,6 +299,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「写真」アプリからインポートしたい写真を選択し、「インポートを開始」をタップしてください。"
+          }
+        }
+      }
+    },
+    "Import.SelectAlbum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album to Import To"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真を追加するアルバム"
           }
         }
       }
@@ -499,6 +539,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アルバムに移動"
+          }
+        }
+      }
+    },
+    "Shared.Album.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Photo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Photos"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld枚の写真"
+                }
+              }
+            }
           }
         }
       }
