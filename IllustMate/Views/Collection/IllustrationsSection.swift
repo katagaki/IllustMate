@@ -90,51 +90,50 @@ struct IllustrationsSection: View {
 
     @ViewBuilder
     func selectableIllustrationItem(_ illustration: Illustration) -> some View {
-        Button {
-            if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                selectedIllustrations.removeAll(where: { $0.id == illustration.id })
-            } else {
-                selectedIllustrations.append(illustration)
-            }
-        } label: {
-            illustrationLabel(illustration)
-                .overlay {
-                    if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                        Rectangle()
-                            .foregroundStyle(.black)
-                            .opacity(0.5)
-                            .overlay {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .symbolRenderingMode(.hierarchical)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 32.0, height: 32.0)
-                                    .tint(.white)
-                            }
-                    }
-                }
-        }
-        .contextMenu {
-            if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                Menu {
-                    moveToAlbumMenu(selectedIllustrations) {
-                        selectedIllustrations.removeAll()
-                    }
-                } label: {
-                    Text("Shared.AddToAlbum")
-                    Image(systemName: "rectangle.stack.badge.plus")
-                }
-                Button(role: .destructive) {
-                    for illustration in selectedIllustrations {
-                        illustration.prepareForDeletion()
-                        modelContext.delete(illustration)
-                    }
-                } label: {
-                    Text("Shared.Delete")
-                    Image(systemName: "trash")
+        illustrationLabel(illustration)
+            .overlay {
+                if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                    Rectangle()
+                        .foregroundStyle(.black)
+                        .opacity(0.5)
+                        .overlay {
+                            Image(systemName: "checkmark.circle.fill")
+                                .symbolRenderingMode(.hierarchical)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32.0, height: 32.0)
+                                .tint(.white)
+                        }
                 }
             }
-        }
+            .onTapGesture {
+                if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                    selectedIllustrations.removeAll(where: { $0.id == illustration.id })
+                } else {
+                    selectedIllustrations.append(illustration)
+                }
+            }
+            .contextMenu {
+                if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                    Menu {
+                        moveToAlbumMenu(selectedIllustrations) {
+                            selectedIllustrations.removeAll()
+                        }
+                    } label: {
+                        Text("Shared.AddToAlbum")
+                        Image(systemName: "rectangle.stack.badge.plus")
+                    }
+                    Button(role: .destructive) {
+                        for illustration in selectedIllustrations {
+                            illustration.prepareForDeletion()
+                            modelContext.delete(illustration)
+                        }
+                    } label: {
+                        Text("Shared.Delete")
+                        Image(systemName: "trash")
+                    }
+                }
+            }
     }
 
     @ViewBuilder
