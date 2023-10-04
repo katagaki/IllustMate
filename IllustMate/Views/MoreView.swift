@@ -88,6 +88,9 @@ struct MoreView: View {
                         for album in albums {
                             modelContext.delete(album)
                         }
+                        deleteContents(of: illustrationsFolder)
+                        deleteContents(of: thumbnailsFolder)
+                        deleteContents(of: importsFolder)
                     } label: {
                         Text("More.DeleteAll")
                     }
@@ -121,6 +124,16 @@ SOFTWARE.
 """)])
                 default: Color.clear
                 }
+            }
+        }
+    }
+
+    func deleteContents(of url: URL?) {
+        if let url = url,
+           let fileURLs = try? FileManager.default
+            .contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
+            for fileURL in fileURLs {
+                try? FileManager.default.removeItem(at: fileURL)
             }
         }
     }
