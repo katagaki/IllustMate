@@ -13,17 +13,9 @@ struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
 
-    // Root
-    @Query(filter: #Predicate<Album> { $0.parentAlbum == nil },
-           sort: \Album.name,
-           order: .forward,
-           animation: .snappy.speed(2)) var albums: [Album]
-    @Query(sort: \Illustration.dateAdded,
-           order: .reverse,
-           animation: .snappy.speed(2)) var illustrations: [Illustration]
-
-    // Selected album
-    var currentAlbum: Album?
+    @State var albums: [Album] = []
+    @State var illustrations: [Illustration] = []
+    @State var currentAlbum: Album?
 
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
@@ -31,21 +23,22 @@ struct AlbumView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 20.0) {
-                if let currentAlbum = currentAlbum {
-                    AlbumsSection(currentAlbum: currentAlbum,
-                                  isAddingAlbum: $isAddingAlbum,
-                                  albumToRename: $albumToRename)
-                    IllustrationsSection(currentAlbum: currentAlbum,
-                                         selectableAlbums: currentAlbum.albums())
-                } else {
-                    AlbumsSection(currentAlbum: currentAlbum,
-                                  isAddingAlbum: $isAddingAlbum,
-                                  albumToRename: $albumToRename)
-                    IllustrationsSection(currentAlbum: currentAlbum,
-                                         selectableAlbums: albums)
-                }
+                AlbumsSection(albums: $albums,
+                              currentAlbum: $currentAlbum,
+                              isAddingAlbum: $isAddingAlbum,
+                              albumToRename: $albumToRename)
+                IllustrationsSection(illustrations: $illustrations,
+                                     currentAlbum: $currentAlbum)
             }
             .padding([.top], 20.0)
+        }
+        .onAppear {
+            refreshData()
+        }
+        .refreshable {
+            withAnimation(.snappy.speed(2)) {
+                refreshData()
+            }
         }
         .sheet(isPresented: $isAddingAlbum) {
             NewAlbumView(albumToAddTo: currentAlbum)
@@ -54,5 +47,20 @@ struct AlbumView: View {
             RenameAlbumView(album: album)
         }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
+    }
+
+    @MainActor
+    func refreshData() {
+        do {
+            let currentAlbumID = currentAlbum?.id
+            albums = try modelContext.fetch(FetchDescriptor<Album>(
+                predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
+                sortBy: [SortDescriptor(\.name)]))
+            illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
+                predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
+                sortBy: [SortDescriptor(\.dateAdded)]))
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
     }
 }

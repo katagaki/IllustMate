@@ -14,12 +14,9 @@ struct IllustrationsSection: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @Query(sort: \Illustration.dateAdded,
-           order: .reverse,
-           animation: .snappy.speed(2)) var illustrations: [Illustration]
+    @Binding var illustrations: [Illustration]
+    @Binding var currentAlbum: Album?
 
-    var currentAlbum: Album?
-    var selectableAlbums: [Album]
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
 
@@ -33,8 +30,8 @@ struct IllustrationsSection: View {
             HStack(alignment: .center, spacing: 16.0) {
                 HStack(alignment: .center, spacing: 8.0) {
                     ListSectionHeader(text: "Albums.Illustrations")
-                    if !illustrations.filter({ $0.isInAlbum(currentAlbum) }).isEmpty {
-                        Text("(\(illustrations.filter({ $0.isInAlbum(currentAlbum) }).count))")
+                    if !illustrations.isEmpty {
+                        Text("(\(illustrations.count))")
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -42,7 +39,7 @@ struct IllustrationsSection: View {
                 if isSelectingIllustrations {
                     Button {
                         selectedIllustrations.removeAll()
-                        selectedIllustrations.append(contentsOf: illustrations.filter({ $0.isInAlbum(currentAlbum) }))
+                        selectedIllustrations.append(contentsOf: illustrations)
                     } label: {
                         Text("Shared.SelectAll")
                     }
@@ -66,7 +63,7 @@ struct IllustrationsSection: View {
             Group {
                 if !illustrations.isEmpty {
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                        ForEach(illustrations.filter({ $0.isInAlbum(currentAlbum) }), id: \.id) { illustration in
+                        ForEach(illustrations, id: \.id) { illustration in
                             illustrationItem(illustration)
                         }
                     }
@@ -157,12 +154,9 @@ struct IllustrationsSection: View {
     func contextMenu(_ illustration: Illustration) -> some View {
         if isSelectingIllustrations {
             if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                Menu {
-                    moveToAlbumMenu(selectedIllustrations) {
-                        selectedIllustrations.removeAll()
-                    }
-                } label: {
-                    Label("Shared.AddToAlbum", systemImage: "rectangle.stack.badge.plus")
+                moveToAlbumMenu(selectedIllustrations) {
+                    isSelectingIllustrations = false
+                    selectedIllustrations.removeAll()
                 }
                 Button(role: .destructive) {
                     for illustration in selectedIllustrations {
@@ -174,17 +168,16 @@ struct IllustrationsSection: View {
                 }
             }
         } else {
-            Menu {
-                moveToAlbumMenu([illustration]) { }
-            } label: {
-                Label("Shared.AddToAlbum", systemImage: "rectangle.stack.badge.plus")
+            moveToAlbumMenu([illustration]) {
+                isSelectingIllustrations = false
+                selectedIllustrations.removeAll()
             }
             Divider()
             if let currentAlbum = currentAlbum, let image = illustration.image() {
                 Button {
                     currentAlbum.coverPhoto = Album.makeCover(image.pngData())
                 } label: {
-                    Label("Shared.SetAsCover", systemImage: "photo.stack")
+                    Label("Shared.SetAsCover", systemImage: "photo")
                 }
                 Divider()
             }
@@ -209,31 +202,45 @@ struct IllustrationsSection: View {
         if let currentAlbum = currentAlbum {
             if let parentAlbum = currentAlbum.parentAlbum {
                 Button {
-                    parentAlbum.moveChildIllustrations(illustrations)
+                    parentAlbum.addChildIllustrations(illustrations)
                     postMoveAction()
                 } label: {
-                    Text(parentAlbum.name)
+                    Label("Shared.MoveOutTo.\(parentAlbum.name)", systemImage: "tray.and.arrow.up")
                 }
             } else {
                 Button {
-                    illustrations.forEach { illustration in
-                        illustration.containingAlbums?.forEach({ album in
-                            album.removeChildIllustration(illustration)
-                        })
-                    }
+                    currentAlbum.removeChildIllustration(illustrations)
                     postMoveAction()
                 } label: {
-                    Text("Shared.MoveOutOfAlbum")
+                    Label("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up")
                 }
             }
-            Divider()
         }
-        ForEach(selectableAlbums) { album in
-            Button {
-                album.moveChildIllustrations(illustrations)
-                postMoveAction()
-            } label: {
-                Text(album.name)
+        Menu {
+            ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
+                Button {
+                    album.addChildIllustrations(illustrations)
+                    postMoveAction()
+                } label: {
+                    Text(album.name)
+                }
+            }
+        } label: {
+            Label("Shared.AddToAlbum", systemImage: "tray.and.arrow.down")
+        }
+    }
+
+    func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
+        if let currentAlbum = currentAlbum {
+            return currentAlbum.albums()
+        } else {
+            do {
+                return try modelContext.fetch(FetchDescriptor<Album>(
+                    predicate: #Predicate { $0.parentAlbum == nil },
+                    sortBy: [SortDescriptor(\.name)]))
+            } catch {
+                debugPrint(error.localizedDescription)
+                return []
             }
         }
     }

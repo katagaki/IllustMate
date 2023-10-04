@@ -13,11 +13,8 @@ struct AlbumsSection: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @Query(sort: \Album.name,
-           order: .forward,
-           animation: .snappy.speed(2)) var albums: [Album]
-
-    var currentAlbum: Album?
+    @Binding var albums: [Album]
+    @Binding var currentAlbum: Album?
 
     @Binding var isAddingAlbum: Bool
     @Binding var albumToRename: Album?
@@ -33,7 +30,10 @@ struct AlbumsSection: View {
                 Button {
                     isAddingAlbum = true
                 } label: {
-                    Image(systemName: "rectangle.stack.badge.plus")
+                    Image(systemName: "plus")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 18.0, height: 18.0)
                 }
             }
             .padding([.leading, .trailing], 20.0)
@@ -43,7 +43,7 @@ struct AlbumsSection: View {
             Group {
                 if !albums.isEmpty {
                     LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-                        ForEach(albums.filter({ $0.isInAlbum(currentAlbum) }), id: \.id) { album in
+                        ForEach(albums, id: \.id) { album in
                             NavigationLink(value: ViewPath.album(album: album)) {
                                 VStack(alignment: .leading, spacing: 8.0) {
                                     Group {
@@ -104,7 +104,7 @@ struct AlbumsSection: View {
             predicate: #Predicate<Illustration> { $0.id == illustration.id }
         )
         if let illustrations = try? modelContext.fetch(fetchDescriptor) {
-            album.moveChildIllustrations(illustrations)
+            album.addChildIllustrations(illustrations)
         }
     }
 }

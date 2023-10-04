@@ -19,9 +19,8 @@ final class Album {
     @Relationship(deleteRule: .cascade, inverse: \Album.childAlbums) var parentAlbum: Album?
     var dateCreated: Date = Date.now
 
-    init(name: String, dateCreated: Date) {
+    init(name: String) {
         self.name = name
-        self.dateCreated = dateCreated
     }
 
     func albums() -> [Album] {
@@ -56,24 +55,25 @@ final class Album {
         childAlbums?.append(album)
     }
 
-    func moveChildIllustration(_ illustration: Illustration) {
-        illustration.containingAlbums?.forEach({ album in
-            album.removeChildIllustration(illustration)
-        })
-        childIllustrations?.append(illustration)
+    func addChildIllustration(_ illustration: Illustration) {
+        illustration.containingAlbum = self
     }
 
-    func moveChildIllustrations(_ illustrations: [Illustration]) {
-        illustrations.forEach { illustration in
-            illustration.containingAlbums?.forEach({ album in
-                album.removeChildIllustration(illustration)
-            })
+    func addChildIllustrations(_ illustrations: [Illustration]) {
+        for illustration in illustrations {
+            addChildIllustration(illustration)
         }
         childIllustrations?.append(contentsOf: illustrations)
     }
 
     func removeChildIllustration(_ illustration: Illustration) {
         childIllustrations?.removeAll(where: { $0.id == illustration.id })
+    }
+
+    func removeChildIllustration(_ illustrations: [Illustration]) {
+        illustrations.forEach { illustration in
+            removeChildIllustration(illustration)
+        }
     }
 
     static func makeCover(_ data: Data?) -> Data? {

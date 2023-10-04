@@ -14,7 +14,7 @@ import UIKit
 final class Illustration {
     var id = UUID().uuidString
     var name: String = ""
-    @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbums: [Album]? = []
+    @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbum: Album?
     var dateAdded: Date = Date.now
 
     init(name: String, data: Data) {
@@ -60,18 +60,13 @@ final class Illustration {
 
     func isInAlbum(_ album: Album?) -> Bool {
         if let album = album {
-            return containingAlbums?.contains(album) ?? false
-        } else {
-            return isNotInAnyAlbums()
+            return containingAlbum?.id ?? "" == album.id
         }
-    }
-
-    func isNotInAnyAlbums() -> Bool {
-        containingAlbums?.isEmpty ?? false
+        return true
     }
 
     func addToAlbum(_ album: Album) {
-        containingAlbums?.append(album)
+        containingAlbum = album
     }
 
     func prepareForDeletion() {

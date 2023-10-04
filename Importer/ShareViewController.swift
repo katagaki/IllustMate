@@ -154,7 +154,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func importIllustration(_ name: String, data: Data) {
         let illustration = Illustration(name: name, data: data)
         if let selectedAlbum = selectedAlbum {
-            selectedAlbum.moveChildIllustration(illustration)
+            selectedAlbum.addChildIllustration(illustration)
         }
         modelContext.insert(illustration)
     }

@@ -34,8 +34,7 @@ struct NewAlbumView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces),
-                                             dateCreated: .now)
+                        let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
                         if let albumToAddTo = albumToAddTo {
                             albumToAddTo.addChildAlbum(newAlbum)
                         } else {

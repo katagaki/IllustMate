@@ -458,13 +458,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add To Album"
+            "value" : "Move Into Album"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アルバムに追加"
+            "value" : "アルバムに移動"
           }
         }
       }
@@ -582,6 +582,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コレクションに戻す"
+          }
+        }
+      }
+    },
+    "Shared.MoveOutTo.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Back to %s"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%sに戻す"
           }
         }
       }

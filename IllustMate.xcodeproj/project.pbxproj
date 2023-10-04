@@ -192,7 +192,6 @@
 			isa = PBXGroup;
 			children = (
 				E4614D2F2ACB100B00D751FB /* NavigationManager.swift */,
-				E4614D312ACB103200D751FB /* TabManager.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -202,6 +201,7 @@
 			children = (
 				E4614D2B2ACB0FD800D751FB /* ViewPath.swift */,
 				E4614D2D2ACB0FF500D751FB /* TabType.swift */,
+				E4614D312ACB103200D751FB /* TabManager.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
