@@ -21,7 +21,7 @@ class ShareViewController: UIViewController {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Album.self, Illustration.self, IllustrationData.self
+            Album.self, Illustration.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema,
                                                     isStoredInMemoryOnly: false,

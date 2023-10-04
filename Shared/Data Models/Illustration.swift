@@ -14,25 +14,57 @@ import UIKit
 final class Illustration {
     var id = UUID().uuidString
     var name: String = ""
-    var illustrationData: IllustrationData?
-    var thumbnail: Data = Data()
     @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbums: [Album]? = []
     var dateAdded: Date = Date.now
 
     init(name: String, data: Data) {
         self.name = name
-        self.illustrationData = IllustrationData(id: self.id, data: data)
-        if let thumbnailData = Illustration.makeThumbnail(data) {
-            thumbnail = thumbnailData
-        }
         self.dateAdded = .now
+        if let illustrationPath = illustrationPath() {
+            FileManager.default.createFile(atPath: illustrationPath, contents: data)
+        }
+        if let thumbnailPath = thumbnailPath(), let thumbnailData = Illustration.makeThumbnail(data) {
+            FileManager.default.createFile(atPath: thumbnailPath, contents: thumbnailData)
+        }
+    }
+
+    func illustrationPath() -> String? {
+        if let illustrationsFolder = illustrationsFolder {
+            return illustrationsFolder.appendingPathComponent(id).path(percentEncoded: false)
+        }
+        return nil
+    }
+
+    func thumbnailPath() -> String? {
+        if let thumbnailsFolder = thumbnailsFolder {
+            return thumbnailsFolder.appendingPathComponent(id).path(percentEncoded: false)
+        }
+        return nil
     }
 
     func image() -> UIImage? {
-        if let data = illustrationData {
-            return UIImage(data: data.data)
+        if let illustrationPath = illustrationPath() {
+            return UIImage(contentsOfFile: illustrationPath)
+        } else {
+            return nil
         }
-        return nil
+    }
+
+    func thumbnail() -> UIImage? {
+        if let thumbnailPath = thumbnailPath() {
+            return UIImage(contentsOfFile: thumbnailPath)
+        } else {
+            return nil
+        }
+    }
+
+    func prepareForDeletion() {
+        if let illustrationPath = illustrationPath() {
+            try? FileManager.default.removeItem(atPath: illustrationPath)
+        }
+        if let thumbnailPath = thumbnailPath() {
+            try? FileManager.default.removeItem(atPath: thumbnailPath)
+        }
     }
 
     static func makeThumbnail(_ data: Data?) -> Data? {

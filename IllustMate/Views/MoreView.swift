@@ -17,7 +17,6 @@ struct MoreView: View {
     @ObservedObject var syncMonitor = SyncMonitor.shared
     @Query var albums: [Album]
     @Query var illustrations: [Illustration]
-    @Query var illustrationData: [IllustrationData]
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -82,13 +81,9 @@ struct MoreView: View {
                 Section {
                     Button {
                         try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
-                        try? modelContext.delete(model: IllustrationData.self, includeSubclasses: true)
                         try? modelContext.delete(model: Album.self, includeSubclasses: true)
                         for illustration in illustrations {
                             modelContext.delete(illustration)
-                        }
-                        for illustrationData in illustrationData {
-                            modelContext.delete(illustrationData)
                         }
                         for album in albums {
                             modelContext.delete(album)

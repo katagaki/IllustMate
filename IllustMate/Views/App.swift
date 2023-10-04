@@ -16,7 +16,7 @@ struct IllustMateApp: App {
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Album.self, Illustration.self, IllustrationData.self
+            Album.self, Illustration.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema,
                                                     isStoredInMemoryOnly: false,
@@ -33,7 +33,24 @@ struct IllustMateApp: App {
             MainTabView()
                 .environmentObject(tabManager)
                 .environmentObject(navigationManager)
+                .task {
+                    createIfNotExists(illustrationsFolder)
+                    createIfNotExists(thumbnailsFolder)
+                    createIfNotExists(importsFolder)
+                }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    func createIfNotExists(_ url: URL?) {
+        if let url = url, !directoryExistsAtPath(url) {
+            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
+        }
+    }
+
+    func directoryExistsAtPath(_ url: URL) -> Bool {
+        var isDirectory: ObjCBool = true
+        let exists = FileManager.default.fileExists(atPath: url.path(percentEncoded: false), isDirectory: &isDirectory)
+        return exists && isDirectory.boolValue
     }
 }

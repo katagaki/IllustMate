@@ -126,6 +126,7 @@ struct IllustrationsSection: View {
                 }
                 Button(role: .destructive) {
                     for illustration in selectedIllustrations {
+                        illustration.prepareForDeletion()
                         modelContext.delete(illustration)
                     }
                 } label: {
@@ -149,9 +150,9 @@ struct IllustrationsSection: View {
                 Image(systemName: "rectangle.stack.badge.plus")
             }
             Divider()
-            if let currentAlbum = currentAlbum, let illustrationData = illustration.illustrationData {
+            if let currentAlbum = currentAlbum, let image = illustration.image() {
                 Button {
-                    currentAlbum.coverPhoto = Album.makeCover(illustrationData.data)
+                    currentAlbum.coverPhoto = Album.makeCover(image.pngData())
                 } label: {
                     Text("Shared.SetAsCover")
                     Image(systemName: "photo.stack")
@@ -159,24 +160,23 @@ struct IllustrationsSection: View {
                 Divider()
             }
             Button {
-                if let illustrationData = illustration.illustrationData,
-                   let uiImage = UIImage(data: illustrationData.data) {
-                    UIPasteboard.general.image = uiImage
+                if let image = illustration.image() {
+                    UIPasteboard.general.image = image
                 }
             } label: {
                 Text("Shared.Copy")
                 Image(systemName: "doc.on.doc")
             }
             Button(role: .destructive) {
+                illustration.prepareForDeletion()
                 modelContext.delete(illustration)
             } label: {
                 Text("Shared.Delete")
                 Image(systemName: "trash")
             }
         } preview: {
-            if let illustrationData = illustration.illustrationData,
-               let uiImage = UIImage(data: illustrationData.data) {
-                Image(uiImage: uiImage)
+            if let image = illustration.image() {
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
             }
@@ -219,7 +219,7 @@ struct IllustrationsSection: View {
 
     @ViewBuilder
     func illustrationLabel(_ illustration: Illustration) -> some View {
-        if let image = UIImage(data: illustration.thumbnail) {
+        if let image = illustration.thumbnail() {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(1.0, contentMode: .fill)
