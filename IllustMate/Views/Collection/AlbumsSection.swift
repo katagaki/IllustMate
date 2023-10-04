@@ -19,6 +19,8 @@ struct AlbumsSection: View {
     @Binding var isAddingAlbum: Bool
     @Binding var albumToRename: Album?
 
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
+
     let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
                                     GridItem(.flexible(), spacing: 20.0)]
 
@@ -34,20 +36,34 @@ struct AlbumsSection: View {
                 }
                 Spacer()
                 Button {
+                    withAnimation(.snappy.speed(2)) {
+                        if style == .grid {
+                            style = .list
+                        } else {
+                            style = .grid
+                        }
+                    }
+                } label: {
+                    switch style {
+                    case .grid:
+                        Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                    case .list:
+                        Label("Albums.Style.List", systemImage: "list.bullet")
+                    }
+                }
+                Button {
                     isAddingAlbum = true
                 } label: {
-                    Image(systemName: "plus")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 18.0, height: 18.0)
+                    Label("Shared.Create", systemImage: "plus")
                 }
             }
             .padding([.leading, .trailing], 20.0)
             .padding([.bottom], 6.0)
             Divider()
                 .padding([.leading], 20.0)
-            Group {
-                if !albums.isEmpty {
+            if !albums.isEmpty {
+                switch style {
+                case .grid:
                     LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
                         ForEach(albums, id: \.id) { album in
                             NavigationLink(value: ViewPath.album(album: album)) {
@@ -70,7 +86,6 @@ struct AlbumsSection: View {
                                     }
                                     .aspectRatio(1.0, contentMode: .fill)
                                     .foregroundStyle(.accent)
-                                    .background(.primary)
                                     .clipShape(RoundedRectangle(cornerRadius: 8.0))
                                     .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                                     VStack(alignment: .leading, spacing: 2.0) {
@@ -82,26 +97,80 @@ struct AlbumsSection: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .contextMenu {
-                                Button {
-                                    albumToRename = album
-                                } label: {
-                                    Label("Shared.Rename", systemImage: "pencil")
-                                }
-                                Button(role: .destructive) {
-                                    modelContext.delete(album)
-                                } label: {
-                                    Label("Shared.Delete", systemImage: "trash")
-                                }
-                            }
+                            .contextMenu { contextMenu(album) }
                         }
                     }
-                } else {
-                    Text("Albums.NoAlbums")
-                        .foregroundStyle(.secondary)
+                    .padding([.leading, .trailing, .top], 20.0)
+                case .list:
+                    LazyVStack(alignment: .leading, spacing: 0.0) {
+                        ForEach(albums, id: \.id) { album in
+                            NavigationLink(value: ViewPath.album(album: album)) {
+                                HStack(alignment: .center, spacing: 16.0) {
+                                    Group {
+                                        if let coverPhotoData = album.coverPhoto,
+                                           let coverPhoto = UIImage(data: coverPhotoData) {
+                                            Image(uiImage: coverPhoto)
+                                                .resizable()
+                                        } else {
+                                            Image("Album.Generic")
+                                                .resizable()
+                                        }
+                                    }
+                                    .frame(width: 30.0, height: 30.0)
+                                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
+                                    .shadow(color: .black.opacity(0.2), radius: 2.0, x: 0.0, y: 2.0)
+                                    VStack(alignment: .leading, spacing: 2.0) {
+                                        Text(album.name)
+                                            .foregroundStyle(.primary)
+                                        Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer(minLength: 0)
+                                    Image(systemName: "chevron.right")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 11.0, height: 11.0)
+                                        .foregroundStyle(.primary.opacity(0.25))
+                                        .fontWeight(.bold)
+                                }
+                                .padding([.leading], 20.0)
+                                .contentShape(Rectangle())
+                                .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                                    for item in items {
+                                        moveIllustrationToAlbum(item, to: album)
+                                    }
+                                    return true
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .padding([.top, .bottom], 6.0)
+                            .padding([.trailing], 20.0)
+                            .contextMenu { contextMenu(album) }
+                            Divider()
+                                .padding([.leading], 66.0)
+                        }
+                    }
                 }
+            } else {
+                Text("Albums.NoAlbums")
+                    .foregroundStyle(.secondary)
+                    .padding([.leading, .top], 20.0)
             }
-            .padding([.leading, .trailing, .top], 20.0)
+        }
+    }
+
+    @ViewBuilder
+    func contextMenu(_ album: Album) -> some View {
+        Button {
+            albumToRename = album
+        } label: {
+            Label("Shared.Rename", systemImage: "pencil")
+        }
+        Button(role: .destructive) {
+            modelContext.delete(album)
+        } label: {
+            Label("Shared.Delete", systemImage: "trash")
         }
     }
 

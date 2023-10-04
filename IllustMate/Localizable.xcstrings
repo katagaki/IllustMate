@@ -195,6 +195,40 @@
         }
       }
     },
+    "Albums.Style.Grid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グリッド"
+          }
+        }
+      }
+    },
+    "Albums.Style.List" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リスト"
+          }
+        }
+      }
+    },
     "Illustration.Error.CouldNotOpen" : {
       "extractionState" : "manual",
       "localizations" : {

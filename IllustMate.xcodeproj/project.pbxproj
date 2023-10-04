@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
 		E4614CE72ACA86C900D751FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* App.swift */; };
 		E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumView.swift */; };
 		E4614CEB2ACA86C900D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
@@ -67,6 +68,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
 		E4614CE32ACA86C900D751FB /* IllustMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IllustMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4614CE62ACA86C900D751FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4614CE82ACA86C900D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 		E4614D2A2ACB0FCA00D751FB /* Enums */ = {
 			isa = PBXGroup;
 			children = (
+				E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */,
 				E4614D2B2ACB0FD800D751FB /* ViewPath.swift */,
 				E4614D2D2ACB0FF500D751FB /* TabType.swift */,
 				E4614D312ACB103200D751FB /* TabManager.swift */,
@@ -408,6 +411,7 @@
 				E4CA0B912ACD2F8A0063F06C /* RenameAlbumView.swift in Sources */,
 				E4614CEB2ACA86C900D751FB /* Album.swift in Sources */,
 				E4614CE72ACA86C900D751FB /* App.swift in Sources */,
+				E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */,
 				E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */,
 				E4614D462ACB417500D751FB /* ImportView.swift in Sources */,
 				E4614D412ACB2DF300D751FB /* AlbumsSection.swift in Sources */,
