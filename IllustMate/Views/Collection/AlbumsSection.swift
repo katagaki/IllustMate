@@ -56,6 +56,7 @@ struct AlbumsSection: View {
                 } label: {
                     Label("Shared.Create", systemImage: "plus")
                 }
+                .padding([.trailing], 10.0)
             }
             .padding([.leading, .trailing], 20.0)
             .padding([.bottom], 6.0)

@@ -52,11 +52,10 @@ struct IllustrationsSection: View {
                         }
                     } label: {
                         Text("Shared.Select")
-                            .bold()
                             .padding([.leading, .trailing], 10.0)
                             .padding([.top, .bottom], 4.0)
                             .foregroundStyle(isSelectingIllustrations ? .white : .accent)
-                            .background(isSelectingIllustrations ? .accent : .primary.opacity(0.1))
+                            .background(isSelectingIllustrations ? .accent : .clear)
                             .clipShape(RoundedRectangle(cornerRadius: 99))
                     }
                 }
@@ -111,12 +110,12 @@ struct IllustrationsSection: View {
             .opacity(0.5)
             .overlay {
                 Image(systemName: "checkmark.circle.fill")
-                    .symbolRenderingMode(.hierarchical)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32.0, height: 32.0)
-                    .tint(.white)
+                    .foregroundStyle(.white)
             }
+            .transition(.scale.animation(.snappy.speed(4)))
     }
 
     @ViewBuilder
