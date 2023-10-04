@@ -1,7 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Generic Album Cover.001.png",
+      "filename" : "Generic Album Cover.004.png",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "Generic Album Cover.005.png",
       "idiom" : "universal"
     }
   ],

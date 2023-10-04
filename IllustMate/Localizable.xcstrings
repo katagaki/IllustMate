@@ -631,7 +631,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%@に戻す"
           }
         }
@@ -649,6 +649,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "名称変更"
+          }
+        }
+      }
+    },
+    "Shared.ResetCover" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Album Cover"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムカバーを消去"
           }
         }
       }

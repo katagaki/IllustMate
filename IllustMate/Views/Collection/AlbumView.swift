@@ -200,6 +200,14 @@ struct AlbumView: View {
     @ViewBuilder
     func albumContextMenu(_ album: Album) -> some View {
         Button {
+            withAnimation(.snappy.speed(2)) {
+                album.coverPhoto = nil
+            }
+        } label: {
+            Label("Shared.ResetCover", systemImage: "photo")
+        }
+        Divider()
+        Button {
             albumToRename = album
         } label: {
             Label("Shared.Rename", systemImage: "pencil")
