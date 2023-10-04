@@ -62,7 +62,7 @@ struct IllustrationsSection: View {
             Group {
                 if !illustrations.isEmpty {
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                        ForEach(illustrations) { illustration in
+                        ForEach(illustrations, id: \.id) { illustration in
                             Group {
                                 if isSelectingIllustrations {
                                     selectableIllustrationItem(illustration)

@@ -37,7 +37,7 @@ struct AlbumsSection: View {
             Group {
                 if !albums.isEmpty {
                     LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-                        ForEach(albums) { album in
+                        ForEach(albums, id: \.id) { album in
                             NavigationLink(value: ViewPath.album(album: album)) {
                                 VStack(alignment: .leading, spacing: 8.0) {
                                     Group {

@@ -58,6 +58,10 @@ final class Illustration {
         }
     }
 
+    func addToAlbum(_ album: Album) {
+        containingAlbums?.append(album)
+    }
+
     func prepareForDeletion() {
         if let illustrationPath = illustrationPath() {
             try? FileManager.default.removeItem(atPath: illustrationPath)

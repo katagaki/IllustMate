@@ -37,7 +37,7 @@ struct RenameAlbumView: View {
                 if let album = album {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            album.name = newAlbumName
+                            album.name = newAlbumName.trimmingCharacters(in: .whitespaces)
                             dismiss()
                         } label: {
                             Text("Shared.Rename")
