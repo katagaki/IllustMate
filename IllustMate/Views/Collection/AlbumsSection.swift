@@ -25,7 +25,13 @@ struct AlbumsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0.0) {
             HStack(alignment: .center, spacing: 16.0) {
-                ListSectionHeader(text: "Albums.Albums")
+                HStack(alignment: .center, spacing: 8.0) {
+                    ListSectionHeader(text: "Albums.Albums")
+                    if !albums.isEmpty {
+                        Text("(\(albums.count))")
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 Spacer()
                 Button {
                     isAddingAlbum = true

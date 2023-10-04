@@ -36,27 +36,31 @@ struct IllustrationsSection: View {
                     }
                 }
                 Spacer()
-                if isSelectingIllustrations {
+                Group {
+                    if isSelectingIllustrations {
+                        Button {
+                            selectedIllustrations.removeAll()
+                            selectedIllustrations.append(contentsOf: illustrations)
+                        } label: {
+                            Text("Shared.SelectAll")
+                        }
+                    }
                     Button {
-                        selectedIllustrations.removeAll()
-                        selectedIllustrations.append(contentsOf: illustrations)
+                        isSelectingIllustrations.toggle()
+                        if !isSelectingIllustrations {
+                            selectedIllustrations.removeAll()
+                        }
                     } label: {
-                        Text("Shared.SelectAll")
+                        Text("Shared.Select")
+                            .bold()
+                            .padding([.leading, .trailing], 10.0)
+                            .padding([.top, .bottom], 4.0)
+                            .foregroundStyle(isSelectingIllustrations ? .white : .accent)
+                            .background(isSelectingIllustrations ? .accent : .primary.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 99))
                     }
                 }
-                Button {
-                    isSelectingIllustrations.toggle()
-                    if !isSelectingIllustrations {
-                        selectedIllustrations.removeAll()
-                    }
-                } label: {
-                    Text("Shared.Select")
-                        .padding([.leading, .trailing], 8.0)
-                        .padding([.top, .bottom], 4.0)
-                        .foregroundStyle(isSelectingIllustrations ? .white : .accent)
-                        .background(isSelectingIllustrations ? .accent : .clear)
-                        .clipShape(RoundedRectangle(cornerRadius: 99))
-                }
+                .disabled(illustrations.isEmpty)
             }
             .padding([.leading, .trailing], 20.0)
             .padding([.bottom], 6.0)
