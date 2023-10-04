@@ -497,7 +497,7 @@ struct AlbumView: View {
             let currentAlbumID = currentAlbum?.id
             illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
                 predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.dateAdded)]))
+                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]))
         } catch {
             debugPrint(error.localizedDescription)
         }
