@@ -29,7 +29,7 @@ struct AlbumView: View {
     @State var selectedIllustrations: [Illustration] = []
 
     @State var displayedIllustration: Illustration?
-    @State var illustrationDisplayOffset: CGSize = .zero
+    @GestureState var illustrationDisplayOffset: CGSize = .zero
 
     let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
                                     GridItem(.flexible(), spacing: 20.0)]
@@ -49,9 +49,6 @@ struct AlbumView: View {
             .padding([.top], 20.0)
         }
         .background(Color.init(uiColor: .systemGroupedBackground))
-        .onAppear {
-            refreshData()
-        }
 #if !targetEnvironment(macCatalyst)
         .refreshable {
             withAnimation(.snappy.speed(2)) {
@@ -78,6 +75,22 @@ struct AlbumView: View {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
+//                            .gesture(
+//                                DragGesture()
+//                                    .updating($illustrationDisplayOffset) { value, state, transaction in
+//                                        state = value.translation
+//                                    }
+//                                    .onEnded { gesture in
+//                                        let hypotenuse = sqrt((gesture.translation.width * gesture.translation.width) +
+//                                                              (gesture.translation.height * gesture.translation.height))
+//                                        if hypotenuse > 50.0 {
+//                                            withAnimation(.snappy.speed(2)) {
+//                                                self.displayedIllustration = nil
+//                                            }
+//                                        }
+//                                    }
+//                            )
+//                            .offset(illustrationDisplayOffset)
                     } else {
                         Image(systemName: "xmark.octagon.fill")
                             .symbolRenderingMode(.multicolor)
@@ -91,27 +104,6 @@ struct AlbumView: View {
                 .padding()
                 .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace,
                                        properties: .position)
-                .gesture(
-                    DragGesture()
-                        .onChanged { gesture in
-                            illustrationDisplayOffset = gesture.translation
-                        }
-                        .onEnded { gesture in
-                            let hypotenuse = sqrt((gesture.translation.width * gesture.translation.width) +
-                                                  (gesture.translation.height * gesture.translation.height))
-                            if hypotenuse > 50.0 {
-                                withAnimation(.snappy.speed(2)) {
-                                    self.displayedIllustration = nil
-                                }
-                                illustrationDisplayOffset = .zero
-                            } else {
-                                withAnimation(.snappy.speed(2)) {
-                                    illustrationDisplayOffset = .zero
-                                }
-                            }
-                        }
-                )
-                .offset(illustrationDisplayOffset)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -124,6 +116,7 @@ struct AlbumView: View {
                                 .symbolRenderingMode(.hierarchical)
                                 .font(.title2)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
                 .safeAreaInset(edge: .bottom, spacing: 0.0) {
@@ -205,6 +198,9 @@ struct AlbumView: View {
         }, content: { album in
             RenameAlbumView(album: album)
         })
+        .onAppear {
+            refreshData()
+        }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 
