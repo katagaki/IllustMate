@@ -66,6 +66,46 @@ struct AlbumView: View {
             }
         }
         #endif
+        .safeAreaInset(edge: .bottom) {
+            if isSelectingIllustrations {
+                HStack(alignment: .center, spacing: 16.0) {
+                    Text("Shared.Selected.\(selectedIllustrations.count)")
+                    Spacer()
+                    Menu {
+                        moveToAlbumMenu(selectedIllustrations) {
+                            try? modelContext.save()
+                            isSelectingIllustrations = false
+                            selectedIllustrations.removeAll()
+                            withAnimation(.snappy.speed(2)) {
+                                refreshIllustrations()
+                            }
+                        }
+                    } label: {
+                        Label("Shared.Move", systemImage: "tray.full")
+                    }
+                    Button {
+                        if illustrations.count == selectedIllustrations.count {
+                            selectedIllustrations.removeAll()
+                        } else {
+                            selectedIllustrations.removeAll()
+                            selectedIllustrations.append(contentsOf: illustrations)
+                        }
+                    } label: {
+                        if illustrations.count == selectedIllustrations.count {
+                            Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                        } else {
+                            Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                        }
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(.thickMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 99))
+                .padding()
+                .transition(.move(edge: .bottom).animation(.snappy.speed(2)))
+            }
+        }
         .sheet(isPresented: $isAddingAlbum, onDismiss: {
             refreshAlbums()
         }, content: {
@@ -105,6 +145,7 @@ struct AlbumView: View {
                 .background(colorScheme == .light ?
                             Color.init(uiColor: .secondarySystemGroupedBackground) :
                                 Color.init(uiColor: .systemBackground))
+                .transition(.opacity.animation(.snappy.speed(2)))
             } else {
                 Divider()
                     .padding([.leading], 20.0)
@@ -329,18 +370,12 @@ struct AlbumView: View {
             }
             Spacer()
             Group {
-                if isSelectingIllustrations {
-                    Button {
-                        selectedIllustrations.removeAll()
-                        selectedIllustrations.append(contentsOf: illustrations)
-                    } label: {
-                        Text("Shared.SelectAll")
-                    }
-                }
                 Button {
-                    isSelectingIllustrations.toggle()
-                    if !isSelectingIllustrations {
-                        selectedIllustrations.removeAll()
+                    withAnimation(.snappy.speed(2)) {
+                        if isSelectingIllustrations {
+                            selectedIllustrations.removeAll()
+                        }
+                        isSelectingIllustrations.toggle()
                     }
                 } label: {
                     if isSelectingIllustrations {
@@ -394,7 +429,6 @@ struct AlbumView: View {
         var shouldDisplay: Bool = true
         ZStack {
             if shouldDisplay {
-                Text(verbatim: "true")
                 if let thumbnailImage = illustration.thumbnail() {
                     Image(uiImage: thumbnailImage)
                         .resizable()
@@ -411,7 +445,6 @@ struct AlbumView: View {
                         }
                 }
             } else {
-                Text(verbatim: "false")
                 Rectangle()
                     .foregroundStyle(.clear)
             }

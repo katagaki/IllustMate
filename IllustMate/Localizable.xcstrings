@@ -62,13 +62,13 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Photo"
+                      "value" : "%arg Illustration"
                     }
                   },
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Photos"
+                      "value" : "%arg Illustrations"
                     }
                   }
                 }
@@ -110,7 +110,7 @@
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg枚の写真"
+                      "value" : "%arg枚のイラスト"
                     }
                   }
                 }
@@ -661,6 +661,23 @@
         }
       }
     },
+    "Shared.DeselectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての選択を解除"
+          }
+        }
+      }
+    },
     "Shared.Illustrations" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -674,6 +691,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イラスト"
+          }
+        }
+      }
+    },
+    "Shared.Move" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動"
           }
         }
       }
@@ -775,6 +809,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてを選択"
+          }
+        }
+      }
+    },
+    "Shared.Selected.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Items"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld個の項目"
+                }
+              }
+            }
           }
         }
       }

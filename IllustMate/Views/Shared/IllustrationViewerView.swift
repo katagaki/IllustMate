@@ -34,6 +34,7 @@ struct IllustrationViewerView: View {
                 }
             }
         }
+        .frame(maxHeight: .infinity)
         .task {
             self.image = illustration.image()
             self.name = illustration.name
@@ -41,6 +42,13 @@ struct IllustrationViewerView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             HStack(alignment: .center, spacing: 16.0) {
+                Button {
+                    if let image = illustration.image() {
+                        UIPasteboard.general.image = image
+                    }
+                } label: {
+                    Label("Shared.Copy", systemImage: "doc.on.doc")
+                }
                 Spacer()
                 if let uiImage = image {
                     let image = Image(uiImage: uiImage)
