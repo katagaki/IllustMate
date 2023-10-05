@@ -5,11 +5,14 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import Komponents
 import SwiftUI
 
-struct IllustrationViewerView: View {
+struct IllustrationViewer: View {
 
-    var illustration: Illustration
+    @Namespace var illustrationTransitionNamespace
+
+    @State var illustration: Illustration
     @State var image: UIImage?
     @State var name: String = ""
     @State var isInitialLoadCompleted: Bool = false
@@ -19,6 +22,8 @@ struct IllustrationViewerView: View {
             if let image = image {
                 Image(uiImage: image)
                     .resizable()
+                    .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
+                                           properties: [.position])
                     .scaledToFit()
             } else {
                 if isInitialLoadCompleted {
@@ -35,10 +40,13 @@ struct IllustrationViewerView: View {
             }
         }
         .frame(maxHeight: .infinity)
+        .padding()
         .task {
-            self.image = illustration.image()
-            self.name = illustration.name
-            isInitialLoadCompleted = true
+            if !isInitialLoadCompleted {
+                self.image = illustration.image()
+                self.name = illustration.name
+                isInitialLoadCompleted = true
+            }
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             HStack(alignment: .center, spacing: 16.0) {
@@ -60,12 +68,9 @@ struct IllustrationViewerView: View {
             .frame(maxWidth: .infinity)
             .padding()
             .background(.regularMaterial)
-            .overlay(Rectangle().frame(width: nil,
-                                       height: 1/3,
-                                       alignment: .top).foregroundColor(.primary.opacity(0.3)),
-                     alignment: .top)
+            .clipShape(RoundedRectangle(cornerRadius: 99))
+            .padding()
         }
-        .navigationTitle(name)
-        .navigationBarTitleDisplayMode(.inline)
+        .background(.regularMaterial)
     }
 }

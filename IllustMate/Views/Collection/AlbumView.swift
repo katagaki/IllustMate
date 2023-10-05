@@ -16,6 +16,8 @@ struct AlbumView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @Namespace var illustrationTransitionNamespace
+
     @State var albums: [Album] = []
     @State var illustrations: [Illustration] = []
     @State var currentAlbum: Album?
@@ -25,6 +27,8 @@ struct AlbumView: View {
 
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
+
+    @State var displayedIllustration: Illustration?
 
     let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
                                     GridItem(.flexible(), spacing: 20.0)]
@@ -47,13 +51,13 @@ struct AlbumView: View {
         .onAppear {
             refreshData()
         }
-        #if !targetEnvironment(macCatalyst)
+#if !targetEnvironment(macCatalyst)
         .refreshable {
             withAnimation(.snappy.speed(2)) {
                 refreshData()
             }
         }
-        #else
+#else
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -65,7 +69,25 @@ struct AlbumView: View {
                 }
             }
         }
-        #endif
+#endif
+        .overlay {
+            if let displayedIllustration = displayedIllustration {
+                IllustrationViewer(illustration: displayedIllustration)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                self.displayedIllustration = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.primary)
+                                    .symbolRenderingMode(.hierarchical)
+                                    .font(.title2)
+                            }
+                        }
+                    }
+                    .transition(.scale.animation(.snappy.speed(2)))
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             if isSelectingIllustrations {
                 HStack(alignment: .center, spacing: 16.0) {
@@ -408,7 +430,7 @@ struct AlbumView: View {
                         selectedIllustrations.append(illustration)
                     }
                 } else {
-                    navigationManager.push(ViewPath.illustrationViewer(illustration: illustration), for: .collection)
+                    displayedIllustration = illustration
                 }
             }
             .contextMenu {
@@ -433,8 +455,15 @@ struct AlbumView: View {
         ZStack {
             if shouldDisplay {
                 if let thumbnailImage = illustration.thumbnail() {
-                    Image(uiImage: thumbnailImage)
-                        .resizable()
+                    if displayedIllustration?.id != illustration.id {
+                        Image(uiImage: thumbnailImage)
+                            .resizable()
+                            .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
+                                                   isSource: true)
+                    } else {
+                        Rectangle()
+                            .foregroundStyle(.clear)
+                    }
                 } else {
                     Rectangle()
                         .foregroundStyle(.clear)

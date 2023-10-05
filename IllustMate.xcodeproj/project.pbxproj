@@ -10,6 +10,7 @@
 		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
 		E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */; };
 		E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
+		E45A8BC82ACF23C400E3035E /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = E45A8BC72ACF23C400E3035E /* NavigationTransitions */; };
 		E4614CE72ACA86C900D751FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* App.swift */; };
 		E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumView.swift */; };
 		E4614CEB2ACA86C900D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
@@ -29,7 +30,7 @@
 		E4614D2E2ACB0FF500D751FB /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D2D2ACB0FF500D751FB /* TabType.swift */; };
 		E4614D302ACB100B00D751FB /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D2F2ACB100B00D751FB /* NavigationManager.swift */; };
 		E4614D322ACB103200D751FB /* TabManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D312ACB103200D751FB /* TabManager.swift */; };
-		E4614D362ACB11C800D751FB /* IllustrationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */; };
+		E4614D362ACB11C800D751FB /* IllustrationViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D352ACB11C800D751FB /* IllustrationViewer.swift */; };
 		E4614D382ACB1C9800D751FB /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */; };
 		E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D392ACB274700D751FB /* CollectionView.swift */; };
 		E4614D462ACB417500D751FB /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D452ACB417500D751FB /* ImportView.swift */; };
@@ -91,7 +92,7 @@
 		E4614D2D2ACB0FF500D751FB /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
 		E4614D2F2ACB100B00D751FB /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		E4614D312ACB103200D751FB /* TabManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabManager.swift; sourceTree = "<group>"; };
-		E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewerView.swift; sourceTree = "<group>"; };
+		E4614D352ACB11C800D751FB /* IllustrationViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewer.swift; sourceTree = "<group>"; };
 		E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E4614D392ACB274700D751FB /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		E4614D452ACB417500D751FB /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
@@ -110,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */,
+				E45A8BC82ACF23C400E3035E /* NavigationTransitions in Frameworks */,
 				E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -236,7 +238,7 @@
 		E4614D3F2ACB2B7D00D751FB /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				E4614D352ACB11C800D751FB /* IllustrationViewerView.swift */,
+				E4614D352ACB11C800D751FB /* IllustrationViewer.swift */,
 				E4614D472ACB46D700D751FB /* ProgressAlert.swift */,
 				E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */,
 			);
@@ -289,6 +291,7 @@
 			packageProductDependencies = (
 				E4614D192ACAB6AD00D751FB /* Komponents */,
 				E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */,
+				E45A8BC72ACF23C400E3035E /* NavigationTransitions */,
 			);
 			productName = IllustMate;
 			productReference = E4614CE32ACA86C900D751FB /* PicMate.app */;
@@ -342,6 +345,7 @@
 			packageReferences = (
 				E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */,
 				E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
+				E45A8BC62ACF23C400E3035E /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
 			);
 			productRefGroup = E4614CE42ACA86C900D751FB /* Products */;
 			projectDirPath = "";
@@ -420,7 +424,7 @@
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 				E4614D2E2ACB0FF500D751FB /* TabType.swift in Sources */,
-				E4614D362ACB11C800D751FB /* IllustrationViewerView.swift in Sources */,
+				E4614D362ACB11C800D751FB /* IllustrationViewer.swift in Sources */,
 				E4614D302ACB100B00D751FB /* NavigationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -742,6 +746,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E45A8BC62ACF23C400E3035E /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.13.1;
+			};
+		};
 		E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/katagaki/Komponents";
@@ -761,6 +773,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E45A8BC72ACF23C400E3035E /* NavigationTransitions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E45A8BC62ACF23C400E3035E /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */;
+			productName = NavigationTransitions;
+		};
 		E4614D192ACAB6AD00D751FB /* Komponents */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */;
