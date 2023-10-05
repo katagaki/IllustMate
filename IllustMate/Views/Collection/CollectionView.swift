@@ -21,7 +21,6 @@ struct CollectionView: View {
                 .navigationDestination(for: ViewPath.self, destination: { viewPath in
                     switch viewPath {
                     case .album(let album): AlbumView(currentAlbum: album)
-                    case .illustrationViewer(let illustration): IllustrationViewer(illustration: illustration)
                     default: Color.clear
                     }
                 })

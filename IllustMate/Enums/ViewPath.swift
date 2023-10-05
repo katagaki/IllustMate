@@ -9,6 +9,5 @@ import Foundation
 
 enum ViewPath: Hashable {
     case album(album: Album)
-    case illustrationViewer(illustration: Illustration)
     case moreAttributions
 }
