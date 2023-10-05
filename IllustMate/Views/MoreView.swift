@@ -79,7 +79,7 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
-                    Button {
+                    Button(role: .destructive) {
                         try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
                         try? modelContext.delete(model: Album.self, includeSubclasses: true)
                         for illustration in illustrations {
