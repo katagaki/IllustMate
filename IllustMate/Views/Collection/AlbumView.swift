@@ -613,8 +613,10 @@ struct AlbumView: View {
                 Label("Shared.Copy", systemImage: "doc.on.doc")
             }
             Button {
-                isSelectingIllustrations = true
-                selectedIllustrations.append(illustration)
+                withAnimation(.snappy.speed(2)) {
+                    isSelectingIllustrations = true
+                    selectedIllustrations.append(illustration)
+                }
             } label: {
                 Label("Shared.Select", systemImage: "checkmark.circle")
             }
