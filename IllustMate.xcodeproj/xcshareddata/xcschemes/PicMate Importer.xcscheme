@@ -30,8 +30,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4614CE22ACA86C900D751FB"
-               BuildableName = "IllustMate.app"
-               BlueprintName = "IllustMate"
+               BuildableName = "PicMate.app"
+               BlueprintName = "PicMate"
                ReferencedContainer = "container:IllustMate.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -56,12 +56,17 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       launchAutomaticallySubstyle = "2">
+      <RemoteRunnable
+         runnableDebuggingMode = "1"
+         BundleIdentifier = "com.apple.mobileslideshow"
+         RemotePath = "/Library/Developer/CoreSimulator/Volumes/iOS_21A328/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 17.0.simruntime/Contents/Resources/RuntimeRoot/Applications/MobileSlideShow.app">
+      </RemoteRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4614CE22ACA86C900D751FB"
-            BuildableName = "IllustMate.app"
-            BlueprintName = "IllustMate"
+            BuildableName = "PicMate.app"
+            BlueprintName = "PicMate"
             ReferencedContainer = "container:IllustMate.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -79,8 +84,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4614CE22ACA86C900D751FB"
-            BuildableName = "IllustMate.app"
-            BlueprintName = "IllustMate"
+            BuildableName = "PicMate.app"
+            BlueprintName = "PicMate"
             ReferencedContainer = "container:IllustMate.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -62,13 +62,13 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Illustration"
+                      "value" : "%arg Picture"
                     }
                   },
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Illustrations"
+                      "value" : "%arg Pictures"
                     }
                   }
                 }
@@ -110,7 +110,7 @@
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg枚のイラスト"
+                      "value" : "%arg枚の画像"
                     }
                   }
                 }
@@ -140,13 +140,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Illustrations"
+            "value" : "Pictures"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "イラスト"
+            "value" : "画像"
           }
         }
       }
@@ -174,13 +174,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No illustrations found"
+            "value" : "No pictures found"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "イラストがありません"
+            "value" : "画像がありません"
           }
         }
       }
@@ -225,13 +225,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Could Not Open Illustration"
+            "value" : "Could Not Open Picture"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "イラストが開けませんでした"
+            "value" : "画像が開けませんでした"
           }
         }
       }
@@ -684,13 +684,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Illustrations"
+            "value" : "Pictures"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "イラスト"
+            "value" : "画像"
           }
         }
       }

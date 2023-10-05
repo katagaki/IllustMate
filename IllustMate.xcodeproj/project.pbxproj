@@ -70,7 +70,7 @@
 /* Begin PBXFileReference section */
 		E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
 		E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRow.swift; sourceTree = "<group>"; };
-		E4614CE32ACA86C900D751FB /* IllustMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IllustMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4614CE32ACA86C900D751FB /* PicMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4614CE62ACA86C900D751FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4614CE82ACA86C900D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
 		E4614CEA2ACA86C900D751FB /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 		E4614CE42ACA86C900D751FB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E4614CE32ACA86C900D751FB /* IllustMate.app */,
+				E4614CE32ACA86C900D751FB /* PicMate.app */,
 				E4614CFC2ACA86EC00D751FB /* Importer.appex */,
 			);
 			name = Products;
@@ -270,9 +270,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E4614CE22ACA86C900D751FB /* IllustMate */ = {
+		E4614CE22ACA86C900D751FB /* PicMate */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E4614CF52ACA86CA00D751FB /* Build configuration list for PBXNativeTarget "IllustMate" */;
+			buildConfigurationList = E4614CF52ACA86CA00D751FB /* Build configuration list for PBXNativeTarget "PicMate" */;
 			buildPhases = (
 				E4614CDF2ACA86C900D751FB /* Sources */,
 				E4614CE02ACA86C900D751FB /* Frameworks */,
@@ -285,13 +285,13 @@
 			dependencies = (
 				E4614D052ACA86ED00D751FB /* PBXTargetDependency */,
 			);
-			name = IllustMate;
+			name = PicMate;
 			packageProductDependencies = (
 				E4614D192ACAB6AD00D751FB /* Komponents */,
 				E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */,
 			);
 			productName = IllustMate;
-			productReference = E4614CE32ACA86C900D751FB /* IllustMate.app */;
+			productReference = E4614CE32ACA86C900D751FB /* PicMate.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E4614CFB2ACA86EC00D751FB /* Importer */ = {
@@ -347,7 +347,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E4614CE22ACA86C900D751FB /* IllustMate */,
+				E4614CE22ACA86C900D751FB /* PicMate */,
 				E4614CFB2ACA86EC00D751FB /* Importer */,
 			);
 		};
@@ -721,7 +721,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E4614CF52ACA86CA00D751FB /* Build configuration list for PBXNativeTarget "IllustMate" */ = {
+		E4614CF52ACA86CA00D751FB /* Build configuration list for PBXNativeTarget "PicMate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4614CF62ACA86CA00D751FB /* Debug */,
