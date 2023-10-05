@@ -23,7 +23,7 @@ struct AlbumRow: View {
                         .resizable()
                 }
             }
-            .frame(width: 30.0, height: 30.0)
+            .frame(width: 48.0, height: 48.0)
             .clipShape(RoundedRectangle(cornerRadius: 6.0))
             .shadow(color: .black.opacity(0.2), radius: 2.0, x: 0.0, y: 2.0)
             VStack(alignment: .leading, spacing: 2.0) {
