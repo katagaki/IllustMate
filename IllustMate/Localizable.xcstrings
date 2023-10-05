@@ -617,13 +617,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copy Image"
+            "value" : "Copy"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像をコピー"
+            "value" : "コピー"
           }
         }
       }
