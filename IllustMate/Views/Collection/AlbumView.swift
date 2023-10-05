@@ -29,6 +29,7 @@ struct AlbumView: View {
     @State var selectedIllustrations: [Illustration] = []
 
     @State var displayedIllustration: Illustration?
+    @State var illustrationDisplayOffset: CGSize = .zero
 
     let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
                                     GridItem(.flexible(), spacing: 20.0)]
@@ -75,6 +76,27 @@ struct AlbumView: View {
                 IllustrationViewer(illustration: displayedIllustration)
                     .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace,
                                            properties: .position)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { gesture in
+                                illustrationDisplayOffset = gesture.translation
+                            }
+                            .onEnded { gesture in
+                                let hypotenuse = sqrt((gesture.translation.width * gesture.translation.width) +
+                                                      (gesture.translation.height * gesture.translation.height))
+                                if hypotenuse > 50.0 {
+                                    withAnimation(.snappy.speed(2)) {
+                                        self.displayedIllustration = nil
+                                    }
+                                    illustrationDisplayOffset = .zero
+                                } else {
+                                    withAnimation(.snappy.speed(2)) {
+                                        illustrationDisplayOffset = .zero
+                                    }
+                                }
+                            }
+                    )
+                    .offset(illustrationDisplayOffset)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
@@ -89,6 +111,30 @@ struct AlbumView: View {
                             }
                         }
                     }
+                    .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                        HStack(alignment: .center, spacing: 16.0) {
+                            Button {
+                                if let image = displayedIllustration.image() {
+                                    UIPasteboard.general.image = image
+                                }
+                            } label: {
+                                Label("Shared.Copy", systemImage: "doc.on.doc")
+                            }
+                            Spacer()
+                            if let uiImage = displayedIllustration.image() {
+                                let image = Image(uiImage: uiImage)
+                                ShareLink(item: image, preview: SharePreview(displayedIllustration.name, image: image)) {
+                                    Label("Shared.Share", systemImage: "square.and.arrow.up")
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 99))
+                        .padding()
+                    }
+                    .background(.regularMaterial)
             }
         }
         .safeAreaInset(edge: .bottom) {

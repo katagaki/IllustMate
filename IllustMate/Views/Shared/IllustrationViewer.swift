@@ -32,29 +32,5 @@ struct IllustrationViewer: View {
         }
         .frame(maxHeight: .infinity)
         .padding()
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            HStack(alignment: .center, spacing: 16.0) {
-                Button {
-                    if let image = illustration.image() {
-                        UIPasteboard.general.image = image
-                    }
-                } label: {
-                    Label("Shared.Copy", systemImage: "doc.on.doc")
-                }
-                Spacer()
-                if let uiImage = illustration.image() {
-                    let image = Image(uiImage: uiImage)
-                    ShareLink(item: image, preview: SharePreview(illustration.name, image: image)) {
-                        Label("Shared.Share", systemImage: "square.and.arrow.up")
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(.regularMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 99))
-            .padding()
-        }
-        .background(.regularMaterial)
     }
 }
