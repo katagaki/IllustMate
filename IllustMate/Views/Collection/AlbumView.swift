@@ -583,6 +583,9 @@ struct AlbumView: View {
                         illustration.prepareForDeletion()
                         modelContext.delete(illustration)
                     }
+                    withAnimation(.snappy.speed(2)) {
+                        refreshIllustrations()
+                    }
                 } label: {
                     Label("Shared.Delete", systemImage: "trash")
                 }
