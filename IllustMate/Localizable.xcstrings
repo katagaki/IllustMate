@@ -435,13 +435,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your data is automatically synced to your iCloud account.\nAs it is not currently possible to turn off iCloud sync from within the app, please go to Settings > Apple ID > iCloud > Show All to change iCloud sync settings for the app."
+            "value" : "Your data is automatically synced to your iCloud account."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アプリ内のデータは自動的にiCloudに同期されます。\nアプリではこの設定を変更することは不可能なため、「設定」アプリ＞「Apple ID」＞「iCloud」＞「すべてを表示」で設定を変更してください。"
+            "value" : "アプリ内のデータは自動的にiCloudに同期されます。"
           }
         }
       }
