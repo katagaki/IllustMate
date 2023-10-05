@@ -71,17 +71,20 @@ struct AlbumView: View {
                 HStack(alignment: .center, spacing: 16.0) {
                     Text("Shared.Selected.\(selectedIllustrations.count)")
                     Spacer()
-                    Menu {
-                        moveToAlbumMenu(selectedIllustrations) {
-                            try? modelContext.save()
-                            isSelectingIllustrations = false
-                            selectedIllustrations.removeAll()
-                            withAnimation(.snappy.speed(2)) {
-                                refreshIllustrations()
+                    if selectedIllustrations.count > 0 {
+                        Menu {
+                            moveToAlbumMenu(selectedIllustrations) {
+                                try? modelContext.save()
+                                isSelectingIllustrations = false
+                                selectedIllustrations.removeAll()
+                                withAnimation(.snappy.speed(2)) {
+                                    refreshIllustrations()
+                                }
                             }
+                        } label: {
+                            Label("Shared.Move", systemImage: "tray.full")
                         }
-                    } label: {
-                        Label("Shared.Move", systemImage: "tray.full")
+                        .transition(.opacity.animation(.snappy.speed(2)))
                     }
                     Button {
                         if illustrations.count == selectedIllustrations.count {
