@@ -16,7 +16,7 @@ final class Album {
     var coverPhoto: Data?
     var childAlbums: [Album]? = []
     var childIllustrations: [Illustration]? = []
-    @Relationship(deleteRule: .cascade, inverse: \Album.childAlbums) var parentAlbum: Album?
+    @Relationship(deleteRule: .nullify, inverse: \Album.childAlbums) var parentAlbum: Album?
     var dateCreated: Date = Date.now
 
     init(name: String) {
