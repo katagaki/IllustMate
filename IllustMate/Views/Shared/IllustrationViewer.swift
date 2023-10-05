@@ -13,41 +13,25 @@ struct IllustrationViewer: View {
     @Namespace var illustrationTransitionNamespace
 
     @State var illustration: Illustration
-    @State var image: UIImage?
-    @State var name: String = ""
     @State var isInitialLoadCompleted: Bool = false
 
     var body: some View {
         VStack(alignment: .center, spacing: 8.0) {
-            if let image = image {
+            if let image = illustration.image() {
                 Image(uiImage: image)
                     .resizable()
-                    .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
-                                           properties: [.position])
                     .scaledToFit()
             } else {
-                if isInitialLoadCompleted {
-                    Image(systemName: "xmark.octagon.fill")
-                        .symbolRenderingMode(.multicolor)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 32.0, height: 32.0)
-                    Text("Illustration.Error.CouldNotOpen")
-                } else {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                }
+                Image(systemName: "xmark.octagon.fill")
+                    .symbolRenderingMode(.multicolor)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32.0, height: 32.0)
+                Text("Illustration.Error.CouldNotOpen")
             }
         }
         .frame(maxHeight: .infinity)
         .padding()
-        .task {
-            if !isInitialLoadCompleted {
-                self.image = illustration.image()
-                self.name = illustration.name
-                isInitialLoadCompleted = true
-            }
-        }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             HStack(alignment: .center, spacing: 16.0) {
                 Button {
@@ -58,9 +42,9 @@ struct IllustrationViewer: View {
                     Label("Shared.Copy", systemImage: "doc.on.doc")
                 }
                 Spacer()
-                if let uiImage = image {
+                if let uiImage = illustration.image() {
                     let image = Image(uiImage: uiImage)
-                    ShareLink(item: image, preview: SharePreview(name, image: image)) {
+                    ShareLink(item: image, preview: SharePreview(illustration.name, image: image)) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
                 }

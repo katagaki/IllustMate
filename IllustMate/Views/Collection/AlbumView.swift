@@ -73,10 +73,14 @@ struct AlbumView: View {
         .overlay {
             if let displayedIllustration = displayedIllustration {
                 IllustrationViewer(illustration: displayedIllustration)
+                    .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace,
+                                           properties: .position)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
-                                self.displayedIllustration = nil
+                                withAnimation(.snappy.speed(2)) {
+                                    self.displayedIllustration = nil
+                                }
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(.primary)
@@ -85,7 +89,6 @@ struct AlbumView: View {
                             }
                         }
                     }
-                    .transition(.scale.animation(.snappy.speed(2)))
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -430,7 +433,9 @@ struct AlbumView: View {
                         selectedIllustrations.append(illustration)
                     }
                 } else {
-                    displayedIllustration = illustration
+                    withAnimation(.snappy.speed(2)) {
+                        displayedIllustration = illustration
+                    }
                 }
             }
             .contextMenu {
@@ -452,18 +457,13 @@ struct AlbumView: View {
     @ViewBuilder
     func illustrationLabel(_ illustration: Illustration) -> some View {
         var shouldDisplay: Bool = true
-        ZStack {
+        VStack(alignment: .center, spacing: 8.0) {
             if shouldDisplay {
                 if let thumbnailImage = illustration.thumbnail() {
-                    if displayedIllustration?.id != illustration.id {
-                        Image(uiImage: thumbnailImage)
-                            .resizable()
-                            .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
-                                                   isSource: true)
-                    } else {
-                        Rectangle()
-                            .foregroundStyle(.clear)
-                    }
+                    Image(uiImage: thumbnailImage)
+                        .resizable()
+                        .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
+                                               properties: .frame)
                 } else {
                     Rectangle()
                         .foregroundStyle(.clear)
