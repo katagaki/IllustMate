@@ -130,6 +130,8 @@ struct AlbumView: View {
                                             .foregroundStyle(.primary)
                                         Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
                                             .foregroundStyle(.secondary)
+                                            .font(.caption)
+                                            .lineLimit(1)
                                     }
                                 }
                             }
