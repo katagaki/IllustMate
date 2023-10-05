@@ -568,6 +568,8 @@ struct AlbumView: View {
     func illustrationContextMenu(_ illustration: Illustration) -> some View {
         if isSelectingIllustrations {
             if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                Text("Shared.Selected.\(selectedIllustrations.count)")
+                Divider()
                 moveToAlbumMenu(selectedIllustrations) {
                     try? modelContext.save()
                     isSelectingIllustrations = false
