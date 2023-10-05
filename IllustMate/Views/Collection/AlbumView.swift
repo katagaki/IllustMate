@@ -507,7 +507,10 @@ struct AlbumView: View {
                     parentAlbum.addChildIllustrations(illustrations)
                     postMoveAction()
                 } label: {
-                    Label("Shared.MoveOutTo.\(parentAlbum.name)", systemImage: "tray.and.arrow.up")
+                    Label(
+                        title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
+                        icon: { Image(uiImage: parentAlbum.cover()) }
+                    )
                 }
             }
             Button {
@@ -525,7 +528,10 @@ struct AlbumView: View {
                     album.addChildIllustrations(illustrations)
                     postMoveAction()
                 } label: {
-                    Text(album.name)
+                    Label(
+                        title: { Text(album.name) },
+                        icon: { Image(uiImage: album.cover()) }
+                    )
                 }
             }
         } label: {

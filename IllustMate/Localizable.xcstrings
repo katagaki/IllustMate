@@ -795,6 +795,23 @@
         }
       }
     },
+    "Shared.Share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有"
+          }
+        }
+      }
+    },
     "TabTitle.Collection" : {
       "extractionState" : "manual",
       "localizations" : {

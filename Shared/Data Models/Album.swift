@@ -31,6 +31,14 @@ final class Album {
         return childIllustrations ?? []
     }
 
+    func cover() -> UIImage {
+        if let coverPhoto = coverPhoto,
+           let uiImage = UIImage(data: coverPhoto) {
+            return uiImage.scalePreservingAspectRatio(targetSize: CGSize(width: 60.0, height: 60.0))
+        }
+        return UIImage(named: "Album.Generic")!
+    }
+
     func isInAlbum(_ album: Album?) -> Bool {
         if let album = album {
             return parentAlbum == album

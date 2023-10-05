@@ -39,13 +39,23 @@ struct IllustrationViewerView: View {
             self.name = illustration.name
             isInitialLoadCompleted = true
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            HStack(alignment: .center, spacing: 16.0) {
+                Spacer()
                 if let uiImage = image {
                     let image = Image(uiImage: uiImage)
-                    ShareLink(item: image, preview: SharePreview(name, image: image))
+                    ShareLink(item: image, preview: SharePreview(name, image: image)) {
+                        Label("Shared.Share", systemImage: "square.and.arrow.up")
+                    }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.regularMaterial)
+            .overlay(Rectangle().frame(width: nil,
+                                       height: 1/3,
+                                       alignment: .top).foregroundColor(.primary.opacity(0.3)),
+                     alignment: .top)
         }
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
