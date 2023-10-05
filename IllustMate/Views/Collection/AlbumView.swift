@@ -610,6 +610,12 @@ struct AlbumView: View {
             } label: {
                 Label("Shared.Copy", systemImage: "doc.on.doc")
             }
+            Button {
+                isSelectingIllustrations = true
+                selectedIllustrations.append(illustration)
+            } label: {
+                Label("Shared.Select", systemImage: "checkmark.circle")
+            }
             Button(role: .destructive) {
                 illustration.prepareForDeletion()
                 modelContext.delete(illustration)
