@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "(%lld)" : {
       "localizations" : {
         "ja" : {
@@ -408,6 +411,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのデータを消去"
+          }
+        }
+      }
+    },
+    "More.RebuildThumbnails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebuild Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルキャッシュを再構築"
+          }
+        }
+      }
+    },
+    "More.RebuildThumbnails.Rebuilding" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebuilding thumbnails..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルのキャッシュを再構築中…"
           }
         }
       }

@@ -15,8 +15,12 @@ struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.modelContext) var modelContext
     @ObservedObject var syncMonitor = SyncMonitor.shared
-    @Query var albums: [Album]
-    @Query var illustrations: [Illustration]
+
+    @Binding var isReportingProgress: Bool
+    @Binding var progressViewText: LocalizedStringKey
+    @Binding var currentProgress: Int
+    @Binding var total: Int
+    @Binding var percentage: Int
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -79,15 +83,13 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    Button {
+                        rebuildThumbnails()
+                    } label: {
+                        Text("More.RebuildThumbnails")
+                    }
                     Button(role: .destructive) {
-                        try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
-                        try? modelContext.delete(model: Album.self, includeSubclasses: true)
-                        for illustration in illustrations {
-                            modelContext.delete(illustration)
-                        }
-                        for album in albums {
-                            modelContext.delete(album)
-                        }
+                        deleteData()
                         deleteContents(of: illustrationsFolder)
                         deleteContents(of: thumbnailsFolder)
                         deleteContents(of: importsFolder)
@@ -150,6 +152,60 @@ SOFTWARE.
                 default: Color.clear
                 }
             }
+        }
+    }
+
+    func rebuildThumbnails() {
+        if let thumbnailsFolder = thumbnailsFolder {
+            do {
+                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+                progressViewText = "More.RebuildThumbnails.Rebuilding"
+                currentProgress = 0
+                total = illustrations.count
+                percentage = 0
+                withAnimation(.easeOut.speed(2)) {
+                    isReportingProgress = true
+                }
+                try FileManager.default.removeItem(at: thumbnailsFolder)
+                try FileManager.default.createDirectory(at: thumbnailsFolder,
+                                                        withIntermediateDirectories: false)
+                Task {
+                    await withDiscardingTaskGroup { group in
+                        for illustration in illustrations {
+                            group.addTask {
+                                if let illustrationPath = illustration.illustrationPath(),
+                                   let illustrationImage = UIImage(contentsOfFile: illustrationPath),
+                                   let thumbnailPath = illustration.thumbnailPath(),
+                                   let thumbnailData = Illustration.makeThumbnail(illustrationImage.pngData()) {
+                                    FileManager.default.createFile(atPath: thumbnailPath, contents: thumbnailData)
+                                }
+                                DispatchQueue.main.async {
+                                    currentProgress += 1
+                                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                                }
+                            }
+                        }
+                    }
+                    isReportingProgress = false
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
+    func deleteData() {
+        try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
+        try? modelContext.delete(model: Album.self, includeSubclasses: true)
+        do {
+            for illustration in try modelContext.fetch(FetchDescriptor<Illustration>()) {
+                modelContext.delete(illustration)
+            }
+            for album in try modelContext.fetch(FetchDescriptor<Album>()) {
+                modelContext.delete(album)
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 

@@ -21,6 +21,7 @@ struct ImportView: View {
     @State var selectedAlbum: Album?
 
     @Binding var isImporting: Bool
+    @Binding var progressViewText: LocalizedStringKey
     @Binding var currentProgress: Int
     @Binding var total: Int
     @Binding var percentage: Int
@@ -62,6 +63,7 @@ struct ImportView: View {
                 }
                 Section {
                     Button {
+                        progressViewText = "Import.Importing"
                         currentProgress = 0
                         total = selectedPhotoItems.count
                         percentage = 0
