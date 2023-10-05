@@ -75,6 +75,7 @@ struct AlbumView: View {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
+                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
 //                            .gesture(
 //                                DragGesture()
 //                                    .updating($illustrationDisplayOffset) { value, state, transaction in
