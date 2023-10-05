@@ -13,6 +13,7 @@ import SwiftData
 struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var navigationManager: NavigationManager
 
     @State var albums: [Album] = []
@@ -46,11 +47,25 @@ struct AlbumView: View {
         .onAppear {
             refreshData()
         }
+        #if !targetEnvironment(macCatalyst)
         .refreshable {
             withAnimation(.snappy.speed(2)) {
                 refreshData()
             }
         }
+        #else
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(.snappy.speed(2)) {
+                        refreshData()
+                    }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+            }
+        }
+        #endif
         .sheet(isPresented: $isAddingAlbum, onDismiss: {
             refreshAlbums()
         }, content: {
@@ -74,17 +89,22 @@ struct AlbumView: View {
                 .padding([.bottom], 6.0)
             if !albums.isEmpty {
                 Divider()
+                    .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
                 Group {
                     switch style {
                     case .grid:
                         albumsGrid()
                             .padding(20.0)
-                        Divider()
+                        if colorScheme == .light {
+                            Divider()
+                        }
                     case .list:
                         albumsList()
                     }
                 }
-                .background(Color.init(uiColor: .secondarySystemGroupedBackground))
+                .background(colorScheme == .light ?
+                            Color.init(uiColor: .secondarySystemGroupedBackground) :
+                                Color.init(uiColor: .systemBackground))
             } else {
                 Divider()
                     .padding([.leading], 20.0)
@@ -279,8 +299,12 @@ struct AlbumView: View {
                             illustrationItem(illustration)
                         }
                     }
-                    .background(Color.init(uiColor: .secondarySystemGroupedBackground))
-                    Divider()
+                    .background(colorScheme == .light ?
+                                Color.init(uiColor: .secondarySystemGroupedBackground) :
+                                    Color.init(uiColor: .systemBackground))
+                    if colorScheme == .light {
+                        Divider()
+                    }
                 } else {
                     Divider()
                         .padding([.leading], 20.0)
