@@ -159,17 +159,7 @@ struct AlbumView: View {
                                     }
                                 }
                                 .onTapGesture {
-                                    if isSelectingIllustrations {
-                                        if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                                            selectedIllustrations.removeAll(where: { $0.id == illustration.id })
-                                        } else {
-                                            selectedIllustrations.append(illustration)
-                                        }
-                                    } else {
-                                        withAnimation(.snappy.speed(2)) {
-                                            displayedIllustration = illustration
-                                        }
-                                    }
+                                    selectOrDeselectIllustration(illustration)
                                 }
                                 .contextMenu {
                                     illustrationContextMenu(illustration)
@@ -420,7 +410,19 @@ struct AlbumView: View {
         }
     }
 
-    // MARK: Data
+    func selectOrDeselectIllustration(_ illustration: Illustration) {
+        if isSelectingIllustrations {
+            if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                selectedIllustrations.removeAll(where: { $0.id == illustration.id })
+            } else {
+                selectedIllustrations.append(illustration)
+            }
+        } else {
+            withAnimation(.snappy.speed(2)) {
+                displayedIllustration = illustration
+            }
+        }
+    }
 
     func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
         if let currentAlbum = currentAlbum {
