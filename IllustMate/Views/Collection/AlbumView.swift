@@ -29,7 +29,7 @@ struct AlbumView: View {
     @State var selectedIllustrations: [Illustration] = []
 
     @State var displayedIllustration: Illustration?
-    @GestureState var illustrationDisplayOffset: CGSize = .zero
+    @State var illustrationDisplayOffset: CGSize = .zero
 
     let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
                                     GridItem(.flexible(), spacing: 20.0)]
@@ -79,8 +79,8 @@ struct AlbumView: View {
                                 .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                                 .gesture(
                                     DragGesture()
-                                        .updating($illustrationDisplayOffset) { value, state, _ in
-                                            state = value.translation
+                                        .onChanged { gesture in
+                                            illustrationDisplayOffset = gesture.translation
                                         }
                                         .onEnded { gesture in
                                             let width = gesture.translation.width
@@ -89,6 +89,10 @@ struct AlbumView: View {
                                             if hypotenuse > 50.0 {
                                                 withAnimation(.snappy.speed(2)) {
                                                     self.displayedIllustration = nil
+                                                }
+                                            } else {
+                                                withAnimation(.snappy.speed(2)) {
+                                                    illustrationDisplayOffset = .zero
                                                 }
                                             }
                                         }
