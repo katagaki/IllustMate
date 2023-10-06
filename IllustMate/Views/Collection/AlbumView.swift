@@ -70,67 +70,58 @@ struct AlbumView: View {
 #endif
         .overlay {
             if let displayedIllustration = displayedIllustration {
-                VStack(alignment: .center, spacing: 8.0) {
-                    if let illustrationPath = displayedIllustration.illustrationPath() {
-                        AsyncImage(url: URL(filePath: illustrationPath)) { image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { gesture in
-                                            illustrationDisplayOffset = gesture.translation
-                                        }
-                                        .onEnded { gesture in
-                                            let width = gesture.translation.width
-                                            let height = gesture.translation.height
-                                            let hypotenuse = sqrt((width * width) + (height * height))
-                                            if hypotenuse > 50.0 {
-                                                withAnimation(.snappy.speed(2)) {
-                                                    self.displayedIllustration = nil
-                                                }
-                                            } else {
-                                                withAnimation(.snappy.speed(2)) {
-                                                    illustrationDisplayOffset = .zero
-                                                }
-                                            }
-                                        }
-                                )
-                                .offset(illustrationDisplayOffset)
-                        } placeholder: {
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                        .transition(.opacity.animation(.snappy.speed(2)))
-                    } else {
-                        Image(systemName: "xmark.octagon.fill")
-                            .symbolRenderingMode(.multicolor)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 32.0, height: 32.0)
-                        Text("Illustration.Error.CouldNotOpen")
-                    }
-                }
-                .frame(maxHeight: .infinity)
-                .padding()
-                .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
+                VStack(alignment: .center, spacing: 16.0) {
+                    HStack(alignment: .center, spacing: 8.0) {
+                        Text(displayedIllustration.name)
+                            .bold()
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
                         Button {
                             withAnimation(.snappy.speed(2)) {
                                 self.displayedIllustration = nil
                             }
                         } label: {
                             Image(systemName: "xmark.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24.0, height: 24.0)
                                 .foregroundStyle(.primary)
                                 .symbolRenderingMode(.hierarchical)
-                                .font(.title2)
                         }
                         .buttonStyle(.plain)
                     }
-                }
-                .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                    AsyncImage(url: URL(filePath: displayedIllustration.illustrationPath())) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                    } placeholder: {
+                        Rectangle()
+                            .foregroundStyle(.clear)
+                    }
+                    .offset(illustrationDisplayOffset)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { gesture in
+                                illustrationDisplayOffset = gesture.translation
+                            }
+                            .onEnded { gesture in
+                                let width = gesture.translation.width
+                                let height = gesture.translation.height
+                                let hypotenuse = sqrt((width * width) + (height * height))
+                                if hypotenuse > 50.0 {
+                                    withAnimation(.snappy.speed(2)) {
+                                        self.displayedIllustration = nil
+                                        illustrationDisplayOffset = .zero
+                                    }
+                                } else {
+                                    withAnimation(.snappy.speed(2)) {
+                                        illustrationDisplayOffset = .zero
+                                    }
+                                }
+                            }
+                    )
+                    .transition(.opacity.animation(.snappy.speed(2)))
                     HStack(alignment: .center, spacing: 16.0) {
                         Button {
                             if let image = displayedIllustration.image() {
@@ -139,20 +130,22 @@ struct AlbumView: View {
                         } label: {
                             Label("Shared.Copy", systemImage: "doc.on.doc")
                         }
-                        Spacer()
+                        .buttonStyle(.borderedProminent)
+                        .clipShape(RoundedRectangle(cornerRadius: 99))
                         if let uiImage = displayedIllustration.image() {
                             let image = Image(uiImage: uiImage)
                             ShareLink(item: image, preview: SharePreview(displayedIllustration.name, image: image)) {
                                 Label("Shared.Share", systemImage: "square.and.arrow.up")
                             }
+                            .buttonStyle(.borderedProminent)
+                            .clipShape(RoundedRectangle(cornerRadius: 99))
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.regularMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 99))
-                    .padding()
                 }
+                .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace)
+                .frame(maxHeight: .infinity)
+                .padding()
                 .background(.regularMaterial)
             }
         }
@@ -527,22 +520,15 @@ struct AlbumView: View {
         var shouldDisplay: Bool = true
         ZStack {
             if shouldDisplay {
-                if displayedIllustration?.id != illustration.id,
-                   let thumbnailPath = illustration.thumbnailPath() {
-                    AsyncImage(url: URL(filePath: thumbnailPath)) { image in
-                        image
-                            .resizable()
-                            .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
-                                                   isSource: true)
-                    } placeholder: {
-                        Rectangle()
-                            .foregroundStyle(.clear)
-                    }
-                    .transition(.opacity.animation(.snappy.speed(2)))
-                } else {
+                AsyncImage(url: URL(filePath: illustration.thumbnailPath())) { image in
+                    image
+                        .resizable()
+                } placeholder: {
                     Rectangle()
                         .foregroundStyle(.clear)
                 }
+                .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
+                .transition(.opacity.animation(.snappy.speed(2)))
             } else {
                 Rectangle()
                     .foregroundStyle(.clear)

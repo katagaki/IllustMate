@@ -20,42 +20,26 @@ final class Illustration {
     init(name: String, data: Data) {
         self.name = name
         self.dateAdded = .now
-        if let illustrationPath = illustrationPath() {
-            FileManager.default.createFile(atPath: illustrationPath, contents: data)
-        }
-        if let thumbnailPath = thumbnailPath(), let thumbnailData = Illustration.makeThumbnail(data) {
-            FileManager.default.createFile(atPath: thumbnailPath, contents: thumbnailData)
+        FileManager.default.createFile(atPath: illustrationPath(), contents: data)
+        if let thumbnailData = Illustration.makeThumbnail(data) {
+            FileManager.default.createFile(atPath: thumbnailPath(), contents: thumbnailData)
         }
     }
 
-    func illustrationPath() -> String? {
-        if let illustrationsFolder = illustrationsFolder {
-            return illustrationsFolder.appendingPathComponent(id).path(percentEncoded: false)
-        }
-        return nil
+    func illustrationPath() -> String {
+        return illustrationsFolder.appendingPathComponent(id).path(percentEncoded: false)
     }
 
-    func thumbnailPath() -> String? {
-        if let thumbnailsFolder = thumbnailsFolder {
-            return thumbnailsFolder.appendingPathComponent(id).path(percentEncoded: false)
-        }
-        return nil
+    func thumbnailPath() -> String {
+        return thumbnailsFolder.appendingPathComponent(id).path(percentEncoded: false)
     }
 
     func image() -> UIImage? {
-        if let illustrationPath = illustrationPath() {
-            return UIImage(contentsOfFile: illustrationPath)
-        } else {
-            return nil
-        }
+        return UIImage(contentsOfFile: illustrationPath())
     }
 
     func thumbnail() -> UIImage? {
-        if let thumbnailPath = thumbnailPath() {
-            return UIImage(contentsOfFile: thumbnailPath)
-        } else {
-            return nil
-        }
+        return UIImage(contentsOfFile: thumbnailPath())
     }
 
     func isInAlbum(_ album: Album?) -> Bool {
@@ -74,12 +58,8 @@ final class Illustration {
     }
 
     func prepareForDeletion() {
-        if let illustrationPath = illustrationPath() {
-            try? FileManager.default.removeItem(atPath: illustrationPath)
-        }
-        if let thumbnailPath = thumbnailPath() {
-            try? FileManager.default.removeItem(atPath: thumbnailPath)
-        }
+        try? FileManager.default.removeItem(atPath: illustrationPath())
+        try? FileManager.default.removeItem(atPath: thumbnailPath())
     }
 
     static func makeThumbnail(_ data: Data?) -> Data? {

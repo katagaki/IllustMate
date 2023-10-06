@@ -7,7 +7,7 @@
 
 import Foundation
 
-let documentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
-let illustrationsFolder = documentsURL?.appendingPathComponent("Illustrations")
-let thumbnailsFolder = documentsURL?.appendingPathComponent("Thumbnails")
-let importsFolder = documentsURL?.appendingPathComponent("Imports")
+let documentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)!.appendingPathComponent("Documents")
+let illustrationsFolder = documentsURL.appendingPathComponent("Illustrations")
+let thumbnailsFolder = documentsURL.appendingPathComponent("Thumbnails")
+let importsFolder = documentsURL.appendingPathComponent("Imports")

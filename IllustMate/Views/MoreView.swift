@@ -156,41 +156,38 @@ SOFTWARE.
     }
 
     func rebuildThumbnails() {
-        if let thumbnailsFolder = thumbnailsFolder {
-            do {
-                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressViewText = "More.RebuildThumbnails.Rebuilding"
-                currentProgress = 0
-                total = illustrations.count
-                percentage = 0
-                withAnimation(.easeOut.speed(2)) {
-                    isReportingProgress = true
-                }
-                try FileManager.default.removeItem(at: thumbnailsFolder)
-                try FileManager.default.createDirectory(at: thumbnailsFolder,
-                                                        withIntermediateDirectories: false)
-                Task {
-                    await withDiscardingTaskGroup { group in
-                        for illustration in illustrations {
-                            group.addTask {
-                                if let illustrationPath = illustration.illustrationPath(),
-                                   let illustrationImage = UIImage(contentsOfFile: illustrationPath),
-                                   let thumbnailPath = illustration.thumbnailPath(),
-                                   let thumbnailData = Illustration.makeThumbnail(illustrationImage.pngData()) {
-                                    FileManager.default.createFile(atPath: thumbnailPath, contents: thumbnailData)
-                                }
-                                DispatchQueue.main.async {
-                                    currentProgress += 1
-                                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                                }
+        do {
+            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+            progressViewText = "More.RebuildThumbnails.Rebuilding"
+            currentProgress = 0
+            total = illustrations.count
+            percentage = 0
+            withAnimation(.easeOut.speed(2)) {
+                isReportingProgress = true
+            }
+            try FileManager.default.removeItem(at: thumbnailsFolder)
+            try FileManager.default.createDirectory(at: thumbnailsFolder,
+                                                    withIntermediateDirectories: false)
+            Task {
+                await withDiscardingTaskGroup { group in
+                    for illustration in illustrations {
+                        group.addTask {
+                            if let illustrationImage = UIImage(contentsOfFile: illustration.illustrationPath()),
+                               let thumbnailData = Illustration.makeThumbnail(illustrationImage.pngData()) {
+                                FileManager.default.createFile(atPath: illustration.thumbnailPath(),
+                                                               contents: thumbnailData)
+                            }
+                            DispatchQueue.main.async {
+                                currentProgress += 1
+                                percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
                             }
                         }
                     }
-                    isReportingProgress = false
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
+                isReportingProgress = false
             }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 
