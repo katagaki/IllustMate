@@ -98,6 +98,7 @@ struct AlbumView: View {
                             Rectangle()
                                 .foregroundStyle(.clear)
                         }
+                        .transition(.opacity.animation(.snappy.speed(2)))
                     } else {
                         Image(systemName: "xmark.octagon.fill")
                             .symbolRenderingMode(.multicolor)
@@ -109,8 +110,7 @@ struct AlbumView: View {
                 }
                 .frame(maxHeight: .infinity)
                 .padding()
-                .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace,
-                                       properties: .position)
+                .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -523,27 +523,21 @@ struct AlbumView: View {
         var shouldDisplay: Bool = true
         ZStack {
             if shouldDisplay {
-                if let thumbnailPath = illustration.thumbnailPath() {
+                if displayedIllustration?.id != illustration.id,
+                   let thumbnailPath = illustration.thumbnailPath() {
                     AsyncImage(url: URL(filePath: thumbnailPath)) { image in
                         image
                             .resizable()
                             .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
-                                                   properties: .frame)
+                                                   isSource: true)
                     } placeholder: {
                         Rectangle()
                             .foregroundStyle(.clear)
                     }
+                    .transition(.opacity.animation(.snappy.speed(2)))
                 } else {
                     Rectangle()
                         .foregroundStyle(.clear)
-                        .overlay {
-                            Image(systemName: "xmark.octagon.fill")
-                                .symbolRenderingMode(.hierarchical)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28.0, height: 28.0)
-                                .tint(.secondary)
-                        }
                 }
             } else {
                 Rectangle()
