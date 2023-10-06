@@ -302,10 +302,26 @@ struct AlbumView: View {
                             Text(album.name)
                                 .foregroundStyle(.primary)
                                 .lineLimit(1)
-                            Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
-                                .foregroundStyle(.secondary)
-                                .font(.caption)
-                                .lineLimit(1)
+                            HStack(alignment: .center, spacing: 8.0) {
+                                HStack(alignment: .center, spacing: 4.0) {
+                                    Group {
+                                        Image(systemName: "photo.fill")
+                                        Text(String(album.illustrations().count))
+                                            .lineLimit(1)
+                                    }
+                                    .foregroundStyle(.secondary)
+                                    .font(.caption)
+                                }
+                                HStack(alignment: .center, spacing: 4.0) {
+                                    Group {
+                                        Image(systemName: "rectangle.stack.fill")
+                                        Text(String(album.albums().count))
+                                            .lineLimit(1)
+                                    }
+                                    .foregroundStyle(.secondary)
+                                    .font(.caption)
+                                }
+                            }
                         }
                     }
                 }
