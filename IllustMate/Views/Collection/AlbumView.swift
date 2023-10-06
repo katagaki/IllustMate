@@ -90,6 +90,7 @@ struct AlbumView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    Spacer(minLength: 0)
                     AsyncImage(url: URL(filePath: displayedIllustration.illustrationPath())) { image in
                         image
                             .resizable()
@@ -101,6 +102,7 @@ struct AlbumView: View {
                     }
                     .offset(illustrationDisplayOffset)
                     .transition(.opacity.animation(.snappy.speed(2)))
+                    Spacer(minLength: 0)
                     HStack(alignment: .center, spacing: 16.0) {
                         Button {
                             if let image = displayedIllustration.image() {
@@ -123,7 +125,6 @@ struct AlbumView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace)
-                .frame(maxHeight: .infinity)
                 .padding()
                 .background(.regularMaterial)
                 .gesture(
