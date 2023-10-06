@@ -76,11 +76,7 @@ final class Illustration {
 
 struct IllustrationTransferable: Codable, Transferable {
 
-    var id = UUID().uuidString
-
-    init(_ illustration: Illustration) {
-        self.id = illustration.id
-    }
+    var id: String
 
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(for: IllustrationTransferable.self, contentType: .image)

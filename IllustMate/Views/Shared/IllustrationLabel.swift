@@ -8,21 +8,17 @@
 import SwiftUI
 
 struct IllustrationLabel: View {
-    let url: URL
+    @State var illustrationPath: String
     @State var shouldDisplay: Bool = true
 
-    init(_ url: URL) {
-        self.url = url
-    }
-
     var body: some View {
-        ZStack {
+        ZStack(alignment: .center) {
             Group {
                 if shouldDisplay {
-                    AsyncImage(url: url) { image in
-                        image
+                    if let image = UIImage(contentsOfFile: illustrationPath) {
+                        Image(uiImage: image)
                             .resizable()
-                    } placeholder: {
+                    } else {
                         Rectangle()
                             .foregroundStyle(.clear)
                     }
@@ -34,6 +30,7 @@ struct IllustrationLabel: View {
             .transition(.opacity.animation(.snappy.speed(2)))
         }
         .aspectRatio(1.0, contentMode: .fill)
+        .contentShape(Rectangle())
         .onAppear {
             shouldDisplay = true
         }

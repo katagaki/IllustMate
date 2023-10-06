@@ -65,7 +65,7 @@ struct AlbumView: View {
                     switch styleState {
                     case .grid:
                         LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-                            ForEach(albums, id: \.id) { album in
+                            ForEach(albums) { album in
                                 NavigationLink(value: ViewPath.album(album: album)) {
                                     AlbumGridLabel(namespace: albumTransitionNamespace,
                                                    id: album.id, image: album.cover(), title: album.name,
@@ -151,33 +151,64 @@ struct AlbumView: View {
                     Divider()
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
                         ForEach(illustrations, id: \.id) { illustration in
-                            IllustrationLabel(URL(filePath: illustration.thumbnailPath()))
-                                .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
-                                .overlay {
-                                    if selectedIllustrations.contains(illustration) {
-                                        SelectionOverlay()
-                                    }
-                                }
-                                .onTapGesture {
-                                    selectOrDeselectIllustration(illustration)
-                                }
-                                .contextMenu {
-                                    illustrationContextMenu(illustration)
-                                } preview: {
-                                    AsyncImage(url: URL(filePath: illustration.illustrationPath())) { image in
-                                        image
+                            // TODO: Refactor again when the cause of the freeze has been resolved
+                            // IllustrationLabel(illustrationPath: illustration.thumbnailPath())
+                            let thumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
+                            var shouldDisplay: Bool = true
+                            ZStack(alignment: .center) {
+                                if shouldDisplay {
+                                    if let thumbnailImage = thumbnailImage {
+                                        Image(uiImage: thumbnailImage)
+                                            .resizable()
+                                    } else {
+                                        Image(systemName: "xmark.circle.fill")
                                             .resizable()
                                             .scaledToFit()
-                                    } placeholder: {
-                                        Rectangle()
-                                            .foregroundStyle(.clear)
+                                            .frame(width: 24.0, height: 24.0)
+                                            .foregroundStyle(.primary)
+                                            .symbolRenderingMode(.hierarchical)
                                     }
+                                } else {
+                                    Rectangle()
+                                        .foregroundStyle(.clear)
                                 }
-                                .draggable(IllustrationTransferable(illustration)) {
-                                    IllustrationLabel(URL(filePath: illustration.thumbnailPath()))
+                            }
+                            .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
+                            .aspectRatio(1.0, contentMode: .fill)
+                            .transition(.opacity.animation(.snappy.speed(2)))
+                            .contentShape(Rectangle())
+                            .onAppear {
+                                shouldDisplay = true
+                            }
+                            .onDisappear {
+                                shouldDisplay = false
+                            }
+                            .overlay {
+                                if selectedIllustrations.contains(illustration) {
+                                    SelectionOverlay()
+                                }
+                            }
+                            .onTapGesture {
+                                selectOrDeselectIllustration(illustration)
+                            }
+                            .contextMenu {
+                                illustrationContextMenu(illustration)
+                            } preview: {
+                                if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                }
+                            }
+                            .draggable(IllustrationTransferable(id: illustration.id)) {
+                                if let thumbnailImage = thumbnailImage {
+                                    // IllustrationLabel(illustrationPath: illustration.thumbnailPath())
+                                    Image(uiImage: thumbnailImage)
+                                        .resizable()
                                         .frame(width: 100.0, height: 100.0)
                                         .clipShape(RoundedRectangle(cornerRadius: 8.0))
                                 }
+                            }
                         }
                     }
                     .background(colorScheme == .light ?

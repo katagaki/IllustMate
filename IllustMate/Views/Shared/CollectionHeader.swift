@@ -10,8 +10,8 @@ import SwiftUI
 
 struct CollectionHeader<Content: View>: View {
 
-    @State var title: LocalizedStringKey
-    @State var count: Int
+    var title: LocalizedStringKey
+    var count: Int
     @ViewBuilder var trailingViews: Content
 
     var body: some View {
