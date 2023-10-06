@@ -34,14 +34,6 @@ final class Illustration {
         return thumbnailsFolder.appendingPathComponent(id).path(percentEncoded: false)
     }
 
-    func image() -> UIImage? {
-        return UIImage(contentsOfFile: illustrationPath())
-    }
-
-    func thumbnail() -> UIImage? {
-        return UIImage(contentsOfFile: thumbnailPath())
-    }
-
     func isInAlbum(_ album: Album?) -> Bool {
         if let album = album {
             return containingAlbum?.id ?? "" == album.id

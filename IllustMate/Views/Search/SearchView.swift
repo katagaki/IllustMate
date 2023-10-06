@@ -33,17 +33,8 @@ struct SearchView: View {
                     if !illustrationsFound().isEmpty {
                         Section {
                             ForEach(illustrationsFound()) { illustration in
-                                if let uiImage = illustration.thumbnail() {
-                                    HStack(alignment: .center, spacing: 16.0) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .frame(width: 30.0, height: 30.0)
-                                            .clipShape(RoundedRectangle(cornerRadius: 6.0))
-                                        Text(illustration.name)
-                                            .font(.body)
-                                        Spacer()
-                                    }
-                                }
+                                Text(illustration.name)
+                                    .font(.body)
                             }
                         } header: {
                             ListSectionHeader(text: "Shared.Illustrations")

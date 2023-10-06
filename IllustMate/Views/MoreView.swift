@@ -83,18 +83,14 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
-                    Button {
+                    Button("More.RebuildThumbnails") {
                         rebuildThumbnails()
-                    } label: {
-                        Text("More.RebuildThumbnails")
                     }
-                    Button(role: .destructive) {
+                    Button("More.DeleteAll", role: .destructive) {
                         deleteData()
                         deleteContents(of: illustrationsFolder)
                         deleteContents(of: thumbnailsFolder)
                         deleteContents(of: importsFolder)
-                    } label: {
-                        Text("More.DeleteAll")
                     }
                 }
             }

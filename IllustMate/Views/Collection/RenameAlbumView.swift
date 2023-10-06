@@ -27,20 +27,16 @@ struct RenameAlbumView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(role: .cancel) {
+                    Button("Shared.Cancel", role: .cancel) {
                         newAlbumName = ""
                         dismiss()
-                    } label: {
-                        Text("Shared.Cancel")
                     }
                 }
                 if let album = album {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button {
+                        Button("Shared.Rename") {
                             album.name = newAlbumName.trimmingCharacters(in: .whitespaces)
                             dismiss()
-                        } label: {
-                            Text("Shared.Rename")
                         }
                         .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
                     }

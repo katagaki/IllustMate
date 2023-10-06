@@ -36,11 +36,11 @@ struct MainTabView: View {
                     Label("TabTitle.Import", image: "Tab.Import")
                 }
                 .tag(TabType.importer)
-            SearchView()
-                .tabItem {
-                    Label("TabTitle.Search", systemImage: "magnifyingglass")
-                }
-                .tag(TabType.search)
+//            SearchView()
+//                .tabItem {
+//                    Label("TabTitle.Search", systemImage: "magnifyingglass")
+//                }
+//                .tag(TabType.search)
             MoreView(isReportingProgress: $isProgressAlertDisplayed,
                      progressViewText: $progressViewText,
                      currentProgress: $currentProgress,

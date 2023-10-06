@@ -62,7 +62,7 @@ struct ImportView: View {
                         .font(.body)
                 }
                 Section {
-                    Button {
+                    Button("Import.StartImport") {
                         progressViewText = "Import.Importing"
                         currentProgress = 0
                         total = selectedPhotoItems.count
@@ -73,8 +73,6 @@ struct ImportView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             importPhotos()
                         }
-                    } label: {
-                        Text("Import.StartImport")
                     }
                     .disabled(selectedPhotoItems.isEmpty)
                 } footer: {

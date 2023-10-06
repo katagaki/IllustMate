@@ -25,15 +25,13 @@ struct NewAlbumView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(role: .cancel) {
+                    Button("Shared.Cancel", role: .cancel) {
                         newAlbumName = ""
                         dismiss()
-                    } label: {
-                        Text("Shared.Cancel")
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
+                    Button("Shared.Create") {
                         let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
                         if let albumToAddTo = albumToAddTo {
                             albumToAddTo.addChildAlbum(newAlbum)
@@ -41,8 +39,6 @@ struct NewAlbumView: View {
                             modelContext.insert(newAlbum)
                         }
                         dismiss()
-                    } label: {
-                        Text("Shared.Create")
                     }
                     .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
                 }

@@ -17,10 +17,15 @@ struct AlbumView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace
+    @Namespace var albumTransitionNamespace
 
     @State var albums: [Album] = []
     @State var illustrations: [Illustration] = []
     @State var currentAlbum: Album?
+
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
+    @State var styleState: ViewStyle = .grid
+    // HACK: To get animations working as @AppStorage does not support animations
 
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
@@ -34,13 +39,170 @@ struct AlbumView: View {
     let albumColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
     let illustrationsColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
-
     var body: some View {
         ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: 20.0) {
-                albumsSection()
-                illustrationsSection()
+            VStack(alignment: .leading, spacing: 0.0) {
+                CollectionHeader(title: "Albums.Albums", count: albums.count) {
+                    Button {
+                        withAnimation(.snappy.speed(2)) {
+                            styleState = styleState == .grid ? .list : .grid
+                        }
+                    } label: {
+                        switch style {
+                        case .grid: Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                        case .list: Label("Albums.Style.List", systemImage: "list.bullet")
+                        }
+                    }
+                    Button("Shared.Create", systemImage: "plus") {
+                        isAddingAlbum = true
+                    }
+                }
+                .padding([.leading, .trailing], 20.0)
+                .padding([.bottom], 6.0)
+                if !albums.isEmpty {
+                    Divider()
+                        .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
+                    switch styleState {
+                    case .grid:
+                        LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
+                            ForEach(albums, id: \.id) { album in
+                                NavigationLink(value: ViewPath.album(album: album)) {
+                                    AlbumGridLabel(namespace: albumTransitionNamespace,
+                                                   id: album.id, image: album.cover(), title: album.name,
+                                                   numberOfIllustrations: album.illustrations().count,
+                                                   numberOfAlbums: album.albums().count)
+                                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                                        for item in items {
+                                            moveIllustrationToAlbum(item, to: album)
+                                        }
+                                        return true
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu { albumContextMenu(album) }
+                            }
+                        }
+                        .padding(20.0)
+                        .background(colorScheme == .light ?
+                                    Color.init(uiColor: .secondarySystemGroupedBackground) :
+                                        Color.init(uiColor: .systemBackground))
+                        if colorScheme == .light {
+                            Divider()
+                        }
+                    case .list:
+                        LazyVStack(alignment: .leading, spacing: 0.0) {
+                            ForEach(albums, id: \.id) { album in
+                                NavigationLink(value: ViewPath.album(album: album)) {
+                                    AlbumListRow(namespace: albumTransitionNamespace,
+                                                 id: album.id, image: album.cover(), title: album.name,
+                                                 numberOfIllustrations: album.illustrations().count,
+                                                 numberOfAlbums: album.albums().count)
+                                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                                        for item in items {
+                                            moveIllustrationToAlbum(item, to: album)
+                                        }
+                                        return true
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu { albumContextMenu(album) }
+                                if album == albums.last {
+                                    Divider()
+                                } else {
+                                    Divider()
+                                        .padding([.leading], 84.0)
+                                }
+                            }
+                        }
+                        .background(colorScheme == .light ?
+                                    Color.init(uiColor: .secondarySystemGroupedBackground) :
+                                        Color.init(uiColor: .systemBackground))
+                    }
+                } else {
+                    Divider()
+                        .padding([.leading], 20.0)
+                    Text("Albums.NoAlbums")
+                        .foregroundStyle(.secondary)
+                        .padding(20.0)
+                }
+                Spacer(minLength: 20.0)
+                CollectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
+                    Group {
+                        Button {
+                            withAnimation(.snappy.speed(2)) {
+                                if isSelectingIllustrations {
+                                    selectedIllustrations.removeAll()
+                                }
+                                isSelectingIllustrations.toggle()
+                            }
+                        } label: {
+                            if isSelectingIllustrations {
+                                Label("Shared.Select", systemImage: "checkmark.circle.fill")
+                            } else {
+                                Label("Shared.Select", systemImage: "checkmark.circle")
+                            }
+                        }
+                    }
+                    .disabled(illustrations.isEmpty)
+                }
+                .padding([.leading, .trailing], 20.0)
+                .padding([.bottom], 6.0)
+                if !illustrations.isEmpty {
+                    Divider()
+                    LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
+                        ForEach(illustrations, id: \.id) { illustration in
+                            IllustrationLabel(URL(filePath: illustration.thumbnailPath()))
+                                .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
+                                .overlay {
+                                    if selectedIllustrations.contains(illustration) {
+                                        SelectionOverlay()
+                                    }
+                                }
+                                .onTapGesture {
+                                    if isSelectingIllustrations {
+                                        if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
+                                            selectedIllustrations.removeAll(where: { $0.id == illustration.id })
+                                        } else {
+                                            selectedIllustrations.append(illustration)
+                                        }
+                                    } else {
+                                        withAnimation(.snappy.speed(2)) {
+                                            displayedIllustration = illustration
+                                        }
+                                    }
+                                }
+                                .contextMenu {
+                                    illustrationContextMenu(illustration)
+                                } preview: {
+                                    AsyncImage(url: URL(filePath: illustration.illustrationPath())) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFit()
+                                    } placeholder: {
+                                        Rectangle()
+                                            .foregroundStyle(.clear)
+                                    }
+                                }
+                                .draggable(IllustrationTransferable(illustration)) {
+                                    IllustrationLabel(URL(filePath: illustration.thumbnailPath()))
+                                        .frame(width: 100.0, height: 100.0)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                                }
+                        }
+                    }
+                    .background(colorScheme == .light ?
+                                Color.init(uiColor: .secondarySystemGroupedBackground) :
+                                    Color.init(uiColor: .systemBackground))
+                    if colorScheme == .light {
+                        Divider()
+                    }
+                } else {
+                    Divider()
+                        .padding([.leading], 20.0)
+                    Text("Albums.NoIllustrations")
+                        .foregroundStyle(.secondary)
+                        .padding(20.0)
+                }
             }
             .padding([.top], 20.0)
         }
@@ -66,127 +228,32 @@ struct AlbumView: View {
 #endif
         .overlay {
             if let displayedIllustration = displayedIllustration {
-                VStack(alignment: .center, spacing: 16.0) {
-                    HStack(alignment: .center, spacing: 8.0) {
-                        Text(displayedIllustration.name)
-                            .bold()
-                            .lineLimit(1)
-                        Spacer(minLength: 0)
-                        Button {
-                            withAnimation(.snappy.speed(2)) {
-                                self.displayedIllustration = nil
-                            }
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24.0, height: 24.0)
-                                .foregroundStyle(.primary)
-                                .symbolRenderingMode(.hierarchical)
-                        }
-                        .buttonStyle(.plain)
+                IllustrationViewer(namespace: illustrationTransitionNamespace,
+                                   displayedIllustration: displayedIllustration,
+                                   illustrationDisplayOffset: $illustrationDisplayOffset) {
+                    withAnimation(.snappy.speed(2)) {
+                        self.displayedIllustration = nil
+                        illustrationDisplayOffset = .zero
                     }
-                    Spacer(minLength: 0)
-                    AsyncImage(url: URL(filePath: displayedIllustration.illustrationPath())) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                    } placeholder: {
-                        Rectangle()
-                            .foregroundStyle(.clear)
-                    }
-                    .offset(illustrationDisplayOffset)
-                    .transition(.opacity.animation(.snappy.speed(2)))
-                    Spacer(minLength: 0)
-                    HStack(alignment: .center, spacing: 16.0) {
-                        Button {
-                            if let image = displayedIllustration.image() {
-                                UIPasteboard.general.image = image
-                            }
-                        } label: {
-                            Label("Shared.Copy", systemImage: "doc.on.doc")
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .clipShape(RoundedRectangle(cornerRadius: 99))
-                        if let uiImage = displayedIllustration.image() {
-                            let image = Image(uiImage: uiImage)
-                            ShareLink(item: image, preview: SharePreview(displayedIllustration.name, image: image)) {
-                                Label("Shared.Share", systemImage: "square.and.arrow.up")
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .clipShape(RoundedRectangle(cornerRadius: 99))
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
                 }
-                .matchedGeometryEffect(id: displayedIllustration.id, in: illustrationTransitionNamespace)
-                .padding()
-                .background(.regularMaterial)
-                .gesture(
-                    DragGesture()
-                        .onChanged { gesture in
-                            illustrationDisplayOffset = gesture.translation
-                        }
-                        .onEnded { gesture in
-                            let width = gesture.translation.width
-                            let height = gesture.translation.height
-                            let hypotenuse = sqrt((width * width) + (height * height))
-                            if hypotenuse > 50.0 {
-                                withAnimation(.snappy.speed(2)) {
-                                    self.displayedIllustration = nil
-                                    illustrationDisplayOffset = .zero
-                                }
-                            } else {
-                                withAnimation(.snappy.speed(2)) {
-                                    illustrationDisplayOffset = .zero
-                                }
-                            }
-                        }
-                )
             }
         }
         .safeAreaInset(edge: .bottom) {
             if isSelectingIllustrations {
-                HStack(alignment: .center, spacing: 16.0) {
-                    Text("Shared.Selected.\(selectedIllustrations.count)")
-                    Spacer()
-                    if selectedIllustrations.count > 0 {
-                        Menu {
-                            moveToAlbumMenu(selectedIllustrations) {
-                                try? modelContext.save()
-                                isSelectingIllustrations = false
-                                selectedIllustrations.removeAll()
-                                withAnimation(.snappy.speed(2)) {
-                                    refreshIllustrations()
-                                }
+                SelectionBar(illustrations: $illustrations,
+                             selectedIllustrations: $selectedIllustrations) {
+                    Menu("Shared.Move", systemImage: "tray.full") {
+                        moveToAlbumMenu(selectedIllustrations) {
+                            try? modelContext.save()
+                            isSelectingIllustrations = false
+                            selectedIllustrations.removeAll()
+                            withAnimation(.snappy.speed(2)) {
+                                refreshIllustrations()
                             }
-                        } label: {
-                            Label("Shared.Move", systemImage: "tray.full")
-                        }
-                        .transition(.opacity.animation(.snappy.speed(2)))
-                    }
-                    Button {
-                        if illustrations.count == selectedIllustrations.count {
-                            selectedIllustrations.removeAll()
-                        } else {
-                            selectedIllustrations.removeAll()
-                            selectedIllustrations.append(contentsOf: illustrations)
-                        }
-                    } label: {
-                        if illustrations.count == selectedIllustrations.count {
-                            Label("Shared.DeselectAll", systemImage: "rectangle.stack")
-                        } else {
-                            Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
                         }
                     }
+                    .transition(.opacity.animation(.snappy.speed(2)))
                 }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(.thickMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 99))
-                .padding()
-                .transition(.move(edge: .bottom).animation(.snappy.speed(2)))
             }
         }
         .sheet(isPresented: $isAddingAlbum, onDismiss: {
@@ -200,216 +267,33 @@ struct AlbumView: View {
             RenameAlbumView(album: album)
         })
         .onAppear {
+            styleState = style
             refreshData()
         }
+        .onChange(of: styleState, { _, newValue in
+            style = newValue
+        })
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 
     // MARK: Albums
 
     @ViewBuilder
-    func albumsSection() -> some View {
-        VStack(alignment: .leading, spacing: 0.0) {
-            albumsHeader()
-                .padding([.leading, .trailing], 20.0)
-                .padding([.bottom], 6.0)
-            if !albums.isEmpty {
-                Divider()
-                    .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
-                Group {
-                    switch style {
-                    case .grid:
-                        albumsGrid()
-                            .padding(20.0)
-                        if colorScheme == .light {
-                            Divider()
-                        }
-                    case .list:
-                        albumsList()
-                    }
-                }
-                .background(colorScheme == .light ?
-                            Color.init(uiColor: .secondarySystemGroupedBackground) :
-                                Color.init(uiColor: .systemBackground))
-                .transition(.opacity.animation(.snappy.speed(2)))
-            } else {
-                Divider()
-                    .padding([.leading], 20.0)
-                Text("Albums.NoAlbums")
-                    .foregroundStyle(.secondary)
-                    .padding(20.0)
-            }
-        }
-    }
-
-    @ViewBuilder
-    func albumsHeader() -> some View {
-        HStack(alignment: .center, spacing: 16.0) {
-            HStack(alignment: .center, spacing: 8.0) {
-                ListSectionHeader(text: "Albums.Albums")
-                    .font(.title2)
-                if !albums.isEmpty {
-                    Text("(\(albums.count))")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Spacer()
-            Button {
-                withAnimation(.snappy.speed(2)) {
-                    style = style == .grid ? .list : .grid
-                }
-            } label: {
-                switch style {
-                case .grid: Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                case .list: Label("Albums.Style.List", systemImage: "list.bullet")
-                }
-            }
-            Button {
-                isAddingAlbum = true
-            } label: {
-                Label("Shared.Create", systemImage: "plus")
-            }
-        }
-    }
-
-    @ViewBuilder
-    func albumsGrid() -> some View {
-        LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-            ForEach(albums, id: \.id) { album in
-                NavigationLink(value: ViewPath.album(album: album)) {
-                    VStack(alignment: .leading, spacing: 8.0) {
-                        Group {
-                            if let coverPhotoData = album.coverPhoto,
-                               let coverPhoto = UIImage(data: coverPhotoData) {
-                                Image(uiImage: coverPhoto)
-                                    .resizable()
-                            } else {
-                                Image("Album.Generic")
-                                    .resizable()
-                            }
-                        }
-                        .dropDestination(for: IllustrationTransferable.self) { items, _ in
-                            for item in items {
-                                moveIllustrationToAlbum(item, to: album)
-                            }
-                            return true
-                        }
-                        .aspectRatio(1.0, contentMode: .fill)
-                        .foregroundStyle(.accent)
-                        .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                        VStack(alignment: .leading, spacing: 2.0) {
-                            Text(album.name)
-                                .foregroundStyle(.primary)
-                                .lineLimit(1)
-                            HStack(alignment: .center, spacing: 8.0) {
-                                HStack(alignment: .center, spacing: 4.0) {
-                                    Group {
-                                        Image(systemName: "photo.fill")
-                                        Text(String(album.illustrations().count))
-                                            .lineLimit(1)
-                                    }
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                                }
-                                HStack(alignment: .center, spacing: 4.0) {
-                                    Group {
-                                        Image(systemName: "rectangle.stack.fill")
-                                        Text(String(album.albums().count))
-                                            .lineLimit(1)
-                                    }
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                                }
-                            }
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-                .contextMenu { albumContextMenu(album) }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func albumsList() -> some View {
-        LazyVStack(alignment: .leading, spacing: 0.0) {
-            ForEach(albums, id: \.id) { album in
-                NavigationLink(value: ViewPath.album(album: album)) {
-                    HStack(alignment: .center, spacing: 16.0) {
-                        Group {
-                            if let coverPhotoData = album.coverPhoto,
-                               let coverPhoto = UIImage(data: coverPhotoData) {
-                                Image(uiImage: coverPhoto)
-                                    .resizable()
-                            } else {
-                                Image("Album.Generic")
-                                    .resizable()
-                            }
-                        }
-                        .frame(width: 48.0, height: 48.0)
-                        .clipShape(RoundedRectangle(cornerRadius: 6.0))
-                        .shadow(color: .black.opacity(0.2), radius: 2.0, x: 0.0, y: 2.0)
-                        VStack(alignment: .leading, spacing: 2.0) {
-                            Text(album.name)
-                                .foregroundStyle(.primary)
-                            Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer(minLength: 0)
-                        Image(systemName: "chevron.right")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 11.0, height: 11.0)
-                            .foregroundStyle(.primary.opacity(0.25))
-                            .fontWeight(.bold)
-                    }
-                    .padding([.leading], 20.0)
-                    .contentShape(Rectangle())
-                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
-                        for item in items {
-                            moveIllustrationToAlbum(item, to: album)
-                        }
-                        return true
-                    }
-                }
-                .buttonStyle(.plain)
-                .padding([.top, .bottom], 6.0)
-                .padding([.trailing], 20.0)
-                .contextMenu { albumContextMenu(album) }
-                if album == albums.last {
-                    Divider()
-                } else {
-                    Divider()
-                        .padding([.leading], 66.0)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
     func albumContextMenu(_ album: Album) -> some View {
-        Button {
+        Button("Shared.ResetCover", systemImage: "photo") {
             withAnimation(.snappy.speed(2)) {
                 album.coverPhoto = nil
             }
-        } label: {
-            Label("Shared.ResetCover", systemImage: "photo")
         }
         Divider()
-        Button {
+        Button("Shared.Rename", systemImage: "pencil") {
             albumToRename = album
-        } label: {
-            Label("Shared.Rename", systemImage: "pencil")
         }
-        Button(role: .destructive) {
+        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
             modelContext.delete(album)
             withAnimation(.snappy.speed(2)) {
                 refreshAlbums()
             }
-        } label: {
-            Label("Shared.Delete", systemImage: "trash")
         }
     }
 
@@ -430,150 +314,6 @@ struct AlbumView: View {
     // MARK: Illustrations
 
     @ViewBuilder
-    func illustrationsSection() -> some View {
-        VStack(alignment: .leading, spacing: 0.0) {
-            illustrationsHeader()
-            .padding([.leading, .trailing], 20.0)
-            .padding([.bottom], 6.0)
-            Group {
-                if !illustrations.isEmpty {
-                    Divider()
-                    LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                        ForEach(illustrations, id: \.id) { illustration in
-                            illustrationItem(illustration)
-                        }
-                    }
-                    .background(colorScheme == .light ?
-                                Color.init(uiColor: .secondarySystemGroupedBackground) :
-                                    Color.init(uiColor: .systemBackground))
-                    if colorScheme == .light {
-                        Divider()
-                    }
-                } else {
-                    Divider()
-                        .padding([.leading], 20.0)
-                    Text("Albums.NoIllustrations")
-                        .foregroundStyle(.secondary)
-                        .padding(20.0)
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func illustrationsHeader() -> some View {
-        HStack(alignment: .center, spacing: 16.0) {
-            HStack(alignment: .center, spacing: 8.0) {
-                ListSectionHeader(text: "Albums.Illustrations")
-                    .font(.title2)
-                if !illustrations.isEmpty {
-                    Text("(\(illustrations.count))")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Spacer()
-            Group {
-                Button {
-                    withAnimation(.snappy.speed(2)) {
-                        if isSelectingIllustrations {
-                            selectedIllustrations.removeAll()
-                        }
-                        isSelectingIllustrations.toggle()
-                    }
-                } label: {
-                    if isSelectingIllustrations {
-                        Label("Shared.Select", systemImage: "checkmark.circle.fill")
-                    } else {
-                        Label("Shared.Select", systemImage: "checkmark.circle")
-                    }
-                }
-            }
-            .disabled(illustrations.isEmpty)
-        }
-    }
-
-    @ViewBuilder
-    func illustrationItem(_ illustration: Illustration) -> some View {
-        illustrationLabel(illustration)
-            .overlay {
-                if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                    selectionOverlay()
-                }
-            }
-            .onTapGesture {
-                if isSelectingIllustrations {
-                    if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                        selectedIllustrations.removeAll(where: { $0.id == illustration.id })
-                    } else {
-                        selectedIllustrations.append(illustration)
-                    }
-                } else {
-                    withAnimation(.snappy.speed(2)) {
-                        displayedIllustration = illustration
-                    }
-                }
-            }
-            .contextMenu {
-                illustrationContextMenu(illustration)
-            } preview: {
-                if let image = illustration.image() {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                }
-            }
-            .draggable(IllustrationTransferable(illustration)) {
-                illustrationLabel(illustration)
-                    .frame(width: 100.0, height: 100.0)
-                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
-            }
-    }
-
-    @ViewBuilder
-    func illustrationLabel(_ illustration: Illustration) -> some View {
-        var shouldDisplay: Bool = true
-        ZStack {
-            if shouldDisplay {
-                AsyncImage(url: URL(filePath: illustration.thumbnailPath())) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    Rectangle()
-                        .foregroundStyle(.clear)
-                }
-                .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
-                .transition(.opacity.animation(.snappy.speed(2)))
-            } else {
-                Rectangle()
-                    .foregroundStyle(.clear)
-            }
-        }
-        .aspectRatio(1.0, contentMode: .fill)
-        .onAppear {
-            shouldDisplay = true
-        }
-        .onDisappear {
-            shouldDisplay = false
-        }
-        .transition(.opacity.animation(.snappy.speed(2)))
-    }
-
-    @ViewBuilder
-    func selectionOverlay() -> some View {
-        Rectangle()
-            .foregroundStyle(.black)
-            .opacity(0.5)
-            .overlay {
-                Image(systemName: "checkmark.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32.0, height: 32.0)
-                    .foregroundStyle(.white)
-            }
-            .transition(.scale.animation(.snappy.speed(4)))
-    }
-
-    @ViewBuilder
     func illustrationContextMenu(_ illustration: Illustration) -> some View {
         if isSelectingIllustrations {
             if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
@@ -587,7 +327,7 @@ struct AlbumView: View {
                         refreshIllustrations()
                     }
                 }
-                Button(role: .destructive) {
+                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                     for illustration in selectedIllustrations {
                         illustration.prepareForDeletion()
                         modelContext.delete(illustration)
@@ -595,11 +335,36 @@ struct AlbumView: View {
                     withAnimation(.snappy.speed(2)) {
                         refreshIllustrations()
                     }
-                } label: {
-                    Label("Shared.Delete", systemImage: "trash")
                 }
             }
         } else {
+            Button("Shared.Select", systemImage: "checkmark.circle") {
+                withAnimation(.snappy.speed(2)) {
+                    isSelectingIllustrations = true
+                    selectedIllustrations.append(illustration)
+                }
+            }
+            Divider()
+            Button("Shared.Copy", systemImage: "doc.on.doc") {
+                if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                    UIPasteboard.general.image = image
+                }
+            }
+            if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                ShareLink(item: Image(uiImage: image),
+                          preview: SharePreview(illustration.name, image: Image(uiImage: image))) {
+                    Label("Shared.Share", systemImage: "square.and.arrow.up")
+                }
+            }
+            Divider()
+            if let currentAlbum = currentAlbum {
+                Button("Shared.SetAsCover", systemImage: "photo") {
+                    let image = UIImage(contentsOfFile: illustration.illustrationPath())
+                    if let data = image?.jpegData(compressionQuality: 1.0) {
+                        currentAlbum.coverPhoto = Album.makeCover(data)
+                    }
+                }
+            }
             moveToAlbumMenu([illustration]) {
                 try? modelContext.save()
                 isSelectingIllustrations = false
@@ -609,37 +374,12 @@ struct AlbumView: View {
                 }
             }
             Divider()
-            if let currentAlbum = currentAlbum, let image = illustration.image() {
-                Button {
-                    currentAlbum.coverPhoto = Album.makeCover(image.pngData())
-                } label: {
-                    Label("Shared.SetAsCover", systemImage: "photo")
-                }
-                Divider()
-            }
-            Button {
-                if let image = illustration.image() {
-                    UIPasteboard.general.image = image
-                }
-            } label: {
-                Label("Shared.Copy", systemImage: "doc.on.doc")
-            }
-            Button {
-                withAnimation(.snappy.speed(2)) {
-                    isSelectingIllustrations = true
-                    selectedIllustrations.append(illustration)
-                }
-            } label: {
-                Label("Shared.Select", systemImage: "checkmark.circle")
-            }
-            Button(role: .destructive) {
+            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                 illustration.prepareForDeletion()
                 modelContext.delete(illustration)
                 withAnimation(.snappy.speed(2)) {
                     refreshIllustrations()
                 }
-            } label: {
-                Label("Shared.Delete", systemImage: "trash")
             }
         }
     }
@@ -658,16 +398,14 @@ struct AlbumView: View {
                     )
                 }
             }
-            Button {
+            Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 illustrations.forEach { illustration in
                     illustration.removeFromAlbum()
                 }
                 postMoveAction()
-            } label: {
-                Label("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up")
             }
         }
-        Menu {
+        Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
                     album.addChildIllustrations(illustrations)
@@ -679,8 +417,6 @@ struct AlbumView: View {
                     )
                 }
             }
-        } label: {
-            Label("Shared.AddToAlbum", systemImage: "tray.and.arrow.down")
         }
     }
 
