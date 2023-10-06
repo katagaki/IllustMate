@@ -53,7 +53,9 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
         // Load albums
         do {
-            albums = try modelContext.fetch(FetchDescriptor<Album>(sortBy: [SortDescriptor(\.name)]))
+            var fetchDescriptor = FetchDescriptor<Album>(sortBy: [SortDescriptor(\.name)])
+            fetchDescriptor.propertiesToFetch = [\.name]
+            albums = try modelContext.fetch(fetchDescriptor)
         } catch {
             debugPrint(error.localizedDescription)
         }
