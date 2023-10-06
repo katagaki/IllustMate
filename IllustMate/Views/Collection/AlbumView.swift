@@ -386,6 +386,7 @@ struct AlbumView: View {
                     }
                 }
             }
+            Divider()
             moveToAlbumMenu([illustration]) {
                 try? modelContext.save()
                 isSelectingIllustrations = false
