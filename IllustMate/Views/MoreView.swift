@@ -86,6 +86,9 @@ struct MoreView: View {
                     Button("More.RebuildThumbnails") {
                         rebuildThumbnails()
                     }
+                    Button("More.RedownloadThumbnails") {
+                        redownloadThumbnails()
+                    }
                     Button("More.DeleteAll", role: .destructive) {
                         deleteData()
                         deleteContents(of: illustrationsFolder)
@@ -152,6 +155,7 @@ SOFTWARE.
     }
 
     func rebuildThumbnails() {
+        UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
             progressViewText = "More.RebuildThumbnails.Rebuilding"
@@ -180,10 +184,49 @@ SOFTWARE.
                         }
                     }
                 }
-                isReportingProgress = false
+                UIApplication.shared.isIdleTimerDisabled = false
+                withAnimation(.easeOut.speed(2)) {
+                    isReportingProgress = false
+                }
             }
         } catch {
             debugPrint(error.localizedDescription)
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    func redownloadThumbnails() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+            progressViewText = "More.RedownloadThumbnails.Redownloading"
+            currentProgress = 0
+            total = illustrations.count
+            percentage = 0
+            withAnimation(.easeOut.speed(2)) {
+                isReportingProgress = true
+            }
+            Task {
+                for illustration in illustrations {
+                    do {
+                        try FileManager.default.startDownloadingUbiquitousItem(
+                            at: URL(filePath: illustration.thumbnailPath()))
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
+                    DispatchQueue.main.async {
+                        currentProgress += 1
+                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                    }
+                }
+                UIApplication.shared.isIdleTimerDisabled = false
+                withAnimation(.easeOut.speed(2)) {
+                    isReportingProgress = false
+                }
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
