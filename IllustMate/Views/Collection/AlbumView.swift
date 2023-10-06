@@ -100,27 +100,6 @@ struct AlbumView: View {
                             .foregroundStyle(.clear)
                     }
                     .offset(illustrationDisplayOffset)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                illustrationDisplayOffset = gesture.translation
-                            }
-                            .onEnded { gesture in
-                                let width = gesture.translation.width
-                                let height = gesture.translation.height
-                                let hypotenuse = sqrt((width * width) + (height * height))
-                                if hypotenuse > 50.0 {
-                                    withAnimation(.snappy.speed(2)) {
-                                        self.displayedIllustration = nil
-                                        illustrationDisplayOffset = .zero
-                                    }
-                                } else {
-                                    withAnimation(.snappy.speed(2)) {
-                                        illustrationDisplayOffset = .zero
-                                    }
-                                }
-                            }
-                    )
                     .transition(.opacity.animation(.snappy.speed(2)))
                     HStack(alignment: .center, spacing: 16.0) {
                         Button {
@@ -147,6 +126,27 @@ struct AlbumView: View {
                 .frame(maxHeight: .infinity)
                 .padding()
                 .background(.regularMaterial)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            illustrationDisplayOffset = gesture.translation
+                        }
+                        .onEnded { gesture in
+                            let width = gesture.translation.width
+                            let height = gesture.translation.height
+                            let hypotenuse = sqrt((width * width) + (height * height))
+                            if hypotenuse > 50.0 {
+                                withAnimation(.snappy.speed(2)) {
+                                    self.displayedIllustration = nil
+                                    illustrationDisplayOffset = .zero
+                                }
+                            } else {
+                                withAnimation(.snappy.speed(2)) {
+                                    illustrationDisplayOffset = .zero
+                                }
+                            }
+                        }
+                )
             }
         }
         .safeAreaInset(edge: .bottom) {
