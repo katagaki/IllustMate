@@ -128,6 +128,9 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
 
     func importItems() {
+        // Clear memory used by albums array
+        albums.removeAll()
+        // Start import
         if let item = extensionContext?.inputItems.first as? NSExtensionItem {
             let attachments = (item.attachments ?? [])
                 .filter({ $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) })
