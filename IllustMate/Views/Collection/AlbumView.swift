@@ -31,12 +31,8 @@ struct AlbumView: View {
     @State var displayedIllustration: Illustration?
     @State var illustrationDisplayOffset: CGSize = .zero
 
-    let albumColumnConfiguration = [GridItem(.flexible(), spacing: 20.0),
-                                    GridItem(.flexible(), spacing: 20.0)]
-    let illustrationsColumnConfiguration = [GridItem(.flexible(), spacing: 2.0),
-                                            GridItem(.flexible(), spacing: 2.0),
-                                            GridItem(.flexible(), spacing: 2.0),
-                                            GridItem(.flexible(), spacing: 2.0)]
+    let albumColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
+    let illustrationsColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
 
@@ -305,6 +301,7 @@ struct AlbumView: View {
                         VStack(alignment: .leading, spacing: 2.0) {
                             Text(album.name)
                                 .foregroundStyle(.primary)
+                                .lineLimit(1)
                             Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
                                 .foregroundStyle(.secondary)
                                 .font(.caption)
