@@ -521,7 +521,7 @@ struct AlbumView: View {
     @ViewBuilder
     func illustrationLabel(_ illustration: Illustration) -> some View {
         var shouldDisplay: Bool = true
-        VStack(alignment: .center, spacing: 8.0) {
+        ZStack {
             if shouldDisplay {
                 if let thumbnailPath = illustration.thumbnailPath() {
                     AsyncImage(url: URL(filePath: thumbnailPath)) { image in
