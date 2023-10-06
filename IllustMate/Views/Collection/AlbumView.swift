@@ -71,27 +71,32 @@ struct AlbumView: View {
         .overlay {
             if let displayedIllustration = displayedIllustration {
                 VStack(alignment: .center, spacing: 8.0) {
-                    if let image = displayedIllustration.image() {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-//                            .gesture(
-//                                DragGesture()
-//                                    .updating($illustrationDisplayOffset) { value, state, transaction in
-//                                        state = value.translation
-//                                    }
-//                                    .onEnded { gesture in
-//                                        let hypotenuse = sqrt((gesture.translation.width * gesture.translation.width) +
-//                                                              (gesture.translation.height * gesture.translation.height))
-//                                        if hypotenuse > 50.0 {
-//                                            withAnimation(.snappy.speed(2)) {
-//                                                self.displayedIllustration = nil
-//                                            }
-//                                        }
-//                                    }
-//                            )
-//                            .offset(illustrationDisplayOffset)
+                    if let illustrationPath = displayedIllustration.illustrationPath() {
+                        AsyncImage(url: URL(filePath: illustrationPath)) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                                .gesture(
+                                    DragGesture()
+                                        .updating($illustrationDisplayOffset) { value, state, transaction in
+                                            state = value.translation
+                                        }
+                                        .onEnded { gesture in
+                                            let hypotenuse = sqrt((gesture.translation.width * gesture.translation.width) +
+                                                                  (gesture.translation.height * gesture.translation.height))
+                                            if hypotenuse > 50.0 {
+                                                withAnimation(.snappy.speed(2)) {
+                                                    self.displayedIllustration = nil
+                                                }
+                                            }
+                                        }
+                                )
+                                .offset(illustrationDisplayOffset)
+                        } placeholder: {
+                            Rectangle()
+                                .foregroundStyle(.clear)
+                        }
                     } else {
                         Image(systemName: "xmark.octagon.fill")
                             .symbolRenderingMode(.multicolor)
@@ -517,11 +522,16 @@ struct AlbumView: View {
         var shouldDisplay: Bool = true
         VStack(alignment: .center, spacing: 8.0) {
             if shouldDisplay {
-                if let thumbnailImage = illustration.thumbnail() {
-                    Image(uiImage: thumbnailImage)
-                        .resizable()
-                        .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
-                                               properties: .frame)
+                if let thumbnailPath = illustration.thumbnailPath() {
+                    AsyncImage(url: URL(filePath: thumbnailPath)) { image in
+                        image
+                            .resizable()
+                            .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace,
+                                                   properties: .frame)
+                    } placeholder: {
+                        Rectangle()
+                            .foregroundStyle(.clear)
+                    }
                 } else {
                     Rectangle()
                         .foregroundStyle(.clear)
