@@ -135,31 +135,44 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         // Start import
         if let item = extensionContext?.inputItems.first as? NSExtensionItem {
             let attachments = (item.attachments ?? [])
-                .filter({ $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) })
+                .filter({ $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
+                    $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) })
             total = attachments.count
             for attachment: NSItemProvider in attachments {
-                attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { [self] file, _ in
-                    if let url = file as? URL,
-                       let imageData = try? Data(contentsOf: url) {
-                        importIllustration(url.lastPathComponent, data: imageData)
-                    } else if let image = file as? UIImage {
-                        if let pngData = image.pngData() {
-                            importIllustration(UUID().uuidString, data: pngData)
-                        } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
-                            importIllustration(UUID().uuidString, data: jpgData)
-                        }
+                if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                    attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { [self] file, _ in
+                        loadAndImport(file)
                     }
-                    self.incrementProgress()
-                    self.dismissIfCompleted()
+                } else if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+                    attachment.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { [self] file, _ in
+                        loadAndImport(file)
+                    }
                 }
             }
         }
     }
 
+    func loadAndImport(_ file: Any?) {
+        if let url = file as? URL,
+           let imageData = try? Data(contentsOf: url) {
+            importIllustration(url.lastPathComponent, data: imageData)
+        } else if let image = file as? UIImage {
+            if let pngData = image.pngData() {
+                importIllustration(UUID().uuidString, data: pngData)
+            } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
+                importIllustration(UUID().uuidString, data: jpgData)
+            } else if let heicData = image.heicData() {
+                importIllustration(UUID().uuidString, data: heicData)
+            }
+        }
+        self.incrementProgress()
+        self.dismissIfCompleted()
+    }
+
     func importIllustration(_ name: String, data: Data) {
         let illustration = Illustration(name: name, data: data)
         if let selectedAlbum = selectedAlbum {
-            selectedAlbum.addChildIllustration(illustration)
+            illustration.containingAlbum = selectedAlbum
         }
         modelContext.insert(illustration)
     }
@@ -176,7 +189,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             if currentProgress == total {
                 progressLabel.text = String(localized: "Importer.DoneText")
                 heroImage.image = UIImage(systemName: "checkmark.circle.fill")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
                     extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
                 }
             }
