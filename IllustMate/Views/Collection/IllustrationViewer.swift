@@ -44,6 +44,7 @@ struct IllustrationViewer: View {
                 Rectangle()
                     .foregroundStyle(.clear)
             }
+            .matchedGeometryEffect(id: displayedIllustration.id, in: namespace)
             .zIndex(1)
             .offset(illustrationDisplayOffset)
             .transition(.opacity.animation(.snappy.speed(2)))
@@ -64,7 +65,6 @@ struct IllustrationViewer: View {
                 }
             }
         }
-        .matchedGeometryEffect(id: displayedIllustration.id, in: namespace)
         .padding()
         .background(.regularMaterial)
         .gesture(
