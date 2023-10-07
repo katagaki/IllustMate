@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct IllustrationLabel: View {
-    @State var illustrationPath: String
+    var illustrationPath: String
     @State var shouldDisplay: Bool = true
 
     var body: some View {

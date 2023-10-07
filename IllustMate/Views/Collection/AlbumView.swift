@@ -175,6 +175,7 @@ struct AlbumView: View {
                             }
                             .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
                             .aspectRatio(1.0, contentMode: .fill)
+                            .opacity(illustration.id == displayedIllustration?.id ? 0.0 : 1.0)
                             .transition(.opacity.animation(.snappy.speed(2)))
                             .contentShape(Rectangle())
                             .onAppear {
@@ -254,6 +255,7 @@ struct AlbumView: View {
                                    illustrationDisplayOffset: $illustrationDisplayOffset) {
                     withAnimation(.snappy.speed(2)) {
                         self.displayedIllustration = nil
+                    } completion: {
                         illustrationDisplayOffset = .zero
                     }
                 }

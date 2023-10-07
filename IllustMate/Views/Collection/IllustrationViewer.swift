@@ -44,6 +44,7 @@ struct IllustrationViewer: View {
                 Rectangle()
                     .foregroundStyle(.clear)
             }
+            .zIndex(1)
             .offset(illustrationDisplayOffset)
             .transition(.opacity.animation(.snappy.speed(2)))
             Spacer(minLength: 0)

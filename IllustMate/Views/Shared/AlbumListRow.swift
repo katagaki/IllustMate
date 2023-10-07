@@ -13,11 +13,11 @@ struct AlbumListRow: View {
 
     var namespace: Namespace.ID
 
-    @State var id: String
-    @State var image: UIImage?
-    @State var title: String
-    @State var numberOfIllustrations: Int
-    @State var numberOfAlbums: Int
+    var id: String
+    var image: UIImage?
+    var title: String
+    var numberOfIllustrations: Int
+    var numberOfAlbums: Int
     @State var shouldDisplay: Bool = true
 
     var body: some View {

@@ -16,6 +16,8 @@ struct MoreView: View {
     @Environment(\.modelContext) var modelContext
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
+    @State var isDeleteAllowed: Bool = false
+
     @Binding var isReportingProgress: Bool
     @Binding var progressViewText: LocalizedStringKey
     @Binding var currentProgress: Int
@@ -89,11 +91,14 @@ struct MoreView: View {
                     Button("More.RedownloadThumbnails") {
                         redownloadThumbnails()
                     }
-                    Button("More.DeleteAll", role: .destructive) {
-                        deleteData()
-                        deleteContents(of: illustrationsFolder)
-                        deleteContents(of: thumbnailsFolder)
-                        deleteContents(of: importsFolder)
+                    Toggle(isOn: $isDeleteAllowed) {
+                        Button("More.DeleteAll", role: .destructive) {
+                            deleteData()
+                            deleteContents(of: illustrationsFolder)
+                            deleteContents(of: thumbnailsFolder)
+                            deleteContents(of: importsFolder)
+                        }
+                        .disabled(!isDeleteAllowed)
                     }
                 }
             }
