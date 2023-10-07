@@ -1,6 +1,6 @@
 //
 //  AlbumRow.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/04.
 //

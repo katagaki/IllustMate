@@ -1,6 +1,6 @@
 //
 //  Item.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -69,7 +69,7 @@ final class Album {
     }
 
     func addChildIllustrations(_ illustrations: [Illustration]) {
-        for illustration in illustrations {
+        illustrations.forEach { illustration in
             addChildIllustration(illustration)
         }
     }

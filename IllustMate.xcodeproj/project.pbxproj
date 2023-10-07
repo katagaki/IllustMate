@@ -18,6 +18,8 @@
 		E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BD32AD04A2400E3035E /* SelectionBar.swift */; };
 		E45A8BD62AD04CD100E3035E /* SelectionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BD52AD04CD100E3035E /* SelectionOverlay.swift */; };
 		E45A8BD82AD04E1C00E3035E /* IllustrationViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */; };
+		E45A8BF62AD1029400E3035E /* MainSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BF52AD1029400E3035E /* MainSplitView.swift */; };
+		E45A8BFC2AD1958B00E3035E /* AlbumStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BFB2AD1958B00E3035E /* AlbumStack.swift */; };
 		E4614CE72ACA86C900D751FB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE62ACA86C900D751FB /* App.swift */; };
 		E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CE82ACA86C900D751FB /* AlbumView.swift */; };
 		E4614CEB2ACA86C900D751FB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614CEA2ACA86C900D751FB /* Album.swift */; };
@@ -84,6 +86,8 @@
 		E45A8BD32AD04A2400E3035E /* SelectionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionBar.swift; sourceTree = "<group>"; };
 		E45A8BD52AD04CD100E3035E /* SelectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlay.swift; sourceTree = "<group>"; };
 		E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewer.swift; sourceTree = "<group>"; };
+		E45A8BF52AD1029400E3035E /* MainSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSplitView.swift; sourceTree = "<group>"; };
+		E45A8BFB2AD1958B00E3035E /* AlbumStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumStack.swift; sourceTree = "<group>"; };
 		E4614CE32ACA86C900D751FB /* PicMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4614CE62ACA86C900D751FB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E4614CE82ACA86C900D751FB /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
@@ -227,6 +231,7 @@
 			children = (
 				E4614CE62ACA86C900D751FB /* App.swift */,
 				E4614D162ACAB66600D751FB /* MainTabView.swift */,
+				E45A8BF52AD1029400E3035E /* MainSplitView.swift */,
 				E4614D342ACB11AC00D751FB /* Collection */,
 				E4614D442ACB416B00D751FB /* Import */,
 				E4CA0B8A2ACC41C20063F06C /* Search */,
@@ -241,6 +246,7 @@
 			children = (
 				E4614D392ACB274700D751FB /* CollectionView.swift */,
 				E4614CE82ACA86C900D751FB /* AlbumView.swift */,
+				E45A8BFB2AD1958B00E3035E /* AlbumStack.swift */,
 				E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */,
 				E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */,
 				E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */,
@@ -425,6 +431,7 @@
 			files = (
 				E45A8BD02AD0389600E3035E /* AlbumGridLabel.swift in Sources */,
 				E4614D242ACB048000D751FB /* MoreView.swift in Sources */,
+				E45A8BFC2AD1958B00E3035E /* AlbumStack.swift in Sources */,
 				E45A8BD22AD03C5E00E3035E /* AlbumListRow.swift in Sources */,
 				E45A8BD82AD04E1C00E3035E /* IllustrationViewer.swift in Sources */,
 				E4CA0B8C2ACC41D50063F06C /* SearchView.swift in Sources */,
@@ -448,6 +455,7 @@
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 				E45A8BD62AD04CD100E3035E /* SelectionOverlay.swift in Sources */,
+				E45A8BF62AD1029400E3035E /* MainSplitView.swift in Sources */,
 				E4614D2E2ACB0FF500D751FB /* TabType.swift in Sources */,
 				E4614D302ACB100B00D751FB /* NavigationManager.swift in Sources */,
 			);

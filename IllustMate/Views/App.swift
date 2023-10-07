@@ -1,6 +1,6 @@
 //
-//  IllustMateApp.swift
-//  IllustMate
+//  PicMateApp.swift
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -30,14 +30,20 @@ struct IllustMateApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
-                .environmentObject(tabManager)
-                .environmentObject(navigationManager)
-                .task {
-                    createIfNotExists(illustrationsFolder)
-                    createIfNotExists(thumbnailsFolder)
-                    createIfNotExists(importsFolder)
+            Group {
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    MainTabView()
+                } else {
+                    MainSplitView()
                 }
+            }
+            .environmentObject(tabManager)
+            .environmentObject(navigationManager)
+            .task {
+                createIfNotExists(illustrationsFolder)
+                createIfNotExists(thumbnailsFolder)
+                createIfNotExists(importsFolder)
+            }
         }
         .modelContainer(sharedModelContainer)
     }

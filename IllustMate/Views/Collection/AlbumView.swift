@@ -1,6 +1,6 @@
 //
 //  AlbumView.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -19,9 +19,9 @@ struct AlbumView: View {
     @Namespace var illustrationTransitionNamespace
     @Namespace var albumTransitionNamespace
 
+    var currentAlbum: Album?
     @State var albums: [Album] = []
     @State var illustrations: [Illustration] = []
-    @State var currentAlbum: Album?
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
     @State var styleState: ViewStyle = .grid
