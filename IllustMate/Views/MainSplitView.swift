@@ -87,5 +87,11 @@ struct MainSplitView: View {
                 }
             }
         }
+        .overlay {
+            if isProgressAlertDisplayed {
+                ProgressAlert(title: progressViewText, percentage: $percentage)
+                    .ignoresSafeArea()
+            }
+        }
     }
 }

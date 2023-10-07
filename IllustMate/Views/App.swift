@@ -43,6 +43,7 @@ struct IllustMateApp: App {
                 createIfNotExists(illustrationsFolder)
                 createIfNotExists(thumbnailsFolder)
                 createIfNotExists(importsFolder)
+                createIfNotExists(orphansFolder)
             }
         }
         .modelContainer(sharedModelContainer)

@@ -10,12 +10,14 @@ import Komponents
 import SwiftData
 import SwiftUI
 
+// swiftlint:disable type_body_length
 struct MoreView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(\.modelContext) var modelContext
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
+    @State var orphans: [String] = []
     @State var isDeleteAllowed: Bool = false
 
     @Binding var isReportingProgress: Bool
@@ -85,12 +87,17 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    Button("More.ScanForOrphans") {
+                        scanForOrphans()
+                    }
                     Button("More.RebuildThumbnails") {
                         rebuildThumbnails()
                     }
                     Button("More.RedownloadThumbnails") {
                         redownloadThumbnails()
                     }
+                }
+                Section {
                     Toggle(isOn: $isDeleteAllowed) {
                         Button("More.DeleteAll", role: .destructive) {
                             deleteData()
@@ -156,6 +163,53 @@ SOFTWARE.
                 default: Color.clear
                 }
             }
+        }
+    }
+
+    func scanForOrphans() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            var fetchDescriptor = FetchDescriptor<Illustration>()
+            fetchDescriptor.propertiesToFetch = [\.id]
+            let illustrations = try modelContext.fetch(fetchDescriptor)
+            progressViewText = "More.ScanForOrphans.Scanning"
+            currentProgress = 0
+            total = 0
+            percentage = 0
+            withAnimation(.easeOut.speed(2)) {
+                isReportingProgress = true
+            }
+            let filesToCheck = try FileManager.default
+                .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
+            orphans.removeAll()
+            total = filesToCheck.count
+            for file in filesToCheck {
+                if !illustrations.contains(where: { $0.id == file.lastPathComponent }) {
+                    orphans.append(file.lastPathComponent)
+                }
+                DispatchQueue.main.async {
+                    currentProgress += 1
+                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                }
+            }
+            currentProgress = 0
+            total = orphans.count
+            orphans.forEach { orphan in
+                try? FileManager.default.moveItem(
+                    at: illustrationsFolder.appendingPathComponent(orphan),
+                    to: orphansFolder.appendingPathComponent(orphan))
+                DispatchQueue.main.async {
+                    currentProgress += 1
+                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                }
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            withAnimation(.easeOut.speed(2)) {
+                isReportingProgress = false
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
@@ -260,3 +314,4 @@ SOFTWARE.
         }
     }
 }
+// swiftlint:enable type_body_length

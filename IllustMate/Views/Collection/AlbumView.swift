@@ -151,65 +151,26 @@ struct AlbumView: View {
                     Divider()
                     LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
                         ForEach(illustrations, id: \.id) { illustration in
-                            // TODO: Refactor again when the cause of the freeze has been resolved
-                            // IllustrationLabel(illustrationPath: illustration.thumbnailPath())
-                            let thumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
-                            var shouldDisplay: Bool = true
-                            ZStack(alignment: .center) {
-                                if shouldDisplay {
-                                    if let thumbnailImage = thumbnailImage {
-                                        Image(uiImage: thumbnailImage)
-                                            .resizable()
-                                    } else {
-                                        Image(systemName: "xmark.circle.fill")
+                            IllustrationLabel(namespace: illustrationTransitionNamespace, illustration: illustration)
+                                .opacity(illustration.id == displayedIllustration?.id ? 0.0 : 1.0)
+                                .overlay {
+                                    if selectedIllustrations.contains(illustration) {
+                                        SelectionOverlay()
+                                    }
+                                }
+                                .onTapGesture {
+                                    selectOrDeselectIllustration(illustration)
+                                }
+                                .contextMenu {
+                                    illustrationContextMenu(illustration)
+                                } preview: {
+                                    if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                                        Image(uiImage: image)
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 24.0, height: 24.0)
-                                            .foregroundStyle(.primary)
-                                            .symbolRenderingMode(.hierarchical)
                                     }
-                                } else {
-                                    Rectangle()
-                                        .foregroundStyle(.clear)
                                 }
-                            }
-                            .matchedGeometryEffect(id: illustration.id, in: illustrationTransitionNamespace)
-                            .aspectRatio(1.0, contentMode: .fill)
-                            .opacity(illustration.id == displayedIllustration?.id ? 0.0 : 1.0)
-                            .transition(.opacity.animation(.snappy.speed(2)))
-                            .contentShape(Rectangle())
-                            .onAppear {
-                                shouldDisplay = true
-                            }
-                            .onDisappear {
-                                shouldDisplay = false
-                            }
-                            .overlay {
-                                if selectedIllustrations.contains(illustration) {
-                                    SelectionOverlay()
-                                }
-                            }
-                            .onTapGesture {
-                                selectOrDeselectIllustration(illustration)
-                            }
-                            .contextMenu {
-                                illustrationContextMenu(illustration)
-                            } preview: {
-                                if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFit()
-                                }
-                            }
-                            .draggable(IllustrationTransferable(id: illustration.id)) {
-                                if let thumbnailImage = thumbnailImage {
-                                    // IllustrationLabel(illustrationPath: illustration.thumbnailPath())
-                                    Image(uiImage: thumbnailImage)
-                                        .resizable()
-                                        .frame(width: 100.0, height: 100.0)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                                }
-                            }
+                            // illustrationLabel(illustration)
                         }
                     }
                     .background(colorScheme == .light ?
@@ -411,6 +372,12 @@ struct AlbumView: View {
     @ViewBuilder
     func moveToAlbumMenu(_ illustrations: [Illustration], postMoveAction: @escaping () -> Void) -> some View {
         if let currentAlbum = currentAlbum {
+            Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
+                illustrations.forEach { illustration in
+                    illustration.removeFromAlbum()
+                }
+                postMoveAction()
+            }
             if let parentAlbum = currentAlbum.parentAlbum {
                 Button {
                     parentAlbum.addChildIllustrations(illustrations)
@@ -421,12 +388,6 @@ struct AlbumView: View {
                         icon: { Image(uiImage: parentAlbum.cover()) }
                     )
                 }
-            }
-            Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                illustrations.forEach { illustration in
-                    illustration.removeFromAlbum()
-                }
-                postMoveAction()
             }
         }
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {

@@ -496,6 +496,40 @@
         }
       }
     },
+    "More.ScanForOrphans" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan for Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認"
+          }
+        }
+      }
+    },
+    "More.ScanForOrphans.Scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認中…"
+          }
+        }
+      }
+    },
     "More.Sync" : {
       "extractionState" : "manual",
       "localizations" : {
