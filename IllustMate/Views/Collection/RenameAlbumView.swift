@@ -18,7 +18,7 @@ struct RenameAlbumView: View {
     var body: some View {
         NavigationStack {
             List {
-                if let album = album {
+                if let album {
                     Section {
                         TextField(album.name, text: $newAlbumName)
                             .textInputAutocapitalization(.words)
@@ -32,7 +32,7 @@ struct RenameAlbumView: View {
                         dismiss()
                     }
                 }
-                if let album = album {
+                if let album {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Shared.Rename") {
                             album.name = newAlbumName.trimmingCharacters(in: .whitespaces)

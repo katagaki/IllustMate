@@ -22,10 +22,7 @@ struct AlbumsList: View {
         LazyVStack(alignment: .leading, spacing: 0.0) {
             ForEach(albums, id: \.id) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
-                    AlbumListRow(namespace: namespace,
-                                 id: album.id, image: album.cover(), title: album.name,
-                                 numberOfIllustrations: album.illustrations().count,
-                                 numberOfAlbums: album.albums().count)
+                    AlbumListRow(namespace: namespace, album: album)
                     .dropDestination(for: IllustrationTransferable.self) { items, _ in
                         for item in items {
                             onDrop(item, album)
@@ -48,9 +45,7 @@ struct AlbumsList: View {
                         onDelete(album)
                     }
                 }
-                if album == albums.last {
-                    Divider()
-                } else {
+                if album != albums.last {
                     Divider()
                         .padding([.leading], 84.0)
                 }

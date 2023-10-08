@@ -124,9 +124,8 @@ struct MoreDebugView: View {
                     for illustration in illustrations {
                         group.addTask {
                             // Generate thumbnail
-                            debugPrint("Generating thumbnail for \(illustration.id)")
                             let illustrationImage = UIImage(contentsOfFile: illustration.illustrationPath())
-                            if let illustrationImage = illustrationImage, let thumbnailData = Illustration
+                            if let illustrationImage, let thumbnailData = Illustration
                                 .makeThumbnail(illustrationImage.jpegData(compressionQuality: 1.0)) {
                                 FileManager.default.createFile(atPath: illustration.thumbnailPath(),
                                                                contents: thumbnailData)
@@ -210,8 +209,7 @@ struct MoreDebugView: View {
     }
 
     func deleteContents(of url: URL?) {
-        if let url = url,
-           let fileURLs = try? FileManager.default
+        if let url, let fileURLs = try? FileManager.default
             .contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
             for fileURL in fileURLs {
                 try? FileManager.default.removeItem(at: fileURL)

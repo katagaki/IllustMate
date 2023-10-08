@@ -13,39 +13,18 @@ struct AlbumListRow: View {
 
     var namespace: Namespace.ID
 
-    var id: String
-    var image: UIImage?
-    var title: String
-    var numberOfIllustrations: Int
-    var numberOfAlbums: Int
-    @State var shouldDisplay: Bool = true
+    var album: Album
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            Group {
-                if shouldDisplay {
-                    if let image = image {
-                        Image(uiImage: image)
-                            .resizable()
-                    } else {
-                        Image("Album.Generic")
-                            .resizable()
-                    }
-                } else {
-                    Image("Album.Generic")
-                        .resizable()
-                }
-            }
-            .matchedGeometryEffect(id: "\(id).Image", in: namespace)
-            .frame(width: 48.0, height: 48.0)
-            .clipShape(RoundedRectangle(cornerRadius: 6.0))
-            .shadow(color: .black.opacity(0.2), radius: 2.0, x: 0.0, y: 2.0)
+            AlbumCover(length: 48.0, data: album.coverPhoto)
+                .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
-                Text(title)
-                    .matchedGeometryEffect(id: "\(id).Title", in: namespace)
+                Text(album.name)
+                    .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                Text("Albums.Detail.\(numberOfIllustrations),\(numberOfAlbums)")
+                Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

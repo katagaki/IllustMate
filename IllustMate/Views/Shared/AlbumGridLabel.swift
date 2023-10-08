@@ -11,44 +11,23 @@ struct AlbumGridLabel: View {
 
     var namespace: Namespace.ID
 
-    var id: String
-    var image: UIImage?
-    var title: String
-    var numberOfIllustrations: Int
-    var numberOfAlbums: Int
-    @State var shouldDisplay: Bool = true
+    var album: Album
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            Group {
-                if shouldDisplay {
-                    if let image = image {
-                        Image(uiImage: image)
-                            .resizable()
-                    } else {
-                        Image("Album.Generic")
-                            .resizable()
-                    }
-                } else {
-                    Image("Album.Generic")
-                        .resizable()
-                }
-            }
-            .matchedGeometryEffect(id: "\(id).Image", in: namespace)
-            .aspectRatio(1.0, contentMode: .fill)
-            .foregroundStyle(.accent)
-            .clipShape(RoundedRectangle(cornerRadius: 8.0))
-            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+            AlbumCover(cornerRadius: 8.0, shadowSize: 4.0, data: album.coverPhoto)
+                .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
+                .foregroundStyle(.accent)
             VStack(alignment: .leading, spacing: 2.0) {
-                Text(title)
-                    .matchedGeometryEffect(id: "\(id).Title", in: namespace)
+                Text(album.name)
+                    .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 HStack(alignment: .center, spacing: 8.0) {
                     HStack(alignment: .center, spacing: 4.0) {
                         Group {
                             Image(systemName: "photo.fill")
-                            Text(String(numberOfIllustrations))
+                            Text(String(album.illustrations().count))
                                 .lineLimit(1)
                         }
                         .foregroundStyle(.secondary)
@@ -57,7 +36,7 @@ struct AlbumGridLabel: View {
                     HStack(alignment: .center, spacing: 4.0) {
                         Group {
                             Image(systemName: "rectangle.stack.fill")
-                            Text(String(numberOfAlbums))
+                            Text(String(album.albums().count))
                                 .lineLimit(1)
                         }
                         .foregroundStyle(.secondary)
@@ -67,11 +46,5 @@ struct AlbumGridLabel: View {
             }
         }
         .contentShape(Rectangle())
-        .onAppear {
-            shouldDisplay = true
-        }
-        .onDisappear {
-            shouldDisplay = false
-        }
     }
 }

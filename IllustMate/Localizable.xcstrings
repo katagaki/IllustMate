@@ -1084,6 +1084,23 @@
         }
       }
     },
+    "TabTitle.Illustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
+          }
+        }
+      }
+    },
     "TabTitle.Import" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1199,6 +1216,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高度なオプション"
+          }
+        }
+      }
+    },
+    "ViewTitle.Illustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }

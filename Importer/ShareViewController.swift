@@ -110,8 +110,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             }
         default:
             configuration.text = albums[indexPath.row - 1].name
-            if let selectedAlbum = selectedAlbum,
-               selectedAlbum.id == albums[indexPath.row - 1].id {
+            if let selectedAlbum, selectedAlbum.id == albums[indexPath.row - 1].id {
                 cell.accessoryType = .checkmark
             } else {
                 cell.accessoryType = .none
@@ -182,7 +181,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     func importIllustration(_ name: String, data: Data) {
         let illustration = Illustration(name: name, data: data)
-        if let selectedAlbum = selectedAlbum {
+        if let selectedAlbum {
             illustration.containingAlbum = selectedAlbum
         }
         modelContext.insert(illustration)

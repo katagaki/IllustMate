@@ -33,7 +33,7 @@ struct NewAlbumView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Create") {
                         let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
-                        if let albumToAddTo = albumToAddTo {
+                        if let albumToAddTo {
                             albumToAddTo.addChildAlbum(newAlbum)
                         } else {
                             modelContext.insert(newAlbum)

@@ -20,9 +20,12 @@ struct IllustrationLabel: View {
     var body: some View {
         ZStack(alignment: .center) {
             if isFileFromCloudReadyForDisplay {
-                if let thumbnailImage = thumbnailImage {
+                if let thumbnailImage {
                     Image(uiImage: thumbnailImage)
                         .resizable()
+                        .transition(.opacity.animation(.snappy.speed(2)))
+                    // IMPORTANT: Do NOT move this transition to after matchedGeometryEffect, as it
+                    // will cause CATASTROPHIC freezes!
                 } else {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.1))
@@ -44,8 +47,6 @@ struct IllustrationLabel: View {
                     }
             }
         }
-        // TODO: Apply nice fade animation when image has loaded
-        //       For some reason, it is not possible to do this, a freeze will occur
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
@@ -100,7 +101,7 @@ struct IllustrationLabel: View {
             }
         }
         .draggable(IllustrationTransferable(id: illustration.id)) {
-            if let thumbnailImage = thumbnailImage {
+            if let thumbnailImage {
                 Image(uiImage: thumbnailImage)
                     .resizable()
                     .frame(width: 100.0, height: 100.0)

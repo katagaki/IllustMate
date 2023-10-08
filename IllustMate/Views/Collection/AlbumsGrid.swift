@@ -26,9 +26,7 @@ struct AlbumsGrid: View {
             ForEach(albums) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumGridLabel(namespace: namespace,
-                                   id: album.id, image: album.cover(), title: album.name,
-                                   numberOfIllustrations: album.illustrations().count,
-                                   numberOfAlbums: album.albums().count)
+                                   album: album)
                     .dropDestination(for: IllustrationTransferable.self) { items, _ in
                         for item in items {
                             onDrop(item, album)

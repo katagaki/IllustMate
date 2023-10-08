@@ -33,6 +33,15 @@ struct MainSplitView: View {
                             .frame(width: 16.0, height: 16.0)
                     }
                 }
+                NavigationLink(value: ViewPath.illustrations) {
+                    Label {
+                        Text("TabTitle.Illustrations")
+                    } icon: {
+                        Image(systemName: "photo.stack.fill")
+                            .resizable()
+                            .frame(width: 16.0, height: 16.0)
+                    }
+                }
                 NavigationLink(value: ViewPath.importer) {
                     Label {
                         Text("TabTitle.Import")
@@ -67,7 +76,8 @@ struct MainSplitView: View {
                 switch viewPath {
                 case .collection:
                     CollectionView()
-                        .toolbarBackground(.visible, for: .navigationBar)
+                case .illustrations:
+                    IllustrationsView()
                 case .importer:
                     ImportView(isImporting: $isProgressAlertDisplayed,
                                progressViewText: $progressViewText,

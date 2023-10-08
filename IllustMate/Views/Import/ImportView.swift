@@ -92,7 +92,7 @@ struct ImportView: View {
                     let illustration = Illustration(
                         name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
                         data: data)
-                    if let selectedAlbum = selectedAlbum {
+                    if let selectedAlbum {
                         selectedAlbum.addChildIllustration(illustration)
                     }
                     modelContext.insert(illustration)

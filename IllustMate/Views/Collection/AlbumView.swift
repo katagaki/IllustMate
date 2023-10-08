@@ -56,8 +56,7 @@ struct AlbumView: View {
                         isAddingAlbum = true
                     }
                 }
-                .padding([.leading, .trailing], 20.0)
-                .padding([.bottom], 6.0)
+                .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !isDataLoadedFromInitialAppearance {
                     Divider()
                         .padding([.leading], 20.0)
@@ -87,7 +86,7 @@ struct AlbumView: View {
                             } onDrop: { transferable, album in
                                 moveIllustrationToAlbum(transferable, to: album)
                             }
-
+                            Divider()
                         }
                     } else {
                         Divider()
@@ -99,21 +98,15 @@ struct AlbumView: View {
                 }
                 Spacer(minLength: 20.0)
                 CollectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
-                    Group {
-                        Button {
-                            startOrStopSelectingIllustrations()
-                        } label: {
-                            if isSelectingIllustrations {
-                                Label("Shared.Select", systemImage: "checkmark.circle.fill")
-                            } else {
-                                Label("Shared.Select", systemImage: "checkmark.circle")
-                            }
-                        }
+                    Button {
+                        startOrStopSelectingIllustrations()
+                    } label: {
+                        Label("Shared.Select",
+                              systemImage: isSelectingIllustrations ? "checkmark.circle.fill" : "checkmark.circle")
                     }
                     .disabled(illustrations.isEmpty)
                 }
-                .padding([.leading, .trailing], 20.0)
-                .padding([.bottom], 6.0)
+                .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !isDataLoadedFromInitialAppearance {
                     Divider()
                         .padding([.leading], 20.0)
@@ -152,28 +145,18 @@ struct AlbumView: View {
                             }
                         } moveMenu: { illustration in
                             if isSelectingIllustrations {
-                                illustrationMoveMenu(selectedIllustrations) {
-                                    try? modelContext.save()
-                                    isSelectingIllustrations = false
-                                    selectedIllustrations.removeAll()
-                                    withAnimation(.snappy.speed(2)) {
-                                        refreshIllustrations()
-                                    }
+                                IllustrationMoveMenu(illustrations: selectedIllustrations,
+                                                     containingAlbum: currentAlbum) {
+                                    refreshDataAfterIllustrationMovedToAlbum()
                                 }
                             } else {
-                                illustrationMoveMenu([illustration]) {
-                                    try? modelContext.save()
-                                    isSelectingIllustrations = false
-                                    selectedIllustrations.removeAll()
-                                    withAnimation(.snappy.speed(2)) {
-                                        refreshIllustrations()
-                                    }
+                                IllustrationMoveMenu(illustrations: [illustration],
+                                                     containingAlbum: currentAlbum) {
+                                    refreshDataAfterIllustrationMovedToAlbum()
                                 }
                             }
                         }
-                        if colorScheme == .light {
-                            Divider()
-                        }
+                        Divider()
                     } else {
                         Divider()
                             .padding([.leading], 20.0)
@@ -204,7 +187,7 @@ struct AlbumView: View {
         }
 #endif
         .overlay {
-            if let displayedIllustration = displayedIllustration {
+            if let displayedIllustration {
                 IllustrationViewer(namespace: illustrationTransitionNamespace,
                                    displayedIllustration: displayedIllustration,
                                    illustrationDisplayOffset: $illustrationDisplayOffset) {
@@ -222,13 +205,8 @@ struct AlbumView: View {
                     startOrStopSelectingIllustrations()
                 } menuItems: {
                     Menu("Shared.Move", systemImage: "tray.full") {
-                        illustrationMoveMenu(selectedIllustrations) {
-                            try? modelContext.save()
-                            isSelectingIllustrations = false
-                            selectedIllustrations.removeAll()
-                            withAnimation(.snappy.speed(2)) {
-                                refreshIllustrations()
-                            }
+                        IllustrationMoveMenu(illustrations: selectedIllustrations, containingAlbum: currentAlbum) {
+                            refreshDataAfterIllustrationMovedToAlbum()
                         }
                     }
                     .transition(.opacity.animation(.snappy.speed(2)))
@@ -236,12 +214,16 @@ struct AlbumView: View {
             }
         }
         .sheet(isPresented: $isAddingAlbum, onDismiss: {
-            refreshAlbums()
+            withAnimation(.snappy.speed(2)) {
+                refreshAlbums()
+            }
         }, content: {
             NewAlbumView(albumToAddTo: currentAlbum)
         })
         .sheet(item: $albumToRename, onDismiss: {
-            refreshAlbums()
+            withAnimation(.snappy.speed(2)) {
+                refreshAlbums()
+            }
         }, content: { album in
             RenameAlbumView(album: album)
         })
@@ -257,30 +239,30 @@ struct AlbumView: View {
                 refreshData()
             }
         }
-        .onChange(of: styleState, { _, newValue in
+        .onChange(of: styleState) { _, newValue in
             style = newValue
-        })
-        .onChange(of: scenePhase, { _, newValue in
+        }
+        .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
                 refreshData()
             }
-        })
+        }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 
     @ViewBuilder
-    func illustrationMoveMenu(_ illustrations: [Illustration], postMoveAction: @escaping () -> Void) -> some View {
-        if let currentAlbum = currentAlbum {
+    func illustrationMoveMenu(_ illustrations: [Illustration]) -> some View {
+        if let currentAlbum {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 illustrations.forEach { illustration in
                     illustration.removeFromAlbum()
                 }
-                postMoveAction()
+                refreshDataAfterIllustrationMovedToAlbum()
             }
             if let parentAlbum = currentAlbum.parentAlbum {
                 Button {
                     parentAlbum.addChildIllustrations(illustrations)
-                    postMoveAction()
+                    refreshDataAfterIllustrationMovedToAlbum()
                 } label: {
                     Label(
                         title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
@@ -293,7 +275,7 @@ struct AlbumView: View {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
                     album.addChildIllustrations(illustrations)
-                    postMoveAction()
+                    refreshDataAfterIllustrationMovedToAlbum()
                 } label: {
                     Label(
                         title: { Text(album.name) },
@@ -334,6 +316,14 @@ struct AlbumView: View {
         }
     }
 
+    func refreshDataAfterIllustrationMovedToAlbum() {
+        startOrStopSelectingIllustrations()
+        selectedIllustrations.removeAll()
+        withAnimation(.snappy.speed(2)) {
+            refreshIllustrations()
+        }
+    }
+
     func selectOrDeselectIllustration(_ illustration: Illustration) {
         if isSelectingIllustrations {
             if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
@@ -349,7 +339,7 @@ struct AlbumView: View {
     }
 
     func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
-        if let currentAlbum = currentAlbum {
+        if let currentAlbum {
             return currentAlbum.albums()
         } else {
             do {
@@ -369,28 +359,25 @@ struct AlbumView: View {
     }
 
     func refreshAlbums() {
-        albums.removeAll()
         do {
             let currentAlbumID = currentAlbum?.id
-            albums.append(contentsOf: try modelContext.fetch(FetchDescriptor<Album>(
+            albums = try modelContext.fetch(FetchDescriptor<Album>(
                 predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.name)])))
+                sortBy: [SortDescriptor(\.name)]))
         } catch {
             debugPrint(error.localizedDescription)
         }
     }
 
     func refreshIllustrations() {
-        illustrations.removeAll()
         do {
             let currentAlbumID = currentAlbum?.id
-            illustrations.append(contentsOf: try modelContext.fetch(FetchDescriptor<Illustration>(
+            illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
                 predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])))
+                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]))
         } catch {
             debugPrint(error.localizedDescription)
         }
     }
-
 }
 // swiftlint:enable type_body_length

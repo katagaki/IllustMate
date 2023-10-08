@@ -10,22 +10,11 @@ import SwiftUI
 struct AlbumRow: View {
 
     var album: Album
+    @State var image: UIImage?
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            Group {
-                if let coverPhotoData = album.coverPhoto,
-                   let coverPhoto = UIImage(data: coverPhotoData) {
-                    Image(uiImage: coverPhoto)
-                        .resizable()
-                } else {
-                    Image("Album.Generic")
-                        .resizable()
-                }
-            }
-            .frame(width: 48.0, height: 48.0)
-            .clipShape(RoundedRectangle(cornerRadius: 6.0))
-            .shadow(color: .black.opacity(0.2), radius: 2.0, x: 0.0, y: 2.0)
+            AlbumCover(length: 48.0, data: album.coverPhoto)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
                     .font(.body)

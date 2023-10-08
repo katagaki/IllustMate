@@ -41,11 +41,12 @@ struct IllustrationViewer: View {
             Spacer(minLength: 0)
             ZStack {
                 if isFileFromCloudReadyForDisplay {
-                    if let displayedImage = displayedImage {
+                    if let displayedImage {
                         Image(uiImage: displayedImage)
                             .resizable()
                             .scaledToFit()
                             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                            .transition(.opacity.animation(.snappy.speed(2)))
                     } else {
                         Rectangle()
                             .foregroundStyle(.primary.opacity(0.1))
@@ -57,6 +58,7 @@ struct IllustrationViewer: View {
                                     .foregroundStyle(.primary)
                                     .symbolRenderingMode(.multicolor)
                             }
+                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                     }
                 } else {
                     Rectangle()
@@ -118,6 +120,7 @@ struct IllustrationViewer: View {
                     }
                 } catch {
                     debugPrint(error.localizedDescription)
+                    isFileFromCloudReadyForDisplay = true
                 }
 #else
                 // On macOS, such a file doesn't exist,

@@ -9,6 +9,7 @@ import Foundation
 
 enum ViewPath: Hashable {
     case collection
+    case illustrations
     case album(album: Album)
     case importer
     case more

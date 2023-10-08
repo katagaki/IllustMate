@@ -43,7 +43,7 @@ final class Illustration {
     }
 
     func isInAlbum(_ album: Album?) -> Bool {
-        if let album = album {
+        if let album {
             return containingAlbum?.id ?? "" == album.id
         }
         return true
@@ -63,7 +63,7 @@ final class Illustration {
     }
 
     static func makeThumbnail(_ data: Data?) -> Data? {
-        if let data = data, let sourceImage = UIImage(data: data) {
+        if let data, let sourceImage = UIImage(data: data) {
             return sourceImage.jpegThumbnail(of: 150.0)
         }
         return nil

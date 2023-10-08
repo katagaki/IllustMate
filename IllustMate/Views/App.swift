@@ -53,7 +53,7 @@ struct IllustMateApp: App {
     }
 
     func createIfNotExists(_ url: URL?) {
-        if let url = url, !directoryExistsAtPath(url) {
+        if let url, !directoryExistsAtPath(url) {
             try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
         }
     }

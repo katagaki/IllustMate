@@ -20,20 +20,22 @@ struct IllustrationsView: View {
     var body: some View {
         // TODO: Improve performance
         // This view has HORRIBLE performance! It needs to be improved.
-        IllustrationsGrid(namespace: illustrationTransitionNamespace,
-                          illustrations: .constant(illustrations), isSelecting: .constant(false)) { illustration in
-            illustration.id == displayedIllustration?.id
-        } isSelected: { illustration in
-            return false
-        } onSelect: { illustration in
-            // TODO
-        } selectedCount: {
-            return 0
-        } onDelete: { illustration in
-            // TODO
-        } moveMenu: { illustration in
-            // TODO
+        ScrollView(.vertical) {
+            IllustrationsGrid(namespace: illustrationTransitionNamespace,
+                              illustrations: .constant(illustrations), isSelecting: .constant(false)) { illustration in
+                illustration.id == displayedIllustration?.id
+            } isSelected: { illustration in
+                return false
+            } onSelect: { illustration in
+                // TODO
+            } selectedCount: {
+                return 0
+            } onDelete: { illustration in
+                // TODO
+            } moveMenu: { illustration in
+                // TODO
+            }
         }
-
+        .navigationTitle("ViewTitle.Illustrations")
     }
 }

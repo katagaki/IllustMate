@@ -32,15 +32,14 @@ final class Album {
     }
 
     func cover() -> UIImage {
-        if let coverPhoto = coverPhoto,
-           let uiImage = UIImage(data: coverPhoto) {
+        if let coverPhoto, let uiImage = UIImage(data: coverPhoto) {
             return uiImage.scalePreservingAspectRatio(targetSize: CGSize(width: 60.0, height: 60.0))
         }
         return UIImage(named: "Album.Generic")!
     }
 
     func isInAlbum(_ album: Album?) -> Bool {
-        if let album = album {
+        if let album {
             return parentAlbum == album
         } else {
             return isNotInAnyAlbums()
@@ -85,7 +84,7 @@ final class Album {
     }
 
     static func makeCover(_ data: Data?) -> Data? {
-        if let data = data, let sourceImage = UIImage(data: data) {
+        if let data, let sourceImage = UIImage(data: data) {
             return sourceImage.jpegThumbnail(of: 350.0)
         }
         return nil
