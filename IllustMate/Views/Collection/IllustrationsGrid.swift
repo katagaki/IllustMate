@@ -15,6 +15,7 @@ struct IllustrationsGrid<Content: View>: View {
 
     @Binding var illustrations: [Illustration]
     @Binding var isSelecting: Bool
+    @State var enableSelection: Bool = true
     var isViewing: (Illustration) -> Bool
     var isSelected: (Illustration) -> Bool
     var onSelect: (Illustration) -> Void
@@ -22,10 +23,18 @@ struct IllustrationsGrid<Content: View>: View {
     var onDelete: (Illustration) -> Void
     @ViewBuilder var moveMenu: (Illustration) -> Content
 
-    let illustrationsColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
+    let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
+#if targetEnvironment(macCatalyst)
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 4.0)]
+#else
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 160.0), spacing: 4.0)]
+#endif
 
     var body: some View {
-        LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
+        LazyVGrid(
+            columns: UIDevice.current.userInterfaceIdiom == .phone ?
+                     phoneColumnConfiguration : padOrMacColumnConfiguration,
+            spacing: UIDevice.current.userInterfaceIdiom == .phone ? 2.0 : 4.0) {
             ForEach(illustrations, id: \.id) { illustration in
                 Button {
                     onSelect(illustration)
@@ -48,13 +57,15 @@ struct IllustrationsGrid<Content: View>: View {
                                     }
                                 }
                             } else {
-                                Button("Shared.Select", systemImage: "checkmark.circle") {
-                                    withAnimation(.snappy.speed(2)) {
-                                        isSelecting = true
-                                        onSelect(illustration)
+                                if enableSelection {
+                                    Button("Shared.Select", systemImage: "checkmark.circle") {
+                                        withAnimation(.snappy.speed(2)) {
+                                            isSelecting = true
+                                            onSelect(illustration)
+                                        }
                                     }
+                                    Divider()
                                 }
-                                Divider()
                                 Button("Shared.Copy", systemImage: "doc.on.doc") {
                                     if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
                                         UIPasteboard.general.image = image

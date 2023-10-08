@@ -19,10 +19,18 @@ struct AlbumsGrid: View {
     var onDelete: (Album) -> Void
     var onDrop: (IllustrationTransferable, Album) -> Void
 
-    let albumColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
+    let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
+#if targetEnvironment(macCatalyst)
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
+#else
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 160.0), spacing: 20.0)]
+#endif
 
     var body: some View {
-        LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
+        LazyVGrid(
+            columns: UIDevice.current.userInterfaceIdiom == .phone ?
+                    phoneColumnConfiguration : padOrMacColumnConfiguration,
+            spacing: 20.0) {
             ForEach(albums) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumGridLabel(namespace: namespace,

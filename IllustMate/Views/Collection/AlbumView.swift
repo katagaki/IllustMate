@@ -121,7 +121,8 @@ struct AlbumView: View {
                             }
                             Divider()
                         }
-                        IllustrationsGrid(namespace: illustrationTransitionNamespace, illustrations: $illustrations,
+                        IllustrationsGrid(namespace: illustrationTransitionNamespace,
+                                          illustrations: $illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
                             illustration.id == displayedIllustration?.id
                         } isSelected: { illustration in
@@ -250,42 +251,6 @@ struct AlbumView: View {
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 
-    @ViewBuilder
-    func illustrationMoveMenu(_ illustrations: [Illustration]) -> some View {
-        if let currentAlbum {
-            Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                illustrations.forEach { illustration in
-                    illustration.removeFromAlbum()
-                }
-                refreshDataAfterIllustrationMovedToAlbum()
-            }
-            if let parentAlbum = currentAlbum.parentAlbum {
-                Button {
-                    parentAlbum.addChildIllustrations(illustrations)
-                    refreshDataAfterIllustrationMovedToAlbum()
-                } label: {
-                    Label(
-                        title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
-                        icon: { Image(uiImage: parentAlbum.cover()) }
-                    )
-                }
-            }
-        }
-        Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
-            ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
-                Button {
-                    album.addChildIllustrations(illustrations)
-                    refreshDataAfterIllustrationMovedToAlbum()
-                } label: {
-                    Label(
-                        title: { Text(album.name) },
-                        icon: { Image(uiImage: album.cover()) }
-                    )
-                }
-            }
-        }
-    }
-
     func deleteAlbum(_ album: Album) {
         modelContext.delete(album)
         withAnimation(.snappy.speed(2)) {
@@ -334,21 +299,6 @@ struct AlbumView: View {
         } else {
             withAnimation(.snappy.speed(2)) {
                 displayedIllustration = illustration
-            }
-        }
-    }
-
-    func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
-        if let currentAlbum {
-            return currentAlbum.albums()
-        } else {
-            do {
-                return try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum == nil },
-                    sortBy: [SortDescriptor(\.name)]))
-            } catch {
-                debugPrint(error.localizedDescription)
-                return []
             }
         }
     }
