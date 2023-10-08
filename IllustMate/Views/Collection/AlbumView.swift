@@ -170,6 +170,9 @@ struct AlbumView: View {
                                 }
                             }
                         }
+                        if colorScheme == .light {
+                            Divider()
+                        }
                     } else {
                         Divider()
                             .padding([.leading], 20.0)

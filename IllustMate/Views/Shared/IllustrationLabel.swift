@@ -74,6 +74,7 @@ struct IllustrationLabel: View {
                             DispatchQueue.global(qos: .userInteractive).async {
                                 var isDownloaded: Bool = false
                                 while !isDownloaded {
+                                    Thread.sleep(forTimeInterval: Double.random(in: 0.0..<0.2))
                                     if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
                                         isDownloaded = true
                                     }
