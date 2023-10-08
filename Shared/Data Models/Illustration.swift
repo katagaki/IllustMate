@@ -64,19 +64,7 @@ final class Illustration {
 
     static func makeThumbnail(_ data: Data?) -> Data? {
         if let data = data, let sourceImage = UIImage(data: data) {
-            let shortSideLength = min(sourceImage.size.width, sourceImage.size.height)
-            let xOffset = (sourceImage.size.width - shortSideLength) / 2.0
-            let yOffset = (sourceImage.size.height - shortSideLength) / 2.0
-            let cropRect = CGRect(x: xOffset, y: yOffset, width: shortSideLength, height: shortSideLength)
-            let imageRendererFormat = sourceImage.imageRendererFormat
-            imageRendererFormat.opaque = false
-            let croppedImage = UIGraphicsImageRenderer(size: cropRect.size,
-                                                             format: imageRendererFormat).image { _ in
-                sourceImage.draw(in: CGRect(origin: CGPoint(x: -xOffset, y: -yOffset), size: sourceImage.size))
-            }.cgImage!
-            return UIImage(cgImage: croppedImage)
-                .preparingThumbnail(of: CGSize(width: 200.0, height: 200.0))?
-                .jpegData(compressionQuality: 1.0)
+            return sourceImage.jpegThumbnail(of: 150.0)
         }
         return nil
     }

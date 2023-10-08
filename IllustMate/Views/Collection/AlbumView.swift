@@ -363,22 +363,24 @@ struct AlbumView: View {
     }
 
     func refreshAlbums() {
+        albums.removeAll()
         do {
             let currentAlbumID = currentAlbum?.id
-            albums = try modelContext.fetch(FetchDescriptor<Album>(
+            albums.append(contentsOf: try modelContext.fetch(FetchDescriptor<Album>(
                 predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.name)]))
+                sortBy: [SortDescriptor(\.name)])))
         } catch {
             debugPrint(error.localizedDescription)
         }
     }
 
     func refreshIllustrations() {
+        illustrations.removeAll()
         do {
             let currentAlbumID = currentAlbum?.id
-            illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
+            illustrations.append(contentsOf: try modelContext.fetch(FetchDescriptor<Illustration>(
                 predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]))
+                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])))
         } catch {
             debugPrint(error.localizedDescription)
         }

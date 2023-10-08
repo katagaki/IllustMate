@@ -15,40 +15,33 @@ struct IllustrationLabel: View {
 
     @State var isFileFromCloudReadyForDisplay: Bool = false
     @State var isDownloadTriggered: Bool = false
-    @State var shouldDisplay: Bool = true
     @State var thumbnailImage: UIImage?
 
     var body: some View {
         ZStack(alignment: .center) {
-            if shouldDisplay {
-                if isFileFromCloudReadyForDisplay {
-                    if let thumbnailImage = thumbnailImage {
-                        Image(uiImage: thumbnailImage)
-                            .resizable()
-                    } else {
-                        Rectangle()
-                            .foregroundStyle(.primary.opacity(0.1))
-                            .overlay {
-                                Image(systemName: "xmark.circle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24.0, height: 24.0)
-                                    .foregroundStyle(.primary)
-                                    .symbolRenderingMode(.multicolor)
-                            }
-                    }
+            if isFileFromCloudReadyForDisplay {
+                if let thumbnailImage = thumbnailImage {
+                    Image(uiImage: thumbnailImage)
+                        .resizable()
                 } else {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.1))
                         .overlay {
-                            ProgressView()
-                                .progressViewStyle(.circular)
+                            Image(systemName: "xmark.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24.0, height: 24.0)
+                                .foregroundStyle(.primary)
+                                .symbolRenderingMode(.multicolor)
                         }
                 }
             } else {
                 Rectangle()
                     .foregroundStyle(.primary.opacity(0.1))
-                    .foregroundStyle(.clear)
+                    .overlay {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    }
             }
         }
         // TODO: Apply nice fade animation when image has loaded
@@ -103,10 +96,6 @@ struct IllustrationLabel: View {
 #endif
                 }
             }
-            shouldDisplay = true
-        }
-        .onDisappear {
-            shouldDisplay = false
         }
         .draggable(IllustrationTransferable(id: illustration.id)) {
             if let thumbnailImage = thumbnailImage {

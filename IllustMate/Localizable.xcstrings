@@ -423,7 +423,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "高度オプション"
+            "value" : "高度なオプション"
           }
         }
       }
@@ -1198,7 +1198,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "高度オプション"
+            "value" : "高度なオプション"
           }
         }
       }
