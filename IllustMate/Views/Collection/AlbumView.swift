@@ -282,7 +282,6 @@ struct AlbumView: View {
     }
 
     func refreshDataAfterIllustrationMovedToAlbum() {
-        startOrStopSelectingIllustrations()
         selectedIllustrations.removeAll()
         withAnimation(.snappy.speed(2)) {
             refreshIllustrations()
