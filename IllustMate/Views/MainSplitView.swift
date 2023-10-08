@@ -81,7 +81,7 @@ struct MainSplitView: View {
                              total: $total,
                              percentage: $percentage)
                 case .album(let album):
-                    AlbumStack(album: album)
+                    AlbumNavigationStack(album: album)
                         .id(album.id)
                 default: Color.clear
                 }

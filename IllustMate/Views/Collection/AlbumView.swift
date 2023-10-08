@@ -6,14 +6,15 @@
 //
 
 import Komponents
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 // swiftlint:disable type_body_length function_body_length file_length
 struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace
@@ -22,6 +23,7 @@ struct AlbumView: View {
     var currentAlbum: Album?
     @State var albums: [Album] = []
     @State var illustrations: [Illustration] = []
+    @State var isDataLoadedFromInitialAppearance: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
     @State var styleState: ViewStyle = .grid
@@ -36,7 +38,6 @@ struct AlbumView: View {
     @State var displayedIllustration: Illustration?
     @State var illustrationDisplayOffset: CGSize = .zero
 
-    let albumColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
     let illustrationsColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 
     var body: some View {
@@ -59,71 +60,44 @@ struct AlbumView: View {
                 }
                 .padding([.leading, .trailing], 20.0)
                 .padding([.bottom], 6.0)
-                if !albums.isEmpty {
-                    Divider()
-                        .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
-                    switch styleState {
-                    case .grid:
-                        LazyVGrid(columns: albumColumnConfiguration, spacing: 20.0) {
-                            ForEach(albums) { album in
-                                NavigationLink(value: ViewPath.album(album: album)) {
-                                    AlbumGridLabel(namespace: albumTransitionNamespace,
-                                                   id: album.id, image: album.cover(), title: album.name,
-                                                   numberOfIllustrations: album.illustrations().count,
-                                                   numberOfAlbums: album.albums().count)
-                                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
-                                        for item in items {
-                                            moveIllustrationToAlbum(item, to: album)
-                                        }
-                                        return true
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                                .contextMenu { albumContextMenu(album) }
-                            }
-                        }
-                        .padding(20.0)
-                        .background(colorScheme == .light ?
-                                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                                        Color.init(uiColor: .systemBackground))
-                        if colorScheme == .light {
-                            Divider()
-                        }
-                    case .list:
-                        LazyVStack(alignment: .leading, spacing: 0.0) {
-                            ForEach(albums, id: \.id) { album in
-                                NavigationLink(value: ViewPath.album(album: album)) {
-                                    AlbumListRow(namespace: albumTransitionNamespace,
-                                                 id: album.id, image: album.cover(), title: album.name,
-                                                 numberOfIllustrations: album.illustrations().count,
-                                                 numberOfAlbums: album.albums().count)
-                                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
-                                        for item in items {
-                                            moveIllustrationToAlbum(item, to: album)
-                                        }
-                                        return true
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                                .contextMenu { albumContextMenu(album) }
-                                if album == albums.last {
-                                    Divider()
-                                } else {
-                                    Divider()
-                                        .padding([.leading], 84.0)
-                                }
-                            }
-                        }
-                        .background(colorScheme == .light ?
-                                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                                        Color.init(uiColor: .systemBackground))
-                    }
-                } else {
+                if !isDataLoadedFromInitialAppearance {
                     Divider()
                         .padding([.leading], 20.0)
-                    Text("Albums.NoAlbums")
-                        .foregroundStyle(.secondary)
+                    ProgressView()
                         .padding(20.0)
+                } else {
+                    if !albums.isEmpty {
+                        Divider()
+                            .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
+                        switch styleState {
+                        case .grid:
+                            AlbumsGrid(namespace: albumTransitionNamespace, albums: $albums) { album in
+                                albumToRename = album
+                            } onDelete: { album in
+                                deleteAlbum(album)
+                            } onDrop: { transferable, album in
+                                moveIllustrationToAlbum(transferable, to: album)
+                            }
+                            if colorScheme == .light {
+                                Divider()
+                            }
+                        case .list:
+                            AlbumsList(namespace: albumTransitionNamespace, albums: $albums) { album in
+                                albumToRename = album
+                            } onDelete: { album in
+                                deleteAlbum(album)
+                            } onDrop: { transferable, album in
+                                moveIllustrationToAlbum(transferable, to: album)
+                            }
+
+                        }
+                    } else {
+                        Divider()
+                            .padding([.leading], 20.0)
+                        Text("Albums.NoAlbums")
+                            .foregroundStyle(.secondary)
+                            .padding(20.0)
+                    }
                 }
                 Spacer(minLength: 20.0)
                 CollectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
@@ -147,44 +121,48 @@ struct AlbumView: View {
                 }
                 .padding([.leading, .trailing], 20.0)
                 .padding([.bottom], 6.0)
-                if !illustrations.isEmpty {
-                    Divider()
-                    LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                        ForEach(illustrations, id: \.id) { illustration in
-                            IllustrationLabel(namespace: illustrationTransitionNamespace, illustration: illustration)
-                                .opacity(illustration.id == displayedIllustration?.id ? 0.0 : 1.0)
-                                .overlay {
-                                    if selectedIllustrations.contains(illustration) {
-                                        SelectionOverlay()
-                                    }
-                                }
-                                .onTapGesture {
-                                    selectOrDeselectIllustration(illustration)
-                                }
-                                .contextMenu {
-                                    illustrationContextMenu(illustration)
-                                } preview: {
-                                    if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .scaledToFit()
-                                    }
-                                }
-                            // illustrationLabel(illustration)
-                        }
-                    }
-                    .background(colorScheme == .light ?
-                                Color.init(uiColor: .secondarySystemGroupedBackground) :
-                                    Color.init(uiColor: .systemBackground))
-                    if colorScheme == .light {
-                        Divider()
-                    }
-                } else {
+                if !isDataLoadedFromInitialAppearance {
                     Divider()
                         .padding([.leading], 20.0)
-                    Text("Albums.NoIllustrations")
-                        .foregroundStyle(.secondary)
+                    ProgressView()
                         .padding(20.0)
+                } else {
+                    if !illustrations.isEmpty {
+                        Divider()
+                        LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
+                            ForEach(illustrations, id: \.id) { illustration in
+                                IllustrationLabel(namespace: illustrationTransitionNamespace,
+                                                  illustration: illustration)
+                                    .opacity(illustration.id == displayedIllustration?.id ? 0.0 : 1.0)
+                                    .overlay {
+                                        if selectedIllustrations.contains(illustration) {
+                                            SelectionOverlay()
+                                        }
+                                    }
+                                    .onTapGesture {
+                                        selectOrDeselectIllustration(illustration)
+                                    }
+                                    .contextMenu {
+                                        illustrationContextMenu(illustration)
+                                    } preview: {
+                                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .scaledToFit()
+                                        }
+                                    }
+                            }
+                        }
+                        .background(colorScheme == .light ?
+                                    Color.init(uiColor: .secondarySystemGroupedBackground) :
+                                        Color.init(uiColor: .systemBackground))
+                    } else {
+                        Divider()
+                            .padding([.leading], 20.0)
+                        Text("Albums.NoIllustrations")
+                            .foregroundStyle(.secondary)
+                            .padding(20.0)
+                    }
                 }
             }
             .padding([.top], 20.0)
@@ -250,34 +228,32 @@ struct AlbumView: View {
         }, content: { album in
             RenameAlbumView(album: album)
         })
-        .onAppear {
-            styleState = style
-            refreshData()
+        .task {
+            if !isDataLoadedFromInitialAppearance {
+                withAnimation(.snappy.speed(2)) {
+                    styleState = style
+                    refreshData()
+                    isDataLoadedFromInitialAppearance = true
+                }
+            }
         }
         .onChange(of: styleState, { _, newValue in
             style = newValue
+        })
+        .onChange(of: scenePhase, { _, newValue in
+            if newValue == .active {
+                refreshData()
+            }
         })
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 
     // MARK: Albums
 
-    @ViewBuilder
-    func albumContextMenu(_ album: Album) -> some View {
-        Button("Shared.ResetCover", systemImage: "photo") {
-            withAnimation(.snappy.speed(2)) {
-                album.coverPhoto = nil
-            }
-        }
-        Divider()
-        Button("Shared.Rename", systemImage: "pencil") {
-            albumToRename = album
-        }
-        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-            modelContext.delete(album)
-            withAnimation(.snappy.speed(2)) {
-                refreshAlbums()
-            }
+    func deleteAlbum(_ album: Album) {
+        modelContext.delete(album)
+        withAnimation(.snappy.speed(2)) {
+            refreshData()
         }
     }
 

@@ -25,7 +25,7 @@ struct MainTabView: View {
                 .tabItem {
                     Label("TabTitle.Collection", image: "Tab.Collection")
                 }
-                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(.visible, for: .tabBar)
                 .tag(TabType.collection)
             ImportView(isImporting: $isProgressAlertDisplayed,
                        progressViewText: $progressViewText,

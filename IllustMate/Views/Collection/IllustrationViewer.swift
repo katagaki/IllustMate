@@ -97,7 +97,7 @@ struct IllustrationViewer: View {
                         isFileFromCloudReadyForDisplay = true
                     } else {
                         try FileManager.default.startDownloadingUbiquitousItem(
-                            at: URL(filePath: displayedIllustration.illustrationPathWhenUbiquitousFileNotDownloaded()))
+                            at: URL(filePath: displayedIllustration.illustrationPath()))
                         DispatchQueue.global(qos: .userInitiated).async {
                             var isDownloaded: Bool = false
                             while !isDownloaded {

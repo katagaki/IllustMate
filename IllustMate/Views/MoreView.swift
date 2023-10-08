@@ -235,8 +235,8 @@ SOFTWARE.
             Task {
                 await withDiscardingTaskGroup { group in
                     for illustration in illustrations {
-                        // TODO: Download illustrations before rebuild
                         group.addTask {
+                            // Generate thumbnail
                             if let illustrationImage = UIImage(contentsOfFile: illustration.illustrationPath()),
                                let thumbnailData = Illustration.makeThumbnail(illustrationImage.pngData()) {
                                 FileManager.default.createFile(atPath: illustration.thumbnailPath(),
@@ -276,6 +276,12 @@ SOFTWARE.
                     do {
                         try FileManager.default.startDownloadingUbiquitousItem(
                             at: URL(filePath: illustration.thumbnailPath()))
+                        var isDownloaded: Bool = false
+                        while !isDownloaded {
+                            if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
+                                isDownloaded = true
+                            }
+                        }
                     } catch {
                         debugPrint(error.localizedDescription)
                     }

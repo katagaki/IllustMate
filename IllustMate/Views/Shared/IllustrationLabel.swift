@@ -69,7 +69,7 @@ struct IllustrationLabel: View {
                         } else {
                             isDownloadTriggered = true
                             try FileManager.default.startDownloadingUbiquitousItem(
-                                at: URL(filePath: illustration.thumbnailPathWhenUbiquitousFileNotDownloaded()))
+                                at: URL(filePath: illustration.thumbnailPath()))
                             DispatchQueue.global(qos: .userInitiated).async {
                                 var isDownloaded: Bool = false
                                 while !isDownloaded {
