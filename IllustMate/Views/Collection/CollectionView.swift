@@ -25,6 +25,8 @@ struct CollectionView: View {
                     }
                 })
         }
+#if !targetEnvironment(macCatalyst)
         .navigationTransition(.default, interactivity: .pan)
+#endif
     }
 }
