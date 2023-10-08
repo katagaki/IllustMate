@@ -16,7 +16,7 @@ struct AlbumCover: View {
     @State var image: UIImage?
 
     var body: some View {
-        Group {
+        ZStack(alignment: .center) {
             if let length {
                 Group {
                     if let image {
