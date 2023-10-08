@@ -53,6 +53,7 @@
 		E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892252AD28080005C9DBD /* AlbumsGrid.swift */; };
 		E4E8922A2AD2843A005C9DBD /* AlbumsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892292AD2843A005C9DBD /* AlbumsList.swift */; };
 		E4E8922E2AD2871A005C9DBD /* IllustrationsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */; };
+		E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8922F2AD28F11005C9DBD /* IllustrationsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -125,6 +126,7 @@
 		E4E892252AD28080005C9DBD /* AlbumsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGrid.swift; sourceTree = "<group>"; };
 		E4E892292AD2843A005C9DBD /* AlbumsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsList.swift; sourceTree = "<group>"; };
 		E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationsGrid.swift; sourceTree = "<group>"; };
+		E4E8922F2AD28F11005C9DBD /* IllustrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -251,6 +253,7 @@
 			isa = PBXGroup;
 			children = (
 				E4614D392ACB274700D751FB /* CollectionView.swift */,
+				E4E8922F2AD28F11005C9DBD /* IllustrationsView.swift */,
 				E4614CE82ACA86C900D751FB /* AlbumView.swift */,
 				E45A8BFB2AD1958B00E3035E /* AlbumNavigationStack.swift */,
 				E4E892252AD28080005C9DBD /* AlbumsGrid.swift */,
@@ -464,6 +467,7 @@
 				E45A8BCE2AD0362900E3035E /* IllustrationLabel.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
+				E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */,
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 				E45A8BD62AD04CD100E3035E /* SelectionOverlay.swift in Sources */,

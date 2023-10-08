@@ -190,13 +190,11 @@ struct AlbumView: View {
         }
 #else
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Shared.Refresh") {
                     withAnimation(.snappy.speed(2)) {
                         refreshData()
                     }
-                } label: {
-                    Image(systemName: "arrow.clockwise")
                 }
             }
         }

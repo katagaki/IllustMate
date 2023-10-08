@@ -91,9 +91,11 @@ struct IllustrationLabel: View {
                     // On macOS, such a file doesn't exist, 
                     // so we can't do anything about it other than to try to push it to another thread
                     DispatchQueue.global(qos: .userInitiated).async {
-                        thumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
-                        DispatchQueue.main.async {
-                            isFileFromCloudReadyForDisplay = true
+                        if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
+                            DispatchQueue.main.async {
+                                thumbnailImage = UIImage(data: thumbnailData)
+                                isFileFromCloudReadyForDisplay = true
+                            }
                         }
                     }
 #endif
