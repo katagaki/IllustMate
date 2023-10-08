@@ -34,9 +34,9 @@ struct AlbumView: View {
 
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
-
     @State var displayedIllustration: Illustration?
     @State var illustrationDisplayOffset: CGSize = .zero
+    @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
     var body: some View {
         ScrollView(.vertical) {
@@ -127,6 +127,12 @@ struct AlbumView: View {
                 } else {
                     if !illustrations.isEmpty {
                         Divider()
+                        if showIllustrationIDs {
+                            ForEach(illustrations, id: \.id) { illustration in
+                                Text(illustration.id)
+                            }
+                            Divider()
+                        }
                         IllustrationsGrid(namespace: illustrationTransitionNamespace, illustrations: $illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
                             illustration.id == displayedIllustration?.id
@@ -249,6 +255,9 @@ struct AlbumView: View {
                     refreshData()
                     isDataLoadedFromInitialAppearance = true
                 }
+            } else {
+                styleState = style
+                refreshData()
             }
         }
         .onChange(of: styleState, { _, newValue in

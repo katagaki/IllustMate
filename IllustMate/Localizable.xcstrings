@@ -411,7 +411,24 @@
         }
       }
     },
-    "More.DeleteAll" : {
+    "More.Debug" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度オプション"
+          }
+        }
+      }
+    },
+    "More.Debug.DeleteAll" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -428,7 +445,7 @@
         }
       }
     },
-    "More.RebuildThumbnails" : {
+    "More.Debug.RebuildThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -445,7 +462,7 @@
         }
       }
     },
-    "More.RebuildThumbnails.Rebuilding" : {
+    "More.Debug.RebuildThumbnails.Rebuilding" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -462,7 +479,7 @@
         }
       }
     },
-    "More.RedownloadThumbnails" : {
+    "More.Debug.RedownloadThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -479,7 +496,7 @@
         }
       }
     },
-    "More.RedownloadThumbnails.Redownloading" : {
+    "More.Debug.RedownloadThumbnails.Redownloading" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -496,7 +513,7 @@
         }
       }
     },
-    "More.ScanForOrphans" : {
+    "More.Debug.ScanForOrphans" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -513,7 +530,7 @@
         }
       }
     },
-    "More.ScanForOrphans.Moving" : {
+    "More.Debug.ScanForOrphans.Moving" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -530,7 +547,7 @@
         }
       }
     },
-    "More.ScanForOrphans.Scanning" : {
+    "More.Debug.ScanForOrphans.Scanning" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -543,6 +560,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "孤立したファイルを確認中…"
+          }
+        }
+      }
+    },
+    "More.Debug.ShowIllustrationIDs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Illustration IDs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像IDを表示"
           }
         }
       }
@@ -1148,6 +1182,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コレクション"
+          }
+        }
+      }
+    },
+    "ViewTitle.Debug" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度オプション"
           }
         }
       }

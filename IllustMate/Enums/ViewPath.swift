@@ -12,5 +12,6 @@ enum ViewPath: Hashable {
     case album(album: Album)
     case importer
     case more
+    case moreDebug
     case moreAttributions
 }

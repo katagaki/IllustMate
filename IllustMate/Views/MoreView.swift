@@ -20,6 +20,8 @@ struct MoreView: View {
     @State var orphans: [String] = []
     @State var isDeleteAllowed: Bool = false
 
+    @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
+
     @Binding var isReportingProgress: Bool
     @Binding var progressViewText: LocalizedStringKey
     @Binding var currentProgress: Int
@@ -87,33 +89,44 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
-                    Button("More.ScanForOrphans") {
-                        scanForOrphans()
-                    }
-                    Button("More.RebuildThumbnails") {
-                        rebuildThumbnails()
-                    }
-                    Button("More.RedownloadThumbnails") {
-                        redownloadThumbnails()
-                    }
-                }
-                Section {
-                    Toggle(isOn: $isDeleteAllowed) {
-                        Button("More.DeleteAll", role: .destructive) {
-                            deleteData()
-                            deleteContents(of: illustrationsFolder)
-                            deleteContents(of: thumbnailsFolder)
-                            deleteContents(of: importsFolder)
-                        }
-                        .disabled(!isDeleteAllowed)
+                    NavigationLink(value: ViewPath.moreDebug) {
+                        ListRow(image: "ListIcon.Debug", title: "More.Debug")
                     }
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
+                case .moreDebug:
+                    List {
+                        Section {
+                            Toggle("More.Debug.ShowIllustrationIDs", isOn: $showIllustrationIDs)
+                            Button("More.Debug.ScanForOrphans") {
+                                scanForOrphans()
+                            }
+                            Button("More.Debug.RebuildThumbnails") {
+                                rebuildThumbnails()
+                            }
+                            Button("More.Debug.RedownloadThumbnails") {
+                                redownloadThumbnails()
+                            }
+                        }
+                        Section {
+                            Toggle(isOn: $isDeleteAllowed) {
+                                Button("More.Debug.DeleteAll", role: .destructive) {
+                                    deleteData()
+                                    deleteContents(of: illustrationsFolder)
+                                    deleteContents(of: thumbnailsFolder)
+                                    deleteContents(of: importsFolder)
+                                }
+                                .disabled(!isDeleteAllowed)
+                            }
+                        }
+                    }
+                    .navigationTitle("ViewTitle.Debug")
+                    .navigationBarTitleDisplayMode(.inline)
                 case .moreAttributions: LicensesView(licenses: [
-                    License(libraryName: "CloudKitSyncMonitor",
-                            text:
+                    // swiftlint:disable line_length
+                    License(libraryName: "CloudKitSyncMonitor", text:
 """
 Copyright (c) 2020 Grant Grueninger
 
@@ -135,8 +148,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                License(libraryName: "swiftui-navigation-transitions",
-                        text:
+                    License(libraryName: "swiftui-introspect", text:
+"""
+Copyright 2019 Timber Software
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+"""),
+                    License(libraryName: "swiftui-navigation-transitions", text:
 """
 MIT License
 
@@ -160,6 +183,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """)])
+                    // swiftlint:enable line_length
                 default: Color.clear
                 }
             }
@@ -173,7 +197,7 @@ SOFTWARE.
                 var fetchDescriptor = FetchDescriptor<Illustration>()
                 fetchDescriptor.propertiesToFetch = [\.id]
                 let illustrations = try modelContext.fetch(fetchDescriptor)
-                progressViewText = "More.ScanForOrphans.Scanning"
+                progressViewText = "More.Debug.ScanForOrphans.Scanning"
                 currentProgress = 0
                 total = 0
                 percentage = 0
@@ -193,7 +217,7 @@ SOFTWARE.
                         percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
                     }
                 }
-                progressViewText = "More.ScanForOrphans.Moving"
+                progressViewText = "More.Debug.ScanForOrphans.Moving"
                 currentProgress = 0
                 total = orphans.count
                 orphans.forEach { orphan in
@@ -222,7 +246,7 @@ SOFTWARE.
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressViewText = "More.RebuildThumbnails.Rebuilding"
+            progressViewText = "More.Debug.RebuildThumbnails.Rebuilding"
             currentProgress = 0
             total = illustrations.count
             percentage = 0
@@ -264,7 +288,7 @@ SOFTWARE.
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressViewText = "More.RedownloadThumbnails.Redownloading"
+            progressViewText = "More.Debug.RedownloadThumbnails.Redownloading"
             currentProgress = 0
             total = illustrations.count
             percentage = 0
