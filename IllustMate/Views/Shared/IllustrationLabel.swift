@@ -72,10 +72,11 @@ struct IllustrationLabel: View {
                                         isDownloaded = true
                                     }
                                 }
-                                thumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
-                                DispatchQueue.main.async {
-                                    isFileFromCloudReadyForDisplay = true
+                                let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath()))
+                                if let data {
+                                    thumbnailImage = UIImage(data: data)
                                 }
+                                isFileFromCloudReadyForDisplay = true
                             }
                         }
                     } catch {
@@ -87,10 +88,11 @@ struct IllustrationLabel: View {
                     // so we can't do anything about it other than to try to push it to another thread
                     DispatchQueue.global(qos: .userInteractive).async {
                         if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
-                            DispatchQueue.main.async {
-                                thumbnailImage = UIImage(data: thumbnailData)
-                                isFileFromCloudReadyForDisplay = true
+                            let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath()))
+                            if let data {
+                                thumbnailImage = UIImage(data: data)
                             }
+                            isFileFromCloudReadyForDisplay = true
                         }
                     }
 #endif

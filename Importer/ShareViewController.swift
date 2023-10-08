@@ -134,25 +134,38 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         albums.removeAll()
         // Start import
         if let item = extensionContext?.inputItems.first as? NSExtensionItem {
-            let attachments = (item.attachments ?? [])
-                .filter({ $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) ||
-                    $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) })
+            let attachments = item.attachments ?? []
             total = attachments.count
-            for attachment: NSItemProvider in attachments {
-                if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                    attachment.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { [self] file, _ in
-                        loadAndImport(file)
+            Task {
+                for attachment: NSItemProvider in attachments {
+                    var loadedFile: Any?
+                    if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                        loadedFile = await loadItem(attachment, type: UTType.image)
+                    } else if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+                        loadedFile = await loadItem(attachment, type: UTType.url)
                     }
-                } else if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
-                    attachment.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { [self] file, _ in
-                        loadAndImport(file)
-                    }
+                    importItem(loadedFile)
+                    currentProgress += 1
+                    progressView.progress = Float(currentProgress) / Float(total)
+                }
+                progressLabel.text = String(localized: "Importer.DoneText")
+                heroImage.image = UIImage(systemName: "checkmark.circle.fill")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+                    extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
                 }
             }
         }
     }
 
-    func loadAndImport(_ file: Any?) {
+    func loadItem(_ attachment: NSItemProvider, type: UTType) async -> Any? {
+        return await withCheckedContinuation { continuation in
+            attachment.loadItem(forTypeIdentifier: type.identifier, options: nil) { file, _ in
+                continuation.resume(returning: (file))
+            }
+        }
+    }
+
+    func importItem(_ file: Any?) {
         if let url = file as? URL,
            let imageData = try? Data(contentsOf: url) {
             importIllustration(url.lastPathComponent, data: imageData)
@@ -165,8 +178,6 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 importIllustration(UUID().uuidString, data: heicData)
             }
         }
-        self.incrementProgress()
-        self.dismissIfCompleted()
     }
 
     func importIllustration(_ name: String, data: Data) {
@@ -175,24 +186,5 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             illustration.containingAlbum = selectedAlbum
         }
         modelContext.insert(illustration)
-    }
-
-    func incrementProgress() {
-        DispatchQueue.main.async { [self] in
-            currentProgress += 1
-            progressView.progress = Float(currentProgress) / Float(total)
-        }
-    }
-
-    func dismissIfCompleted() {
-        DispatchQueue.main.async { [self] in
-            if currentProgress == total {
-                progressLabel.text = String(localized: "Importer.DoneText")
-                heroImage.image = UIImage(systemName: "checkmark.circle.fill")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
-                    extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
-                }
-            }
-        }
     }
 }
