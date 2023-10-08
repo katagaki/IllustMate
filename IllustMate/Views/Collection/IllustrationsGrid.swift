@@ -50,6 +50,7 @@ struct IllustrationsGrid<Content: View>: View {
                         } else {
                             Button("Shared.Select", systemImage: "checkmark.circle") {
                                 withAnimation(.snappy.speed(2)) {
+                                    isSelecting = true
                                     onSelect(illustration)
                                 }
                             }
