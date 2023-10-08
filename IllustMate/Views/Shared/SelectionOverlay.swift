@@ -20,6 +20,5 @@ struct SelectionOverlay: View {
                 .foregroundStyle(.white)
                 .padding(8.0)
         }
-            .transition(.scale.animation(.snappy.speed(4)))
     }
 }

@@ -101,12 +101,7 @@ struct AlbumView: View {
                 CollectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
                     Group {
                         Button {
-                            withAnimation(.snappy.speed(2)) {
-                                if isSelectingIllustrations {
-                                    selectedIllustrations.removeAll()
-                                }
-                                isSelectingIllustrations.toggle()
-                            }
+                            startOrStopSelectingIllustrations()
                         } label: {
                             if isSelectingIllustrations {
                                 Label("Shared.Select", systemImage: "checkmark.circle.fill")
@@ -224,6 +219,8 @@ struct AlbumView: View {
         .safeAreaInset(edge: .bottom) {
             if isSelectingIllustrations {
                 SelectionBar(illustrations: $illustrations, selectedIllustrations: $selectedIllustrations) {
+                    startOrStopSelectingIllustrations()
+                } menuItems: {
                     Menu("Shared.Move", systemImage: "tray.full") {
                         illustrationMoveMenu(selectedIllustrations) {
                             try? modelContext.save()
@@ -311,6 +308,15 @@ struct AlbumView: View {
         modelContext.delete(album)
         withAnimation(.snappy.speed(2)) {
             refreshData()
+        }
+    }
+
+    func startOrStopSelectingIllustrations() {
+        withAnimation(.snappy.speed(2)) {
+            if isSelectingIllustrations {
+                selectedIllustrations.removeAll()
+            }
+            isSelectingIllustrations.toggle()
         }
     }
 
