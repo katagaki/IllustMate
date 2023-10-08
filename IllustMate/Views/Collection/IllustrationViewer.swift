@@ -59,8 +59,13 @@ struct IllustrationViewer: View {
                             }
                     }
                 } else {
-                    ProgressView()
-                        .progressViewStyle(.circular)
+                    Rectangle()
+                        .foregroundStyle(.clear)
+                        .overlay {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .matchedGeometryEffect(id: displayedIllustration.id, in: namespace)
