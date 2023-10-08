@@ -47,6 +47,7 @@ struct IllustrationLabel: View {
                 }
             } else {
                 Rectangle()
+                    .foregroundStyle(.primary.opacity(0.1))
                     .foregroundStyle(.clear)
             }
         }
