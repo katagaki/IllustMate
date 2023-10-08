@@ -30,11 +30,17 @@ struct IllustrationsGrid<Content: View>: View {
     let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 160.0), spacing: 4.0)]
 #endif
 
+#if targetEnvironment(macCatalyst)
+    let padOrMacSpacing = 2.0
+#else
+    let padOrMacSpacing = 4.0
+#endif
+
     var body: some View {
         LazyVGrid(
             columns: UIDevice.current.userInterfaceIdiom == .phone ?
                      phoneColumnConfiguration : padOrMacColumnConfiguration,
-            spacing: UIDevice.current.userInterfaceIdiom == .phone ? 2.0 : 4.0) {
+            spacing: UIDevice.current.userInterfaceIdiom == .phone ? 2.0 : padOrMacSpacing) {
             ForEach(illustrations, id: \.id) { illustration in
                 Button {
                     onSelect(illustration)
