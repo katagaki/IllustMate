@@ -30,8 +30,16 @@ final class Illustration {
         return illustrationsFolder.appendingPathComponent(id).path(percentEncoded: false)
     }
 
+    func illustrationPathWhenUbiquitousFileNotDownloaded() -> String {
+        return illustrationsFolder.appendingPathComponent(".\(id).icloud").path(percentEncoded: false)
+    }
+
     func thumbnailPath() -> String {
         return thumbnailsFolder.appendingPathComponent(id).path(percentEncoded: false)
+    }
+
+    func thumbnailPathWhenUbiquitousFileNotDownloaded() -> String {
+        return thumbnailsFolder.appendingPathComponent(".\(id).icloud").path(percentEncoded: false)
     }
 
     func isInAlbum(_ album: Album?) -> Bool {

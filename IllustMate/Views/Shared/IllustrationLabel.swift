@@ -14,6 +14,7 @@ struct IllustrationLabel: View {
     var illustration: Illustration
 
     @State var isFileFromCloudReadyForDisplay: Bool = false
+    @State var isDownloadTriggered: Bool = false
     @State var shouldDisplay: Bool = true
     @State var thumbnailImage: UIImage?
 
@@ -40,12 +41,8 @@ struct IllustrationLabel: View {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.1))
                         .overlay {
-                            Image(systemName: "icloud.and.arrow.down.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24.0, height: 24.0)
-                                .foregroundStyle(.primary)
-                                .symbolRenderingMode(.multicolor)
+                            ProgressView()
+                                .progressViewStyle(.circular)
                         }
                 }
             } else {
@@ -53,15 +50,53 @@ struct IllustrationLabel: View {
                     .foregroundStyle(.clear)
             }
         }
+        // TODO: Apply nice fade animation when image has loaded
+        //       For some reason, it is not possible to do this, a freeze will occur
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
         .onAppear {
-            if !isFileFromCloudReadyForDisplay {
+            if !isFileFromCloudReadyForDisplay && !isDownloadTriggered {
                 Task {
-                    let fetchedThumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
-                    thumbnailImage = fetchedThumbnailImage
-                    isFileFromCloudReadyForDisplay = true
+                    #if !targetEnvironment(macCatalyst)
+                    // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
+                    do {
+                        if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
+                            let fetchedThumbnailImage = UIImage.byPreparingForDisplay(
+                                UIImage(data: thumbnailData)!)
+                            thumbnailImage = await fetchedThumbnailImage()
+                            isFileFromCloudReadyForDisplay = true
+                        } else {
+                            isDownloadTriggered = true
+                            try FileManager.default.startDownloadingUbiquitousItem(
+                                at: URL(filePath: illustration.thumbnailPathWhenUbiquitousFileNotDownloaded()))
+                            DispatchQueue.global(qos: .userInitiated).async {
+                                var isDownloaded: Bool = false
+                                while !isDownloaded {
+                                    if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
+                                        isDownloaded = true
+                                    }
+                                }
+                                thumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
+                                DispatchQueue.main.async {
+                                    isFileFromCloudReadyForDisplay = true
+                                }
+                            }
+                        }
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                        isFileFromCloudReadyForDisplay = true
+                    }
+                    #else
+                    // On macOS, such a file doesn't exist, 
+                    // so we can't do anything about it other than to try to push it to another thread
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        thumbnailImage = UIImage(contentsOfFile: illustration.thumbnailPath())
+                        DispatchQueue.main.async {
+                            isFileFromCloudReadyForDisplay = true
+                        }
+                    }
+                    #endif
                 }
             }
             shouldDisplay = true

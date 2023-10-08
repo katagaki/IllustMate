@@ -13,6 +13,10 @@ struct IllustrationViewer: View {
 
     @State var displayedIllustration: Illustration
     @Binding var illustrationDisplayOffset: CGSize
+
+    @State var isFileFromCloudReadyForDisplay: Bool = false
+    @State var displayedImage: UIImage?
+
     var closeAction: () -> Void
 
     var body: some View {
@@ -35,14 +39,29 @@ struct IllustrationViewer: View {
                 .buttonStyle(.plain)
             }
             Spacer(minLength: 0)
-            AsyncImage(url: URL(filePath: displayedIllustration.illustrationPath())) { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-            } placeholder: {
-                Rectangle()
-                    .foregroundStyle(.clear)
+            ZStack {
+                if isFileFromCloudReadyForDisplay {
+                    if let displayedImage = displayedImage {
+                        Image(uiImage: displayedImage)
+                            .resizable()
+                            .scaledToFit()
+                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                    } else {
+                        Rectangle()
+                            .foregroundStyle(.primary.opacity(0.1))
+                            .overlay {
+                                Image(systemName: "xmark.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24.0, height: 24.0)
+                                    .foregroundStyle(.primary)
+                                    .symbolRenderingMode(.multicolor)
+                            }
+                    }
+                } else {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
             }
             .matchedGeometryEffect(id: displayedIllustration.id, in: namespace)
             .zIndex(1)
@@ -67,6 +86,46 @@ struct IllustrationViewer: View {
         }
         .padding()
         .background(.regularMaterial)
+        .onAppear {
+            Task {
+                #if !targetEnvironment(macCatalyst)
+                // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
+                do {
+                    if let data = try? Data(contentsOf: URL(filePath: displayedIllustration.illustrationPath())) {
+                        let fetchedImage = UIImage.byPreparingForDisplay(UIImage(data: data)!)
+                        displayedImage = await fetchedImage()
+                        isFileFromCloudReadyForDisplay = true
+                    } else {
+                        try FileManager.default.startDownloadingUbiquitousItem(
+                            at: URL(filePath: displayedIllustration.illustrationPathWhenUbiquitousFileNotDownloaded()))
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            var isDownloaded: Bool = false
+                            while !isDownloaded {
+                                if FileManager.default.fileExists(atPath: displayedIllustration.illustrationPath()) {
+                                    isDownloaded = true
+                                }
+                            }
+                            displayedImage = UIImage(contentsOfFile: displayedIllustration.illustrationPath())
+                            DispatchQueue.main.async {
+                                isFileFromCloudReadyForDisplay = true
+                            }
+                        }
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+                #else
+                // On macOS, such a file doesn't exist,
+                // so we can't do anything about it other than to try to push it to another thread
+                DispatchQueue.global(qos: .userInitiated).async {
+                    displayedImage = UIImage(contentsOfFile: illustration.illustrationPath())
+                    DispatchQueue.main.async {
+                        isFileFromCloudReadyForDisplay = true
+                    }
+                }
+                #endif
+            }
+        }
         .gesture(
             DragGesture()
                 .onChanged { gesture in

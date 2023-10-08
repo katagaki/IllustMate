@@ -168,48 +168,53 @@ SOFTWARE.
 
     func scanForOrphans() {
         UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            var fetchDescriptor = FetchDescriptor<Illustration>()
-            fetchDescriptor.propertiesToFetch = [\.id]
-            let illustrations = try modelContext.fetch(fetchDescriptor)
-            progressViewText = "More.ScanForOrphans.Scanning"
-            currentProgress = 0
-            total = 0
-            percentage = 0
-            withAnimation(.easeOut.speed(2)) {
-                isReportingProgress = true
-            }
-            let filesToCheck = try FileManager.default
-                .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
-            orphans.removeAll()
-            total = filesToCheck.count
-            for file in filesToCheck {
-                if !illustrations.contains(where: { $0.id == file.lastPathComponent }) {
-                    orphans.append(file.lastPathComponent)
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                var fetchDescriptor = FetchDescriptor<Illustration>()
+                fetchDescriptor.propertiesToFetch = [\.id]
+                let illustrations = try modelContext.fetch(fetchDescriptor)
+                progressViewText = "More.ScanForOrphans.Scanning"
+                currentProgress = 0
+                total = 0
+                percentage = 0
+                withAnimation(.easeOut.speed(2)) {
+                    isReportingProgress = true
+                }
+                let filesToCheck = try FileManager.default
+                    .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
+                orphans.removeAll()
+                total = filesToCheck.count
+                for file in filesToCheck {
+                    if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
+                        orphans.append(file.lastPathComponent)
+                    }
+                    DispatchQueue.main.async {
+                        currentProgress += 1
+                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                    }
+                }
+                progressViewText = "More.ScanForOrphans.Moving"
+                currentProgress = 0
+                total = orphans.count
+                orphans.forEach { orphan in
+                    try? FileManager.default.moveItem(
+                        at: illustrationsFolder.appendingPathComponent(orphan),
+                        to: orphansFolder.appendingPathComponent(orphan))
+                    DispatchQueue.main.async {
+                        currentProgress += 1
+                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                    }
                 }
                 DispatchQueue.main.async {
-                    currentProgress += 1
-                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    withAnimation(.easeOut.speed(2)) {
+                        isReportingProgress = false
+                    }
                 }
+            } catch {
+                debugPrint(error.localizedDescription)
+                UIApplication.shared.isIdleTimerDisabled = false
             }
-            currentProgress = 0
-            total = orphans.count
-            orphans.forEach { orphan in
-                try? FileManager.default.moveItem(
-                    at: illustrationsFolder.appendingPathComponent(orphan),
-                    to: orphansFolder.appendingPathComponent(orphan))
-                DispatchQueue.main.async {
-                    currentProgress += 1
-                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                }
-            }
-            UIApplication.shared.isIdleTimerDisabled = false
-            withAnimation(.easeOut.speed(2)) {
-                isReportingProgress = false
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
@@ -230,6 +235,7 @@ SOFTWARE.
             Task {
                 await withDiscardingTaskGroup { group in
                     for illustration in illustrations {
+                        // TODO: Download illustrations before rebuild
                         group.addTask {
                             if let illustrationImage = UIImage(contentsOfFile: illustration.illustrationPath()),
                                let thumbnailData = Illustration.makeThumbnail(illustrationImage.pngData()) {

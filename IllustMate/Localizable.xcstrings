@@ -513,6 +513,23 @@
         }
       }
     },
+    "More.ScanForOrphans.Moving" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを移動中…"
+          }
+        }
+      }
+    },
     "More.ScanForOrphans.Scanning" : {
       "extractionState" : "manual",
       "localizations" : {
