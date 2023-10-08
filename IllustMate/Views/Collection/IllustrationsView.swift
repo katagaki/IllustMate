@@ -21,8 +21,6 @@ struct IllustrationsView: View {
     @State var illustrationDisplayOffset: CGSize = .zero
 
     var body: some View {
-        // TODO: Improve performance
-        // This view has HORRIBLE performance! It needs to be improved.
         ScrollView(.vertical) {
             IllustrationsGrid(namespace: illustrationTransitionNamespace,
                               illustrations: .constant(illustrations),
