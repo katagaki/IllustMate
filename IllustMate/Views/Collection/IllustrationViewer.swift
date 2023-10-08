@@ -103,7 +103,7 @@ struct IllustrationViewer: View {
                     } else {
                         try FileManager.default.startDownloadingUbiquitousItem(
                             at: URL(filePath: displayedIllustration.illustrationPath()))
-                        DispatchQueue.global(qos: .userInitiated).async {
+                        DispatchQueue.global(qos: .userInteractive).async {
                             var isDownloaded: Bool = false
                             while !isDownloaded {
                                 if FileManager.default.fileExists(atPath: displayedIllustration.illustrationPath()) {
@@ -122,7 +122,7 @@ struct IllustrationViewer: View {
 #else
                 // On macOS, such a file doesn't exist,
                 // so we can't do anything about it other than to try to push it to another thread
-                DispatchQueue.global(qos: .userInitiated).async {
+                DispatchQueue.global(qos: .userInteractive).async {
                     displayedImage = UIImage(contentsOfFile: displayedIllustration.illustrationPath())
                     DispatchQueue.main.async {
                         isFileFromCloudReadyForDisplay = true

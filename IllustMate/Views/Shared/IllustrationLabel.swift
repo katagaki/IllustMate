@@ -71,7 +71,7 @@ struct IllustrationLabel: View {
                             isDownloadTriggered = true
                             try FileManager.default.startDownloadingUbiquitousItem(
                                 at: URL(filePath: illustration.thumbnailPath()))
-                            DispatchQueue.global(qos: .userInitiated).async {
+                            DispatchQueue.global(qos: .userInteractive).async {
                                 var isDownloaded: Bool = false
                                 while !isDownloaded {
                                     if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
@@ -91,7 +91,7 @@ struct IllustrationLabel: View {
 #else
                     // On macOS, such a file doesn't exist, 
                     // so we can't do anything about it other than to try to push it to another thread
-                    DispatchQueue.global(qos: .userInitiated).async {
+                    DispatchQueue.global(qos: .userInteractive).async {
                         if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
                             DispatchQueue.main.async {
                                 thumbnailImage = UIImage(data: thumbnailData)
