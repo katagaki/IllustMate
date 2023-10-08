@@ -58,7 +58,7 @@ struct IllustrationLabel: View {
         .onAppear {
             if !isFileFromCloudReadyForDisplay && !isDownloadTriggered {
                 Task {
-                    #if !targetEnvironment(macCatalyst)
+#if !targetEnvironment(macCatalyst)
                     // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
                     do {
                         if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
@@ -87,7 +87,7 @@ struct IllustrationLabel: View {
                         debugPrint(error.localizedDescription)
                         isFileFromCloudReadyForDisplay = true
                     }
-                    #else
+#else
                     // On macOS, such a file doesn't exist, 
                     // so we can't do anything about it other than to try to push it to another thread
                     DispatchQueue.global(qos: .userInitiated).async {
@@ -96,7 +96,7 @@ struct IllustrationLabel: View {
                             isFileFromCloudReadyForDisplay = true
                         }
                     }
-                    #endif
+#endif
                 }
             }
             shouldDisplay = true

@@ -88,7 +88,7 @@ struct IllustrationViewer: View {
         .background(.regularMaterial)
         .onAppear {
             Task {
-                #if !targetEnvironment(macCatalyst)
+#if !targetEnvironment(macCatalyst)
                 // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
                 do {
                     if let data = try? Data(contentsOf: URL(filePath: displayedIllustration.illustrationPath())) {
@@ -114,16 +114,16 @@ struct IllustrationViewer: View {
                 } catch {
                     debugPrint(error.localizedDescription)
                 }
-                #else
+#else
                 // On macOS, such a file doesn't exist,
                 // so we can't do anything about it other than to try to push it to another thread
                 DispatchQueue.global(qos: .userInitiated).async {
-                    displayedImage = UIImage(contentsOfFile: illustration.illustrationPath())
+                    displayedImage = UIImage(contentsOfFile: displayedIllustration.illustrationPath())
                     DispatchQueue.main.async {
                         isFileFromCloudReadyForDisplay = true
                     }
                 }
-                #endif
+#endif
             }
         }
         .gesture(

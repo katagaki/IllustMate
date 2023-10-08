@@ -35,6 +35,9 @@ struct IllustMateApp: App {
                     MainTabView()
                 } else {
                     MainSplitView()
+#if targetEnvironment(macCatalyst)
+                        .frame(minWidth: 600.0, minHeight: 500.0)
+#endif
                 }
             }
             .environmentObject(tabManager)

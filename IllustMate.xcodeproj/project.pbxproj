@@ -52,6 +52,7 @@
 		E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
 		E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892252AD28080005C9DBD /* AlbumsGrid.swift */; };
 		E4E8922A2AD2843A005C9DBD /* AlbumsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892292AD2843A005C9DBD /* AlbumsList.swift */; };
+		E4E8922E2AD2871A005C9DBD /* IllustrationsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +124,7 @@
 		E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		E4E892252AD28080005C9DBD /* AlbumsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGrid.swift; sourceTree = "<group>"; };
 		E4E892292AD2843A005C9DBD /* AlbumsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsList.swift; sourceTree = "<group>"; };
+		E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationsGrid.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,9 +255,10 @@
 				E45A8BFB2AD1958B00E3035E /* AlbumNavigationStack.swift */,
 				E4E892252AD28080005C9DBD /* AlbumsGrid.swift */,
 				E4E892292AD2843A005C9DBD /* AlbumsList.swift */,
+				E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */,
+				E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */,
 				E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */,
 				E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */,
-				E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */,
 			);
 			path = Collection;
 			sourceTree = "<group>";
@@ -446,6 +449,7 @@
 				E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */,
 				E4614D2C2ACB0FD800D751FB /* ViewPath.swift in Sources */,
 				E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */,
+				E4E8922E2AD2871A005C9DBD /* IllustrationsGrid.swift in Sources */,
 				E4CA0B912ACD2F8A0063F06C /* RenameAlbumView.swift in Sources */,
 				E4614CEB2ACA86C900D751FB /* Album.swift in Sources */,
 				E4614CE72ACA86C900D751FB /* App.swift in Sources */,

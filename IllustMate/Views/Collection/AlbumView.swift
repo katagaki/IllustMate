@@ -9,7 +9,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-// swiftlint:disable type_body_length function_body_length file_length
+// swiftlint:disable type_body_length
 struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
@@ -37,8 +37,6 @@ struct AlbumView: View {
 
     @State var displayedIllustration: Illustration?
     @State var illustrationDisplayOffset: CGSize = .zero
-
-    let illustrationsColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 
     var body: some View {
         ScrollView(.vertical) {
@@ -129,33 +127,49 @@ struct AlbumView: View {
                 } else {
                     if !illustrations.isEmpty {
                         Divider()
-                        LazyVGrid(columns: illustrationsColumnConfiguration, spacing: 2.0) {
-                            ForEach(illustrations, id: \.id) { illustration in
-                                IllustrationLabel(namespace: illustrationTransitionNamespace,
-                                                  illustration: illustration)
-                                    .opacity(illustration.id == displayedIllustration?.id ? 0.0 : 1.0)
-                                    .overlay {
-                                        if selectedIllustrations.contains(illustration) {
-                                            SelectionOverlay()
-                                        }
+                        IllustrationsGrid(namespace: illustrationTransitionNamespace, illustrations: $illustrations,
+                                          isSelecting: $isSelectingIllustrations) { illustration in
+                            illustration.id == displayedIllustration?.id
+                        } isSelected: { illustration in
+                            selectedIllustrations.contains(illustration)
+                        } onSelect: { illustration in
+                            selectOrDeselectIllustration(illustration)
+                        } selectedCount: {
+                            selectedIllustrations.count
+                        } onDelete: { illustration in
+                            if isSelectingIllustrations {
+                                for illustration in selectedIllustrations {
+                                    illustration.prepareForDeletion()
+                                    modelContext.delete(illustration)
+                                }
+                            } else {
+                                illustration.prepareForDeletion()
+                                modelContext.delete(illustration)
+                            }
+                            withAnimation(.snappy.speed(2)) {
+                                refreshIllustrations()
+                            }
+                        } moveMenu: { illustration in
+                            if isSelectingIllustrations {
+                                illustrationMoveMenu(selectedIllustrations) {
+                                    try? modelContext.save()
+                                    isSelectingIllustrations = false
+                                    selectedIllustrations.removeAll()
+                                    withAnimation(.snappy.speed(2)) {
+                                        refreshIllustrations()
                                     }
-                                    .onTapGesture {
-                                        selectOrDeselectIllustration(illustration)
+                                }
+                            } else {
+                                illustrationMoveMenu([illustration]) {
+                                    try? modelContext.save()
+                                    isSelectingIllustrations = false
+                                    selectedIllustrations.removeAll()
+                                    withAnimation(.snappy.speed(2)) {
+                                        refreshIllustrations()
                                     }
-                                    .contextMenu {
-                                        illustrationContextMenu(illustration)
-                                    } preview: {
-                                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                                            Image(uiImage: image)
-                                                .resizable()
-                                                .scaledToFit()
-                                        }
-                                    }
+                                }
                             }
                         }
-                        .background(colorScheme == .light ?
-                                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                                        Color.init(uiColor: .systemBackground))
                     } else {
                         Divider()
                             .padding([.leading], 20.0)
@@ -202,10 +216,9 @@ struct AlbumView: View {
         }
         .safeAreaInset(edge: .bottom) {
             if isSelectingIllustrations {
-                SelectionBar(illustrations: $illustrations,
-                             selectedIllustrations: $selectedIllustrations) {
+                SelectionBar(illustrations: $illustrations, selectedIllustrations: $selectedIllustrations) {
                     Menu("Shared.Move", systemImage: "tray.full") {
-                        moveToAlbumMenu(selectedIllustrations) {
+                        illustrationMoveMenu(selectedIllustrations) {
                             try? modelContext.save()
                             isSelectingIllustrations = false
                             selectedIllustrations.removeAll()
@@ -248,105 +261,8 @@ struct AlbumView: View {
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 
-    // MARK: Albums
-
-    func deleteAlbum(_ album: Album) {
-        modelContext.delete(album)
-        withAnimation(.snappy.speed(2)) {
-            refreshData()
-        }
-    }
-
-    func moveIllustrationToAlbum(_ illustration: IllustrationTransferable, to album: Album) {
-        let fetchDescriptor = FetchDescriptor<Illustration>(
-            predicate: #Predicate<Illustration> { $0.id == illustration.id }
-        )
-        if let illustrations = try? modelContext.fetch(fetchDescriptor) {
-            album.addChildIllustrations(illustrations)
-            withAnimation(.snappy.speed(2)) {
-                for illustration in illustrations {
-                    self.illustrations.removeAll(where: { $0.id == illustration.id })
-                }
-            }
-        }
-    }
-
-    // MARK: Illustrations
-
     @ViewBuilder
-    func illustrationContextMenu(_ illustration: Illustration) -> some View {
-        if isSelectingIllustrations {
-            if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                Text("Shared.Selected.\(selectedIllustrations.count)")
-                Divider()
-                moveToAlbumMenu(selectedIllustrations) {
-                    try? modelContext.save()
-                    isSelectingIllustrations = false
-                    selectedIllustrations.removeAll()
-                    withAnimation(.snappy.speed(2)) {
-                        refreshIllustrations()
-                    }
-                }
-                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                    for illustration in selectedIllustrations {
-                        illustration.prepareForDeletion()
-                        modelContext.delete(illustration)
-                    }
-                    withAnimation(.snappy.speed(2)) {
-                        refreshIllustrations()
-                    }
-                }
-            }
-        } else {
-            Button("Shared.Select", systemImage: "checkmark.circle") {
-                withAnimation(.snappy.speed(2)) {
-                    isSelectingIllustrations = true
-                    selectedIllustrations.append(illustration)
-                }
-            }
-            Divider()
-            Button("Shared.Copy", systemImage: "doc.on.doc") {
-                if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                    UIPasteboard.general.image = image
-                }
-            }
-            if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                ShareLink(item: Image(uiImage: image),
-                          preview: SharePreview(illustration.name, image: Image(uiImage: image))) {
-                    Label("Shared.Share", systemImage: "square.and.arrow.up")
-                }
-            }
-            Divider()
-            if let currentAlbum = currentAlbum {
-                Button("Shared.SetAsCover", systemImage: "photo") {
-                    let image = UIImage(contentsOfFile: illustration.illustrationPath())
-                    if let data = image?.jpegData(compressionQuality: 1.0) {
-                        currentAlbum.coverPhoto = Album.makeCover(data)
-                    }
-                }
-            }
-            Divider()
-            moveToAlbumMenu([illustration]) {
-                try? modelContext.save()
-                isSelectingIllustrations = false
-                selectedIllustrations.removeAll()
-                withAnimation(.snappy.speed(2)) {
-                    refreshIllustrations()
-                }
-            }
-            Divider()
-            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                illustration.prepareForDeletion()
-                modelContext.delete(illustration)
-                withAnimation(.snappy.speed(2)) {
-                    refreshIllustrations()
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func moveToAlbumMenu(_ illustrations: [Illustration], postMoveAction: @escaping () -> Void) -> some View {
+    func illustrationMoveMenu(_ illustrations: [Illustration], postMoveAction: @escaping () -> Void) -> some View {
         if let currentAlbum = currentAlbum {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 illustrations.forEach { illustration in
@@ -376,6 +292,27 @@ struct AlbumView: View {
                         title: { Text(album.name) },
                         icon: { Image(uiImage: album.cover()) }
                     )
+                }
+            }
+        }
+    }
+
+    func deleteAlbum(_ album: Album) {
+        modelContext.delete(album)
+        withAnimation(.snappy.speed(2)) {
+            refreshData()
+        }
+    }
+
+    func moveIllustrationToAlbum(_ illustration: IllustrationTransferable, to album: Album) {
+        let fetchDescriptor = FetchDescriptor<Illustration>(
+            predicate: #Predicate<Illustration> { $0.id == illustration.id }
+        )
+        if let illustrations = try? modelContext.fetch(fetchDescriptor) {
+            album.addChildIllustrations(illustrations)
+            withAnimation(.snappy.speed(2)) {
+                for illustration in illustrations {
+                    self.illustrations.removeAll(where: { $0.id == illustration.id })
                 }
             }
         }
@@ -438,4 +375,4 @@ struct AlbumView: View {
     }
 
 }
-// swiftlint:enable type_body_length function_body_length file_length
+// swiftlint:enable type_body_length
