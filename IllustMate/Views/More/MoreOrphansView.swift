@@ -49,6 +49,9 @@ struct MoreOrphansView: View {
                                     Image(uiImage: image)
                                         .resizable()
                                 }
+#if targetEnvironment(macCatalyst)
+                                .buttonStyle(.borderless)
+#endif
                             } else {
                                 Rectangle()
                                     .foregroundStyle(.primary.opacity(0.1))
