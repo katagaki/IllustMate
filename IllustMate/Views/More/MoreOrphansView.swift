@@ -14,8 +14,8 @@ struct MoreOrphansView: View {
     @Namespace var orphanTransitionNamespace
 
     @State var orphans: [String]
+    @State var orphanThumbnails: [String: Data] = [:]
     @State var selectedOrphan: String?
-    @State var selectedOrphanImage: UIImage?
     @State var isReimportConfirming: Bool = false
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
@@ -39,38 +39,26 @@ struct MoreOrphansView: View {
                 spacing: UIDevice.current.userInterfaceIdiom == .phone ? 2.0 : padOrMacSpacing) {
                     ForEach(orphans, id: \.self) { orphan in
                         ZStack(alignment: .center) {
-                            if let image = UIImage(contentsOfFile: orphansFolder
-                                .appendingPathComponent(orphan).path(percentEncoded: false)) {
-                                Button {
-                                    selectedOrphan = orphan
-                                    selectedOrphanImage = image
-                                    isReimportConfirming = true
-                                } label: {
-                                    if let thumbnailData = image.jpegThumbnail(of: 150.0),
-                                       let image = UIImage(data: thumbnailData) {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .scaledToFill()
-                                    } else {
-                                        Rectangle()
-                                            .foregroundStyle(.primary.opacity(0.1))
-                                    }
+                            Button {
+                                selectedOrphan = orphan
+                                isReimportConfirming = true
+                            } label: {
+                                if let imageData = orphanThumbnails[orphan],
+                                   let image = UIImage(data: imageData) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .transition(.opacity.animation(.snappy.speed(2)))
+                                } else {
+                                    Rectangle()
+                                        .foregroundStyle(.primary.opacity(0.1))
                                 }
-#if targetEnvironment(macCatalyst)
-                                .buttonStyle(.borderless)
-#endif
-                            } else {
-                                Rectangle()
-                                    .foregroundStyle(.primary.opacity(0.1))
-                                    .overlay {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 24.0, height: 24.0)
-                                            .foregroundStyle(.primary)
-                                            .symbolRenderingMode(.multicolor)
-                                    }
                             }
+#if targetEnvironment(macCatalyst)
+                            .buttonStyle(.borderless)
+#else
+                            .buttonStyle(.plain)
+#endif
                         }
                         .aspectRatio(1.0, contentMode: .fill)
                         .contextMenu {
@@ -94,11 +82,27 @@ struct MoreOrphansView: View {
         } message: {
             Text("Alert.ReimportOrphan.Text")
         }
+        .task {
+            loadOrphanThumbnails()
+        }
         .navigationTitle("ViewTitle.Orphans")
     }
 
+    func loadOrphanThumbnails() {
+        DispatchQueue.global(qos: .userInteractive).async {
+            for orphan in orphans {
+                let fullOrphanFilePath = orphansFolder
+                    .appendingPathComponent(orphan).path(percentEncoded: false)
+                if let image = UIImage(contentsOfFile: fullOrphanFilePath) {
+                    orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                }
+            }
+        }
+    }
+
     func moveOrphanBack(_ fileName: String) {
-        if let selectedOrphanImage {
+        if let selectedOrphanImage = UIImage(contentsOfFile: orphansFolder
+            .appendingPathComponent(fileName).path(percentEncoded: false)) {
             if let pngData = selectedOrphanImage.pngData() {
                 importIllustration(UUID().uuidString, data: pngData)
             } else if let jpgData = selectedOrphanImage.jpegData(compressionQuality: 1.0) {

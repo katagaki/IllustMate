@@ -109,6 +109,8 @@ struct IllustrationsGrid<Content: View>: View {
                 }
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
+#else
+                .buttonStyle(.plain)
 #endif
             }
         }

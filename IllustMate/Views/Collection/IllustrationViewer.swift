@@ -50,6 +50,7 @@ struct IllustrationViewer: View {
                     } else {
                         Rectangle()
                             .foregroundStyle(.primary.opacity(0.1))
+                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                             .overlay {
                                 Image(systemName: "xmark.circle.fill")
                                     .resizable()
@@ -58,7 +59,6 @@ struct IllustrationViewer: View {
                                     .foregroundStyle(.primary)
                                     .symbolRenderingMode(.multicolor)
                             }
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                     }
                 } else {
                     Rectangle()
