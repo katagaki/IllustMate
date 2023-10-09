@@ -14,7 +14,7 @@ struct IllustrationsView: View {
 
     @Namespace var illustrationTransitionNamespace
 
-    @Query(sort: [SortDescriptor<Illustration>(\.name, order: .reverse)],
+    @Query(sort: [SortDescriptor<Illustration>(\.dateAdded, order: .reverse)],
            animation: .snappy.speed(2)) var illustrations: [Illustration]
 
     @State var displayedIllustration: Illustration?
