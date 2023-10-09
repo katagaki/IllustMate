@@ -13,11 +13,7 @@ struct MainTabView: View {
     @EnvironmentObject var tabManager: TabManager
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @State var isProgressAlertDisplayed: Bool = false
-    @State var progressViewText: LocalizedStringKey = ""
-    @State var currentProgress: Int = 0
-    @State var total: Int = 0
-    @State var percentage: Int = 0
+    @State var progressAlertManager = ProgressAlertManager()
 
     var body: some View {
         TabView(selection: $tabManager.selectedTab) {
@@ -26,33 +22,32 @@ struct MainTabView: View {
                     Label("TabTitle.Collection", image: "Tab.Collection")
                 }
                 .tag(TabType.collection)
-            ImportView(isImporting: $isProgressAlertDisplayed,
-                       progressViewText: $progressViewText,
-                       currentProgress: $currentProgress,
-                       total: $total,
-                       percentage: $percentage)
+            NavigationStack(path: $navigationManager.illustrationsTabPath) {
+                IllustrationsView()
+            }
+            .tabItem {
+                Label("TabTitle.Illustrations", systemImage: "photo.stack.fill")
+            }
+            .tag(TabType.illustrations)
+            ImportView(progressAlertManager: $progressAlertManager)
                 .tabItem {
                     Label("TabTitle.Import", image: "Tab.Import")
                 }
                 .tag(TabType.importer)
-//            SearchView()
-//                .tabItem {
-//                    Label("TabTitle.Search", systemImage: "magnifyingglass")
-//                }
-//                .tag(TabType.search)
-            MoreView(isReportingProgress: $isProgressAlertDisplayed,
-                     progressViewText: $progressViewText,
-                     currentProgress: $currentProgress,
-                     total: $total,
-                     percentage: $percentage)
+            SearchView()
+                .tabItem {
+                    Label("TabTitle.Search", systemImage: "magnifyingglass")
+                }
+                .tag(TabType.search)
+            MoreView(progressAlertManager: $progressAlertManager)
                 .tabItem {
                     Label("TabTitle.More", systemImage: "ellipsis")
                 }
                 .tag(TabType.more)
         }
         .overlay {
-            if isProgressAlertDisplayed {
-                ProgressAlert(title: progressViewText, percentage: $percentage)
+            if progressAlertManager.isDisplayed {
+                ProgressAlert(manager: $progressAlertManager)
                     .ignoresSafeArea()
             }
         }

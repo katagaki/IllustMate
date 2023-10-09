@@ -15,11 +15,7 @@ struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
-    @Binding var isReportingProgress: Bool
-    @Binding var progressViewText: LocalizedStringKey
-    @Binding var currentProgress: Int
-    @Binding var total: Int
-    @Binding var percentage: Int
+    @Binding var progressAlertManager: ProgressAlertManager
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -90,11 +86,7 @@ struct MoreView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .moreDebug:
-                    MoreDebugView(isReportingProgress: $isReportingProgress,
-                                  progressViewText: $progressViewText,
-                                  currentProgress: $currentProgress,
-                                  total: $total,
-                                  percentage: $percentage)
+                    MoreDebugView(progressAlertManager: $progressAlertManager)
                 case .moreAttributions: LicensesView(licenses: [
                     // swiftlint:disable line_length
                     License(libraryName: "CloudKitSyncMonitor", text:

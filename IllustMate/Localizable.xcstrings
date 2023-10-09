@@ -235,6 +235,9 @@
         }
       }
     },
+    "Hello, World!" : {
+
+    },
     "Illustration.Error.CouldNotOpen" : {
       "extractionState" : "manual",
       "localizations" : {

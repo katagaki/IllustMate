@@ -57,6 +57,8 @@
 		E4E892322AD2F3C3005C9DBD /* MoreDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892312AD2F3C3005C9DBD /* MoreDebugView.swift */; };
 		E4E892352AD31058005C9DBD /* IllustrationMoveMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892342AD31058005C9DBD /* IllustrationMoveMenu.swift */; };
 		E4E892372AD3163B005C9DBD /* AlbumCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892362AD3163B005C9DBD /* AlbumCover.swift */; };
+		E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */; };
+		E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +135,8 @@
 		E4E892312AD2F3C3005C9DBD /* MoreDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDebugView.swift; sourceTree = "<group>"; };
 		E4E892342AD31058005C9DBD /* IllustrationMoveMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationMoveMenu.swift; sourceTree = "<group>"; };
 		E4E892362AD3163B005C9DBD /* AlbumCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCover.swift; sourceTree = "<group>"; };
+		E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
+		E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOrphansView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				E4614D2F2ACB100B00D751FB /* NavigationManager.swift */,
+				E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -318,6 +323,7 @@
 			children = (
 				E4614D232ACB048000D751FB /* MoreView.swift */,
 				E4E892312AD2F3C3005C9DBD /* MoreDebugView.swift */,
+				E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */,
 			);
 			path = More;
 			sourceTree = "<group>";
@@ -461,6 +467,7 @@
 				E45A8BD02AD0389600E3035E /* AlbumGridLabel.swift in Sources */,
 				E4614D242ACB048000D751FB /* MoreView.swift in Sources */,
 				E4E892352AD31058005C9DBD /* IllustrationMoveMenu.swift in Sources */,
+				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
 				E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */,
 				E45A8BD22AD03C5E00E3035E /* AlbumListRow.swift in Sources */,
@@ -476,6 +483,7 @@
 				E4614CE72ACA86C900D751FB /* App.swift in Sources */,
 				E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */,
 				E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */,
+				E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */,
 				E4614D462ACB417500D751FB /* ImportView.swift in Sources */,
 				E4CA0B8E2ACD17190063F06C /* FileManager.swift in Sources */,
 				E4E892322AD2F3C3005C9DBD /* MoreDebugView.swift in Sources */,

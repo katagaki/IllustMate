@@ -20,11 +20,7 @@ struct ImportView: View {
     @Query(sort: \Album.name, animation: .snappy.speed(2)) var albums: [Album]
     @State var selectedAlbum: Album?
 
-    @Binding var isImporting: Bool
-    @Binding var progressViewText: LocalizedStringKey
-    @Binding var currentProgress: Int
-    @Binding var total: Int
-    @Binding var percentage: Int
+    @Binding var progressAlertManager: ProgressAlertManager
     @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
 
     var body: some View {
@@ -63,12 +59,10 @@ struct ImportView: View {
                 }
                 Section {
                     Button("Import.StartImport") {
-                        progressViewText = "Import.Importing"
-                        currentProgress = 0
-                        total = selectedPhotoItems.count
-                        percentage = 0
+                        progressAlertManager.prepare("Import.Importing",
+                                                     total: selectedPhotoItems.count)
                         withAnimation(.easeOut.speed(2)) {
-                            isImporting = true
+                            progressAlertManager.show()
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             importPhotos()
@@ -92,21 +86,18 @@ struct ImportView: View {
                     let illustration = Illustration(
                         name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
                         data: data)
-                    if let selectedAlbum {
+                    if let selectedAlbum, albums.contains(selectedAlbum) {
                         selectedAlbum.addChildIllustration(illustration)
                     }
                     modelContext.insert(illustration)
                     runningNumberForImageName += 1
                 }
-                DispatchQueue.main.async {
-                    currentProgress += 1
-                    percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                }
+                progressAlertManager.incrementProgress()
             }
             UIApplication.shared.isIdleTimerDisabled = false
             withAnimation(.easeOut.speed(2)) {
                 selectedPhotoItems.removeAll()
-                isImporting = false
+                progressAlertManager.hide()
             }
         }
     }

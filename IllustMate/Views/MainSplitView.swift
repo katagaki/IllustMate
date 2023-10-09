@@ -15,11 +15,7 @@ struct MainSplitView: View {
 
     @State var viewPath: ViewPath? = .collection
 
-    @State var isProgressAlertDisplayed: Bool = false
-    @State var progressViewText: LocalizedStringKey = ""
-    @State var currentProgress: Int = 0
-    @State var total: Int = 0
-    @State var percentage: Int = 0
+    @State var progressAlertManager = ProgressAlertManager()
 
     var body: some View {
         NavigationSplitView {
@@ -79,17 +75,9 @@ struct MainSplitView: View {
                 case .illustrations:
                     IllustrationsView()
                 case .importer:
-                    ImportView(isImporting: $isProgressAlertDisplayed,
-                               progressViewText: $progressViewText,
-                               currentProgress: $currentProgress,
-                               total: $total,
-                               percentage: $percentage)
+                    ImportView(progressAlertManager: $progressAlertManager)
                 case .more:
-                    MoreView(isReportingProgress: $isProgressAlertDisplayed,
-                             progressViewText: $progressViewText,
-                             currentProgress: $currentProgress,
-                             total: $total,
-                             percentage: $percentage)
+                    MoreView(progressAlertManager: $progressAlertManager)
                 case .album(let album):
                     AlbumNavigationStack(album: album)
                         .id(album.id)
@@ -98,8 +86,8 @@ struct MainSplitView: View {
             }
         }
         .overlay {
-            if isProgressAlertDisplayed {
-                ProgressAlert(title: progressViewText, percentage: $percentage)
+            if progressAlertManager.isDisplayed {
+                ProgressAlert(manager: $progressAlertManager)
                     .ignoresSafeArea()
             }
         }

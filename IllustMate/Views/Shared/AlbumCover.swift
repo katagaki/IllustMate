@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AlbumCover: View {
 
-    var length: Double?
+    var length: CGFloat?
     var cornerRadius: Double = 6.0
     var shadowSize: Double = 2.0
     var data: Data?
@@ -17,27 +17,15 @@ struct AlbumCover: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            if let length {
-                Group {
-                    if let image {
-                        Image(uiImage: image)
-                            .resizable()
-                    } else {
-                        Image("Album.Generic")
-                            .resizable()
-                    }
-                }
-                .frame(width: length, height: length)
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
             } else {
-                if let image {
-                    Image(uiImage: image)
-                        .resizable()
-                } else {
-                    Image("Album.Generic")
-                        .resizable()
-                }
+                Image("Album.Generic")
+                    .resizable()
             }
         }
+        .frame(width: length, height: length)
         .aspectRatio(1.0, contentMode: .fill)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)

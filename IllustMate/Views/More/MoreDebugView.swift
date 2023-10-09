@@ -17,16 +17,14 @@ struct MoreDebugView: View {
 
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
-    @Binding var isReportingProgress: Bool
-    @Binding var progressViewText: LocalizedStringKey
-    @Binding var currentProgress: Int
-    @Binding var total: Int
-    @Binding var percentage: Int
+    @Binding var progressAlertManager: ProgressAlertManager
 
     var body: some View {
         List {
             Section {
                 Toggle("More.Debug.ShowIllustrationIDs", isOn: $showIllustrationIDs)
+            }
+            Section {
                 Button("More.Debug.ScanForOrphans") {
                     scanForOrphans()
                 }
@@ -60,42 +58,32 @@ struct MoreDebugView: View {
                 var fetchDescriptor = FetchDescriptor<Illustration>()
                 fetchDescriptor.propertiesToFetch = [\.id]
                 let illustrations = try modelContext.fetch(fetchDescriptor)
-                progressViewText = "More.Debug.ScanForOrphans.Scanning"
-                currentProgress = 0
-                total = 0
-                percentage = 0
+                progressAlertManager.prepare("More.Debug.ScanForOrphans.Scanning")
                 withAnimation(.easeOut.speed(2)) {
-                    isReportingProgress = true
+                    progressAlertManager.show()
                 }
                 let filesToCheck = try FileManager.default
                     .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
                 orphans.removeAll()
-                total = filesToCheck.count
+                progressAlertManager.prepare("More.Debug.ScanForOrphans.Scanning",
+                                             total: filesToCheck.count)
                 for file in filesToCheck {
                     if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
                         orphans.append(file.lastPathComponent)
                     }
-                    DispatchQueue.main.async {
-                        currentProgress += 1
-                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                    }
+                    progressAlertManager.incrementProgress()
                 }
-                progressViewText = "More.Debug.ScanForOrphans.Moving"
-                currentProgress = 0
-                total = orphans.count
+                progressAlertManager.prepare("More.Debug.ScanForOrphans.Moving", total: orphans.count)
                 orphans.forEach { orphan in
                     try? FileManager.default.moveItem(
                         at: illustrationsFolder.appendingPathComponent(orphan),
                         to: orphansFolder.appendingPathComponent(orphan))
-                    DispatchQueue.main.async {
-                        currentProgress += 1
-                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                    }
+                    progressAlertManager.incrementProgress()
                 }
                 DispatchQueue.main.async {
                     UIApplication.shared.isIdleTimerDisabled = false
                     withAnimation(.easeOut.speed(2)) {
-                        isReportingProgress = false
+                        progressAlertManager.hide()
                     }
                 }
             } catch {
@@ -109,12 +97,10 @@ struct MoreDebugView: View {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressViewText = "More.Debug.RebuildThumbnails.Rebuilding"
-            currentProgress = 0
-            total = illustrations.count
-            percentage = 0
+            progressAlertManager.prepare("More.Debug.RebuildThumbnails.Rebuilding",
+                                         total: illustrations.count)
             withAnimation(.easeOut.speed(2)) {
-                isReportingProgress = true
+                progressAlertManager.show()
             }
             try FileManager.default.removeItem(at: thumbnailsFolder)
             try FileManager.default.createDirectory(at: thumbnailsFolder,
@@ -130,10 +116,7 @@ struct MoreDebugView: View {
                                 FileManager.default.createFile(atPath: illustration.thumbnailPath(),
                                                                contents: thumbnailData)
                             }
-                            DispatchQueue.main.async {
-                                currentProgress += 1
-                                percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
-                            }
+                            progressAlertManager.incrementProgress()
                         }
                     }
                 }
@@ -141,7 +124,7 @@ struct MoreDebugView: View {
                     UIApplication.shared.isIdleTimerDisabled = false
                 }
                 withAnimation(.easeOut.speed(2)) {
-                    isReportingProgress = false
+                    progressAlertManager.hide()
                 }
             }
         } catch {
@@ -154,12 +137,10 @@ struct MoreDebugView: View {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressViewText = "More.Debug.RedownloadThumbnails.Redownloading"
-            currentProgress = 0
-            total = illustrations.count
-            percentage = 0
+            progressAlertManager.prepare("More.Debug.RedownloadThumbnails.Redownloading",
+                                         total: illustrations.count)
             withAnimation(.easeOut.speed(2)) {
-                isReportingProgress = true
+                progressAlertManager.show()
             }
             Task {
                 for illustration in illustrations {
@@ -176,15 +157,14 @@ struct MoreDebugView: View {
                         debugPrint(error.localizedDescription)
                     }
                     DispatchQueue.main.async {
-                        currentProgress += 1
-                        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+                        progressAlertManager.incrementProgress()
                     }
                 }
                 await MainActor.run {
                     UIApplication.shared.isIdleTimerDisabled = false
                 }
                 withAnimation(.easeOut.speed(2)) {
-                    isReportingProgress = false
+                    progressAlertManager.hide()
                 }
             }
         } catch {
