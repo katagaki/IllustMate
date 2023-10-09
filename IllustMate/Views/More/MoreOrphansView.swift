@@ -40,14 +40,21 @@ struct MoreOrphansView: View {
                     ForEach(orphans, id: \.self) { orphan in
                         ZStack(alignment: .center) {
                             if let image = UIImage(contentsOfFile: orphansFolder
-                                    .appendingPathComponent(orphan).path(percentEncoded: false)) {
+                                .appendingPathComponent(orphan).path(percentEncoded: false)) {
                                 Button {
                                     selectedOrphan = orphan
                                     selectedOrphanImage = image
                                     isReimportConfirming = true
                                 } label: {
-                                    Image(uiImage: image)
-                                        .resizable()
+                                    if let thumbnailData = image.jpegThumbnail(of: 150.0),
+                                       let image = UIImage(data: thumbnailData) {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .scaledToFill()
+                                    } else {
+                                        Rectangle()
+                                            .foregroundStyle(.primary.opacity(0.1))
+                                    }
                                 }
 #if targetEnvironment(macCatalyst)
                                 .buttonStyle(.borderless)
