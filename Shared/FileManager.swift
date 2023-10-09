@@ -7,6 +7,7 @@
 
 import Foundation
 
+let isCloudSyncEnabled = FileManager.default.url(forUbiquityContainerIdentifier: nil) != nil
 let documentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents") ??
                    FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 let illustrationsFolder = documentsURL.appendingPathComponent("Illustrations")

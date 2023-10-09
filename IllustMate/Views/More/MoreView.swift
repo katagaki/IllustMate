@@ -74,8 +74,10 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.Sync")
                         .font(.body)
                 } footer: {
-                    Text("More.Sync.Description")
-                        .font(.body)
+                    if isCloudSyncEnabled {
+                        Text("More.Sync.Description")
+                            .font(.body)
+                    }
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreFileManagement) {
