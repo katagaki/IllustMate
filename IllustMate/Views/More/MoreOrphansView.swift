@@ -89,12 +89,16 @@ struct MoreOrphansView: View {
     }
 
     func loadOrphanThumbnails() {
-        DispatchQueue.global(qos: .userInteractive).async {
-            for orphan in orphans {
-                let fullOrphanFilePath = orphansFolder
-                    .appendingPathComponent(orphan).path(percentEncoded: false)
-                if let image = UIImage(contentsOfFile: fullOrphanFilePath) {
-                    orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+        Task {
+            await withDiscardingTaskGroup { group in
+                for orphan in orphans {
+                    group.addTask {
+                        let fullOrphanFilePath = orphansFolder
+                            .appendingPathComponent(orphan).path(percentEncoded: false)
+                        if let image = UIImage(contentsOfFile: fullOrphanFilePath) {
+                            orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                        }
+                    }
                 }
             }
         }
