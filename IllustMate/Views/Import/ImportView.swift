@@ -93,7 +93,7 @@ struct ImportView: View {
             for selectedPhotoItem in selectedPhotoItems {
                 if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                     let illustration = Illustration(
-                        name: "ILLUST_\(String(format: "%04d", runningNumberForImageName))",
+                        name: "PIC_\(String(format: "%04d", runningNumberForImageName))",
                         data: data)
                     if let selectedAlbum, albums.contains(selectedAlbum) {
                         selectedAlbum.addChildIllustration(illustration)
