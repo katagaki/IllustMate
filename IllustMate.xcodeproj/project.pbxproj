@@ -60,6 +60,7 @@
 		E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */; };
 		E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */; };
 		E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */; };
+		E4E8923F2AD3DF6F005C9DBD /* MoreFileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +140,7 @@
 		E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
 		E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOrphansView.swift; sourceTree = "<group>"; };
 		E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTroubleshootingView.swift; sourceTree = "<group>"; };
+		E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreFileManagementView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -324,8 +326,9 @@
 			isa = PBXGroup;
 			children = (
 				E4614D232ACB048000D751FB /* MoreView.swift */,
-				E4E892312AD2F3C3005C9DBD /* MoreDebugView.swift */,
+				E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */,
 				E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */,
+				E4E892312AD2F3C3005C9DBD /* MoreDebugView.swift */,
 				E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */,
 			);
 			path = More;
@@ -470,6 +473,7 @@
 				E45A8BD02AD0389600E3035E /* AlbumGridLabel.swift in Sources */,
 				E4614D242ACB048000D751FB /* MoreView.swift in Sources */,
 				E4E892352AD31058005C9DBD /* IllustrationMoveMenu.swift in Sources */,
+				E4E8923F2AD3DF6F005C9DBD /* MoreFileManagementView.swift in Sources */,
 				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
 				E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */,

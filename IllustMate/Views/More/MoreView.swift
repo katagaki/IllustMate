@@ -78,6 +78,11 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    NavigationLink(value: ViewPath.moreFileManagement) {
+                        ListRow(image: "ListIcon.FileManagement", title: "More.Files")
+                    }
+                }
+                Section {
                     NavigationLink(value: ViewPath.moreDebug) {
                         ListRow(image: "ListIcon.Debug", title: "More.Debug")
                     }
@@ -88,8 +93,10 @@ struct MoreView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
+                case .moreFileManagement:
+                    MoreFileManagementView(progressAlertManager: $progressAlertManager)
                 case .moreDebug:
-                    MoreDebugView(progressAlertManager: $progressAlertManager)
+                    MoreDebugView()
                 case .moreOrphans(let orphans):
                     MoreOrphansView(orphans: orphans)
                 case .moreTroubleshooting:
