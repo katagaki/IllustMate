@@ -63,6 +63,14 @@ struct MoreOrphansView: View {
                             }
                         }
                         .aspectRatio(1.0, contentMode: .fill)
+                        .contextMenu {
+                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                                try? FileManager.default.removeItem(at: orphansFolder.appendingPathComponent(orphan))
+                                withAnimation(.snappy.speed(2)) {
+                                    orphans.removeAll(where: { $0 == orphan })
+                                }
+                            }
+                        }
                     }
             }
         }
