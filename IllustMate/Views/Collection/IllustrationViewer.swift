@@ -74,6 +74,17 @@ struct IllustrationViewer: View {
             .zIndex(1)
             .offset(illustrationDisplayOffset)
             .transition(.opacity.animation(.snappy.speed(2)))
+            if let displayedImage {
+                HStack(alignment: .center, spacing: 2.0) {
+                    Group {
+                        Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                        Text(verbatim: "×")
+                        Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                }
+            }
             Spacer(minLength: 0)
             if let image = UIImage(contentsOfFile: displayedIllustration.illustrationPath()) {
                 HStack(alignment: .center, spacing: 16.0) {
@@ -81,13 +92,13 @@ struct IllustrationViewer: View {
                         UIPasteboard.general.image = image
                     }
                     .buttonStyle(.borderedProminent)
-                    .clipShape(RoundedRectangle(cornerRadius: 99))
+                    .buttonBorderShape(.capsule)
                     ShareLink(item: Image(uiImage: image),
                               preview: SharePreview(displayedIllustration.name, image: Image(uiImage: image))) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
                     .buttonStyle(.borderedProminent)
-                    .clipShape(RoundedRectangle(cornerRadius: 99))
+                    .buttonBorderShape(.capsule)
                 }
             }
         }
