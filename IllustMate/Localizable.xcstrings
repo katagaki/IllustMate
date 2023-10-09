@@ -267,6 +267,63 @@
         }
       }
     },
+    "Alert.ImportCompleted.Text.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The selected photo has been imported successfully."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld photos have been imported successfully."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した写真が正常にインポートされました。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld枚の写真が正常にインポートされました。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Alert.ImportCompleted.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート完了"
+          }
+        }
+      }
+    },
     "Alert.ReimportOrphan.Text" : {
       "localizations" : {
         "en" : {
@@ -1042,6 +1099,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "いいえ"
+          }
+        }
+      }
+    },
+    "Shared.OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }

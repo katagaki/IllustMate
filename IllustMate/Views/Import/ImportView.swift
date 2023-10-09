@@ -21,6 +21,10 @@ struct ImportView: View {
     @State var selectedAlbum: Album?
 
     @Binding var progressAlertManager: ProgressAlertManager
+
+    @State var isImportCompleted: Bool = false
+    @State var importCompletedCount: Int = 0
+
     @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
 
     var body: some View {
@@ -74,6 +78,11 @@ struct ImportView: View {
                     .font(.body)
                 }
             }
+            .alert("Alert.ImportCompleted.Title", isPresented: $isImportCompleted) {
+                Button("Shared.OK") { }
+            } message: {
+                Text("Alert.ImportCompleted.Text.\(importCompletedCount)")
+            }
             .navigationTitle("ViewTitle.Import")
         }
     }
@@ -95,9 +104,12 @@ struct ImportView: View {
                 progressAlertManager.incrementProgress()
             }
             UIApplication.shared.isIdleTimerDisabled = false
+            importCompletedCount = selectedPhotoItems.count
             withAnimation(.easeOut.speed(2)) {
                 selectedPhotoItems.removeAll()
                 progressAlertManager.hide()
+            } completion: {
+                isImportCompleted = true
             }
         }
     }
