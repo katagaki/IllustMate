@@ -538,13 +538,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Debug Options"
+            "value" : "Experiments"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "デバッグオプション"
+            "value" : "ラボ"
           }
         }
       }
@@ -1446,13 +1446,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Debug Options"
+            "value" : "Experiments"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "デバッグオプション"
+            "value" : "ラボ"
           }
         }
       }
