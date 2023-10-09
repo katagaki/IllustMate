@@ -116,10 +116,16 @@ struct AlbumView: View {
                     if !illustrations.isEmpty {
                         Divider()
                         if showIllustrationIDs {
-                            ForEach(illustrations, id: \.id) { illustration in
-                                Text(illustration.id)
+                            VStack(alignment: .leading, spacing: 0.0) {
+                                ForEach(illustrations, id: \.id) { illustration in
+                                    Text(illustration.id)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .padding([.leading, .trailing], 20.0)
+                                }
+                                Divider()
                             }
-                            Divider()
+                            .padding([.top, .bottom], 8.0)
                         }
                         IllustrationsGrid(namespace: illustrationTransitionNamespace,
                                           illustrations: $illustrations,

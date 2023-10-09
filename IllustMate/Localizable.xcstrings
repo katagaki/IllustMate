@@ -566,6 +566,23 @@
         }
       }
     },
+    "More.Debug.UseNewThumbnailCache" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use New Thumbnail Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいサムネイルキャッシュを有効"
+          }
+        }
+      }
+    },
     "More.Files" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -14,6 +14,7 @@ struct MoreOrphansView: View {
     @Namespace var orphanTransitionNamespace
 
     @State var orphans: [String]
+
     @State var orphanThumbnails: [String: Data] = [:]
     @State var selectedOrphan: String?
     @State var isReimportConfirming: Bool = false
@@ -74,37 +75,35 @@ struct MoreOrphansView: View {
             Text("Alert.ReimportOrphan.Text")
         }
         .task {
-            loadOrphanThumbnails()
+            await loadOrphanThumbnails()
         }
         .navigationTitle("ViewTitle.Orphans")
     }
 
-    func loadOrphanThumbnails() {
-        Task {
-            await withDiscardingTaskGroup { group in
-                for orphan in orphans {
-                    group.addTask {
-                        do {
-                            let filePath = orphansFolder.appendingPathComponent(orphan).path(percentEncoded: false)
-                            if let image = UIImage(contentsOfFile: filePath) {
-                                orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
-                            } else {
-                                try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
-                                var isDownloaded: Bool = false
-                                debugPrint("\(orphan) - Waiting for download")
-                                while !isDownloaded {
-                                    if FileManager.default.fileExists(atPath: filePath) {
-                                        isDownloaded = true
-                                    }
-                                }
-                                debugPrint("\(orphan) - Download appears to have completed")
-                                if let image = UIImage(contentsOfFile: filePath) {
-                                    orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+    func loadOrphanThumbnails() async {
+        await withDiscardingTaskGroup { group in
+            for orphan in orphans {
+                group.addTask {
+                    do {
+                        let filePath = orphansFolder.appendingPathComponent(orphan).path(percentEncoded: false)
+                        if let image = UIImage(contentsOfFile: filePath) {
+                            orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                        } else {
+                            try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
+                            var isDownloaded: Bool = false
+                            debugPrint("\(orphan) - Waiting for download")
+                            while !isDownloaded {
+                                if FileManager.default.fileExists(atPath: filePath) {
+                                    isDownloaded = true
                                 }
                             }
-                        } catch {
-                            debugPrint(error.localizedDescription)
+                            debugPrint("\(orphan) - Download appears to have completed")
+                            if let image = UIImage(contentsOfFile: filePath) {
+                                orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                            }
                         }
+                    } catch {
+                        debugPrint(error.localizedDescription)
                     }
                 }
             }
