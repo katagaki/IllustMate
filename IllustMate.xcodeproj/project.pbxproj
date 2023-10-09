@@ -61,6 +61,7 @@
 		E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */; };
 		E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */; };
 		E4E8923F2AD3DF6F005C9DBD /* MoreFileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */; };
+		E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892422AD45DD6005C9DBD /* OptionalImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +142,7 @@
 		E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOrphansView.swift; sourceTree = "<group>"; };
 		E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTroubleshootingView.swift; sourceTree = "<group>"; };
 		E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreFileManagementView.swift; sourceTree = "<group>"; };
+		E4E892422AD45DD6005C9DBD /* OptionalImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,6 +295,7 @@
 				E4E892362AD3163B005C9DBD /* AlbumCover.swift */,
 				E45A8BD32AD04A2400E3035E /* SelectionBar.swift */,
 				E45A8BD52AD04CD100E3035E /* SelectionOverlay.swift */,
+				E4E892422AD45DD6005C9DBD /* OptionalImage.swift */,
 				E4614D472ACB46D700D751FB /* ProgressAlert.swift */,
 			);
 			path = Shared;
@@ -502,6 +505,7 @@
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */,
+				E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */,
 				E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */,
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,

@@ -29,8 +29,14 @@ struct MoreFileManagementView: View {
                     if let orphanFiles {
                         var orphans: [String] = []
                         for orphanFile in orphanFiles {
-                            let orphanFileName = URL(filePath: orphanFile).lastPathComponent
+                            var orphanFileName = URL(filePath: orphanFile).lastPathComponent
                             if orphanFileName != ".DS_Store" {
+                                if orphanFileName.starts(with: ".") {
+                                    orphanFileName = orphanFileName.trimmingCharacters(in: .init(charactersIn: "."))
+                                }
+                                if orphanFileName.hasSuffix(".icloud") {
+                                    orphanFileName = String(orphanFileName.prefix(36))
+                                }
                                 orphans.append(orphanFileName)
                             }
                         }

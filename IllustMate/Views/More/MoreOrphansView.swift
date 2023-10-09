@@ -43,23 +43,14 @@ struct MoreOrphansView: View {
                                 selectedOrphan = orphan
                                 isReimportConfirming = true
                             } label: {
-                                if let imageData = orphanThumbnails[orphan],
-                                   let image = UIImage(data: imageData) {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .transition(.opacity.animation(.snappy.speed(2)))
-                                } else {
-                                    Rectangle()
-                                        .foregroundStyle(.primary.opacity(0.1))
-                                }
+                                OptionalImage(imageData: orphanThumbnails[orphan])
                             }
-#if targetEnvironment(macCatalyst)
-                            .buttonStyle(.borderless)
-#else
-                            .buttonStyle(.plain)
-#endif
                         }
+#if targetEnvironment(macCatalyst)
+                        .buttonStyle(.borderless)
+#else
+                        .buttonStyle(.plain)
+#endif
                         .aspectRatio(1.0, contentMode: .fill)
                         .contextMenu {
                             Button("Shared.Delete", systemImage: "trash", role: .destructive) {
@@ -93,10 +84,26 @@ struct MoreOrphansView: View {
             await withDiscardingTaskGroup { group in
                 for orphan in orphans {
                     group.addTask {
-                        let fullOrphanFilePath = orphansFolder
-                            .appendingPathComponent(orphan).path(percentEncoded: false)
-                        if let image = UIImage(contentsOfFile: fullOrphanFilePath) {
-                            orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                        do {
+                            let filePath = orphansFolder.appendingPathComponent(orphan).path(percentEncoded: false)
+                            if let image = UIImage(contentsOfFile: filePath) {
+                                orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                            } else {
+                                try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
+                                var isDownloaded: Bool = false
+                                debugPrint("\(orphan) - Waiting for download")
+                                while !isDownloaded {
+                                    if FileManager.default.fileExists(atPath: filePath) {
+                                        isDownloaded = true
+                                    }
+                                }
+                                debugPrint("\(orphan) - Download appears to have completed")
+                                if let image = UIImage(contentsOfFile: filePath) {
+                                    orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                                }
+                            }
+                        } catch {
+                            debugPrint(error.localizedDescription)
                         }
                     }
                 }
