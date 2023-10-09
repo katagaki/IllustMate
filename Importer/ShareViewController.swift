@@ -142,8 +142,12 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         loadedFile = await loadItem(attachment, type: UTType.image)
                     } else if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
                         loadedFile = await loadItem(attachment, type: UTType.url)
+                    } else if attachment.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                        loadedFile = await loadItem(attachment, type: UTType.fileURL)
                     }
-                    importItem(loadedFile)
+                    if let loadedFile {
+                        importItem(loadedFile)
+                    }
                     currentProgress += 1
                     progressView.progress = Float(currentProgress) / Float(total)
                 }
