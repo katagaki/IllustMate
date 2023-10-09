@@ -14,5 +14,7 @@ enum ViewPath: Hashable {
     case importer
     case more
     case moreDebug
+    case moreOrphans(orphans: [String])
+    case moreTroubleshooting
     case moreAttributions
 }

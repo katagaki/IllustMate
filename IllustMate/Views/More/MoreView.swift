@@ -81,12 +81,19 @@ struct MoreView: View {
                     NavigationLink(value: ViewPath.moreDebug) {
                         ListRow(image: "ListIcon.Debug", title: "More.Debug")
                     }
+                    NavigationLink(value: ViewPath.moreTroubleshooting) {
+                        ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
+                    }
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .moreDebug:
                     MoreDebugView(progressAlertManager: $progressAlertManager)
+                case .moreOrphans(let orphans):
+                    MoreOrphansView(orphans: orphans)
+                case .moreTroubleshooting:
+                    MoreTroubleshootingView()
                 case .moreAttributions: LicensesView(licenses: [
                     // swiftlint:disable line_length
                     License(libraryName: "CloudKitSyncMonitor", text:

@@ -59,6 +59,7 @@
 		E4E892372AD3163B005C9DBD /* AlbumCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892362AD3163B005C9DBD /* AlbumCover.swift */; };
 		E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */; };
 		E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */; };
+		E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -137,6 +138,7 @@
 		E4E892362AD3163B005C9DBD /* AlbumCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCover.swift; sourceTree = "<group>"; };
 		E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
 		E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOrphansView.swift; sourceTree = "<group>"; };
+		E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTroubleshootingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -324,6 +326,7 @@
 				E4614D232ACB048000D751FB /* MoreView.swift */,
 				E4E892312AD2F3C3005C9DBD /* MoreDebugView.swift */,
 				E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */,
+				E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */,
 			);
 			path = More;
 			sourceTree = "<group>";
@@ -494,6 +497,7 @@
 				E45A8BCE2AD0362900E3035E /* IllustrationLabel.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
+				E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */,
 				E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */,
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,

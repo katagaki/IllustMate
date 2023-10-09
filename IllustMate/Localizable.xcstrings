@@ -235,8 +235,37 @@
         }
       }
     },
-    "Hello, World!" : {
-
+    "Alert.DeleteAll.Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all your data? This operation cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを削除してもよろしいですか？\n削除後、データは復元できません。"
+          }
+        }
+      }
+    },
+    "Alert.DeleteAll.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを消去"
+          }
+        }
+      }
     },
     "Illustration.Error.CouldNotOpen" : {
       "extractionState" : "manual",
@@ -431,23 +460,6 @@
         }
       }
     },
-    "More.Debug.DeleteAll" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete All Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのデータを消去"
-          }
-        }
-      }
-    },
     "More.Debug.RebuildThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -460,7 +472,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルキャッシュを再構築"
+            "value" : "サムネイルを再構築"
           }
         }
       }
@@ -477,7 +489,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルのキャッシュを再構築中…"
+            "value" : "サムネイルを再構築中…"
           }
         }
       }
@@ -511,7 +523,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダウンロード要求を送信中…"
+            "value" : "サムネイルのダウンロード要求を送信中…"
           }
         }
       }
@@ -580,6 +592,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像IDを表示"
+          }
+        }
+      }
+    },
+    "More.Debug.ViewOrphans" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを見る"
           }
         }
       }
@@ -694,6 +723,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同期済み"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troubleshooting"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トラブルシューティング"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.DeleteAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを消去"
           }
         }
       }
@@ -918,6 +981,22 @@
         }
       }
     },
+    "Shared.No" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いいえ"
+          }
+        }
+      }
+    },
     "Shared.Refresh" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1066,6 +1145,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "共有"
+          }
+        }
+      }
+    },
+    "Shared.Yes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はい"
           }
         }
       }
@@ -1257,6 +1352,22 @@
         }
       }
     },
+    "ViewTitle.Orphans" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイル"
+          }
+        }
+      }
+    },
     "ViewTitle.Search" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1270,6 +1381,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "検索"
+          }
+        }
+      }
+    },
+    "ViewTitle.Troubleshooting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troubleshooting"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トラブルシューティング"
           }
         }
       }

@@ -11,9 +11,9 @@ import SwiftUI
 struct MoreDebugView: View {
 
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var navigationManager: NavigationManager
 
     @State var orphans: [String] = []
-    @State var isDeleteAllowed: Bool = false
 
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
@@ -28,22 +28,27 @@ struct MoreDebugView: View {
                 Button("More.Debug.ScanForOrphans") {
                     scanForOrphans()
                 }
+                Button("More.Debug.ViewOrphans") {
+                    let orphanFiles = try? FileManager.default.contentsOfDirectory(
+                        atPath: orphansFolder.path(percentEncoded: false))
+                    if let orphanFiles {
+                        var orphans: [String] = []
+                        for orphanFile in orphanFiles {
+                            let orphanFileName = URL(filePath: orphanFile).lastPathComponent
+                            if orphanFileName != ".DS_Store" {
+                                orphans.append(orphanFileName)
+                            }
+                        }
+                        navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
+                    }
+                }
+            }
+            Section {
                 Button("More.Debug.RebuildThumbnails") {
                     rebuildThumbnails()
                 }
                 Button("More.Debug.RedownloadThumbnails") {
                     redownloadThumbnails()
-                }
-            }
-            Section {
-                Toggle(isOn: $isDeleteAllowed) {
-                    Button("More.Debug.DeleteAll", role: .destructive) {
-                        deleteData()
-                        deleteContents(of: illustrationsFolder)
-                        deleteContents(of: thumbnailsFolder)
-                        deleteContents(of: importsFolder)
-                    }
-                    .disabled(!isDeleteAllowed)
                 }
             }
         }
@@ -84,6 +89,10 @@ struct MoreDebugView: View {
                     UIApplication.shared.isIdleTimerDisabled = false
                     withAnimation(.easeOut.speed(2)) {
                         progressAlertManager.hide()
+                    } completion: {
+                        if !orphans.isEmpty {
+                            navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
+                        }
                     }
                 }
             } catch {
@@ -116,7 +125,7 @@ struct MoreDebugView: View {
                                 FileManager.default.createFile(atPath: illustration.thumbnailPath(),
                                                                contents: thumbnailData)
                             }
-                            progressAlertManager.incrementProgress()
+                            await progressAlertManager.incrementProgress()
                         }
                     }
                 }
@@ -170,30 +179,6 @@ struct MoreDebugView: View {
         } catch {
             debugPrint(error.localizedDescription)
             UIApplication.shared.isIdleTimerDisabled = false
-        }
-    }
-
-    func deleteData() {
-        try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
-        try? modelContext.delete(model: Album.self, includeSubclasses: true)
-        do {
-            for illustration in try modelContext.fetch(FetchDescriptor<Illustration>()) {
-                modelContext.delete(illustration)
-            }
-            for album in try modelContext.fetch(FetchDescriptor<Album>()) {
-                modelContext.delete(album)
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-    }
-
-    func deleteContents(of url: URL?) {
-        if let url, let fileURLs = try? FileManager.default
-            .contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
-            for fileURL in fileURLs {
-                try? FileManager.default.removeItem(at: fileURL)
-            }
         }
     }
 }
