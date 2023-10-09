@@ -46,6 +46,10 @@ class ProgressAlertManager {
     }
 
     func setProgress() {
-        percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+        if total > 0 {
+            percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
+        } else {
+            percentage = 0
+        }
     }
 }
