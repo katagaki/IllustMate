@@ -41,6 +41,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     var currentProgress: Int = 0
     var total: Int = 0
+    var failedItemCount: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -147,14 +148,21 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                     if let loadedFile {
                         importItem(loadedFile)
+                    } else {
+                        failedItemCount += 1
                     }
                     currentProgress += 1
                     progressView.progress = Float(currentProgress) / Float(total)
                 }
-                progressLabel.text = String(localized: "Importer.DoneText")
-                heroImage.image = UIImage(systemName: "checkmark.circle.fill")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
-                    extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                if failedItemCount == 0 {
+                    progressLabel.text = String(localized: "Importer.DoneText")
+                    heroImage.image = UIImage(systemName: "checkmark.circle.fill")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
+                        extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
+                    }
+                } else {
+                    progressLabel.text = String(localized: "Importer.DoneText.WithError.\(failedItemCount)")
+                    heroImage.image = UIImage(systemName: "exclamationmark.circle.fill")
                 }
             }
         }
@@ -168,18 +176,20 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
 
-    func importItem(_ file: Any?) {
-        if let url = file as? URL,
-           let imageData = try? Data(contentsOf: url) {
-            importIllustration(url.lastPathComponent, data: imageData)
+    func importItem(_ file: Any?, name: String = UUID().uuidString) {
+        if let url = file as? URL, let imageData = try? Data(contentsOf: url),
+            let image = UIImage(data: imageData) {
+            importItem(image, name: url.lastPathComponent)
         } else if let image = file as? UIImage {
             if let pngData = image.pngData() {
-                importIllustration(UUID().uuidString, data: pngData)
+                importIllustration(name, data: pngData)
             } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
-                importIllustration(UUID().uuidString, data: jpgData)
+                importIllustration(name, data: jpgData)
             } else if let heicData = image.heicData() {
-                importIllustration(UUID().uuidString, data: heicData)
+                importIllustration(name, data: heicData)
             }
+        } else {
+            failedItemCount += 1
         }
     }
 

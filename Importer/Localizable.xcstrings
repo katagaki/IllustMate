@@ -35,6 +35,23 @@
         }
       }
     },
+    "Importer.DoneText.WithError.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Completed With %lld Errors"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート完了（%lld個失敗）"
+          }
+        }
+      }
+    },
     "Importer.ProgressText" : {
       "extractionState" : "manual",
       "localizations" : {
