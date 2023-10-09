@@ -25,8 +25,10 @@ struct MainSplitView: View {
                         Text("TabTitle.Collection")
                     } icon: {
                         Image("Tab.Collection")
+#if targetEnvironment(macCatalyst)
                             .resizable()
                             .frame(width: 16.0, height: 16.0)
+#endif
                     }
                 }
                 NavigationLink(value: ViewPath.illustrations) {
@@ -34,8 +36,10 @@ struct MainSplitView: View {
                         Text("TabTitle.Illustrations")
                     } icon: {
                         Image(systemName: "photo.stack.fill")
+#if targetEnvironment(macCatalyst)
                             .resizable()
                             .frame(width: 16.0, height: 16.0)
+#endif
                     }
                 }
                 NavigationLink(value: ViewPath.importer) {
@@ -43,8 +47,10 @@ struct MainSplitView: View {
                         Text("TabTitle.Import")
                     } icon: {
                         Image("Tab.Import")
+#if targetEnvironment(macCatalyst)
                             .resizable()
                             .frame(width: 16.0, height: 16.0)
+#endif
                     }
                 }
                 NavigationLink(value: ViewPath.more) {
@@ -58,8 +64,13 @@ struct MainSplitView: View {
                         } icon: {
                             Image(uiImage: album.cover())
                                 .resizable()
+#if targetEnvironment(macCatalyst)
                                 .frame(width: 16.0, height: 16.0)
                                 .clipShape(RoundedRectangle(cornerRadius: 3.0))
+#else
+                                .frame(width: 28.0, height: 28.0)
+                                .clipShape(RoundedRectangle(cornerRadius: 6.0))
+#endif
                         }
                     }
                 }
