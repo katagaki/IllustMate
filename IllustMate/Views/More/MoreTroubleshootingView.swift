@@ -24,18 +24,14 @@ struct MoreTroubleshootingView: View {
             }
         }
         .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
-            Button(role: .destructive) {
+            Button("Shared.Yes", role: .destructive) {
                 deleteData()
                 deleteContents(of: illustrationsFolder)
                 deleteContents(of: thumbnailsFolder)
                 deleteContents(of: importsFolder)
                 navigationManager.popAll()
-            } label: {
-                Text("Shared.Yes")
             }
-            Button(role: .cancel) { } label: {
-                Text("Shared.No")
-            }
+            Button("Shared.No", role: .cancel) { }
         } message: {
             Text("Alert.DeleteAll.Text")
         }
