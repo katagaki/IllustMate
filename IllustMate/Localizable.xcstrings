@@ -674,7 +674,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルをすべて再生成"
+            "value" : "すべてのサムネイルを再生成"
           }
         }
       }
@@ -696,6 +696,40 @@
         }
       }
     },
+    "More.Files.RedownloadIllustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download All Pictures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての画像をダウンロード"
+          }
+        }
+      }
+    },
+    "More.Files.RedownloadIllustrations.Redownloading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending picture download requests..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像のダウンロード要求を送信中…"
+          }
+        }
+      }
+    },
     "More.Files.RedownloadThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -708,7 +742,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルをすべてダウンロード"
+            "value" : "すべてのサムネイルをダウンロード"
           }
         }
       }
@@ -719,12 +753,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sending download request..."
+            "value" : "Sending thumbnail download request..."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "サムネイルのダウンロード要求を送信中…"
           }
         }

@@ -54,6 +54,11 @@ struct MoreFileManagementView: View {
                     redownloadThumbnails()
                 }
             }
+            Section {
+                Button("More.Files.RedownloadIllustrations") {
+                    redownloadIllustrations()
+                }
+            }
         }
         .navigationTitle("ViewTitle.Files")
         .navigationBarTitleDisplayMode(.inline)
@@ -158,6 +163,44 @@ struct MoreFileManagementView: View {
                     var isDownloaded: Bool = false
                     while !isDownloaded {
                         if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
+                            isDownloaded = true
+                        }
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+                DispatchQueue.main.async {
+                    progressAlertManager.incrementProgress()
+                }
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            withAnimation(.easeOut.speed(2)) {
+                progressAlertManager.hide()
+            } completion: {
+                // TODO: Show an alert that the downloads may take some time to complete
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    func redownloadIllustrations() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+            progressAlertManager.prepare("More.Files.RedownloadIllustrations.Redownloading",
+                                         total: illustrations.count)
+            withAnimation(.easeOut.speed(2)) {
+                progressAlertManager.show()
+            }
+            for illustration in illustrations {
+                do {
+                    try FileManager.default.startDownloadingUbiquitousItem(
+                        at: URL(filePath: illustration.illustrationPath()))
+                    var isDownloaded: Bool = false
+                    while !isDownloaded {
+                        if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
                             isDownloaded = true
                         }
                     }
