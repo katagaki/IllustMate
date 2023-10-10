@@ -32,8 +32,6 @@ struct IllustrationLabel: View {
                 rectangleWhenLoading()
             }
         }
-        .transition(.opacity.animation(.snappy.speed(2)))
-        .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
         .onAppear {

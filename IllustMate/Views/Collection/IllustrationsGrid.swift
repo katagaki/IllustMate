@@ -54,7 +54,6 @@ struct IllustrationsGrid<Content: View>: View {
                     if useNewThumbnailCache {
                         OptionalImage(imageData: thumbnails[illustration.id])
                             .aspectRatio(1.0, contentMode: .fill)
-                            .matchedGeometryEffect(id: illustration.id, in: namespace)
                             .opacity(isViewing(illustration) ? 0.0 : 1.0)
                             .overlay {
                                 if isSelected(illustration) {
@@ -62,20 +61,23 @@ struct IllustrationsGrid<Content: View>: View {
                                 }
                             }
                     } else {
-                        if !isViewing(illustration) {
-                            IllustrationLabel(namespace: namespace, illustration: illustration)
-                                .overlay {
-                                    if isSelected(illustration) {
-                                        SelectionOverlay()
+                        ZStack(alignment: .center) {
+                            if !isViewing(illustration) {
+                                IllustrationLabel(namespace: namespace, illustration: illustration)
+                                    .overlay {
+                                        if isSelected(illustration) {
+                                            SelectionOverlay()
+                                        }
                                     }
-                                }
-                        } else {
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                                .aspectRatio(1.0, contentMode: .fill)
+                            } else {
+                                Rectangle()
+                                    .foregroundStyle(.clear)
+                                    .aspectRatio(1.0, contentMode: .fill)
+                            }
                         }
                     }
                 }
+                .matchedGeometryEffect(id: illustration.id, in: namespace)
                 .id(illustration.id)
                 .contextMenu {
                     if isSelecting {
