@@ -127,8 +127,10 @@ struct MoreFileManagementView: View {
                             if let illustrationImage, let thumbnailData = Illustration
                                 .makeThumbnail(illustrationImage.jpegData(compressionQuality: 1.0)) {
                                 if useCoreDataThumbnail {
-                                    let thumbnail = Thumbnail(data: thumbnailData)
-                                    illustration.cachedThumbnail = thumbnail
+                                    DispatchQueue.main.async {
+                                        let thumbnail = Thumbnail(data: thumbnailData)
+                                        illustration.cachedThumbnail = thumbnail
+                                    }
                                 } else {
                                     FileManager.default.createFile(atPath: illustration.thumbnailPath(),
                                                                    contents: thumbnailData)

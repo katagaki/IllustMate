@@ -29,8 +29,12 @@ struct IllustrationLabel: View {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.1))
                         .overlay {
-                            ProgressView()
-                                .progressViewStyle(.circular)
+                            Image(systemName: "xmark.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24.0, height: 24.0)
+                                .foregroundStyle(.primary)
+                                .symbolRenderingMode(.multicolor)
                         }
                 }
             } else {
