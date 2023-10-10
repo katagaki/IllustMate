@@ -12,7 +12,7 @@ struct IllustrationViewer: View {
     var namespace: Namespace.ID
 
     @State var illustration: Illustration
-    @Binding var illustrationDisplayOffset: CGSize
+    @State var illustrationDisplayOffset: CGSize = .zero
 
     @State var isFileFromCloudReadyForDisplay: Bool = false
     @State var displayedImage: UIImage?
@@ -32,7 +32,7 @@ struct IllustrationViewer: View {
                     Image(systemName: "xmark.circle.fill")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 24.0, height: 24.0)
+                        .frame(width: 28.0, height: 28.0)
                         .foregroundStyle(.primary)
                         .symbolRenderingMode(.hierarchical)
                 }
@@ -87,16 +87,15 @@ struct IllustrationViewer: View {
                 .opacity(opacityDuringGesture())
             }
             Spacer(minLength: 0)
-            if let image = UIImage(contentsOfFile: illustration.illustrationPath()),
-               let cgImage = image.cgImage {
+            if let displayedImage, let cgImage = displayedImage.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        UIPasteboard.general.image = image
+                        UIPasteboard.general.image = displayedImage
                     }
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
-                    ShareLink(item: Image(cgImage, scale: image.scale, label: Text("")),
-                              preview: SharePreview(illustration.name, image: Image(uiImage: image))) {
+                    ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
+                              preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
                     .buttonStyle(.borderedProminent)

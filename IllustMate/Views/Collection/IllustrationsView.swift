@@ -49,8 +49,7 @@ struct IllustrationsView: View {
         .overlay {
             if let displayedIllustration {
                 IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   illustration: displayedIllustration,
-                                   illustrationDisplayOffset: $illustrationDisplayOffset) {
+                                   illustration: displayedIllustration) {
                     withAnimation(.snappy.speed(2)) {
                         self.displayedIllustration = nil
                     } completion: {

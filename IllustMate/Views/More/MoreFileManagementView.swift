@@ -123,7 +123,6 @@ struct MoreFileManagementView: View {
             try FileManager.default.createDirectory(at: thumbnailsFolder,
                                                     withIntermediateDirectories: false)
             Task {
-                let useCoreDataThumbnail = useCoreDataThumbnail
                 await withDiscardingTaskGroup { group in
                     for illustration in illustrations {
                         group.addTask {

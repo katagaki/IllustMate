@@ -35,7 +35,6 @@ struct AlbumView: View {
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
     @Binding var displayedIllustration: Illustration?
-    @Binding var illustrationDisplayOffset: CGSize
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
     var body: some View {

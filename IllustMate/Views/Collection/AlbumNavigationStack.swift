@@ -15,20 +15,17 @@ struct AlbumNavigationStack: View {
     @Namespace var illustrationTransitionNamespace
 
     @State var displayedIllustration: Illustration?
-    @State var illustrationDisplayOffset: CGSize = .zero
 
     var body: some View {
         NavigationStack(path: $viewPath) {
             AlbumView(illustrationTransitionNamespace: illustrationTransitionNamespace,
                       currentAlbum: album,
-                      displayedIllustration: $displayedIllustration,
-                      illustrationDisplayOffset: $illustrationDisplayOffset)
+                      displayedIllustration: $displayedIllustration)
                 .navigationDestination(for: ViewPath.self, destination: { viewPath in
                     switch viewPath {
                     case .album(let album): AlbumView(illustrationTransitionNamespace: illustrationTransitionNamespace,
                                                       currentAlbum: album,
-                                                      displayedIllustration: $displayedIllustration,
-                                                      illustrationDisplayOffset: $illustrationDisplayOffset)
+                                                      displayedIllustration: $displayedIllustration)
                     default: Color.clear
                     }
                 })
@@ -36,12 +33,9 @@ struct AlbumNavigationStack: View {
         .overlay {
             if let displayedIllustration {
                 IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   illustration: displayedIllustration,
-                                   illustrationDisplayOffset: $illustrationDisplayOffset) {
+                                   illustration: displayedIllustration) {
                     withAnimation(.snappy.speed(2)) {
                         self.displayedIllustration = nil
-                    } completion: {
-                        illustrationDisplayOffset = .zero
                     }
                 }
             }
