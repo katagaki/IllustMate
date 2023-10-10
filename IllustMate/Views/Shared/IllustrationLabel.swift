@@ -24,6 +24,7 @@ struct IllustrationLabel: View {
                 if let thumbnailImage {
                     Image(uiImage: thumbnailImage)
                         .resizable()
+                        .transition(.opacity.animation(.snappy.speed(2)))
                 } else {
                     rectangleWhenError()
                 }
@@ -35,7 +36,7 @@ struct IllustrationLabel: View {
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
-        .task {
+        .onAppear {
             if useCoreDataThumbnail {
                 switch state {
                 case .notReadyForDisplay:
@@ -86,13 +87,10 @@ struct IllustrationLabel: View {
                     // On macOS, such a file doesn't exist,
                     // so we can't do anything about it other than to try to push it to another thread
                     DispatchQueue.global(qos: .userInteractive).async {
-                        if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
-                            let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath()))
-                            if let data {
-                                thumbnailImage = UIImage(data: data)
-                            }
-                            state = .readyForDisplay
+                        if let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
+                            thumbnailImage = UIImage(data: data)
                         }
+                        state = .readyForDisplay
                     }
 #endif
                 case .hidden:
