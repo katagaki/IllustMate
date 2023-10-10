@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import CloudKitSyncMonitor
 import SwiftUI
 import SwiftData
 
@@ -13,6 +14,9 @@ struct IllustMateApp: App {
 
     @StateObject var tabManager = TabManager()
     @StateObject var navigationManager = NavigationManager()
+    @ObservedObject var syncMonitor = SyncMonitor.shared
+
+    @AppStorage(wrappedValue: false, "DebugShowCloudStatusEverywhere") var showCloudStatusEverywhere: Bool
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -38,6 +42,43 @@ struct IllustMateApp: App {
 #if targetEnvironment(macCatalyst)
                         .frame(minWidth: 600.0, minHeight: 500.0)
 #endif
+                }
+            }
+            .overlay {
+                if showCloudStatusEverywhere {
+                    ZStack(alignment: .bottomTrailing) {
+                        Color.clear
+                        Group {
+                            if syncMonitor.syncStateSummary.isBroken {
+                                Image(systemName: "xmark.icloud.fill")
+                                    .resizable()
+                                    .foregroundStyle(.red)
+                            } else if syncMonitor.syncStateSummary.inProgress {
+                                Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
+                                    .resizable()
+                                    .foregroundStyle(.primary)
+                            } else {
+                                switch syncMonitor.syncStateSummary {
+                                case .notStarted, .succeeded:
+                                    Image(systemName: "checkmark.icloud.fill")
+                                        .resizable()
+                                        .foregroundStyle(.green)
+                                case .noNetwork:
+                                    Image(systemName: "bolt.horizontal.icloud.fill")
+                                        .resizable()
+                                        .foregroundStyle(.orange)
+                                default:
+                                    Image(systemName: "exclamationmark.icloud.fill")
+                                        .resizable()
+                                        .foregroundStyle(.primary)
+                                }
+                            }
+                        }
+                        .symbolRenderingMode(.multicolor)
+                        .scaledToFit()
+                        .frame(width: 16.0, height: 16.0)
+                    }
+                    .padding()
                 }
             }
             .environmentObject(tabManager)

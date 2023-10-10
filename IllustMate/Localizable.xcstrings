@@ -372,6 +372,22 @@
         }
       }
     },
+    "Experiments.ShowCloudStatusEverywhere" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Cloud Status Everywhere"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クラウド同期状況を常に表示"
+          }
+        }
+      }
+    },
     "Experiments.ShowIllustrationIDs" : {
       "localizations" : {
         "en" : {

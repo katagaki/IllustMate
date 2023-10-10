@@ -26,7 +26,7 @@ struct IllustrationsGrid<Content: View>: View {
     @State var thumbnails: [String: Data] = [:]
 
     @AppStorage(wrappedValue: false, "DebugUseNewThumbnailCache") var useNewThumbnailCache: Bool
-    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: true, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
     @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
                 store: defaults) var allowPerImageThumbnailRegeneration: Bool
 

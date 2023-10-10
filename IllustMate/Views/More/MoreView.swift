@@ -98,7 +98,7 @@ struct MoreView: View {
                 case .moreFileManagement:
                     MoreFileManagementView(progressAlertManager: $progressAlertManager)
                 case .moreDebug:
-                    MoreDebugView()
+                    MoreExperimentsView()
                 case .moreOrphans(let orphans):
                     MoreOrphansView(orphans: orphans)
                 case .moreTroubleshooting:

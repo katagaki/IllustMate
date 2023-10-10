@@ -1,5 +1,5 @@
 //
-//  MoreDebugView.swift
+//  MoreExperimentsView.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/08.
@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct MoreDebugView: View {
+struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
     @AppStorage(wrappedValue: false, "DebugUseNewThumbnailCache") var useNewThumbnailCache: Bool
-    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail",
-                store: defaults) var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: true, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
     @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
                 store: defaults) var allowPerImageThumbnailRegeneration: Bool
+    @AppStorage(wrappedValue: false, "DebugShowCloudStatusEverywhere") var showCloudStatusEverywhere: Bool
 
     var body: some View {
         List {
@@ -45,6 +45,9 @@ struct MoreDebugView: View {
                 Toggle("Experiments.UseNewThumbnailCache", isOn: $useNewThumbnailCache)
                 Toggle("Experiments.UseCoreDataThumbnail", isOn: $useCoreDataThumbnail)
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
+            }
+            Section {
+                Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
             }
         }
         .navigationTitle("ViewTitle.Debug")
