@@ -20,58 +20,35 @@ struct IllustrationLabel: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            if useCoreDataThumbnail {
-                if let thumbnail = illustration.thumbnail() {
-                    Image(uiImage: thumbnail)
+            if state == .readyForDisplay {
+                if let thumbnailImage {
+                    Image(uiImage: thumbnailImage)
                         .resizable()
                         .transition(.opacity.animation(.snappy.speed(2)))
+                    // IMPORTANT: Do NOT move this transition to after matchedGeometryEffect, as it
+                    // will cause CATASTROPHIC freezes!
                 } else {
-                    Rectangle()
-                        .foregroundStyle(.primary.opacity(0.1))
-                        .overlay {
-                            Image(systemName: "xmark.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24.0, height: 24.0)
-                                .foregroundStyle(.primary)
-                                .symbolRenderingMode(.multicolor)
-                        }
+                    rectangleWhenError()
                 }
             } else {
-                if state == .readyForDisplay {
-                    if let thumbnailImage {
-                        Image(uiImage: thumbnailImage)
-                            .resizable()
-                            .transition(.opacity.animation(.snappy.speed(2)))
-                        // IMPORTANT: Do NOT move this transition to after matchedGeometryEffect, as it
-                        // will cause CATASTROPHIC freezes!
-                    } else {
-                        Rectangle()
-                            .foregroundStyle(.primary.opacity(0.1))
-                            .overlay {
-                                Image(systemName: "xmark.circle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24.0, height: 24.0)
-                                    .foregroundStyle(.primary)
-                                    .symbolRenderingMode(.multicolor)
-                            }
-                    }
-                } else {
-                    Rectangle()
-                        .foregroundStyle(.primary.opacity(0.1))
-                        .overlay {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                        }
-                }
+                rectangleWhenLoading()
             }
         }
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
         .task {
-            if !useCoreDataThumbnail {
+            if useCoreDataThumbnail {
+                switch state {
+                case .notReadyForDisplay:
+                    state = .downloading
+                    thumbnailImage = illustration.thumbnail()
+                    state = .readyForDisplay
+                case .hidden:
+                    state = .readyForDisplay
+                default: break
+                }
+            } else {
                 switch state {
                 case .notReadyForDisplay:
 #if !targetEnvironment(macCatalyst)
@@ -125,9 +102,7 @@ struct IllustrationLabel: View {
             }
         }
         .onDisappear {
-            if !useCoreDataThumbnail {
-                state = .hidden
-            }
+            state = .hidden
         }
         .draggable(IllustrationTransferable(id: illustration.id)) {
             if let thumbnailImage {
@@ -137,5 +112,29 @@ struct IllustrationLabel: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8.0))
             }
         }
+    }
+
+    @ViewBuilder
+    func rectangleWhenLoading() -> some View {
+        Rectangle()
+            .foregroundStyle(.primary.opacity(0.1))
+            .overlay {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            }
+    }
+
+    @ViewBuilder
+    func rectangleWhenError() -> some View {
+        Rectangle()
+            .foregroundStyle(.primary.opacity(0.1))
+            .overlay {
+                Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24.0, height: 24.0)
+                    .foregroundStyle(.primary)
+                    .symbolRenderingMode(.multicolor)
+            }
     }
 }
