@@ -14,7 +14,7 @@ final class Album {
     var id = UUID().uuidString
     var name: String = ""
     var coverPhoto: Data?
-    var childAlbums: [Album]? = []
+    @Relationship(deleteRule: .cascade) var childAlbums: [Album]? = []
     var childIllustrations: [Illustration]? = []
     @Relationship(deleteRule: .nullify, inverse: \Album.childAlbums) var parentAlbum: Album?
     var dateCreated: Date = Date.now

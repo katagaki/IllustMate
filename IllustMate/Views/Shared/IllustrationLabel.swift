@@ -91,7 +91,7 @@ struct IllustrationLabel: View {
                             if let data {
                                 thumbnailImage = UIImage(data: data)
                             }
-                            isFileFromCloudReadyForDisplay = true
+                            state = .readyForDisplay
                         }
                     }
 #endif
