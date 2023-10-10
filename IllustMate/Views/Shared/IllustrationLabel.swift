@@ -24,9 +24,6 @@ struct IllustrationLabel: View {
                 if let thumbnailImage {
                     Image(uiImage: thumbnailImage)
                         .resizable()
-                        .transition(.opacity.animation(.snappy.speed(2)))
-                    // IMPORTANT: Do NOT move this transition to after matchedGeometryEffect, as it
-                    // will cause CATASTROPHIC freezes!
                 } else {
                     rectangleWhenError()
                 }
@@ -34,6 +31,7 @@ struct IllustrationLabel: View {
                 rectangleWhenLoading()
             }
         }
+        .transition(.opacity.animation(.snappy.speed(2)))
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
@@ -42,7 +40,9 @@ struct IllustrationLabel: View {
                 switch state {
                 case .notReadyForDisplay:
                     state = .downloading
-                    thumbnailImage = illustration.thumbnail()
+                    if let image = illustration.thumbnail() {
+                        thumbnailImage = image
+                    }
                     state = .readyForDisplay
                 case .hidden:
                     state = .readyForDisplay

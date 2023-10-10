@@ -216,7 +216,6 @@ struct AlbumView: View {
                             refreshDataAfterIllustrationMovedToAlbum()
                         }
                     }
-                    .transition(.opacity.animation(.snappy.speed(2)))
                 }
             }
         }

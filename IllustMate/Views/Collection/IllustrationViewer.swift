@@ -70,10 +70,10 @@ struct IllustrationViewer: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
+            .transition(.opacity.animation(.snappy.speed(2)))
             .matchedGeometryEffect(id: displayedIllustration.id, in: namespace)
             .zIndex(1)
             .offset(illustrationDisplayOffset)
-            .transition(.opacity.animation(.snappy.speed(2)))
             if let displayedImage {
                 HStack(alignment: .center, spacing: 2.0) {
                     Group {
