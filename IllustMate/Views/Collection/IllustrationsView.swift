@@ -11,6 +11,7 @@ import SwiftUI
 struct IllustrationsView: View {
 
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace
 
@@ -21,31 +22,34 @@ struct IllustrationsView: View {
     @State var illustrationDisplayOffset: CGSize = .zero
 
     var body: some View {
-        ScrollView(.vertical) {
-            IllustrationsGrid(namespace: illustrationTransitionNamespace,
-                              illustrations: .constant(illustrations),
-                              isSelecting: .constant(false),
-                              enableSelection: false) { illustration in
-                illustration.id == displayedIllustration?.id
-            } isSelected: { _ in
-                return false
-            } onSelect: { illustration in
-                withAnimation(.snappy.speed(2)) {
-                    displayedIllustration = illustration
-                }
-            } selectedCount: {
-                return 0
-            } onDelete: { illustration in
-                illustration.prepareForDeletion()
-                withAnimation(.snappy.speed(2)) {
-                    modelContext.delete(illustration)
-                }
-            } moveMenu: { _ in }
+        NavigationStack(path: $navigationManager.illustrationsTabPath) {
+            ScrollView(.vertical) {
+                IllustrationsGrid(namespace: illustrationTransitionNamespace,
+                                  illustrations: .constant(illustrations),
+                                  isSelecting: .constant(false),
+                                  enableSelection: false) { illustration in
+                    illustration.id == displayedIllustration?.id
+                } isSelected: { _ in
+                    return false
+                } onSelect: { illustration in
+                    withAnimation(.snappy.speed(2)) {
+                        displayedIllustration = illustration
+                    }
+                } selectedCount: {
+                    return 0
+                } onDelete: { illustration in
+                    illustration.prepareForDeletion()
+                    withAnimation(.snappy.speed(2)) {
+                        modelContext.delete(illustration)
+                    }
+                } moveMenu: { _ in }
+            }
+            .navigationTitle("ViewTitle.Illustrations")
         }
         .overlay {
             if let displayedIllustration {
                 IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   displayedIllustration: displayedIllustration,
+                                   illustration: displayedIllustration,
                                    illustrationDisplayOffset: $illustrationDisplayOffset) {
                     withAnimation(.snappy.speed(2)) {
                         self.displayedIllustration = nil
@@ -55,6 +59,5 @@ struct IllustrationsView: View {
                 }
             }
         }
-        .navigationTitle("ViewTitle.Illustrations")
     }
 }

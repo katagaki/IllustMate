@@ -11,7 +11,7 @@ struct IllustrationViewer: View {
 
     var namespace: Namespace.ID
 
-    @State var displayedIllustration: Illustration
+    @State var illustration: Illustration
     @Binding var illustrationDisplayOffset: CGSize
 
     @State var isFileFromCloudReadyForDisplay: Bool = false
@@ -22,7 +22,7 @@ struct IllustrationViewer: View {
     var body: some View {
         VStack(alignment: .center, spacing: 16.0) {
             HStack(alignment: .center, spacing: 8.0) {
-                Text(displayedIllustration.name)
+                Text(illustration.name)
                     .bold()
                     .lineLimit(1)
                 Spacer(minLength: 0)
@@ -38,6 +38,7 @@ struct IllustrationViewer: View {
                 }
                 .buttonStyle(.plain)
             }
+            .opacity(opacityDuringGesture())
             Spacer(minLength: 0)
             ZStack {
                 if isFileFromCloudReadyForDisplay {
@@ -49,8 +50,7 @@ struct IllustrationViewer: View {
                             .transition(.opacity.animation(.snappy.speed(2)))
                     } else {
                         Rectangle()
-                            .foregroundStyle(.primary.opacity(0.1))
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                            .foregroundStyle(.clear)
                             .overlay {
                                 Image(systemName: "xmark.circle.fill")
                                     .resizable()
@@ -59,6 +59,7 @@ struct IllustrationViewer: View {
                                     .foregroundStyle(.primary)
                                     .symbolRenderingMode(.multicolor)
                             }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 } else {
                     Rectangle()
@@ -70,9 +71,8 @@ struct IllustrationViewer: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .transition(.opacity.animation(.snappy.speed(2)))
-            .matchedGeometryEffect(id: displayedIllustration.id, in: namespace)
             .zIndex(1)
+            .matchedGeometryEffect(id: illustration.id, in: namespace)
             .offset(illustrationDisplayOffset)
             if let displayedImage {
                 HStack(alignment: .center, spacing: 2.0) {
@@ -84,9 +84,10 @@ struct IllustrationViewer: View {
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                 }
+                .opacity(opacityDuringGesture())
             }
             Spacer(minLength: 0)
-            if let image = UIImage(contentsOfFile: displayedIllustration.illustrationPath()),
+            if let image = UIImage(contentsOfFile: illustration.illustrationPath()),
                let cgImage = image.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
@@ -95,56 +96,51 @@ struct IllustrationViewer: View {
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
                     ShareLink(item: Image(cgImage, scale: image.scale, label: Text("")),
-                              preview: SharePreview(displayedIllustration.name, image: Image(uiImage: image))) {
+                              preview: SharePreview(illustration.name, image: Image(uiImage: image))) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
                 }
+                .opacity(opacityDuringGesture())
             }
         }
-        .padding()
-        .background(.regularMaterial)
+        .padding(20.0)
+        .background(.regularMaterial.opacity(opacityDuringGesture()))
         .onAppear {
-            Task {
 #if !targetEnvironment(macCatalyst)
-                // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
-                do {
-                    if let data = try? Data(contentsOf: URL(filePath: displayedIllustration.illustrationPath())) {
-                        let fetchedImage = UIImage.byPreparingForDisplay(UIImage(data: data)!)
-                        displayedImage = await fetchedImage()
-                        isFileFromCloudReadyForDisplay = true
-                    } else {
-                        try FileManager.default.startDownloadingUbiquitousItem(
-                            at: URL(filePath: displayedIllustration.illustrationPath()))
-                        DispatchQueue.global(qos: .userInteractive).async {
-                            var isDownloaded: Bool = false
-                            while !isDownloaded {
-                                if FileManager.default.fileExists(atPath: displayedIllustration.illustrationPath()) {
-                                    isDownloaded = true
-                                }
-                            }
-                            displayedImage = UIImage(contentsOfFile: displayedIllustration.illustrationPath())
-                            DispatchQueue.main.async {
-                                isFileFromCloudReadyForDisplay = true
-                            }
+            do {
+                if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
+                   let image = UIImage(data: data) {
+                    displayedImage = image
+                    isFileFromCloudReadyForDisplay = true
+                } else {
+                    try FileManager.default.startDownloadingUbiquitousItem(
+                        at: URL(filePath: illustration.illustrationPath()))
+                    var isDownloaded: Bool = false
+                    while !isDownloaded {
+                        if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
+                            isDownloaded = true
                         }
                     }
-                } catch {
-                    debugPrint(error.localizedDescription)
+                    let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath()))
+                    if let data, let image = UIImage(data: data) {
+                        displayedImage = image
+                    }
                     isFileFromCloudReadyForDisplay = true
                 }
-#else
-                // On macOS, such a file doesn't exist,
-                // so we can't do anything about it other than to try to push it to another thread
-                DispatchQueue.global(qos: .userInteractive).async {
-                    displayedImage = UIImage(contentsOfFile: displayedIllustration.illustrationPath())
-                    DispatchQueue.main.async {
-                        isFileFromCloudReadyForDisplay = true
-                    }
-                }
-#endif
+            } catch {
+                debugPrint(error.localizedDescription)
+                isFileFromCloudReadyForDisplay = true
             }
+#else
+            if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())) {
+                displayedImage = UIImage(data: data)
+            }
+            DispatchQueue.main.async {
+                isFileFromCloudReadyForDisplay = true
+            }
+#endif
         }
         .gesture(
             DragGesture()
@@ -152,10 +148,7 @@ struct IllustrationViewer: View {
                     illustrationDisplayOffset = gesture.translation
                 }
                 .onEnded { gesture in
-                    let width = gesture.translation.width
-                    let height = gesture.translation.height
-                    let hypotenuse = sqrt((width * width) + (height * height))
-                    if hypotenuse > 50.0 {
+                    if hypotenuse(gesture.translation) > 100.0 {
                         closeAction()
                     } else {
                         withAnimation(.snappy.speed(2)) {
@@ -164,5 +157,15 @@ struct IllustrationViewer: View {
                     }
                 }
         )
+    }
+
+    func opacityDuringGesture() -> Double {
+        1.0 - hypotenuse(illustrationDisplayOffset) / 100.0
+    }
+
+    func hypotenuse(_ translation: CGSize) -> Double {
+        let width = translation.width
+        let height = translation.height
+        return sqrt((width * width) + (height * height))
     }
 }

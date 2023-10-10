@@ -22,13 +22,11 @@ struct MainTabView: View {
                     Label("TabTitle.Collection", image: "Tab.Collection")
                 }
                 .tag(TabType.collection)
-            NavigationStack(path: $navigationManager.illustrationsTabPath) {
-                IllustrationsView()
-            }
-            .tabItem {
-                Label("TabTitle.Illustrations", systemImage: "photo.stack.fill")
-            }
-            .tag(TabType.illustrations)
+            IllustrationsView()
+                .tabItem {
+                    Label("TabTitle.Illustrations", systemImage: "photo.stack.fill")
+                }
+                .tag(TabType.illustrations)
             ImportView(progressAlertManager: $progressAlertManager)
                 .tabItem {
                     Label("TabTitle.Import", image: "Tab.Import")

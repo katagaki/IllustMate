@@ -62,13 +62,18 @@ struct IllustrationsGrid<Content: View>: View {
                                 }
                             }
                     } else {
-                        IllustrationLabel(namespace: namespace, illustration: illustration)
-                            .opacity(isViewing(illustration) ? 0.0 : 1.0)
-                            .overlay {
-                                if isSelected(illustration) {
-                                    SelectionOverlay()
+                        if !isViewing(illustration) {
+                            IllustrationLabel(namespace: namespace, illustration: illustration)
+                                .overlay {
+                                    if isSelected(illustration) {
+                                        SelectionOverlay()
+                                    }
                                 }
-                            }
+                        } else {
+                            Rectangle()
+                                .foregroundStyle(.clear)
+                                .aspectRatio(1.0, contentMode: .fill)
+                        }
                     }
                 }
                 .id(illustration.id)

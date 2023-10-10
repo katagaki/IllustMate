@@ -17,7 +17,7 @@ struct AlbumView: View {
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
 
-    @Namespace var illustrationTransitionNamespace
+    var illustrationTransitionNamespace: Namespace.ID
     @Namespace var albumTransitionNamespace
 
     var currentAlbum: Album?
@@ -34,8 +34,8 @@ struct AlbumView: View {
 
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
-    @State var displayedIllustration: Illustration?
-    @State var illustrationDisplayOffset: CGSize = .zero
+    @Binding var displayedIllustration: Illustration?
+    @Binding var illustrationDisplayOffset: CGSize
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
     var body: some View {
@@ -193,19 +193,6 @@ struct AlbumView: View {
             }
         }
 #endif
-        .overlay {
-            if let displayedIllustration {
-                IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   displayedIllustration: displayedIllustration,
-                                   illustrationDisplayOffset: $illustrationDisplayOffset) {
-                    withAnimation(.snappy.speed(2)) {
-                        self.displayedIllustration = nil
-                    } completion: {
-                        illustrationDisplayOffset = .zero
-                    }
-                }
-            }
-        }
         .safeAreaInset(edge: .bottom) {
             if isSelectingIllustrations {
                 SelectionBar(illustrations: $illustrations, selectedIllustrations: $selectedIllustrations) {

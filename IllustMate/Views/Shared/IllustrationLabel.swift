@@ -57,8 +57,8 @@ struct IllustrationLabel: View {
                     DispatchQueue.global(qos: .userInteractive).async {
                         do {
                             state = .downloading
-                            if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())),
-                               let image = UIImage(data: thumbnailData) {
+                            if let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())),
+                               let image = UIImage(data: data) {
                                 thumbnailImage = image
                                 state = .readyForDisplay
                             } else {
