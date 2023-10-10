@@ -112,113 +112,122 @@ struct MoreFileManagementView: View {
 
     func rebuildThumbnails() {
         UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressAlertManager.prepare("More.Files.RebuildThumbnails.Rebuilding",
-                                         total: illustrations.count)
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.show()
-            }
-            try FileManager.default.removeItem(at: thumbnailsFolder)
-            try FileManager.default.createDirectory(at: thumbnailsFolder,
-                                                    withIntermediateDirectories: false)
-            Task {
-                await withDiscardingTaskGroup { group in
-                    for illustration in illustrations {
-                        group.addTask {
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+                progressAlertManager.prepare("More.Files.RebuildThumbnails.Rebuilding",
+                                             total: illustrations.count)
+                withAnimation(.easeOut.speed(2)) {
+                    progressAlertManager.show()
+                } completion: {
+                    if useCoreDataThumbnail {
+                        try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
+                    } else {
+                        try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
+                        try? FileManager.default.removeItem(at: thumbnailsFolder)
+                        try? FileManager.default.createDirectory(at: thumbnailsFolder,
+                                                                 withIntermediateDirectories: false)
+                    }
+                    modelContext.autosaveEnabled = false
+                    DispatchQueue.global(qos: .background).async {
+                        illustrations.forEach { illustration in
                             illustration.generateThumbnail()
-                            DispatchQueue.main.async {
-                                progressAlertManager.incrementProgress()
+                            progressAlertManager.incrementProgress()
+                        }
+                        DispatchQueue.main.async {
+                            try? modelContext.save()
+                            modelContext.autosaveEnabled = true
+                            UIApplication.shared.isIdleTimerDisabled = false
+                            withAnimation(.easeOut.speed(2)) {
+                                progressAlertManager.hide()
                             }
                         }
                     }
                 }
-                await MainActor.run {
-                    UIApplication.shared.isIdleTimerDisabled = false
-                }
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.hide()
-                }
+            } catch {
+                debugPrint(error.localizedDescription)
+                UIApplication.shared.isIdleTimerDisabled = false
             }
-        } catch {
-            debugPrint(error.localizedDescription)
-            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
     func redownloadThumbnails() {
         UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressAlertManager.prepare("More.Files.RedownloadThumbnails.Redownloading",
-                                         total: illustrations.count)
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.show()
-            }
-            for illustration in illustrations {
-                do {
-                    try FileManager.default.startDownloadingUbiquitousItem(
-                        at: URL(filePath: illustration.thumbnailPath()))
-                    var isDownloaded: Bool = false
-                    while !isDownloaded {
-                        if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
-                            isDownloaded = true
-                        }
-                    }
-                } catch {
-                    debugPrint(error.localizedDescription)
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+                progressAlertManager.prepare("More.Files.RedownloadThumbnails.Redownloading",
+                                             total: illustrations.count)
+                withAnimation(.easeOut.speed(2)) {
+                    progressAlertManager.show()
                 }
-                DispatchQueue.main.async {
+                for illustration in illustrations {
+                    do {
+                        try FileManager.default.startDownloadingUbiquitousItem(
+                            at: URL(filePath: illustration.thumbnailPath()))
+                        var isDownloaded: Bool = false
+                        while !isDownloaded {
+                            if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
+                                isDownloaded = true
+                            }
+                        }
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
                     progressAlertManager.incrementProgress()
                 }
+                DispatchQueue.main.async {
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    withAnimation(.easeOut.speed(2)) {
+                        progressAlertManager.hide()
+                    } completion: {
+                        // TODO: Show an alert that the downloads may take some time to complete
+                    }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+                UIApplication.shared.isIdleTimerDisabled = false
             }
-            UIApplication.shared.isIdleTimerDisabled = false
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.hide()
-            } completion: {
-                // TODO: Show an alert that the downloads may take some time to complete
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
     func redownloadIllustrations() {
         UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressAlertManager.prepare("More.Files.RedownloadIllustrations.Redownloading",
-                                         total: illustrations.count)
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.show()
-            }
-            for illustration in illustrations {
-                do {
-                    try FileManager.default.startDownloadingUbiquitousItem(
-                        at: URL(filePath: illustration.illustrationPath()))
-                    var isDownloaded: Bool = false
-                    while !isDownloaded {
-                        if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
-                            isDownloaded = true
-                        }
-                    }
-                } catch {
-                    debugPrint(error.localizedDescription)
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+                progressAlertManager.prepare("More.Files.RedownloadIllustrations.Redownloading",
+                                             total: illustrations.count)
+                withAnimation(.easeOut.speed(2)) {
+                    progressAlertManager.show()
                 }
-                DispatchQueue.main.async {
+                for illustration in illustrations {
+                    do {
+                        try FileManager.default.startDownloadingUbiquitousItem(
+                            at: URL(filePath: illustration.illustrationPath()))
+                        var isDownloaded: Bool = false
+                        while !isDownloaded {
+                            if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
+                                isDownloaded = true
+                            }
+                        }
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
                     progressAlertManager.incrementProgress()
                 }
+                DispatchQueue.main.async {
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    withAnimation(.easeOut.speed(2)) {
+                        progressAlertManager.hide()
+                    } completion: {
+                        // TODO: Show an alert that the downloads may take some time to complete
+                    }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+                UIApplication.shared.isIdleTimerDisabled = false
             }
-            UIApplication.shared.isIdleTimerDisabled = false
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.hide()
-            } completion: {
-                // TODO: Show an alert that the downloads may take some time to complete
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 }

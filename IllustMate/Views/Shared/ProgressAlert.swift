@@ -19,6 +19,7 @@ struct ProgressAlert: View {
             VStack(alignment: .center, spacing: 0.0) {
                 VStack(alignment: .center, spacing: 16.0) {
                     Text(manager.title)
+                        .multilineTextAlignment(.center)
                         .bold()
                     ProgressView(value: min(Float(manager.percentage), 100.0),
                                  total: 100.0)

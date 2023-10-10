@@ -60,14 +60,11 @@ final class Illustration {
     }
 
     func generateThumbnail() {
-        let illustrationImage = UIImage(contentsOfFile: illustrationPath())
-        if let illustrationImage, let thumbnailData = Illustration
-            .makeThumbnail(illustrationImage.jpegData(compressionQuality: 1.0)) {
+        if let data = try? Data(contentsOf: URL(filePath: illustrationPath())),
+            let thumbnailData = Illustration.makeThumbnail(data) {
             if defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
-                DispatchQueue.main.async { [self] in
-                    let thumbnail = Thumbnail(data: thumbnailData)
-                    cachedThumbnail = thumbnail
-                }
+                let thumbnail = Thumbnail(data: thumbnailData)
+                cachedThumbnail = thumbnail
             } else {
                 FileManager.default.createFile(atPath: thumbnailPath(),
                                                contents: thumbnailData)

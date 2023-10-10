@@ -11,7 +11,7 @@ import UIKit
 
 @Model
 final class Thumbnail {
-    @Relationship(deleteRule: .cascade, inverse: \Illustration.cachedThumbnail) var illustration: Illustration?
+    @Relationship(deleteRule: .nullify, inverse: \Illustration.cachedThumbnail) var illustration: Illustration?
     @Attribute(.externalStorage) var data: Data = Data()
 
     init(data: Data) {
