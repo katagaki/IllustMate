@@ -13,13 +13,12 @@ struct IllustrationLabel: View {
 
     var illustration: Illustration
 
-    @State var isFileFromCloudReadyForDisplay: Bool = false
-    @State var isDownloadTriggered: Bool = false
+    @State var state: CloudImageState = .notReadyForDisplay
     @State var thumbnailImage: UIImage?
 
     var body: some View {
         ZStack(alignment: .center) {
-            if isFileFromCloudReadyForDisplay {
+            if state == .readyForDisplay {
                 if let thumbnailImage {
                     Image(uiImage: thumbnailImage)
                         .resizable()
@@ -50,42 +49,42 @@ struct IllustrationLabel: View {
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
-        .onAppear {
-            if !isFileFromCloudReadyForDisplay && !isDownloadTriggered {
-                Task {
+        .task {
+            switch state {
+            case .notReadyForDisplay:
 #if !targetEnvironment(macCatalyst)
                     // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
-                    do {
-                        if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
-                            let fetchedThumbnailImage = UIImage.byPreparingForDisplay(
-                                UIImage(data: thumbnailData)!)
-                            thumbnailImage = await fetchedThumbnailImage()
-                            isFileFromCloudReadyForDisplay = true
-                        } else {
-                            isDownloadTriggered = true
-                            try FileManager.default.startDownloadingUbiquitousItem(
-                                at: URL(filePath: illustration.thumbnailPath()))
-                            DispatchQueue.global(qos: .userInteractive).async {
-                                var isDownloaded: Bool = false
-                                while !isDownloaded {
-                                    Thread.sleep(forTimeInterval: Double.random(in: 0.0..<0.2))
+                    DispatchQueue.global(qos: .userInteractive).async {
+                        do {
+                            state = .downloading
+                            if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())),
+                               let image = UIImage(data: thumbnailData) {
+                                thumbnailImage = image
+                                state = .readyForDisplay
+                            } else {
+                                if state != .downloading {
+                                    try FileManager.default.startDownloadingUbiquitousItem(
+                                        at: URL(filePath: illustration.thumbnailPath()))
+                                    state = .downloading
+                                }
+                                while state != .downloaded {
                                     if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
-                                        isDownloaded = true
+                                        state = .downloaded
                                     }
                                 }
                                 let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath()))
-                                if let data {
-                                    thumbnailImage = UIImage(data: data)
+                                if let data, let image = UIImage(data: data) {
+                                    thumbnailImage = image
                                 }
-                                isFileFromCloudReadyForDisplay = true
+                                state = .readyForDisplay
                             }
+                        } catch {
+                            debugPrint(error.localizedDescription)
+                            state = .readyForDisplay
                         }
-                    } catch {
-                        debugPrint(error.localizedDescription)
-                        isFileFromCloudReadyForDisplay = true
                     }
 #else
-                    // On macOS, such a file doesn't exist, 
+                    // On macOS, such a file doesn't exist,
                     // so we can't do anything about it other than to try to push it to another thread
                     DispatchQueue.global(qos: .userInteractive).async {
                         if let thumbnailData = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
@@ -97,8 +96,13 @@ struct IllustrationLabel: View {
                         }
                     }
 #endif
-                }
+            case .hidden:
+                state = .readyForDisplay
+            default: break
             }
+        }
+        .onDisappear {
+            state = .hidden
         }
         .draggable(IllustrationTransferable(id: illustration.id)) {
             if let thumbnailImage {

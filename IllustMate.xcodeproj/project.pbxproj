@@ -49,6 +49,7 @@
 		E4CA0B8F2ACD17C10063F06C /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B8D2ACD17190063F06C /* FileManager.swift */; };
 		E4CA0B912ACD2F8A0063F06C /* RenameAlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */; };
 		E4CA0B922ACD32B50063F06C /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4CA0B942ACD32B50063F06C /* MainInterface.storyboard */; };
+		E4CD39A52AD524B100D03298 /* CloudImageState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CD39A42AD524B100D03298 /* CloudImageState.swift */; };
 		E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
 		E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892252AD28080005C9DBD /* AlbumsGrid.swift */; };
 		E4E8922A2AD2843A005C9DBD /* AlbumsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892292AD2843A005C9DBD /* AlbumsList.swift */; };
@@ -130,6 +131,7 @@
 		E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameAlbumView.swift; sourceTree = "<group>"; };
 		E4CA0B932ACD32B50063F06C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		E4CA0B952ACD32B50063F06C /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MainInterface.xcstrings; sourceTree = "<group>"; };
+		E4CD39A42AD524B100D03298 /* CloudImageState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudImageState.swift; sourceTree = "<group>"; };
 		E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		E4E892252AD28080005C9DBD /* AlbumsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGrid.swift; sourceTree = "<group>"; };
 		E4E892292AD2843A005C9DBD /* AlbumsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsList.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				E4614D2B2ACB0FD800D751FB /* ViewPath.swift */,
 				E4614D2D2ACB0FF500D751FB /* TabType.swift */,
 				E4614D312ACB103200D751FB /* TabManager.swift */,
+				E4CD39A42AD524B100D03298 /* CloudImageState.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -508,6 +511,7 @@
 				E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */,
 				E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */,
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
+				E4CD39A52AD524B100D03298 /* CloudImageState.swift in Sources */,
 				E4614D172ACAB66600D751FB /* MainTabView.swift in Sources */,
 				E45A8BD62AD04CD100E3035E /* SelectionOverlay.swift in Sources */,
 				E45A8BF62AD1029400E3035E /* MainSplitView.swift in Sources */,
