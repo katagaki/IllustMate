@@ -26,7 +26,7 @@ struct ImportView: View {
     @State var importCompletedCount: Int = 0
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
-    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager.importerTabPath) {

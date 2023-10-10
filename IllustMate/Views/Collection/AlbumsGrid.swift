@@ -41,6 +41,7 @@ struct AlbumsGrid: View {
                         }
                         return true
                     }
+                    .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                 }
                 .buttonStyle(.plain)
                 .contextMenu {

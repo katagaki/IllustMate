@@ -17,7 +17,7 @@ struct MoreFileManagementView: View {
 
     @Binding var progressAlertManager: ProgressAlertManager
 
-    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
 
     var body: some View {
         List {

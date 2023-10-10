@@ -16,7 +16,7 @@ struct IllustrationLabel: View {
     @State var state: CloudImageState = .notReadyForDisplay
     @State var thumbnailImage: UIImage?
 
-    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
 
     var body: some View {
         ZStack(alignment: .center) {

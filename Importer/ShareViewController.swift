@@ -198,7 +198,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if let selectedAlbum {
             illustration.containingAlbum = selectedAlbum
         }
-        if UserDefaults.standard.bool(forKey: "DebugUseCoreDataThumbnail") {
+        if defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
             if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
                 let thumbnail = Thumbnail(data: thumbnailData)
                 illustration.cachedThumbnail = thumbnail

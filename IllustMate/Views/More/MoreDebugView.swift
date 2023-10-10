@@ -11,7 +11,7 @@ struct MoreDebugView: View {
 
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
     @AppStorage(wrappedValue: false, "DebugUseNewThumbnailCache") var useNewThumbnailCache: Bool
-    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
 
     var body: some View {
         List {
