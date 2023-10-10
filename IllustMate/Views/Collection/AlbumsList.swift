@@ -23,13 +23,14 @@ struct AlbumsList: View {
             ForEach(albums, id: \.id) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumListRow(namespace: namespace, album: album)
-                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
-                        for item in items {
-                            onDrop(item, album)
+                        .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                            for item in items {
+                                onDrop(item, album)
+                            }
+                            return true
                         }
-                        return true
-                    }
                 }
+                .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                 .buttonStyle(.plain)
                 .contextMenu {
                     Button("Shared.ResetCover", systemImage: "photo") {

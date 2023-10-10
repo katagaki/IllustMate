@@ -356,6 +356,70 @@
         }
       }
     },
+    "Experiments.AllowPerImageThumbnailRegeneration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Per Image Thumbnail Regeneration"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像メニューに「サムネイルを再生成」を表示"
+          }
+        }
+      }
+    },
+    "Experiments.ShowIllustrationIDs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Illustration IDs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像IDを表示"
+          }
+        }
+      }
+    },
+    "Experiments.UseCoreDataThumbnail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Core Data Thumbnail"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データとしてサムネイルを保存"
+          }
+        }
+      }
+    },
+    "Experiments.UseNewThumbnailCache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use New Thumbnail Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいサムネイルキャッシュを使用"
+          }
+        }
+      }
+    },
     "Illustration.Error.CouldNotOpen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -549,53 +613,34 @@
         }
       }
     },
-    "More.Debug.ShowIllustrationIDs" : {
-      "extractionState" : "manual",
+    "More.Debug.Warning.Text" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Illustration IDs"
+            "value" : "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not held responsible if any of the following options cause any data loss."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像IDを表示"
+            "value" : "こちらの設定は実験的なものであり、アプリを再起動する必要がある場合があります。\n本アプリの開発者は、こちらの設定によるデータ損失の責任を一切負いかねます。"
           }
         }
       }
     },
-    "More.Debug.UseCoreDataThumbnail" : {
-      "extractionState" : "manual",
+    "More.Debug.Warning.Title" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Store Thumbnails as Data"
+            "value" : "Caution"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルをデータとして保存"
-          }
-        }
-      }
-    },
-    "More.Debug.UseNewThumbnailCache" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Load Thumbnails on Grid"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "グリッドでサムネイルを読み込む"
+            "value" : "警告"
           }
         }
       }
@@ -623,13 +668,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rebuild Thumbnails"
+            "value" : "Recreate All Thumbnails"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルを再構築"
+            "value" : "サムネイルをすべて再生成"
           }
         }
       }
@@ -640,13 +685,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rebuilding thumbnails..."
+            "value" : "Recreating thumbnails..."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルを再構築中…"
+            "value" : "サムネイルを再生成中…"
           }
         }
       }
@@ -657,13 +702,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Redownload Thumbnails"
+            "value" : "Download All Thumbnails"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サムネイルを再ダウンロード"
+            "value" : "サムネイルをすべてダウンロード"
           }
         }
       }
@@ -1166,6 +1211,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再読み込み"
+          }
+        }
+      }
+    },
+    "Shared.RegenerateThumbnail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regenerate Thumbnail"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルを再生成"
           }
         }
       }

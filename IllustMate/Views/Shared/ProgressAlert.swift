@@ -17,7 +17,7 @@ struct ProgressAlert: View {
             Color.black.opacity(colorScheme == .dark ? 0.5 : 0.2)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack(alignment: .center, spacing: 0.0) {
-                VStack(alignment: .center, spacing: 10.0) {
+                VStack(alignment: .center, spacing: 16.0) {
                     Text(manager.title)
                         .bold()
                     ProgressView(value: min(Float(manager.percentage), 100.0),
@@ -28,6 +28,7 @@ struct ProgressAlert: View {
             }
             .background(.thickMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16.0))
+            .frame(maxWidth: 270.0)
             .padding(.all, 32.0)
         }
         .transition(.opacity)

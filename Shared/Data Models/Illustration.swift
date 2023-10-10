@@ -59,6 +59,22 @@ final class Illustration {
         containingAlbum = nil
     }
 
+    func generateThumbnail() {
+        let illustrationImage = UIImage(contentsOfFile: illustrationPath())
+        if let illustrationImage, let thumbnailData = Illustration
+            .makeThumbnail(illustrationImage.jpegData(compressionQuality: 1.0)) {
+            if defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
+                DispatchQueue.main.async { [self] in
+                    let thumbnail = Thumbnail(data: thumbnailData)
+                    cachedThumbnail = thumbnail
+                }
+            } else {
+                FileManager.default.createFile(atPath: thumbnailPath(),
+                                               contents: thumbnailData)
+            }
+        }
+    }
+
     func prepareForDeletion() {
         try? FileManager.default.removeItem(atPath: illustrationPath())
         try? FileManager.default.removeItem(atPath: thumbnailPath())

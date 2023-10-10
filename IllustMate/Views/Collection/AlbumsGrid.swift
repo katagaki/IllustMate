@@ -27,10 +27,9 @@ struct AlbumsGrid: View {
 #endif
 
     var body: some View {
-        LazyVGrid(
-            columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                    phoneColumnConfiguration : padOrMacColumnConfiguration,
-            spacing: 20.0) {
+        LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
+                  phoneColumnConfiguration : padOrMacColumnConfiguration,
+                  spacing: 20.0) {
             ForEach(albums) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumGridLabel(namespace: namespace,
@@ -41,8 +40,8 @@ struct AlbumsGrid: View {
                         }
                         return true
                     }
-                    .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                 }
+                .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                 .buttonStyle(.plain)
                 .contextMenu {
                     Button("Shared.ResetCover", systemImage: "photo") {

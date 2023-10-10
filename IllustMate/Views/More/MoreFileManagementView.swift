@@ -122,22 +122,9 @@ struct MoreFileManagementView: View {
                 await withDiscardingTaskGroup { group in
                     for illustration in illustrations {
                         group.addTask {
-                            // Generate thumbnail
-                            let illustrationImage = UIImage(contentsOfFile: illustration.illustrationPath())
-                            if let illustrationImage, let thumbnailData = Illustration
-                                .makeThumbnail(illustrationImage.jpegData(compressionQuality: 1.0)) {
-                                if useCoreDataThumbnail {
-                                    DispatchQueue.main.async {
-                                        let thumbnail = Thumbnail(data: thumbnailData)
-                                        illustration.cachedThumbnail = thumbnail
-                                    }
-                                } else {
-                                    FileManager.default.createFile(atPath: illustration.thumbnailPath(),
-                                                                   contents: thumbnailData)
-                                }
-                                DispatchQueue.main.async {
-                                    progressAlertManager.incrementProgress()
-                                }
+                            illustration.generateThumbnail()
+                            DispatchQueue.main.async {
+                                progressAlertManager.incrementProgress()
                             }
                         }
                     }
@@ -164,30 +151,28 @@ struct MoreFileManagementView: View {
             withAnimation(.easeOut.speed(2)) {
                 progressAlertManager.show()
             }
-            Task {
-                for illustration in illustrations {
-                    do {
-                        try FileManager.default.startDownloadingUbiquitousItem(
-                            at: URL(filePath: illustration.thumbnailPath()))
-                        var isDownloaded: Bool = false
-                        while !isDownloaded {
-                            if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
-                                isDownloaded = true
-                            }
+            for illustration in illustrations {
+                do {
+                    try FileManager.default.startDownloadingUbiquitousItem(
+                        at: URL(filePath: illustration.thumbnailPath()))
+                    var isDownloaded: Bool = false
+                    while !isDownloaded {
+                        if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
+                            isDownloaded = true
                         }
-                    } catch {
-                        debugPrint(error.localizedDescription)
                     }
-                    DispatchQueue.main.async {
-                        progressAlertManager.incrementProgress()
-                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
                 }
-                await MainActor.run {
-                    UIApplication.shared.isIdleTimerDisabled = false
+                DispatchQueue.main.async {
+                    progressAlertManager.incrementProgress()
                 }
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.hide()
-                }
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            withAnimation(.easeOut.speed(2)) {
+                progressAlertManager.hide()
+            } completion: {
+                // TODO: Show an alert that the downloads may take some time to complete
             }
         } catch {
             debugPrint(error.localizedDescription)

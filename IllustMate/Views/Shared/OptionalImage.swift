@@ -20,10 +20,6 @@ struct OptionalImage: View {
         } else {
             Rectangle()
                 .foregroundStyle(.primary.opacity(0.1))
-                .overlay {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                }
         }
     }
 }

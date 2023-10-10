@@ -26,6 +26,9 @@ struct IllustrationsGrid<Content: View>: View {
     @State var thumbnails: [String: Data] = [:]
 
     @AppStorage(wrappedValue: false, "DebugUseNewThumbnailCache") var useNewThumbnailCache: Bool
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
+    @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
+                store: defaults) var allowPerImageThumbnailRegeneration: Bool
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #if targetEnvironment(macCatalyst)
@@ -41,10 +44,9 @@ struct IllustrationsGrid<Content: View>: View {
 #endif
 
     var body: some View {
-        LazyVGrid(
-            columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                     phoneColumnConfiguration : padOrMacColumnConfiguration,
-            spacing: UIDevice.current.userInterfaceIdiom == .phone ? 2.0 : padOrMacSpacing) {
+        LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
+                  phoneColumnConfiguration : padOrMacColumnConfiguration,
+                  spacing: UIDevice.current.userInterfaceIdiom == .phone ? 2.0 : padOrMacSpacing) {
             ForEach(illustrations, id: \.id) { illustration in
                 Button {
                     onSelect(illustration)
@@ -69,6 +71,7 @@ struct IllustrationsGrid<Content: View>: View {
                             }
                     }
                 }
+                .id(illustration.id)
                 .contextMenu {
                     if isSelecting {
                         if isSelected(illustration) {
@@ -112,6 +115,12 @@ struct IllustrationsGrid<Content: View>: View {
                         Divider()
                         moveMenu(illustration)
                         Divider()
+                        if allowPerImageThumbnailRegeneration {
+                            Button("Shared.RegenerateThumbnail", systemImage: "arrow.clockwise") {
+                                illustration.generateThumbnail()
+                            }
+                            Divider()
+                        }
                         Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                             onDelete(illustration)
                         }
@@ -133,38 +142,44 @@ struct IllustrationsGrid<Content: View>: View {
         .background(colorScheme == .light ?
                     Color.init(uiColor: .secondarySystemGroupedBackground) :
                         Color.init(uiColor: .systemBackground))
-        .task {
+        .onAppear {
             if useNewThumbnailCache {
-                await loadThumbnails()
+                DispatchQueue.global(qos: .background).async {
+                    loadThumbnails()
+                }
             }
         }
     }
 
-    func loadThumbnails() async {
-        await withDiscardingTaskGroup { group in
-            for illustration in illustrations {
-                group.addTask {
-                    do {
-                        let filePath = illustration.thumbnailPath()
-                        if let imageData = try? Data(contentsOf: URL(filePath: filePath)) {
-                            thumbnails[illustration.id] = imageData
-                        } else {
-                            try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
-                            var isDownloaded: Bool = false
-                            while !isDownloaded {
-                                if FileManager.default.fileExists(atPath: filePath) {
-                                    isDownloaded = true
-                                }
-                            }
-                            if let imageData = try? Data(contentsOf: URL(filePath: filePath)) {
-                                thumbnails[illustration.id] = imageData
+    func loadThumbnails() {
+        var thumbnails: [String: Data] = [:]
+        for illustration in illustrations {
+            do {
+                if useCoreDataThumbnail {
+                    if let thumbnailData = illustration.cachedThumbnail?.data {
+                        thumbnails[illustration.id] = thumbnailData
+                    }
+                } else {
+                    let filePath = illustration.thumbnailPath()
+                    if let imageData = try? Data(contentsOf: URL(filePath: filePath)) {
+                        thumbnails[illustration.id] = imageData
+                    } else {
+                        try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
+                        var isDownloaded: Bool = false
+                        while !isDownloaded {
+                            if FileManager.default.fileExists(atPath: filePath) {
+                                isDownloaded = true
                             }
                         }
-                    } catch {
-                        debugPrint(error.localizedDescription)
+                        if let imageData = try? Data(contentsOf: URL(filePath: filePath)) {
+                            thumbnails[illustration.id] = imageData
+                        }
                     }
                 }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
         }
+        self.thumbnails = thumbnails
     }
 }

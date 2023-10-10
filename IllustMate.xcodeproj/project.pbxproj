@@ -244,8 +244,8 @@
 		E4614D292ACB0FC500D751FB /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				E4614D2F2ACB100B00D751FB /* NavigationManager.swift */,
 				E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */,
+				E4614D2F2ACB100B00D751FB /* NavigationManager.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
