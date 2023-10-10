@@ -10,6 +10,17 @@ import UIKit
 
 extension UIImage {
 
+    func data() -> Data {
+        if let data = pngData() {
+            return data
+        } else if let data = jpegData(compressionQuality: 1.0) {
+            return data
+        } else if let data = heicData() {
+            return data
+        }
+        return Data()
+    }
+
     func jpegThumbnail(of length: Double) -> Data? {
         let shortSideLength = min(self.size.width, self.size.height)
         let xOffset = (self.size.width - shortSideLength) / 2.0

@@ -86,14 +86,15 @@ struct IllustrationViewer: View {
                 }
             }
             Spacer(minLength: 0)
-            if let image = UIImage(contentsOfFile: displayedIllustration.illustrationPath()) {
+            if let image = UIImage(contentsOfFile: displayedIllustration.illustrationPath()),
+               let cgImage = image.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
                         UIPasteboard.general.image = image
                     }
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
-                    ShareLink(item: Image(uiImage: image),
+                    ShareLink(item: Image(cgImage, scale: image.scale, label: Text("")),
                               preview: SharePreview(displayedIllustration.name, image: Image(uiImage: image))) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
