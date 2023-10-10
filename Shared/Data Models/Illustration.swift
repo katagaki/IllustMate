@@ -15,7 +15,7 @@ final class Illustration {
     var id = UUID().uuidString
     var name: String = ""
     @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbum: Album?
-    var cachedThumbnail: Thumbnail?
+    @Relationship(deleteRule: .cascade) var cachedThumbnail: Thumbnail?
     var dateAdded: Date = Date.now
 
     init(name: String, data: Data) {
