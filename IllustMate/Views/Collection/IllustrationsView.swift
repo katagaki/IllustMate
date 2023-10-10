@@ -19,7 +19,6 @@ struct IllustrationsView: View {
            animation: .snappy.speed(2)) var illustrations: [Illustration]
 
     @State var displayedIllustration: Illustration?
-    @State var illustrationDisplayOffset: CGSize = .zero
 
     var body: some View {
         NavigationStack(path: $navigationManager.illustrationsTabPath) {
@@ -52,8 +51,6 @@ struct IllustrationsView: View {
                                    illustration: displayedIllustration) {
                     withAnimation(.snappy.speed(2)) {
                         self.displayedIllustration = nil
-                    } completion: {
-                        illustrationDisplayOffset = .zero
                     }
                 }
             }
