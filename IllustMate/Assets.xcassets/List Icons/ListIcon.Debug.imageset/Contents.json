@@ -13,6 +13,20 @@
       ],
       "filename" : "UI Icons.004.png",
       "idiom" : "universal"
+    },
+    {
+      "filename" : "NS Icons.002.png",
+      "idiom" : "mac"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "NS Icons.003.png",
+      "idiom" : "mac"
     }
   ],
   "info" : {
