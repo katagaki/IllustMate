@@ -17,6 +17,8 @@ struct MoreFileManagementView: View {
 
     @Binding var progressAlertManager: ProgressAlertManager
 
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
+
     var body: some View {
         List {
             Section {
@@ -116,6 +118,7 @@ struct MoreFileManagementView: View {
             try FileManager.default.createDirectory(at: thumbnailsFolder,
                                                     withIntermediateDirectories: false)
             Task {
+                let useCoreDataThumbnail = useCoreDataThumbnail
                 await withDiscardingTaskGroup { group in
                     for illustration in illustrations {
                         group.addTask {
@@ -123,11 +126,16 @@ struct MoreFileManagementView: View {
                             let illustrationImage = UIImage(contentsOfFile: illustration.illustrationPath())
                             if let illustrationImage, let thumbnailData = Illustration
                                 .makeThumbnail(illustrationImage.jpegData(compressionQuality: 1.0)) {
-                                FileManager.default.createFile(atPath: illustration.thumbnailPath(),
-                                                               contents: thumbnailData)
-                            }
-                            DispatchQueue.main.async {
-                                progressAlertManager.incrementProgress()
+                                if useCoreDataThumbnail {
+                                    let thumbnail = Thumbnail(data: thumbnailData)
+                                    illustration.cachedThumbnail = thumbnail
+                                } else {
+                                    FileManager.default.createFile(atPath: illustration.thumbnailPath(),
+                                                                   contents: thumbnailData)
+                                }
+                                DispatchQueue.main.async {
+                                    progressAlertManager.incrementProgress()
+                                }
                             }
                         }
                     }

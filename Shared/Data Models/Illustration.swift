@@ -15,15 +15,13 @@ final class Illustration {
     var id = UUID().uuidString
     var name: String = ""
     @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbum: Album?
+    var cachedThumbnail: Thumbnail?
     var dateAdded: Date = Date.now
 
     init(name: String, data: Data) {
         self.name = name
         self.dateAdded = .now
         FileManager.default.createFile(atPath: illustrationPath(), contents: data)
-        if let thumbnailData = Illustration.makeThumbnail(data) {
-            FileManager.default.createFile(atPath: thumbnailPath(), contents: thumbnailData)
-        }
     }
 
     func illustrationPath() -> String {
@@ -32,6 +30,10 @@ final class Illustration {
 
     func illustrationPathWhenUbiquitousFileNotDownloaded() -> String {
         return illustrationsFolder.appendingPathComponent(".\(id).icloud").path(percentEncoded: false)
+    }
+
+    func thumbnail() -> UIImage? {
+        return cachedThumbnail?.image()
     }
 
     func thumbnailPath() -> String {

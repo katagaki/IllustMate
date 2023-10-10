@@ -566,19 +566,36 @@
         }
       }
     },
+    "More.Debug.UseCoreDataThumbnail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Store Thumbnails as Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルをデータとして保存"
+          }
+        }
+      }
+    },
     "More.Debug.UseNewThumbnailCache" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use New Thumbnail Cache"
+            "value" : "Load Thumbnails on Grid"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新しいサムネイルキャッシュを有効"
+            "value" : "グリッドでサムネイルを読み込む"
           }
         }
       }

@@ -198,6 +198,17 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if let selectedAlbum {
             illustration.containingAlbum = selectedAlbum
         }
+        if UserDefaults.standard.bool(forKey: "DebugUseCoreDataThumbnail") {
+            if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
+                let thumbnail = Thumbnail(data: thumbnailData)
+                illustration.cachedThumbnail = thumbnail
+            }
+        } else {
+            if let thumbnailData = Illustration.makeThumbnail(data) {
+                FileManager.default.createFile(atPath: illustration.thumbnailPath(),
+                                               contents: thumbnailData)
+            }
+        }
         modelContext.insert(illustration)
     }
 }

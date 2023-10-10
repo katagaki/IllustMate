@@ -26,6 +26,7 @@ struct ImportView: View {
     @State var importCompletedCount: Int = 0
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager.importerTabPath) {
@@ -97,6 +98,17 @@ struct ImportView: View {
                         data: data)
                     if let selectedAlbum, albums.contains(selectedAlbum) {
                         selectedAlbum.addChildIllustration(illustration)
+                    }
+                    if useCoreDataThumbnail {
+                        if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
+                            let thumbnail = Thumbnail(data: thumbnailData)
+                            illustration.cachedThumbnail = thumbnail
+                        }
+                    } else {
+                        if let thumbnailData = Illustration.makeThumbnail(data) {
+                            FileManager.default.createFile(atPath: illustration.thumbnailPath(),
+                                                           contents: thumbnailData)
+                        }
                     }
                     modelContext.insert(illustration)
                     runningNumberForImageName += 1

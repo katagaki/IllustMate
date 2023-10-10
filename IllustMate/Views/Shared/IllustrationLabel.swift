@@ -16,42 +16,60 @@ struct IllustrationLabel: View {
     @State var state: CloudImageState = .notReadyForDisplay
     @State var thumbnailImage: UIImage?
 
+    @AppStorage(wrappedValue: false, "DebugUseCoreDataThumbnail") var useCoreDataThumbnail: Bool
+
     var body: some View {
         ZStack(alignment: .center) {
-            if state == .readyForDisplay {
-                if let thumbnailImage {
-                    Image(uiImage: thumbnailImage)
+            if useCoreDataThumbnail {
+                if let thumbnail = illustration.thumbnail() {
+                    Image(uiImage: thumbnail)
                         .resizable()
                         .transition(.opacity.animation(.snappy.speed(2)))
-                    // IMPORTANT: Do NOT move this transition to after matchedGeometryEffect, as it
-                    // will cause CATASTROPHIC freezes!
                 } else {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.1))
                         .overlay {
-                            Image(systemName: "xmark.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24.0, height: 24.0)
-                                .foregroundStyle(.primary)
-                                .symbolRenderingMode(.multicolor)
+                            ProgressView()
+                                .progressViewStyle(.circular)
                         }
                 }
             } else {
-                Rectangle()
-                    .foregroundStyle(.primary.opacity(0.1))
-                    .overlay {
-                        ProgressView()
-                            .progressViewStyle(.circular)
+                if state == .readyForDisplay {
+                    if let thumbnailImage {
+                        Image(uiImage: thumbnailImage)
+                            .resizable()
+                            .transition(.opacity.animation(.snappy.speed(2)))
+                        // IMPORTANT: Do NOT move this transition to after matchedGeometryEffect, as it
+                        // will cause CATASTROPHIC freezes!
+                    } else {
+                        Rectangle()
+                            .foregroundStyle(.primary.opacity(0.1))
+                            .overlay {
+                                Image(systemName: "xmark.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24.0, height: 24.0)
+                                    .foregroundStyle(.primary)
+                                    .symbolRenderingMode(.multicolor)
+                            }
                     }
+                } else {
+                    Rectangle()
+                        .foregroundStyle(.primary.opacity(0.1))
+                        .overlay {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        }
+                }
             }
         }
         .matchedGeometryEffect(id: illustration.id, in: namespace)
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
         .task {
-            switch state {
-            case .notReadyForDisplay:
+            if !useCoreDataThumbnail {
+                switch state {
+                case .notReadyForDisplay:
 #if !targetEnvironment(macCatalyst)
                     // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
                     DispatchQueue.global(qos: .userInteractive).async {
@@ -96,13 +114,16 @@ struct IllustrationLabel: View {
                         }
                     }
 #endif
-            case .hidden:
-                state = .readyForDisplay
-            default: break
+                case .hidden:
+                    state = .readyForDisplay
+                default: break
+                }
             }
         }
         .onDisappear {
-            state = .hidden
+            if !useCoreDataThumbnail {
+                state = .hidden
+            }
         }
         .draggable(IllustrationTransferable(id: illustration.id)) {
             if let thumbnailImage {
