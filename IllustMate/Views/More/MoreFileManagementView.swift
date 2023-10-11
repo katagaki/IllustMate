@@ -131,8 +131,10 @@ struct MoreFileManagementView: View {
                     modelContext.autosaveEnabled = false
                     DispatchQueue.global(qos: .background).async {
                         illustrations.forEach { illustration in
-                            illustration.generateThumbnail()
-                            progressAlertManager.incrementProgress()
+                            autoreleasepool {
+                                illustration.generateThumbnail()
+                                progressAlertManager.incrementProgress()
+                            }
                         }
                         DispatchQueue.main.async {
                             try? modelContext.save()
