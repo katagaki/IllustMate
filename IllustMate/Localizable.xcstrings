@@ -690,6 +690,38 @@
         }
       }
     },
+    "More.DataManagement.UnorphanThumbnails" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Orphaned Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したサムネイルを削除"
+          }
+        }
+      }
+    },
+    "More.DataManagement.UnorphanThumbnails.Unorphaning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removing orphaned thumbnails..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したサムネイルを削除中…"
+          }
+        }
+      }
+    },
     "More.Debug" : {
       "extractionState" : "manual",
       "localizations" : {

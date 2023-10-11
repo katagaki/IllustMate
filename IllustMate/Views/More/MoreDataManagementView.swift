@@ -50,6 +50,9 @@ struct MoreDataManagementView: View {
                 Button("More.DataManagement.RebuildThumbnails.MissingOnly") {
                     rebuildMissingThumbnails()
                 }
+                Button("More.DataManagement.UnorphanThumbnails", role: .destructive) {
+                    removeOrphanedThumbnails()
+                }
             }
         }
         .navigationTitle("ViewTitle.DataManagement")
@@ -136,6 +139,35 @@ struct MoreDataManagementView: View {
                 modelContext.autosaveEnabled = true
                 UIApplication.shared.isIdleTimerDisabled = false
             }
+        }
+    }
+
+    func removeOrphanedThumbnails() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let thumbnails = try modelContext.fetch(FetchDescriptor<Thumbnail>(
+                predicate: #Predicate { $0.illustration == nil }
+            ))
+            progressAlertManager.prepare("More.DataManagement.UnorphanThumbnails.Unorphaning",
+                                         total: illustrations.count)
+            withAnimation(.easeOut.speed(2)) {
+                progressAlertManager.show()
+            } completion: {
+                thumbnails.forEach { thumbnail in
+                    modelContext.delete(thumbnail)
+                    progressAlertManager.incrementProgress()
+                }
+                try? modelContext.save()
+                modelContext.autosaveEnabled = true
+                UIApplication.shared.isIdleTimerDisabled = false
+                withAnimation(.easeOut.speed(2)) {
+                    progressAlertManager.hide()
+                }
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+            modelContext.autosaveEnabled = true
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 }
