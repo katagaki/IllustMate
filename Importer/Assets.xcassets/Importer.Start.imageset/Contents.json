@@ -1,0 +1,16 @@
+{
+  "images" : [
+    {
+      "filename" : "UI Images.003.png",
+      "idiom" : "universal"
+    },
+    {
+      "filename" : "UI Images.001.png",
+      "idiom" : "mac"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

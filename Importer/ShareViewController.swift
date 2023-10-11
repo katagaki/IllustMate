@@ -45,14 +45,8 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Configure UIKit stuff
-        importButton.layer.cornerRadius = importButton.frame.height / 2
-        importButton.layer.masksToBounds = true
         albumsTable.delegate = self
         albumsTable.dataSource = self
-
-        // Load albums
         do {
             var fetchDescriptor = FetchDescriptor<Album>(sortBy: [SortDescriptor(\.name)])
             fetchDescriptor.propertiesToFetch = [\.name]
@@ -111,6 +105,11 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
             }
         default:
             configuration.text = albums[indexPath.row - 1].name
+            if let data = albums[indexPath.row - 1].cover().jpegThumbnail(of: 96.0) {
+                configuration.image = UIImage(data: data)
+            }
+            configuration.imageProperties.maximumSize = CGSize(width: 32.0, height: 32.0)
+            configuration.imageProperties.cornerRadius = 4.0
             if let selectedAlbum, selectedAlbum.id == albums[indexPath.row - 1].id {
                 cell.accessoryType = .checkmark
             } else {
@@ -130,9 +129,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
 
     func importItems() {
-        // Clear memory used by albums array
         albums.removeAll()
-        // Start import
         if let item = extensionContext?.inputItems.first as? NSExtensionItem {
             let attachments = item.attachments ?? []
             total = attachments.count
@@ -156,13 +153,13 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
                 if failedItemCount == 0 {
                     progressLabel.text = String(localized: "Importer.DoneText")
-                    heroImage.image = UIImage(systemName: "checkmark.circle.fill")
+                    heroImage.image = UIImage(named: "Importer.Done")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
                         extensionContext!.completeRequest(returningItems: nil, completionHandler: nil)
                     }
                 } else {
                     progressLabel.text = String(localized: "Importer.DoneText.WithError.\(failedItemCount)")
-                    heroImage.image = UIImage(systemName: "exclamationmark.circle.fill")
+                    heroImage.image = UIImage(named: "Importer.Error")
                 }
             }
         }
