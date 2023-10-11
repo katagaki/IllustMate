@@ -81,7 +81,7 @@ struct MoreView: View {
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreFileManagement) {
-                        ListRow(image: "ListIcon.FileManagement", title: "More.Files")
+                        ListRow(image: "ListIcon.DataManagement", title: "More.DataManagement")
                     }
                 }
                 Section {

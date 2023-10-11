@@ -45,46 +45,53 @@ struct MoreFileManagementView: View {
                 }
             }
             Section {
-                Button("More.Files.ScanForOrphans") {
+                Button("More.DataManagement.ScanForOrphans") {
                     scanForOrphans()
                 }
-                Button("More.Files.ViewOrphans") {
-                    let orphanFiles = try? FileManager.default.contentsOfDirectory(
-                        atPath: orphansFolder.path(percentEncoded: false))
-                    if let orphanFiles {
-                        var orphans: [String] = []
-                        for orphanFile in orphanFiles {
-                            var orphanFileName = URL(filePath: orphanFile).lastPathComponent
-                            if orphanFileName != ".DS_Store" {
-                                if orphanFileName.starts(with: ".") {
-                                    orphanFileName = orphanFileName.trimmingCharacters(in: .init(charactersIn: "."))
-                                }
-                                if orphanFileName.hasSuffix(".icloud") {
-                                    orphanFileName = String(orphanFileName.prefix(36))
-                                }
-                                orphans.append(orphanFileName)
-                            }
-                        }
-                        navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
-                    }
+                Button("More.DataManagement.ViewOrphans") {
+                    showOrphans()
                 }
             }
             Section {
-                Button("More.Files.RebuildThumbnails") {
+                Button("More.DataManagement.RebuildThumbnails") {
                     rebuildThumbnails()
                 }
-                Button("More.Files.RedownloadThumbnails") {
-                    redownloadThumbnails()
+                Button("More.DataManagement.RebuildThumbnails.MissingOnly") {
+                    rebuildMissingThumbnails()
                 }
             }
             Section {
-                Button("More.Files.RedownloadIllustrations") {
+                Button("More.DataManagement.RedownloadThumbnails") {
+                    redownloadThumbnails()
+                }
+                Button("More.DataManagement.RedownloadIllustrations") {
                     redownloadIllustrations()
                 }
             }
         }
-        .navigationTitle("ViewTitle.Files")
+        .navigationTitle("ViewTitle.DataManagement")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    func showOrphans() {
+        let orphanFiles = try? FileManager.default.contentsOfDirectory(
+            atPath: orphansFolder.path(percentEncoded: false))
+        if let orphanFiles {
+            var orphans: [String] = []
+            for orphanFile in orphanFiles {
+                var orphanFileName = URL(filePath: orphanFile).lastPathComponent
+                if orphanFileName != ".DS_Store" {
+                    if orphanFileName.starts(with: ".") {
+                        orphanFileName = orphanFileName.trimmingCharacters(in: .init(charactersIn: "."))
+                    }
+                    if orphanFileName.hasSuffix(".icloud") {
+                        orphanFileName = String(orphanFileName.prefix(36))
+                    }
+                    orphans.append(orphanFileName)
+                }
+            }
+            navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
+        }
     }
 
     func scanForOrphans() {
@@ -94,14 +101,14 @@ struct MoreFileManagementView: View {
                 var fetchDescriptor = FetchDescriptor<Illustration>()
                 fetchDescriptor.propertiesToFetch = [\.id]
                 let illustrations = try modelContext.fetch(fetchDescriptor)
-                progressAlertManager.prepare("More.Files.ScanForOrphans.Scanning")
+                progressAlertManager.prepare("More.DataManagement.ScanForOrphans.Scanning")
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()
                 }
                 let filesToCheck = try FileManager.default
                     .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
                 orphans.removeAll()
-                progressAlertManager.prepare("More.Files.ScanForOrphans.Scanning",
+                progressAlertManager.prepare("More.DataManagement.ScanForOrphans.Scanning",
                                              total: filesToCheck.count)
                 for file in filesToCheck {
                     if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
@@ -109,7 +116,7 @@ struct MoreFileManagementView: View {
                     }
                     progressAlertManager.incrementProgress()
                 }
-                progressAlertManager.prepare("More.Files.ScanForOrphans.Moving", total: orphans.count)
+                progressAlertManager.prepare("More.DataManagement.ScanForOrphans.Moving", total: orphans.count)
                 orphans.forEach { orphan in
                     try? FileManager.default.moveItem(
                         at: illustrationsFolder.appendingPathComponent(orphan),
@@ -138,11 +145,12 @@ struct MoreFileManagementView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.Files.RebuildThumbnails.Rebuilding",
+                progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
                                              total: illustrations.count)
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()
                 } completion: {
+                    modelContext.autosaveEnabled = false
                     if useCoreDataThumbnail {
                         try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
                     } else {
@@ -151,11 +159,49 @@ struct MoreFileManagementView: View {
                         try? FileManager.default.createDirectory(at: thumbnailsFolder,
                                                                  withIntermediateDirectories: false)
                     }
+                    DispatchQueue.global(qos: .background).async {
+                        illustrations.forEach { illustration in
+                            autoreleasepool {
+                                illustration.generateThumbnail()
+                                try? modelContext.save()
+                                progressAlertManager.incrementProgress()
+                            }
+                        }
+                        DispatchQueue.main.async {
+                            modelContext.autosaveEnabled = true
+                            UIApplication.shared.isIdleTimerDisabled = false
+                            withAnimation(.easeOut.speed(2)) {
+                                progressAlertManager.hide()
+                            }
+                        }
+                    }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+                modelContext.autosaveEnabled = true
+                UIApplication.shared.isIdleTimerDisabled = false
+            }
+        }
+    }
+
+    func rebuildMissingThumbnails() {
+        UIApplication.shared.isIdleTimerDisabled = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
+                    predicate: #Predicate { $0.cachedThumbnail == nil }
+                ))
+                progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
+                                             total: illustrations.count)
+                withAnimation(.easeOut.speed(2)) {
+                    progressAlertManager.show()
+                } completion: {
                     modelContext.autosaveEnabled = false
                     DispatchQueue.global(qos: .background).async {
                         illustrations.forEach { illustration in
                             autoreleasepool {
                                 illustration.generateThumbnail()
+                                try? modelContext.save()
                                 progressAlertManager.incrementProgress()
                             }
                         }
@@ -171,6 +217,7 @@ struct MoreFileManagementView: View {
                 }
             } catch {
                 debugPrint(error.localizedDescription)
+                modelContext.autosaveEnabled = true
                 UIApplication.shared.isIdleTimerDisabled = false
             }
         }
@@ -181,7 +228,7 @@ struct MoreFileManagementView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.Files.RedownloadThumbnails.Redownloading",
+                progressAlertManager.prepare("More.DataManagement.RedownloadThumbnails.Redownloading",
                                              total: illustrations.count)
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()
@@ -221,7 +268,7 @@ struct MoreFileManagementView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.Files.RedownloadIllustrations.Redownloading",
+                progressAlertManager.prepare("More.DataManagement.RedownloadIllustrations.Redownloading",
                                              total: illustrations.count)
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()

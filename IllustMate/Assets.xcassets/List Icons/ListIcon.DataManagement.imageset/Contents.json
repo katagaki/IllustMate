@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "UI Icons.005.png",
+      "filename" : "UI Icons.015.png",
       "idiom" : "universal"
     },
     {
@@ -11,11 +11,11 @@
           "value" : "dark"
         }
       ],
-      "filename" : "UI Icons.006.png",
+      "filename" : "UI Icons.016.png",
       "idiom" : "universal"
     },
     {
-      "filename" : "NS Icons.004.png",
+      "filename" : "NS Icons.006.png",
       "idiom" : "mac"
     },
     {
@@ -25,7 +25,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "NS Icons.005.png",
+      "filename" : "NS Icons.007.png",
       "idiom" : "mac"
     }
   ],
