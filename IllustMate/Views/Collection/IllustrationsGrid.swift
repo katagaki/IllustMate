@@ -149,7 +149,7 @@ struct IllustrationsGrid<Content: View>: View {
                         Color.init(uiColor: .systemBackground))
         .onAppear {
             if useNewThumbnailCache {
-                DispatchQueue.global(qos: .background).async {
+                Task.detached(priority: .high) {
                     loadThumbnails()
                 }
             }

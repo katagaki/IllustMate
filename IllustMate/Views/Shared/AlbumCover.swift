@@ -30,7 +30,7 @@ struct AlbumCover: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)
         .task {
-            DispatchQueue.global(qos: .userInteractive).async {
+            Task.detached(priority: .high) {
                 if let data, let coverPhoto = UIImage(data: data) {
                     image = coverPhoto
                 }
