@@ -20,18 +20,18 @@ struct MoreFileManagementView: View {
     var body: some View {
         List {
             Section {
-                Button("More.DataManagement.ScanForOrphans") {
+                Button("More.FileManagement.ScanForOrphans") {
                     scanForOrphans()
                 }
-                Button("More.DataManagement.ViewOrphans") {
+                Button("More.FileManagement.ViewOrphans") {
                     showOrphans()
                 }
             }
             Section {
-                Button("More.DataManagement.RedownloadThumbnails") {
+                Button("More.FileManagement.RedownloadThumbnails") {
                     redownloadThumbnails()
                 }
-                Button("More.DataManagement.RedownloadIllustrations") {
+                Button("More.FileManagement.RedownloadIllustrations") {
                     redownloadIllustrations()
                 }
             }
@@ -68,14 +68,14 @@ struct MoreFileManagementView: View {
                 var fetchDescriptor = FetchDescriptor<Illustration>()
                 fetchDescriptor.propertiesToFetch = [\.id]
                 let illustrations = try modelContext.fetch(fetchDescriptor)
-                progressAlertManager.prepare("More.DataManagement.ScanForOrphans.Scanning")
+                progressAlertManager.prepare("More.FileManagement.ScanForOrphans.Scanning")
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()
                 }
                 let filesToCheck = try FileManager.default
                     .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
                 orphans.removeAll()
-                progressAlertManager.prepare("More.DataManagement.ScanForOrphans.Scanning",
+                progressAlertManager.prepare("More.FileManagement.ScanForOrphans.Scanning",
                                              total: filesToCheck.count)
                 for file in filesToCheck {
                     if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
@@ -83,7 +83,7 @@ struct MoreFileManagementView: View {
                     }
                     progressAlertManager.incrementProgress()
                 }
-                progressAlertManager.prepare("More.DataManagement.ScanForOrphans.Moving", total: orphans.count)
+                progressAlertManager.prepare("More.FileManagement.ScanForOrphans.Moving", total: orphans.count)
                 orphans.forEach { orphan in
                     try? FileManager.default.moveItem(
                         at: illustrationsFolder.appendingPathComponent(orphan),
@@ -112,7 +112,7 @@ struct MoreFileManagementView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.DataManagement.RedownloadThumbnails.Redownloading",
+                progressAlertManager.prepare("More.FileManagement.RedownloadThumbnails.Redownloading",
                                              total: illustrations.count)
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()
@@ -152,7 +152,7 @@ struct MoreFileManagementView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.DataManagement.RedownloadIllustrations.Redownloading",
+                progressAlertManager.prepare("More.FileManagement.RedownloadIllustrations.Redownloading",
                                              total: illustrations.count)
                 withAnimation(.easeOut.speed(2)) {
                     progressAlertManager.show()

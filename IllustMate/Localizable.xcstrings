@@ -690,142 +690,6 @@
         }
       }
     },
-    "More.DataManagement.RedownloadIllustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download All Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての画像をダウンロード"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RedownloadIllustrations.Redownloading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sending picture download requests..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像のダウンロード要求を送信中…"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RedownloadThumbnails" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download All Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのサムネイルをダウンロード"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RedownloadThumbnails.Redownloading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sending thumbnail download request..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルのダウンロード要求を送信中…"
-          }
-        }
-      }
-    },
-    "More.DataManagement.ScanForOrphans" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan for Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認"
-          }
-        }
-      }
-    },
-    "More.DataManagement.ScanForOrphans.Moving" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moving orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを移動中…"
-          }
-        }
-      }
-    },
-    "More.DataManagement.ScanForOrphans.Scanning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認中…"
-          }
-        }
-      }
-    },
-    "More.DataManagement.ViewOrphans" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを見る"
-          }
-        }
-      }
-    },
     "More.Debug" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -888,6 +752,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイル管理"
+          }
+        }
+      }
+    },
+    "More.FileManagement.RedownloadIllustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download All Pictures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての画像をダウンロード"
+          }
+        }
+      }
+    },
+    "More.FileManagement.RedownloadIllustrations.Redownloading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending picture download requests..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像のダウンロード要求を送信中…"
+          }
+        }
+      }
+    },
+    "More.FileManagement.RedownloadThumbnails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download All Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのサムネイルをダウンロード"
+          }
+        }
+      }
+    },
+    "More.FileManagement.RedownloadThumbnails.Redownloading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending thumbnail download request..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルのダウンロード要求を送信中…"
+          }
+        }
+      }
+    },
+    "More.FileManagement.ScanForOrphans" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan for Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認"
+          }
+        }
+      }
+    },
+    "More.FileManagement.ScanForOrphans.Moving" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを移動中…"
+          }
+        }
+      }
+    },
+    "More.FileManagement.ScanForOrphans.Scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認中…"
+          }
+        }
+      }
+    },
+    "More.FileManagement.ViewOrphans" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを見る"
           }
         }
       }

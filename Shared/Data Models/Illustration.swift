@@ -62,7 +62,8 @@ final class Illustration {
     func generateThumbnail() {
         if let data = try? Data(contentsOf: URL(filePath: illustrationPath())),
             let thumbnailData = Illustration.makeThumbnail(data) {
-            if defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
+            if defaults.object(forKey: "DebugUseCoreDataThumbnail") == nil ||
+                defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
                 let thumbnail = Thumbnail(data: thumbnailData)
                 cachedThumbnail = thumbnail
             } else {
