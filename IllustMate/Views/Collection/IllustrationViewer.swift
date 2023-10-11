@@ -106,40 +106,33 @@ struct IllustrationViewer: View {
         }
         .padding(20.0)
         .background(.regularMaterial.opacity(opacityDuringGesture()))
-        .onAppear {
-#if !targetEnvironment(macCatalyst)
-            do {
-                if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
-                   let image = UIImage(data: data) {
-                    displayedImage = image
-                    isFileFromCloudReadyForDisplay = true
-                } else {
-                    try FileManager.default.startDownloadingUbiquitousItem(
-                        at: URL(filePath: illustration.illustrationPath()))
-                    var isDownloaded: Bool = false
-                    while !isDownloaded {
-                        if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
-                            isDownloaded = true
-                        }
-                    }
-                    let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath()))
-                    if let data, let image = UIImage(data: data) {
+        .task {
+            Task.detached(priority: .high) {
+                do {
+                    if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
+                       let image = UIImage(data: data) {
                         displayedImage = image
+                        isFileFromCloudReadyForDisplay = true
+                    } else {
+                        try FileManager.default.startDownloadingUbiquitousItem(
+                            at: URL(filePath: illustration.illustrationPath()))
+                        var isDownloaded: Bool = false
+                        while !isDownloaded {
+                            if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
+                                isDownloaded = true
+                            }
+                        }
+                        let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath()))
+                        if let data, let image = UIImage(data: data) {
+                            displayedImage = image
+                        }
+                        isFileFromCloudReadyForDisplay = true
                     }
+                } catch {
+                    debugPrint(error.localizedDescription)
                     isFileFromCloudReadyForDisplay = true
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
-                isFileFromCloudReadyForDisplay = true
             }
-#else
-            if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())) {
-                displayedImage = UIImage(data: data)
-            }
-            DispatchQueue.main.async {
-                isFileFromCloudReadyForDisplay = true
-            }
-#endif
         }
         .gesture(
             DragGesture()

@@ -52,10 +52,7 @@ struct ImportView: View {
                                 .tag(album as Album?)
                         }
                     } label: {
-                        HStack(alignment: .center, spacing: 8.0) {
-                            Text("Import.Album")
-                            Spacer(minLength: 0)
-                        }
+                        Text("Import.Album")
                     }
                     .pickerStyle(.navigationLink)
                 } header: {
@@ -68,8 +65,7 @@ struct ImportView: View {
                                                      total: selectedPhotoItems.count)
                         withAnimation(.easeOut.speed(2)) {
                             progressAlertManager.show()
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        } completion: {
                             importPhotos()
                         }
                     }
@@ -89,16 +85,19 @@ struct ImportView: View {
     }
 
     func importPhotos() {
-        Task {
-            UIApplication.shared.isIdleTimerDisabled = true
+        modelContext.autosaveEnabled = false
+        UIApplication.shared.isIdleTimerDisabled = true
+        let useCoreDataThumbnail = useCoreDataThumbnail
+        let selectedPhotoItems = selectedPhotoItems
+        let selectedAlbum = selectedAlbum
+        Task.detached(priority: .high) {
+            var illustrationsToAdd: [Illustration] = []
+            var runningNumberForImageName = await runningNumberForImageName
             for selectedPhotoItem in selectedPhotoItems {
                 if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                     let illustration = Illustration(
                         name: "PIC_\(String(format: "%04d", runningNumberForImageName))",
                         data: data)
-                    if let selectedAlbum, albums.contains(selectedAlbum) {
-                        selectedAlbum.addChildIllustration(illustration)
-                    }
                     if useCoreDataThumbnail {
                         if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
                             let thumbnail = Thumbnail(data: thumbnailData)
@@ -110,18 +109,28 @@ struct ImportView: View {
                                                            contents: thumbnailData)
                         }
                     }
-                    modelContext.insert(illustration)
+                    illustrationsToAdd.append(illustration)
                     runningNumberForImageName += 1
                 }
-                progressAlertManager.incrementProgress()
+                await progressAlertManager.incrementProgress()
             }
-            UIApplication.shared.isIdleTimerDisabled = false
-            importCompletedCount = selectedPhotoItems.count
-            withAnimation(.easeOut.speed(2)) {
-                selectedPhotoItems.removeAll()
-                progressAlertManager.hide()
-            } completion: {
-                isImportCompleted = true
+            await MainActor.run { [illustrationsToAdd] in
+                illustrationsToAdd.forEach { illustration in
+                    modelContext.insert(illustration)
+                }
+                if let selectedAlbum, albums.contains(selectedAlbum) {
+                    selectedAlbum.addChildIllustrations(illustrationsToAdd)
+                }
+                self.runningNumberForImageName += selectedPhotoItems.count
+                modelContext.autosaveEnabled = true
+                UIApplication.shared.isIdleTimerDisabled = false
+                importCompletedCount = selectedPhotoItems.count
+                withAnimation(.easeOut.speed(2)) {
+                    self.selectedPhotoItems.removeAll()
+                    progressAlertManager.hide()
+                } completion: {
+                    isImportCompleted = true
+                }
             }
         }
     }

@@ -34,7 +34,7 @@ struct IllustrationLabel: View {
         }
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(Rectangle())
-        .onAppear {
+        .task {
             if useCoreDataThumbnail {
                 switch state {
                 case .notReadyForDisplay:
@@ -43,16 +43,12 @@ struct IllustrationLabel: View {
                         thumbnailImage = image
                     }
                     state = .readyForDisplay
-                case .hidden:
-                    state = .readyForDisplay
                 default: break
                 }
             } else {
                 switch state {
                 case .notReadyForDisplay:
-#if !targetEnvironment(macCatalyst)
-                    // On iOS, we can use .FILENAME.icloud format to check whether a file is downloaded
-                    DispatchQueue.global(qos: .userInteractive).async {
+                    Task.detached(priority: .high) {
                         do {
                             state = .downloading
                             if let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())),
@@ -81,24 +77,19 @@ struct IllustrationLabel: View {
                             state = .readyForDisplay
                         }
                     }
-#else
-                    // On macOS, such a file doesn't exist,
-                    // so we can't do anything about it other than to try to push it to another thread
-                    DispatchQueue.global(qos: .userInteractive).async {
-                        if let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())) {
-                            thumbnailImage = UIImage(data: data)
-                        }
-                        state = .readyForDisplay
-                    }
-#endif
-                case .hidden:
-                    state = .readyForDisplay
                 default: break
                 }
             }
         }
+        .onAppear {
+            if state == .hidden {
+                state = .readyForDisplay
+            }
+        }
         .onDisappear {
-            state = .hidden
+            if state == .readyForDisplay {
+                state = .hidden
+            }
         }
         .draggable(IllustrationTransferable(id: illustration.id)) {
             if let thumbnailImage {
