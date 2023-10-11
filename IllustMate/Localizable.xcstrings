@@ -875,6 +875,23 @@
         }
       }
     },
+    "More.FileManagement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル管理"
+          }
+        }
+      }
+    },
     "More.Sync" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1641,6 +1658,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ラボ"
+          }
+        }
+      }
+    },
+    "ViewTitle.FileManagement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル管理"
           }
         }
       }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E43DFB222AD685E0002A6317 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E43DFB212AD685E0002A6317 /* Assets.xcassets */; };
+		E43DFB252AD69D95002A6317 /* MoreFileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */; };
 		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
 		E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */; };
 		E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
@@ -66,7 +67,7 @@
 		E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */; };
 		E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */; };
 		E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */; };
-		E4E8923F2AD3DF6F005C9DBD /* MoreFileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */; };
+		E4E8923F2AD3DF6F005C9DBD /* MoreDataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923E2AD3DF6F005C9DBD /* MoreDataManagementView.swift */; };
 		E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892422AD45DD6005C9DBD /* OptionalImage.swift */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +97,7 @@
 
 /* Begin PBXFileReference section */
 		E43DFB212AD685E0002A6317 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreFileManagementView.swift; sourceTree = "<group>"; };
 		E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
 		E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRow.swift; sourceTree = "<group>"; };
 		E45A8BCB2AD0332000E3035E /* CollectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionHeader.swift; sourceTree = "<group>"; };
@@ -151,7 +153,7 @@
 		E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
 		E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOrphansView.swift; sourceTree = "<group>"; };
 		E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTroubleshootingView.swift; sourceTree = "<group>"; };
-		E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreFileManagementView.swift; sourceTree = "<group>"; };
+		E4E8923E2AD3DF6F005C9DBD /* MoreDataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDataManagementView.swift; sourceTree = "<group>"; };
 		E4E892422AD45DD6005C9DBD /* OptionalImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -343,7 +345,8 @@
 			isa = PBXGroup;
 			children = (
 				E4614D232ACB048000D751FB /* MoreView.swift */,
-				E4E8923E2AD3DF6F005C9DBD /* MoreFileManagementView.swift */,
+				E4E8923E2AD3DF6F005C9DBD /* MoreDataManagementView.swift */,
+				E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */,
 				E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */,
 				E4E892312AD2F3C3005C9DBD /* MoreExperimentsView.swift */,
 				E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */,
@@ -491,7 +494,7 @@
 				E45A8BD02AD0389600E3035E /* AlbumGridLabel.swift in Sources */,
 				E4614D242ACB048000D751FB /* MoreView.swift in Sources */,
 				E4E892352AD31058005C9DBD /* IllustrationMoveMenu.swift in Sources */,
-				E4E8923F2AD3DF6F005C9DBD /* MoreFileManagementView.swift in Sources */,
+				E4E8923F2AD3DF6F005C9DBD /* MoreDataManagementView.swift in Sources */,
 				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
 				E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */,
@@ -514,6 +517,7 @@
 				E4CA0B8E2ACD17190063F06C /* FileManager.swift in Sources */,
 				E4E892322AD2F3C3005C9DBD /* MoreExperimentsView.swift in Sources */,
 				E45A8BCC2AD0332000E3035E /* CollectionHeader.swift in Sources */,
+				E43DFB252AD69D95002A6317 /* MoreFileManagementView.swift in Sources */,
 				E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */,
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
 				E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */,

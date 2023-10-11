@@ -80,8 +80,11 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    NavigationLink(value: ViewPath.moreFileManagement) {
+                    NavigationLink(value: ViewPath.moreDataManagement) {
                         ListRow(image: "ListIcon.DataManagement", title: "More.DataManagement")
+                    }
+                    NavigationLink(value: ViewPath.moreFileManagement) {
+                        ListRow(image: "ListIcon.FileManagement", title: "More.FileManagement")
                     }
                 }
                 Section {
@@ -95,6 +98,8 @@ struct MoreView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
+                case .moreDataManagement:
+                    MoreDataManagementView(progressAlertManager: $progressAlertManager)
                 case .moreFileManagement:
                     MoreFileManagementView(progressAlertManager: $progressAlertManager)
                 case .moreDebug:
