@@ -48,7 +48,7 @@ struct IllustrationLabel: View {
             } else {
                 switch state {
                 case .notReadyForDisplay:
-                    Task.detached(priority: .high) {
+                    Task.detached(priority: .low) {
                         do {
                             state = .downloading
                             if let data = try? Data(contentsOf: URL(filePath: illustration.thumbnailPath())),
