@@ -64,8 +64,10 @@ final class Illustration {
             let thumbnailData = Illustration.makeThumbnail(data) {
             if defaults.object(forKey: "DebugUseCoreDataThumbnail") == nil ||
                 defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
-                let thumbnail = Thumbnail(data: thumbnailData)
-                cachedThumbnail = thumbnail
+                DispatchQueue.main.async { [self] in
+                    let thumbnail = Thumbnail(data: thumbnailData)
+                    cachedThumbnail = thumbnail
+                }
             } else {
                 FileManager.default.createFile(atPath: thumbnailPath(),
                                                contents: thumbnailData)

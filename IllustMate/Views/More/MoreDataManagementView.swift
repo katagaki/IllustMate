@@ -61,84 +61,83 @@ struct MoreDataManagementView: View {
 
     func rebuildThumbnails() {
         UIApplication.shared.isIdleTimerDisabled = true
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
-                                             total: illustrations.count)
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.show()
-                } completion: {
-                    modelContext.autosaveEnabled = false
-                    if useCoreDataThumbnail {
-                        try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
-                    } else {
-                        try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
-                        try? FileManager.default.removeItem(at: thumbnailsFolder)
-                        try? FileManager.default.createDirectory(at: thumbnailsFolder,
-                                                                 withIntermediateDirectories: false)
-                    }
-                    DispatchQueue.global(qos: .background).async {
+        do {
+            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
+            progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
+                                         total: illustrations.count)
+            withAnimation(.easeOut.speed(2)) {
+                progressAlertManager.show()
+            } completion: {
+                if useCoreDataThumbnail {
+                    try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
+                } else {
+                    try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
+                    try? FileManager.default.removeItem(at: thumbnailsFolder)
+                    try? FileManager.default.createDirectory(at: thumbnailsFolder,
+                                                             withIntermediateDirectories: false)
+                }
+                Task.detached(priority: .high) {
+                    await withDiscardingTaskGroup { group in
                         illustrations.forEach { illustration in
-                            autoreleasepool {
-                                illustration.generateThumbnail()
-                                try? modelContext.save()
-                                progressAlertManager.incrementProgress()
+                            group.addTask {
+                                autoreleasepool {
+                                    illustration.generateThumbnail()
+                                    DispatchQueue.main.async {
+                                        progressAlertManager.incrementProgress()
+                                    }
+                                }
                             }
                         }
-                        DispatchQueue.main.async {
-                            modelContext.autosaveEnabled = true
-                            UIApplication.shared.isIdleTimerDisabled = false
-                            withAnimation(.easeOut.speed(2)) {
-                                progressAlertManager.hide()
-                            }
+                    }
+                    DispatchQueue.main.async {
+                        UIApplication.shared.isIdleTimerDisabled = false
+                        withAnimation(.easeOut.speed(2)) {
+                            progressAlertManager.hide()
                         }
                     }
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
-                modelContext.autosaveEnabled = true
-                UIApplication.shared.isIdleTimerDisabled = false
             }
+        } catch {
+            debugPrint(error.localizedDescription)
+            modelContext.autosaveEnabled = true
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
     func rebuildMissingThumbnails() {
         UIApplication.shared.isIdleTimerDisabled = true
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
-                    predicate: #Predicate { $0.cachedThumbnail == nil }
-                ))
-                progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
-                                             total: illustrations.count)
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.show()
-                } completion: {
-                    modelContext.autosaveEnabled = false
-                    DispatchQueue.global(qos: .background).async {
-                        illustrations.forEach { illustration in
-                            autoreleasepool {
-                                illustration.generateThumbnail()
-                                try? modelContext.save()
-                                progressAlertManager.incrementProgress()
-                            }
-                        }
-                        DispatchQueue.main.async {
+        do {
+            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
+                predicate: #Predicate { $0.cachedThumbnail == nil }
+            ))
+            progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
+                                         total: illustrations.count)
+            withAnimation(.easeOut.speed(2)) {
+                progressAlertManager.show()
+            } completion: {
+                modelContext.autosaveEnabled = false
+                DispatchQueue.global(qos: .background).async {
+                    illustrations.forEach { illustration in
+                        autoreleasepool {
+                            illustration.generateThumbnail()
                             try? modelContext.save()
-                            modelContext.autosaveEnabled = true
-                            UIApplication.shared.isIdleTimerDisabled = false
-                            withAnimation(.easeOut.speed(2)) {
-                                progressAlertManager.hide()
-                            }
+                            progressAlertManager.incrementProgress()
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        try? modelContext.save()
+                        modelContext.autosaveEnabled = true
+                        UIApplication.shared.isIdleTimerDisabled = false
+                        withAnimation(.easeOut.speed(2)) {
+                            progressAlertManager.hide()
                         }
                     }
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
-                modelContext.autosaveEnabled = true
-                UIApplication.shared.isIdleTimerDisabled = false
             }
+        } catch {
+            debugPrint(error.localizedDescription)
+            modelContext.autosaveEnabled = true
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
