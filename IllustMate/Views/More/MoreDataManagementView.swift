@@ -76,6 +76,7 @@ struct MoreDataManagementView: View {
                     try? FileManager.default.createDirectory(at: thumbnailsFolder,
                                                              withIntermediateDirectories: false)
                 }
+                modelContext.autosaveEnabled = false
                 Task.detached(priority: .high) {
                     await withDiscardingTaskGroup { group in
                         illustrations.forEach { illustration in
@@ -90,6 +91,8 @@ struct MoreDataManagementView: View {
                         }
                     }
                     DispatchQueue.main.async {
+                        try? modelContext.save()
+                        modelContext.autosaveEnabled = true
                         UIApplication.shared.isIdleTimerDisabled = false
                         withAnimation(.easeOut.speed(2)) {
                             progressAlertManager.hide()
