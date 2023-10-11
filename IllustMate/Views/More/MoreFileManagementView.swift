@@ -13,6 +13,9 @@ struct MoreFileManagementView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
+    @Query var illustrations: [Illustration]
+    @Query var albums: [Album]
+    @Query var thumbnails: [Thumbnail]
     @State var orphans: [String] = []
 
     @Binding var progressAlertManager: ProgressAlertManager
@@ -21,6 +24,26 @@ struct MoreFileManagementView: View {
 
     var body: some View {
         List {
+            Section {
+                HStack(alignment: .center, spacing: 8.0) {
+                    Text("Shared.Albums")
+                    Spacer(minLength: 0)
+                    Text("\(albums.count)")
+                        .foregroundStyle(.secondary)
+                }
+                HStack(alignment: .center, spacing: 8.0) {
+                    Text("Shared.Illustrations")
+                    Spacer(minLength: 0)
+                    Text("\(illustrations.count)")
+                        .foregroundStyle(.secondary)
+                }
+                HStack(alignment: .center, spacing: 8.0) {
+                    Text("Shared.Thumbnails")
+                    Spacer(minLength: 0)
+                    Text("\(thumbnails.count)")
+                        .foregroundStyle(.secondary)
+                }
+            }
             Section {
                 Button("More.Files.ScanForOrphans") {
                     scanForOrphans()

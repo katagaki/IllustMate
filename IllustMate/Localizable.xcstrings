@@ -27,6 +27,16 @@
         }
       }
     },
+    "%lld" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
     "Albums.Albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -774,7 +784,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "サムネイルのダウンロード要求を送信中…"
           }
         }
@@ -1412,6 +1422,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "共有"
+          }
+        }
+      }
+    },
+    "Shared.Thumbnails" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイル"
           }
         }
       }
