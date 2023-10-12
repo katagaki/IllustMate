@@ -37,7 +37,7 @@ struct AlbumListRow: View {
                 .foregroundStyle(.primary.opacity(0.25))
                 .fontWeight(.bold)
         }
-        .contentShape(Rectangle())
+        .contentShape(.rect)
         .padding([.leading, .trailing], 20.0)
         .padding([.top, .bottom], 8.0)
         .background(colorScheme == .light ?

@@ -50,7 +50,7 @@ struct SelectionBar<Content: View>: View {
         .padding(16.0)
         .frame(maxWidth: .infinity)
         .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16.0))
+        .clipShape(.rect(cornerRadius: 16.0))
         .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: 4.0)
         .padding([.leading, .trailing, .bottom], 8.0)
         .transition(.move(edge: .bottom).combined(with: .opacity).animation(.snappy.speed(2)))

@@ -18,27 +18,34 @@ struct SearchView: View {
 
     var body: some View {
         NavigationStack(path: $navigationManager.searchTabPath) {
-            List {
+            Group {
                 if searchTerm.trimmingCharacters(in: .whitespaces) != "" {
-                    if !albumsFound().isEmpty {
-                        Section {
-                            ForEach(albumsFound()) { album in
-                                AlbumRow(album: album)
-                            }
-                        } header: {
-                            ListSectionHeader(text: "Shared.Albums")
-                                .font(.body)
-                        }
-                    }
-                    if !illustrationsFound().isEmpty {
-                        Section {
-                            ForEach(illustrationsFound()) { illustration in
-                                Text(illustration.name)
+                    List {
+                        if !albumsFound().isEmpty {
+                            Section {
+                                ForEach(albumsFound()) { album in
+                                    AlbumRow(album: album)
+                                }
+                            } header: {
+                                ListSectionHeader(text: "Shared.Albums")
                                     .font(.body)
                             }
-                        } header: {
-                            ListSectionHeader(text: "Shared.Illustrations")
-                                .font(.body)
+                        }
+                        if !illustrationsFound().isEmpty {
+                            Section {
+                                ForEach(illustrationsFound()) { illustration in
+                                    Text(illustration.name)
+                                        .font(.body)
+                                }
+                            } header: {
+                                ListSectionHeader(text: "Shared.Illustrations")
+                                    .font(.body)
+                            }
+                        }
+                    }
+                    .overlay {
+                        if albumsFound().isEmpty && illustrationsFound().isEmpty {
+                            ContentUnavailableView.search
                         }
                     }
                 }

@@ -66,10 +66,10 @@ struct MainSplitView: View {
                                 .resizable()
 #if targetEnvironment(macCatalyst)
                                 .frame(width: 16.0, height: 16.0)
-                                .clipShape(RoundedRectangle(cornerRadius: 3.0))
+                                .clipShape(.rect(cornerRadius: 3.0))
 #else
                                 .frame(width: 28.0, height: 28.0)
-                                .clipShape(RoundedRectangle(cornerRadius: 6.0))
+                                .clipShape(.rect(cornerRadius: 6.0))
 #endif
                         }
                     }

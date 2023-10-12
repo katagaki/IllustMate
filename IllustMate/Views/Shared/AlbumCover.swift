@@ -30,7 +30,7 @@ struct AlbumCover: View {
         }
         .frame(width: length, height: length)
         .aspectRatio(1.0, contentMode: .fill)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .clipShape(.rect(cornerRadius: cornerRadius))
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)
         .task {
             concurrency.queue.addOperation {

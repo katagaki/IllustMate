@@ -42,7 +42,7 @@ struct IllustrationLabel: View {
         }
         .background(.primary.opacity(0.05))
         .aspectRatio(1.0, contentMode: .fill)
-        .contentShape(Rectangle())
+        .contentShape(.rect)
         .task {
             switch state {
             case .notReadyForDisplay:

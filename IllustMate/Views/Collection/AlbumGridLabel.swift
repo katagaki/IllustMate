@@ -45,6 +45,6 @@ struct AlbumGridLabel: View {
                 }
             }
         }
-        .contentShape(Rectangle())
+        .contentShape(.rect)
     }
 }
