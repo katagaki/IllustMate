@@ -50,15 +50,16 @@ struct IllustrationsGrid<Content: View>: View {
                 Button {
                     onSelect(illustration)
                 } label: {
-                    IllustrationLabel(namespace: namespace, illustration: illustration)
-                        .matchedGeometryEffect(id: illustration.id, in: namespace)
+                    IllustrationLabel(namespace: namespace, illustration: illustration,
+                                      isHiddenAndOverridesState: isViewing(illustration))
                         .overlay {
                             if isSelected(illustration) {
                                 SelectionOverlay()
                             }
                         }
                         .draggable(IllustrationTransferable(id: illustration.id)) {
-                            IllustrationLabel(namespace: namespace, illustration: illustration)
+                            IllustrationLabel(namespace: namespace, illustration: illustration,
+                                              isHiddenAndOverridesState: false)
                                 .frame(width: 100.0, height: 100.0)
                         }
                 }
@@ -132,15 +133,5 @@ struct IllustrationsGrid<Content: View>: View {
         .background(colorScheme == .light ?
                     Color.init(uiColor: .secondarySystemGroupedBackground) :
                         Color.init(uiColor: .systemBackground))
-    }
-
-    func loadThumbnails() {
-        var thumbnails: [String: Data] = [:]
-        for illustration in illustrations {
-            if let thumbnailData = illustration.cachedThumbnail?.data {
-                thumbnails[illustration.id] = thumbnailData
-            }
-        }
-        self.thumbnails = thumbnails
     }
 }

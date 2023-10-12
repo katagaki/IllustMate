@@ -15,6 +15,7 @@ struct AlbumView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
+    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     var illustrationTransitionNamespace: Namespace.ID
@@ -34,7 +35,7 @@ struct AlbumView: View {
 
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
-    @Binding var displayedIllustration: Illustration?
+    @Binding var viewerManager: ViewerManager
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
     var body: some View {
@@ -129,7 +130,7 @@ struct AlbumView: View {
                         IllustrationsGrid(namespace: illustrationTransitionNamespace,
                                           illustrations: $illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
-                            illustration.id == displayedIllustration?.id
+                            illustration.id == viewerManager.displayedIllustration?.id
                         } isSelected: { illustration in
                             selectedIllustrations.contains(illustration)
                         } onSelect: { illustration in
@@ -299,7 +300,7 @@ struct AlbumView: View {
             }
         } else {
             withAnimation(.snappy.speed(2)) {
-                displayedIllustration = illustration
+                viewerManager.setDisplay(illustration)
             }
         }
     }

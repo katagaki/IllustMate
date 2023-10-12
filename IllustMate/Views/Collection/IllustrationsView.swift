@@ -11,6 +11,7 @@ import SwiftUI
 struct IllustrationsView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace
@@ -18,7 +19,7 @@ struct IllustrationsView: View {
     @Query(sort: [SortDescriptor<Illustration>(\.dateAdded, order: .reverse)],
            animation: .snappy.speed(2)) var illustrations: [Illustration]
 
-    @State var displayedIllustration: Illustration?
+    @State var viewerManager = ViewerManager()
 
     var body: some View {
         NavigationStack(path: $navigationManager.illustrationsTabPath) {
@@ -27,12 +28,12 @@ struct IllustrationsView: View {
                                   illustrations: .constant(illustrations),
                                   isSelecting: .constant(false),
                                   enableSelection: false) { illustration in
-                    illustration.id == displayedIllustration?.id
+                    illustration.id == viewerManager.displayedIllustration?.id
                 } isSelected: { _ in
                     return false
                 } onSelect: { illustration in
                     withAnimation(.snappy.speed(2)) {
-                        displayedIllustration = illustration
+                        viewerManager.setDisplay(illustration)
                     }
                 } selectedCount: {
                     return 0
@@ -46,11 +47,13 @@ struct IllustrationsView: View {
             .navigationTitle("ViewTitle.Illustrations")
         }
         .overlay {
-            if let displayedIllustration {
+            if let illustration = viewerManager.displayedIllustration,
+               let image = viewerManager.displayedImage {
                 IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   illustration: displayedIllustration) {
+                                   illustration: illustration,
+                                   displayedImage: image) {
                     withAnimation(.snappy.speed(2)) {
-                        self.displayedIllustration = nil
+                        viewerManager.removeDisplay()
                     }
                 }
             }

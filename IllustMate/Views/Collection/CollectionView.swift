@@ -17,28 +17,30 @@ struct CollectionView: View {
 
     @Namespace var illustrationTransitionNamespace
 
-    @State var displayedIllustration: Illustration?
+    @State var viewerManager = ViewerManager()
 
     var body: some View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
             AlbumView(illustrationTransitionNamespace: illustrationTransitionNamespace,
                       currentAlbum: nil,
-                      displayedIllustration: $displayedIllustration)
+                      viewerManager: $viewerManager)
                 .navigationDestination(for: ViewPath.self, destination: { viewPath in
                     switch viewPath {
                     case .album(let album): AlbumView(illustrationTransitionNamespace: illustrationTransitionNamespace,
                                                       currentAlbum: album,
-                                                      displayedIllustration: $displayedIllustration)
+                                                      viewerManager: $viewerManager)
                     default: Color.clear
                     }
                 })
         }
         .overlay {
-            if let displayedIllustration {
+            if let illustration = viewerManager.displayedIllustration,
+               let image = viewerManager.displayedImage {
                 IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   illustration: displayedIllustration) {
+                                   illustration: illustration,
+                                   displayedImage: image) {
                     withAnimation(.snappy.speed(2)) {
-                        self.displayedIllustration = nil
+                        viewerManager.removeDisplay()
                     }
                 }
             }

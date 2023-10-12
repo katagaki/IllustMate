@@ -13,6 +13,7 @@ struct IllustrationLabel: View {
     var namespace: Namespace.ID
 
     var illustration: Illustration
+    var isHiddenAndOverridesState: Bool
 
     @State var state: CloudImageState = .notReadyForDisplay
     @State var thumbnailImage: Image?
@@ -20,18 +21,22 @@ struct IllustrationLabel: View {
     var body: some View {
         ZStack(alignment: .center) {
             Color.clear
-            if state == .readyForDisplay {
-                if let thumbnailImage {
-                    thumbnailImage
-                        .resizable()
-                        .transition(.opacity.animation(.snappy.speed(2)))
-                } else {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24.0, height: 24.0)
-                        .foregroundStyle(.primary)
-                        .symbolRenderingMode(.multicolor)
+            if !isHiddenAndOverridesState {
+                if state == .readyForDisplay {
+                    if let thumbnailImage {
+                        thumbnailImage
+                            .resizable()
+                            .transition(.opacity.animation(.snappy.speed(2)))
+                            .matchedGeometryEffect(id: illustration.id, in: namespace)
+                    } else {
+                        Image(systemName: "xmark.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24.0, height: 24.0)
+                            .foregroundStyle(.primary)
+                            .symbolRenderingMode(.multicolor)
+                            .matchedGeometryEffect(id: illustration.id, in: namespace)
+                    }
                 }
             }
         }
@@ -51,15 +56,5 @@ struct IllustrationLabel: View {
             default: break
             }
         }
-//        .onAppear {
-//            if state == .hidden {
-//                state = .readyForDisplay
-//            }
-//        }
-//        .onDisappear {
-//            if state == .readyForDisplay {
-//                state = .hidden
-//            }
-//        }
     }
 }

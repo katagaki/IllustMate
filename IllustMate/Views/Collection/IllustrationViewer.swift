@@ -13,12 +13,10 @@ struct IllustrationViewer: View {
 
     var namespace: Namespace.ID
 
-    @State var illustration: Illustration
-    @State var illustrationDisplayOffset: CGSize = .zero
+    var illustration: Illustration
+    var displayedImage: UIImage
 
-    @State var isFileFromCloudReadyForDisplay: Bool = false
-    @State var displayedUIImage: UIImage?
-    @State var displayedImage: Image?
+    @State var illustrationDisplayOffset: CGSize = .zero
 
     var closeAction: () -> Void
 
@@ -43,102 +41,45 @@ struct IllustrationViewer: View {
             }
             .opacity(opacityDuringGesture())
             Spacer(minLength: 0)
-            ZStack {
-                if isFileFromCloudReadyForDisplay {
-                    if let displayedImage {
-                        displayedImage
-                            .resizable()
-                            .scaledToFit()
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                            .transition(.opacity.animation(.snappy.speed(2)))
-                    } else {
-                        Rectangle()
-                            .foregroundStyle(.clear)
-                            .overlay {
-                                Image(systemName: "xmark.circle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24.0, height: 24.0)
-                                    .foregroundStyle(.primary)
-                                    .symbolRenderingMode(.multicolor)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    }
-                } else {
-                    Rectangle()
-                        .foregroundStyle(.clear)
-                        .overlay {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+            Image(uiImage: displayedImage)
+                .resizable()
+                .scaledToFit()
+                .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+                .transition(.opacity.animation(.snappy.speed(2)))
+                .zIndex(1)
+                .matchedGeometryEffect(id: illustration.id, in: namespace)
+                .offset(illustrationDisplayOffset)
+            HStack(alignment: .center, spacing: 2.0) {
+                Group {
+                    Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                    Text(verbatim: "×")
+                    Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
                 }
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
             }
-            .zIndex(1)
-            .matchedGeometryEffect(id: illustration.id, in: namespace)
-            .offset(illustrationDisplayOffset)
-            if let displayedUIImage {
-                HStack(alignment: .center, spacing: 2.0) {
-                    Group {
-                        Text(verbatim: "\(Int(displayedUIImage.size.width * displayedUIImage.scale))")
-                        Text(verbatim: "×")
-                        Text(verbatim: "\(Int(displayedUIImage.size.height * displayedUIImage.scale))")
-                    }
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                }
-                .opacity(opacityDuringGesture())
-            }
+            .opacity(opacityDuringGesture())
             Spacer(minLength: 0)
-            if let displayedUIImage, let cgImage = displayedUIImage.cgImage {
+            if let cgImage = displayedImage.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        UIPasteboard.general.image = displayedUIImage
+                        UIPasteboard.general.image = displayedImage
                     }
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
-                    ShareLink(item: Image(cgImage, scale: displayedUIImage.scale, label: Text("")),
-                              preview: SharePreview(illustration.name, image: Image(uiImage: displayedUIImage))) {
+                    ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
+                              preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .buttonBorderShape(.capsule)
+                              .buttonStyle(.borderedProminent)
+                              .buttonBorderShape(.capsule)
                 }
                 .opacity(opacityDuringGesture())
             }
         }
         .padding(20.0)
+        .frame(maxHeight: .infinity)
         .background(.regularMaterial.opacity(opacityDuringGesture()))
-        .task {
-            concurrency.queue.addOperation {
-                do {
-                    if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
-                       let image = UIImage(data: data) {
-                        displayedUIImage = image
-                        displayedImage = Image(uiImage: image)
-                        isFileFromCloudReadyForDisplay = true
-                    } else {
-                        try FileManager.default.startDownloadingUbiquitousItem(
-                            at: URL(filePath: illustration.illustrationPath()))
-                        var isDownloaded: Bool = false
-                        while !isDownloaded {
-                            if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
-                                isDownloaded = true
-                            }
-                        }
-                        let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath()))
-                        if let data, let image = UIImage(data: data) {
-                            displayedUIImage = image
-                            displayedImage = Image(uiImage: image)
-                        }
-                        isFileFromCloudReadyForDisplay = true
-                    }
-                } catch {
-                    debugPrint(error.localizedDescription)
-                    isFileFromCloudReadyForDisplay = true
-                }
-            }
-        }
         .gesture(
             DragGesture()
                 .onChanged { gesture in
@@ -147,10 +88,6 @@ struct IllustrationViewer: View {
                 .onEnded { gesture in
                     if hypotenuse(gesture.translation) > 100.0 {
                         closeAction()
-                    } else {
-                        withAnimation(.snappy.speed(2)) {
-                            illustrationDisplayOffset = .zero
-                        }
                     }
                 }
         )
