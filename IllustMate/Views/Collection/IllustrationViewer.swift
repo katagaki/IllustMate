@@ -88,6 +88,10 @@ struct IllustrationViewer: View {
                 .onEnded { gesture in
                     if hypotenuse(gesture.translation) > 100.0 {
                         closeAction()
+                    } else {
+                        withAnimation(.snappy.speed(2)) {
+                            illustrationDisplayOffset = .zero
+                        }
                     }
                 }
         )
