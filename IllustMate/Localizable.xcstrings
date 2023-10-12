@@ -729,7 +729,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not held responsible if any of the following options cause any data loss."
+            "value" : "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not responsible for any data loss caused by the following options."
           }
         },
         "ja" : {
