@@ -50,31 +50,29 @@ struct IllustMateApp: App {
                         Color.clear
                         Group {
                             if syncMonitor.syncStateSummary.isBroken {
-                                Image(systemName: "xmark.icloud.fill")
-                                    .resizable()
-                                    .foregroundStyle(.red)
+                                HStack(alignment: .center, spacing: 2.0) {
+                                    Text(syncMonitor.lastError?.localizedDescription ?? "")
+                                    Image(systemName: "xmark.icloud.fill")
+                                        .resizable()
+                                }
                             } else if syncMonitor.syncStateSummary.inProgress {
                                 Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
                                     .resizable()
-                                    .foregroundStyle(.primary)
                             } else {
                                 switch syncMonitor.syncStateSummary {
                                 case .notStarted, .succeeded:
                                     Image(systemName: "checkmark.icloud.fill")
                                         .resizable()
-                                        .foregroundStyle(.green)
                                 case .noNetwork:
                                     Image(systemName: "bolt.horizontal.icloud.fill")
                                         .resizable()
-                                        .foregroundStyle(.orange)
                                 default:
                                     Image(systemName: "exclamationmark.icloud.fill")
                                         .resizable()
-                                        .foregroundStyle(.primary)
                                 }
                             }
                         }
-                        .symbolRenderingMode(.multicolor)
+                        .foregroundStyle(.secondary)
                         .scaledToFit()
                         .frame(width: 16.0, height: 16.0)
                     }
