@@ -69,6 +69,10 @@ struct IllustrationsGrid<Content: View>: View {
                                         SelectionOverlay()
                                     }
                                 }
+                                .draggable(IllustrationTransferable(id: illustration.id)) {
+                                    IllustrationLabel(namespace: namespace, illustration: illustration)
+                                        .frame(width: 100.0, height: 100.0)
+                                }
                         }
                     }
                     .matchedGeometryEffect(id: illustration.id, in: namespace)

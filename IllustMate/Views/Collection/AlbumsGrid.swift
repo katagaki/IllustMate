@@ -34,6 +34,7 @@ struct AlbumsGrid: View {
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumGridLabel(namespace: namespace,
                                    album: album)
+                    .draggable(AlbumTransferable(id: album.id))
                     .dropDestination(for: Drop.self) { items, _ in
                         for item in items {
                             onDrop(item, album)

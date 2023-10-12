@@ -23,6 +23,7 @@ struct AlbumsList: View {
             ForEach(albums, id: \.id) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumListRow(namespace: namespace, album: album)
+                        .draggable(AlbumTransferable(id: album.id))
                         .dropDestination(for: Drop.self) { items, _ in
                             for item in items {
                                 onDrop(item, album)

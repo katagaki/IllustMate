@@ -91,7 +91,6 @@ struct IllustrationLabel: View {
                 state = .hidden
             }
         }
-        .draggable(IllustrationTransferable(id: illustration.id))
     }
 
     @ViewBuilder
