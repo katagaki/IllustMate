@@ -414,38 +414,6 @@
         }
       }
     },
-    "Experiments.UseCoreDataThumbnail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Core Data Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データとしてサムネイルを保存"
-          }
-        }
-      }
-    },
-    "Experiments.UseNewThumbnailCache" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use New Thumbnail Cache"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新しいサムネイルキャッシュを使用"
-          }
-        }
-      }
-    },
     "Illustration.Error.CouldNotOpen" : {
       "extractionState" : "manual",
       "localizations" : {

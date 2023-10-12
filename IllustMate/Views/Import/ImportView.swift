@@ -26,7 +26,6 @@ struct ImportView: View {
     @State var importCompletedCount: Int = 0
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: .standard) var runningNumberForImageName: Int
-    @AppStorage(wrappedValue: true, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager.importerTabPath) {
@@ -87,7 +86,6 @@ struct ImportView: View {
     func importPhotos() {
         modelContext.autosaveEnabled = false
         UIApplication.shared.isIdleTimerDisabled = true
-        let useCoreDataThumbnail = useCoreDataThumbnail
         let selectedPhotoItems = selectedPhotoItems
         let selectedAlbum = selectedAlbum
         Task.detached(priority: .high) {
@@ -98,16 +96,9 @@ struct ImportView: View {
                     let illustration = Illustration(
                         name: "PIC_\(String(format: "%04d", runningNumberForImageName))",
                         data: data)
-                    if useCoreDataThumbnail {
-                        if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
-                            let thumbnail = Thumbnail(data: thumbnailData)
-                            illustration.cachedThumbnail = thumbnail
-                        }
-                    } else {
-                        if let thumbnailData = Illustration.makeThumbnail(data) {
-                            FileManager.default.createFile(atPath: illustration.thumbnailPath(),
-                                                           contents: thumbnailData)
-                        }
+                    if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
+                        let thumbnail = Thumbnail(data: thumbnailData)
+                        illustration.cachedThumbnail = thumbnail
                     }
                     illustrationsToAdd.append(illustration)
                     runningNumberForImageName += 1

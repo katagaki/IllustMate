@@ -26,8 +26,6 @@ struct IllustrationsGrid<Content: View>: View {
 
     @State var thumbnails: [String: Data] = [:]
 
-    @AppStorage(wrappedValue: false, "DebugUseNewThumbnailCache") var useNewThumbnailCache: Bool
-    @AppStorage(wrappedValue: true, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
     @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
                 store: defaults) var allowPerImageThumbnailRegeneration: Bool
 
@@ -53,27 +51,16 @@ struct IllustrationsGrid<Content: View>: View {
                     Button {
                         onSelect(illustration)
                     } label: {
-                        if useNewThumbnailCache {
-                            OptionalImage(imageData: thumbnails[illustration.id])
-                                .aspectRatio(1.0, contentMode: .fill)
-                                .opacity(isViewing(illustration) ? 0.0 : 1.0)
-                                .overlay {
-                                    if isSelected(illustration) {
-                                        SelectionOverlay()
-                                    }
+                        IllustrationLabel(namespace: namespace, illustration: illustration)
+                            .overlay {
+                                if isSelected(illustration) {
+                                    SelectionOverlay()
                                 }
-                        } else {
-                            IllustrationLabel(namespace: namespace, illustration: illustration)
-                                .overlay {
-                                    if isSelected(illustration) {
-                                        SelectionOverlay()
-                                    }
-                                }
-                                .draggable(IllustrationTransferable(id: illustration.id)) {
-                                    IllustrationLabel(namespace: namespace, illustration: illustration)
-                                        .frame(width: 100.0, height: 100.0)
-                                }
-                        }
+                            }
+                            .draggable(IllustrationTransferable(id: illustration.id)) {
+                                IllustrationLabel(namespace: namespace, illustration: illustration)
+                                    .frame(width: 100.0, height: 100.0)
+                            }
                     }
                     .matchedGeometryEffect(id: illustration.id, in: namespace)
                     .contextMenu {
@@ -151,42 +138,13 @@ struct IllustrationsGrid<Content: View>: View {
         .background(colorScheme == .light ?
                     Color.init(uiColor: .secondarySystemGroupedBackground) :
                         Color.init(uiColor: .systemBackground))
-        .onAppear {
-            if useNewThumbnailCache {
-                Task.detached(priority: .high) {
-                    loadThumbnails()
-                }
-            }
-        }
     }
 
     func loadThumbnails() {
         var thumbnails: [String: Data] = [:]
         for illustration in illustrations {
-            do {
-                if useCoreDataThumbnail {
-                    if let thumbnailData = illustration.cachedThumbnail?.data {
-                        thumbnails[illustration.id] = thumbnailData
-                    }
-                } else {
-                    let filePath = illustration.thumbnailPath()
-                    if let imageData = try? Data(contentsOf: URL(filePath: filePath)) {
-                        thumbnails[illustration.id] = imageData
-                    } else {
-                        try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
-                        var isDownloaded: Bool = false
-                        while !isDownloaded {
-                            if FileManager.default.fileExists(atPath: filePath) {
-                                isDownloaded = true
-                            }
-                        }
-                        if let imageData = try? Data(contentsOf: URL(filePath: filePath)) {
-                            thumbnails[illustration.id] = imageData
-                        }
-                    }
-                }
-            } catch {
-                debugPrint(error.localizedDescription)
+            if let thumbnailData = illustration.cachedThumbnail?.data {
+                thumbnails[illustration.id] = thumbnailData
             }
         }
         self.thumbnails = thumbnails

@@ -33,37 +33,33 @@ struct IllustMateApp: App {
             }
             .overlay {
                 if showCloudStatusEverywhere {
-                    ZStack(alignment: .bottomTrailing) {
-                        Color.clear
+                    ZStack(alignment: .topTrailing) {
                         Group {
                             if syncMonitor.syncStateSummary.isBroken {
                                 HStack(alignment: .center, spacing: 2.0) {
                                     Text(syncMonitor.lastError?.localizedDescription ?? "")
                                     Image(systemName: "xmark.icloud.fill")
-                                        .resizable()
                                 }
                             } else if syncMonitor.syncStateSummary.inProgress {
                                 Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                                    .resizable()
                             } else {
                                 switch syncMonitor.syncStateSummary {
                                 case .notStarted, .succeeded:
                                     Image(systemName: "checkmark.icloud.fill")
-                                        .resizable()
                                 case .noNetwork:
                                     Image(systemName: "bolt.horizontal.icloud.fill")
-                                        .resizable()
                                 default:
-                                    Image(systemName: "exclamationmark.icloud.fill")
-                                        .resizable()
+                                    HStack(alignment: .center, spacing: 2.0) {
+                                        Text(syncMonitor.lastError?.localizedDescription ?? "")
+                                        Image(systemName: "exclamationmark.icloud.fill")
+                                    }
                                 }
                             }
                         }
                         .foregroundStyle(.secondary)
-                        .scaledToFit()
-                        .frame(width: 16.0, height: 16.0)
+                        .font(.caption2)
+                        Color.clear
                     }
-                    .padding()
                 }
             }
             .environmentObject(tabManager)

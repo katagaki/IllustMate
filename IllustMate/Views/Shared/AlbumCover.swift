@@ -22,6 +22,7 @@ struct AlbumCover: View {
             if let image {
                 Image(uiImage: image)
                     .resizable()
+                    .transition(.opacity.animation(.snappy.speed(2)))
             } else {
                 Image("Album.Generic")
                     .resizable()

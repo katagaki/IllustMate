@@ -62,15 +62,9 @@ final class Illustration {
     func generateThumbnail() {
         if let data = try? Data(contentsOf: URL(filePath: illustrationPath())),
             let thumbnailData = Illustration.makeThumbnail(data) {
-            if defaults.object(forKey: "DebugUseCoreDataThumbnail") == nil ||
-                defaults.bool(forKey: "DebugUseCoreDataThumbnail") {
-                DispatchQueue.main.async { [self] in
-                    let thumbnail = Thumbnail(data: thumbnailData)
-                    cachedThumbnail = thumbnail
-                }
-            } else {
-                FileManager.default.createFile(atPath: thumbnailPath(),
-                                               contents: thumbnailData)
+            DispatchQueue.main.async { [self] in
+                let thumbnail = Thumbnail(data: thumbnailData)
+                cachedThumbnail = thumbnail
             }
         }
     }

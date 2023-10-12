@@ -23,8 +23,6 @@ struct MoreDataManagementView: View {
 
     @Binding var progressAlertManager: ProgressAlertManager
 
-    @AppStorage(wrappedValue: true, "DebugUseCoreDataThumbnail", store: defaults) var useCoreDataThumbnail: Bool
-
     var body: some View {
         List {
             Section {
@@ -131,22 +129,13 @@ struct MoreDataManagementView: View {
             withAnimation(.easeOut.speed(2)) {
                 progressAlertManager.show()
             } completion: {
-                if useCoreDataThumbnail {
-                    try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
-                } else {
-                    try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
-                    try? FileManager.default.removeItem(at: thumbnailsFolder)
-                    try? FileManager.default.createDirectory(at: thumbnailsFolder,
-                                                             withIntermediateDirectories: false)
-                }
+                try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
                 modelContext.autosaveEnabled = false
                 illustrations.forEach { illustration in
                     autoreleasepool {
                         concurrency.queue.addOperation {
                             illustration.generateThumbnail()
-                            DispatchQueue.main.async {
-                                progressAlertManager.incrementProgress()
-                            }
+                            progressAlertManager.incrementProgress()
                         }
                     }
                 }
@@ -184,9 +173,7 @@ struct MoreDataManagementView: View {
                     autoreleasepool {
                         concurrency.queue.addOperation {
                             illustration.generateThumbnail()
-                            DispatchQueue.main.async {
-                                progressAlertManager.incrementProgress()
-                            }
+                            progressAlertManager.incrementProgress()
                         }
                     }
                 }
