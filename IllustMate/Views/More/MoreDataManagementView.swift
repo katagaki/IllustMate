@@ -215,7 +215,7 @@ struct MoreDataManagementView: View {
                 predicate: #Predicate { $0.illustration == nil }
             ))
             progressAlertManager.prepare("More.DataManagement.UnorphanThumbnails.Unorphaning",
-                                         total: illustrations.count)
+                                         total: thumbnails.count)
             withAnimation(.easeOut.speed(2)) {
                 progressAlertManager.show()
             } completion: {
