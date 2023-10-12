@@ -9,6 +9,7 @@ import SwiftUI
 
 struct IllustrationLabel: View {
 
+    @Environment(ConcurrencyManager.self) private var concurrency
     var namespace: Namespace.ID
 
     var illustration: Illustration
@@ -39,10 +40,12 @@ struct IllustrationLabel: View {
                 switch state {
                 case .notReadyForDisplay:
                     state = .downloading
-                    if let image = illustration.thumbnail() {
-                        thumbnailImage = image
+                    concurrency.queue.addOperation {
+                        if let image = illustration.thumbnail() {
+                            thumbnailImage = image
+                        }
+                        state = .readyForDisplay
                     }
-                    state = .readyForDisplay
                 default: break
                 }
             } else {
@@ -96,7 +99,7 @@ struct IllustrationLabel: View {
     @ViewBuilder
     func rectangleWhenLoading() -> some View {
         Rectangle()
-            .foregroundStyle(.primary.opacity(0.1))
+            .foregroundStyle(.primary.opacity(0.05))
             .overlay {
                 ProgressView()
                     .progressViewStyle(.circular)
@@ -106,7 +109,7 @@ struct IllustrationLabel: View {
     @ViewBuilder
     func rectangleWhenError() -> some View {
         Rectangle()
-            .foregroundStyle(.primary.opacity(0.1))
+            .foregroundStyle(.primary.opacity(0.05))
             .overlay {
                 Image(systemName: "xmark.circle.fill")
                     .resizable()

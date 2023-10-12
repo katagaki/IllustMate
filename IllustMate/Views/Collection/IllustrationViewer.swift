@@ -9,6 +9,8 @@ import SwiftUI
 
 struct IllustrationViewer: View {
 
+    @Environment(ConcurrencyManager.self) private var concurrency
+
     var namespace: Namespace.ID
 
     @State var illustration: Illustration
@@ -107,7 +109,7 @@ struct IllustrationViewer: View {
         .padding(20.0)
         .background(.regularMaterial.opacity(opacityDuringGesture()))
         .task {
-            Task.detached(priority: .high) {
+            concurrency.queue.addOperation {
                 do {
                     if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
                        let image = UIImage(data: data) {

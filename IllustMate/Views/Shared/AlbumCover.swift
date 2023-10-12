@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AlbumCover: View {
 
+    @Environment(ConcurrencyManager.self) private var concurrency
+
     var length: CGFloat?
     var cornerRadius: Double = 6.0
     var shadowSize: Double = 2.0
@@ -30,7 +32,7 @@ struct AlbumCover: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)
         .task {
-            Task.detached(priority: .high) {
+            concurrency.queue.addOperation {
                 if let data, let coverPhoto = UIImage(data: data) {
                     image = coverPhoto
                 }
