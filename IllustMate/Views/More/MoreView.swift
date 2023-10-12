@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
-import CloudKitSyncMonitor
 import Komponents
 import SwiftData
 import SwiftUI
@@ -13,7 +12,6 @@ import SwiftUI
 struct MoreView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
-    @ObservedObject var syncMonitor = SyncMonitor.shared
 
     @Binding var progressAlertManager: ProgressAlertManager
 
@@ -21,71 +19,15 @@ struct MoreView: View {
         NavigationStack(path: $navigationManager.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    VStack(alignment: .center, spacing: 16.0) {
-                        Group {
-                            if syncMonitor.syncStateSummary.isBroken {
-                                Image(systemName: "xmark.icloud.fill")
-                                    .resizable()
-                                    .foregroundStyle(.red)
-                            } else if syncMonitor.syncStateSummary.inProgress {
-                                Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                                    .resizable()
-                                    .foregroundStyle(.primary)
-                            } else {
-                                switch syncMonitor.syncStateSummary {
-                                case .notStarted, .succeeded:
-                                    Image(systemName: "checkmark.icloud.fill")
-                                        .resizable()
-                                        .foregroundStyle(.green)
-                                case .noNetwork:
-                                    Image(systemName: "bolt.horizontal.icloud.fill")
-                                        .resizable()
-                                        .foregroundStyle(.orange)
-                                default:
-                                    Image(systemName: "exclamationmark.icloud.fill")
-                                        .resizable()
-                                        .foregroundStyle(.primary)
-                                }
-                            }
-                        }
-                        .symbolRenderingMode(.multicolor)
-                        .scaledToFit()
-                        .frame(width: 64.0, height: 64.0)
-                        Group {
-                            if syncMonitor.syncStateSummary.isBroken {
-                                Text("More.Sync.State.Error")
-                            } else if syncMonitor.syncStateSummary.inProgress {
-                                Text("More.Sync.State.InProgress")
-                            } else {
-                                switch syncMonitor.syncStateSummary {
-                                case .notStarted, .succeeded:
-                                    Text("More.Sync.State.Synced")
-                                case .noNetwork:
-                                    Text("More.Sync.State.NoNetwork")
-                                default:
-                                    Text("More.Sync.State.NotSyncing")
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .padding()
-                } header: {
-                    ListSectionHeader(text: "More.Sync")
-                        .font(.body)
-                } footer: {
-                    if isCloudSyncEnabled {
-                        Text("More.Sync.Description")
-                            .font(.body)
-                    }
-                }
-                Section {
                     NavigationLink(value: ViewPath.moreDataManagement) {
                         ListRow(image: "ListIcon.DataManagement", title: "More.DataManagement")
                     }
                     NavigationLink(value: ViewPath.moreFileManagement) {
                         ListRow(image: "ListIcon.FileManagement", title: "More.FileManagement")
                     }
+                } header: {
+                    ListSectionHeader(text: "More.General")
+                        .font(.body)
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreDebug) {
@@ -94,6 +36,9 @@ struct MoreView: View {
                     NavigationLink(value: ViewPath.moreTroubleshooting) {
                         ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
                     }
+                } header: {
+                    ListSectionHeader(text: "More.Advanced")
+                        .font(.body)
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in

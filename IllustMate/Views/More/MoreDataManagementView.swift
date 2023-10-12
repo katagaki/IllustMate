@@ -5,6 +5,8 @@
 //  Created by シン・ジャスティン on 2023/10/09.
 //
 
+import CloudKitSyncMonitor
+import Komponents
 import SwiftData
 import SwiftUI
 
@@ -12,6 +14,7 @@ struct MoreDataManagementView: View {
 
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
+    @ObservedObject var syncMonitor = SyncMonitor.shared
 
     @Query var illustrations: [Illustration]
     @Query var albums: [Album]
@@ -23,6 +26,65 @@ struct MoreDataManagementView: View {
 
     var body: some View {
         List {
+            Section {
+                VStack(alignment: .center, spacing: 16.0) {
+                    Group {
+                        if syncMonitor.syncStateSummary.isBroken {
+                            Image(systemName: "xmark.icloud.fill")
+                                .resizable()
+                                .foregroundStyle(.red)
+                        } else if syncMonitor.syncStateSummary.inProgress {
+                            Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
+                                .resizable()
+                                .foregroundStyle(.primary)
+                        } else {
+                            switch syncMonitor.syncStateSummary {
+                            case .notStarted, .succeeded:
+                                Image(systemName: "checkmark.icloud.fill")
+                                    .resizable()
+                                    .foregroundStyle(.green)
+                            case .noNetwork:
+                                Image(systemName: "bolt.horizontal.icloud.fill")
+                                    .resizable()
+                                    .foregroundStyle(.orange)
+                            default:
+                                Image(systemName: "exclamationmark.icloud.fill")
+                                    .resizable()
+                                    .foregroundStyle(.primary)
+                            }
+                        }
+                    }
+                    .symbolRenderingMode(.multicolor)
+                    .scaledToFit()
+                    .frame(width: 64.0, height: 64.0)
+                    Group {
+                        if syncMonitor.syncStateSummary.isBroken {
+                            Text("More.Sync.State.Error")
+                        } else if syncMonitor.syncStateSummary.inProgress {
+                            Text("More.Sync.State.InProgress")
+                        } else {
+                            switch syncMonitor.syncStateSummary {
+                            case .notStarted, .succeeded:
+                                Text("More.Sync.State.Synced")
+                            case .noNetwork:
+                                Text("More.Sync.State.NoNetwork")
+                            default:
+                                Text("More.Sync.State.NotSyncing")
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding()
+            } header: {
+                ListSectionHeader(text: "More.Sync")
+                    .font(.body)
+            } footer: {
+                if isCloudSyncEnabled {
+                    Text("More.Sync.Description")
+                        .font(.body)
+                }
+            }
             Section {
                 HStack(alignment: .center, spacing: 8.0) {
                     Text("Shared.Albums")
