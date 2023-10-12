@@ -15,12 +15,12 @@ struct AlbumCover: View {
     var cornerRadius: Double = 6.0
     var shadowSize: Double = 2.0
     var data: Data?
-    @State var image: UIImage?
+    @State var image: Image?
 
     var body: some View {
         ZStack(alignment: .center) {
             if let image {
-                Image(uiImage: image)
+                image
                     .resizable()
                     .transition(.opacity.animation(.snappy.speed(2)))
             } else {
@@ -35,7 +35,7 @@ struct AlbumCover: View {
         .task {
             concurrency.queue.addOperation {
                 if let data, let coverPhoto = UIImage(data: data) {
-                    image = coverPhoto
+                    image = Image(uiImage: coverPhoto)
                 }
             }
         }

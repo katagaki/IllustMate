@@ -17,7 +17,8 @@ struct IllustrationViewer: View {
     @State var illustrationDisplayOffset: CGSize = .zero
 
     @State var isFileFromCloudReadyForDisplay: Bool = false
-    @State var displayedImage: UIImage?
+    @State var displayedUIImage: UIImage?
+    @State var displayedImage: Image?
 
     var closeAction: () -> Void
 
@@ -45,7 +46,7 @@ struct IllustrationViewer: View {
             ZStack {
                 if isFileFromCloudReadyForDisplay {
                     if let displayedImage {
-                        Image(uiImage: displayedImage)
+                        displayedImage
                             .resizable()
                             .scaledToFit()
                             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
@@ -76,12 +77,12 @@ struct IllustrationViewer: View {
             .zIndex(1)
             .matchedGeometryEffect(id: illustration.id, in: namespace)
             .offset(illustrationDisplayOffset)
-            if let displayedImage {
+            if let displayedUIImage {
                 HStack(alignment: .center, spacing: 2.0) {
                     Group {
-                        Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                        Text(verbatim: "\(Int(displayedUIImage.size.width * displayedUIImage.scale))")
                         Text(verbatim: "×")
-                        Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
+                        Text(verbatim: "\(Int(displayedUIImage.size.height * displayedUIImage.scale))")
                     }
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
@@ -89,15 +90,15 @@ struct IllustrationViewer: View {
                 .opacity(opacityDuringGesture())
             }
             Spacer(minLength: 0)
-            if let displayedImage, let cgImage = displayedImage.cgImage {
+            if let displayedUIImage, let cgImage = displayedUIImage.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        UIPasteboard.general.image = displayedImage
+                        UIPasteboard.general.image = displayedUIImage
                     }
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
-                    ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
-                              preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
+                    ShareLink(item: Image(cgImage, scale: displayedUIImage.scale, label: Text("")),
+                              preview: SharePreview(illustration.name, image: Image(uiImage: displayedUIImage))) {
                         Label("Shared.Share", systemImage: "square.and.arrow.up")
                     }
                     .buttonStyle(.borderedProminent)
@@ -113,7 +114,8 @@ struct IllustrationViewer: View {
                 do {
                     if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
                        let image = UIImage(data: data) {
-                        displayedImage = image
+                        displayedUIImage = image
+                        displayedImage = Image(uiImage: image)
                         isFileFromCloudReadyForDisplay = true
                     } else {
                         try FileManager.default.startDownloadingUbiquitousItem(
@@ -126,7 +128,8 @@ struct IllustrationViewer: View {
                         }
                         let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath()))
                         if let data, let image = UIImage(data: data) {
-                            displayedImage = image
+                            displayedUIImage = image
+                            displayedImage = Image(uiImage: image)
                         }
                         isFileFromCloudReadyForDisplay = true
                     }

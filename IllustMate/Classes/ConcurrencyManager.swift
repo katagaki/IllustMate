@@ -15,6 +15,6 @@ class ConcurrencyManager {
     init() {
         queue = OperationQueue()
         queue.qualityOfService = .userInitiated
-        queue.maxConcurrentOperationCount = 4
+        queue.maxConcurrentOperationCount = 2
     }
 }

@@ -15,14 +15,14 @@ struct IllustrationLabel: View {
     var illustration: Illustration
 
     @State var state: CloudImageState = .notReadyForDisplay
-    @State var thumbnailImage: UIImage?
+    @State var thumbnailImage: Image?
 
     var body: some View {
         ZStack(alignment: .center) {
             Color.clear
             if state == .readyForDisplay {
                 if let thumbnailImage {
-                    Image(uiImage: thumbnailImage)
+                    thumbnailImage
                         .resizable()
                         .transition(.opacity.animation(.snappy.speed(2)))
                 } else {
@@ -44,22 +44,22 @@ struct IllustrationLabel: View {
                 state = .downloading
                 concurrency.queue.addOperation {
                     if let image = illustration.thumbnail() {
-                        thumbnailImage = image
+                        thumbnailImage = Image(uiImage: image)
                     }
                     state = .readyForDisplay
                 }
             default: break
             }
         }
-        .onAppear {
-            if state == .hidden {
-                state = .readyForDisplay
-            }
-        }
-        .onDisappear {
-            if state == .readyForDisplay {
-                state = .hidden
-            }
-        }
+//        .onAppear {
+//            if state == .hidden {
+//                state = .readyForDisplay
+//            }
+//        }
+//        .onDisappear {
+//            if state == .readyForDisplay {
+//                state = .hidden
+//            }
+//        }
     }
 }
