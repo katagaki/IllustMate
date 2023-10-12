@@ -13,6 +13,7 @@ import SwiftUI
 struct MoreDataManagementView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
@@ -139,19 +140,17 @@ struct MoreDataManagementView: View {
                                                              withIntermediateDirectories: false)
                 }
                 modelContext.autosaveEnabled = false
-                Task.detached(priority: .high) {
-                    await withDiscardingTaskGroup { group in
-                        illustrations.forEach { illustration in
-                            group.addTask {
-                                autoreleasepool {
-                                    illustration.generateThumbnail()
-                                    DispatchQueue.main.async {
-                                        progressAlertManager.incrementProgress()
-                                    }
-                                }
+                illustrations.forEach { illustration in
+                    autoreleasepool {
+                        concurrency.queue.addOperation {
+                            illustration.generateThumbnail()
+                            DispatchQueue.main.async {
+                                progressAlertManager.incrementProgress()
                             }
                         }
                     }
+                }
+                concurrency.queue.addBarrierBlock {
                     DispatchQueue.main.async {
                         try? modelContext.save()
                         modelContext.autosaveEnabled = true
@@ -181,14 +180,17 @@ struct MoreDataManagementView: View {
                 progressAlertManager.show()
             } completion: {
                 modelContext.autosaveEnabled = false
-                DispatchQueue.global(qos: .background).async {
-                    illustrations.forEach { illustration in
-                        autoreleasepool {
+                illustrations.forEach { illustration in
+                    autoreleasepool {
+                        concurrency.queue.addOperation {
                             illustration.generateThumbnail()
-                            try? modelContext.save()
-                            progressAlertManager.incrementProgress()
+                            DispatchQueue.main.async {
+                                progressAlertManager.incrementProgress()
+                            }
                         }
                     }
+                }
+                concurrency.queue.addBarrierBlock {
                     DispatchQueue.main.async {
                         try? modelContext.save()
                         modelContext.autosaveEnabled = true

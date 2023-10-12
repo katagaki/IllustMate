@@ -11,6 +11,7 @@ import SwiftUI
 struct MoreFileManagementView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     @State var orphans: [String] = []
@@ -109,7 +110,7 @@ struct MoreFileManagementView: View {
 
     func redownloadThumbnails() {
         UIApplication.shared.isIdleTimerDisabled = true
-        DispatchQueue.global(qos: .userInitiated).async {
+        concurrency.queue.addOperation {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
                 progressAlertManager.prepare("More.FileManagement.RedownloadThumbnails.Redownloading",
@@ -149,7 +150,7 @@ struct MoreFileManagementView: View {
 
     func redownloadIllustrations() {
         UIApplication.shared.isIdleTimerDisabled = true
-        DispatchQueue.global(qos: .userInitiated).async {
+        concurrency.queue.addOperation {
             do {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
                 progressAlertManager.prepare("More.FileManagement.RedownloadIllustrations.Redownloading",

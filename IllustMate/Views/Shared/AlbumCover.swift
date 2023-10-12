@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AlbumCover: View {
 
-    @Environment(ConcurrencyManager.self) private var concurrency
+    @Environment(ConcurrencyManager.self) var concurrency
 
     var length: CGFloat?
     var cornerRadius: Double = 6.0
