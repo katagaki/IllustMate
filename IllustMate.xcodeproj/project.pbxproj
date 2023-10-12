@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		E43DFB222AD685E0002A6317 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E43DFB212AD685E0002A6317 /* Assets.xcassets */; };
 		E43DFB252AD69D95002A6317 /* MoreFileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */; };
+		E43DFB2A2AD7804A002A6317 /* Drop.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB282AD77D74002A6317 /* Drop.swift */; };
+		E43DFB2C2AD78220002A6317 /* ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB2B2AD78220002A6317 /* ModelContainer.swift */; };
+		E43DFB2D2AD78224002A6317 /* ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB2B2AD78220002A6317 /* ModelContainer.swift */; };
 		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
 		E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */; };
 		E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
@@ -98,6 +101,8 @@
 /* Begin PBXFileReference section */
 		E43DFB212AD685E0002A6317 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreFileManagementView.swift; sourceTree = "<group>"; };
+		E43DFB282AD77D74002A6317 /* Drop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drop.swift; sourceTree = "<group>"; };
+		E43DFB2B2AD78220002A6317 /* ModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainer.swift; sourceTree = "<group>"; };
 		E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
 		E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRow.swift; sourceTree = "<group>"; };
 		E45A8BCB2AD0332000E3035E /* CollectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionHeader.swift; sourceTree = "<group>"; };
@@ -232,6 +237,7 @@
 				E4614D102ACAA7A500D751FB /* Data Models */,
 				E4CA0B8D2ACD17190063F06C /* FileManager.swift */,
 				E4E73BE12AD56B4C00372D05 /* Defaults.swift */,
+				E43DFB2B2AD78220002A6317 /* ModelContainer.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -259,6 +265,7 @@
 			isa = PBXGroup;
 			children = (
 				E4CD39A42AD524B100D03298 /* CloudImageState.swift */,
+				E43DFB282AD77D74002A6317 /* Drop.swift */,
 				E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */,
 				E4614D2B2ACB0FD800D751FB /* ViewPath.swift */,
 				E4614D2D2ACB0FF500D751FB /* TabType.swift */,
@@ -505,6 +512,7 @@
 				E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */,
 				E4614D2C2ACB0FD800D751FB /* ViewPath.swift in Sources */,
 				E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */,
+				E43DFB2D2AD78224002A6317 /* ModelContainer.swift in Sources */,
 				E4E8922E2AD2871A005C9DBD /* IllustrationsGrid.swift in Sources */,
 				E4CA0B912ACD2F8A0063F06C /* RenameAlbumView.swift in Sources */,
 				E4614CEB2ACA86C900D751FB /* Album.swift in Sources */,
@@ -527,6 +535,7 @@
 				E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */,
 				E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */,
 				E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */,
+				E43DFB2A2AD7804A002A6317 /* Drop.swift in Sources */,
 				E4CD39A72AD52E9100D03298 /* Thumbnail.swift in Sources */,
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
 				E4CD39A52AD524B100D03298 /* CloudImageState.swift in Sources */,
@@ -546,6 +555,7 @@
 				E4614CFF2ACA86EC00D751FB /* ShareViewController.swift in Sources */,
 				E4E73BE32AD56B4C00372D05 /* Defaults.swift in Sources */,
 				E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */,
+				E43DFB2C2AD78220002A6317 /* ModelContainer.swift in Sources */,
 				E4CD39A82AD52F0800D03298 /* Thumbnail.swift in Sources */,
 				E4614D212ACAFF6000D751FB /* Illustration.swift in Sources */,
 				E4614D202ACAFF5E00D751FB /* Album.swift in Sources */,

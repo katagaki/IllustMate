@@ -43,5 +43,6 @@ struct AlbumListRow: View {
         .background(colorScheme == .light ?
                     Color.init(uiColor: .secondarySystemGroupedBackground) :
                         Color.init(uiColor: .systemBackground))
+        .draggable(AlbumTransferable(id: album.id))
     }
 }

@@ -16,14 +16,14 @@ struct AlbumsList: View {
     @Binding var albums: [Album]
     var onRename: (Album) -> Void
     var onDelete: (Album) -> Void
-    var onDrop: (IllustrationTransferable, Album) -> Void
+    var onDrop: (Drop, Album) -> Void
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 0.0) {
             ForEach(albums, id: \.id) { album in
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumListRow(namespace: namespace, album: album)
-                        .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                        .dropDestination(for: Drop.self) { items, _ in
                             for item in items {
                                 onDrop(item, album)
                             }

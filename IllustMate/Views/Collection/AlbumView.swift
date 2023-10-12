@@ -72,7 +72,7 @@ struct AlbumView: View {
                             } onDelete: { album in
                                 deleteAlbum(album)
                             } onDrop: { transferable, album in
-                                moveIllustrationToAlbum(transferable, to: album)
+                                moveDropToAlbum(transferable, to: album)
                             }
                             if colorScheme == .light {
                                 Divider()
@@ -83,7 +83,7 @@ struct AlbumView: View {
                             } onDelete: { album in
                                 deleteAlbum(album)
                             } onDrop: { transferable, album in
-                                moveIllustrationToAlbum(transferable, to: album)
+                                moveDropToAlbum(transferable, to: album)
                             }
                             Divider()
                         }
@@ -258,17 +258,28 @@ struct AlbumView: View {
         }
     }
 
-    func moveIllustrationToAlbum(_ illustration: IllustrationTransferable, to album: Album) {
-        let fetchDescriptor = FetchDescriptor<Illustration>(
-            predicate: #Predicate<Illustration> { $0.id == illustration.id }
-        )
-        if let illustrations = try? modelContext.fetch(fetchDescriptor) {
-            album.addChildIllustrations(illustrations)
-            withAnimation(.snappy.speed(2)) {
-                for illustration in illustrations {
-                    self.illustrations.removeAll(where: { $0.id == illustration.id })
+    func moveDropToAlbum(_ drop: Drop, to album: Album) {
+        if let transferable = drop.illustration {
+            let fetchDescriptor = FetchDescriptor<Illustration>(
+                predicate: #Predicate<Illustration> { $0.id == transferable.id }
+            )
+            if let illustrations = try? modelContext.fetch(fetchDescriptor) {
+                album.addChildIllustrations(illustrations)
+            }
+        } else if let transferable = drop.album {
+            let fetchDescriptor = FetchDescriptor<Album>(
+                predicate: #Predicate<Album> { $0.id == transferable.id }
+            )
+            if let albums = try? modelContext.fetch(fetchDescriptor) {
+                if !albums.contains(where: { $0.id == album.id }) {
+                    album.addChildAlbums(albums)
                 }
             }
+        } else if let transferable = drop.importedPhoto {
+            // TODO: Import photo dropped from outside app
+        }
+        withAnimation(.snappy.speed(2)) {
+            refreshData()
         }
     }
 

@@ -91,14 +91,7 @@ struct IllustrationLabel: View {
                 state = .hidden
             }
         }
-        .draggable(IllustrationTransferable(id: illustration.id)) {
-            if let thumbnailImage {
-                Image(uiImage: thumbnailImage)
-                    .resizable()
-                    .frame(width: 100.0, height: 100.0)
-                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
-            }
-        }
+        .draggable(IllustrationTransferable(id: illustration.id))
     }
 
     @ViewBuilder

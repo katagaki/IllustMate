@@ -5,9 +5,9 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import CoreTransferable
 import Foundation
 import SwiftData
-import SwiftUI
 import UIKit
 
 @Model
@@ -94,6 +94,5 @@ struct IllustrationTransferable: Codable, Transferable {
 
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(for: IllustrationTransferable.self, contentType: .image)
-        ProxyRepresentation(exporting: \.id)
     }
 }

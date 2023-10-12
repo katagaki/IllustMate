@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import CoreTransferable
 import Foundation
 import SwiftData
 import UIKit
@@ -62,6 +63,12 @@ final class Album {
         childAlbums?.append(album)
     }
 
+    func addChildAlbums(_ albums: [Album]) {
+        albums.forEach { album in
+            addChildAlbum(album)
+        }
+    }
+
     func addChildIllustration(_ illustration: Illustration) {
         illustration.removeFromAlbum()
         childIllustrations?.append(illustration)
@@ -88,5 +95,14 @@ final class Album {
             return sourceImage.jpegThumbnail(of: 350.0)
         }
         return nil
+    }
+}
+
+struct AlbumTransferable: Codable, Transferable {
+
+    var id: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(for: AlbumTransferable.self, contentType: .folder)
     }
 }

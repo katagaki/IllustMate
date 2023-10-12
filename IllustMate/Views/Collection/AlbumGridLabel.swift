@@ -46,5 +46,6 @@ struct AlbumGridLabel: View {
             }
         }
         .contentShape(Rectangle())
+        .draggable(AlbumTransferable(id: album.id))
     }
 }

@@ -17,7 +17,7 @@ struct AlbumsGrid: View {
     @Binding var albums: [Album]
     var onRename: (Album) -> Void
     var onDelete: (Album) -> Void
-    var onDrop: (IllustrationTransferable, Album) -> Void
+    var onDrop: (Drop, Album) -> Void
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
 #if targetEnvironment(macCatalyst)
@@ -34,7 +34,7 @@ struct AlbumsGrid: View {
                 NavigationLink(value: ViewPath.album(album: album)) {
                     AlbumGridLabel(namespace: namespace,
                                    album: album)
-                    .dropDestination(for: IllustrationTransferable.self) { items, _ in
+                    .dropDestination(for: Drop.self) { items, _ in
                         for item in items {
                             onDrop(item, album)
                         }

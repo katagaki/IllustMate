@@ -12,19 +12,7 @@ import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    let modelContext = ModelContext({
-        let schema = Schema([
-            Album.self, Illustration.self
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema,
-                                                    isStoredInMemoryOnly: false,
-                                                    cloudKitDatabase: .automatic)
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }())
+    let modelContext = ModelContext(sharedModelContainer)
 
     @IBOutlet weak var heroImage: UIImageView!
 
