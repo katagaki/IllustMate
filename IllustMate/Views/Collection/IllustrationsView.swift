@@ -11,7 +11,6 @@ import SwiftUI
 struct IllustrationsView: View {
 
     @Environment(\.modelContext) var modelContext
-    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace

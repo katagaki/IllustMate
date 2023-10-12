@@ -58,9 +58,12 @@ struct IllustrationsGrid<Content: View>: View {
                             }
                         }
                         .draggable(IllustrationTransferable(id: illustration.id)) {
-                            IllustrationLabel(namespace: namespace, illustration: illustration,
-                                              isHiddenAndOverridesState: false)
-                                .frame(width: 100.0, height: 100.0)
+                            if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100.0, height: 100.0)
+                            }
                         }
                 }
                 .contextMenu {

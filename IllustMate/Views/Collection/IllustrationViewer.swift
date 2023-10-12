@@ -9,8 +9,6 @@ import SwiftUI
 
 struct IllustrationViewer: View {
 
-    @Environment(ConcurrencyManager.self) var concurrency
-
     var namespace: Namespace.ID
 
     var illustration: Illustration
