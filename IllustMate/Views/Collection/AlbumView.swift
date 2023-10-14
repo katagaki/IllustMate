@@ -29,9 +29,13 @@ struct AlbumView: View {
     @State var styleState: ViewStyle = .grid
     // HACK: To get animations working as @AppStorage does not support animations
 
+    @State var isConfirmingDeleteAlbum: Bool = false
+    @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
 
+    @State var isConfirmingDeleteIllustration: Bool = false
+    @State var illustrationPendingDeletion: Illustration?
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
     @Binding var viewerManager: ViewerManager
@@ -137,18 +141,7 @@ struct AlbumView: View {
                         } selectedCount: {
                             selectedIllustrations.count
                         } onDelete: { illustration in
-                            if isSelectingIllustrations {
-                                for illustration in selectedIllustrations {
-                                    illustration.prepareForDeletion()
-                                    modelContext.delete(illustration)
-                                }
-                            } else {
-                                illustration.prepareForDeletion()
-                                modelContext.delete(illustration)
-                            }
-                            withAnimation(.snappy.speed(2)) {
-                                refreshIllustrations()
-                            }
+                            deleteIllustration(illustration)
                         } moveMenu: { illustration in
                             if isSelectingIllustrations {
                                 IllustrationMoveMenu(illustrations: selectedIllustrations,
@@ -219,6 +212,23 @@ struct AlbumView: View {
         }, content: { album in
             RenameAlbumView(album: album)
         })
+        .confirmationDialog("Shared.DeleteConfirmation.Album", isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
+            Button("Shared.Yes", role: .destructive) {
+                confirmDeleteAlbum()
+            }
+            Button("Shared.No", role: .cancel) {
+                albumPendingDeletion = nil
+            }
+        }
+        .confirmationDialog("Shared.DeleteConfirmation.Picture",
+                            isPresented: $isConfirmingDeleteIllustration, titleVisibility: .visible) {
+            Button("Shared.Yes", role: .destructive) {
+                confirmDeleteIllustration()
+            }
+            Button("Shared.No", role: .cancel) {
+                illustrationPendingDeletion = nil
+            }
+        }
         .task {
             if !isDataLoadedFromInitialAppearance {
                 withAnimation(.snappy.speed(2)) {
@@ -243,9 +253,38 @@ struct AlbumView: View {
     }
 
     func deleteAlbum(_ album: Album) {
-        modelContext.delete(album)
+        isConfirmingDeleteAlbum = true
+        albumPendingDeletion = album
+    }
+
+    func confirmDeleteAlbum() {
+        if let albumPendingDeletion {
+            modelContext.delete(albumPendingDeletion)
+            withAnimation(.snappy.speed(2)) {
+                refreshData()
+            }
+        }
+    }
+
+    func deleteIllustration(_ illustration: Illustration) {
+        isConfirmingDeleteIllustration = true
+        illustrationPendingDeletion = illustration
+    }
+
+    func confirmDeleteIllustration() {
+        if isSelectingIllustrations {
+            for illustration in selectedIllustrations {
+                illustration.prepareForDeletion()
+                modelContext.delete(illustration)
+            }
+        } else {
+            if let illustrationPendingDeletion {
+                illustrationPendingDeletion.prepareForDeletion()
+                modelContext.delete(illustrationPendingDeletion)
+            }
+        }
         withAnimation(.snappy.speed(2)) {
-            refreshData()
+            refreshIllustrations()
         }
     }
 
