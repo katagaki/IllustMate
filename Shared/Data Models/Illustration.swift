@@ -76,7 +76,7 @@ final class Illustration {
 
     static func makeThumbnail(_ data: Data?) -> Data? {
         if let data, let sourceImage = UIImage(data: data) {
-            return sourceImage.jpegThumbnail(of: 150.0)
+            return sourceImage.jpegThumbnail(of: 120.0)
         }
         return nil
     }

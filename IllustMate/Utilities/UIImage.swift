@@ -35,7 +35,7 @@ extension UIImage {
         }.cgImage!
         if let scaledImage = UIImage(cgImage: croppedImage)
             .scaleImage(toSize: CGSize(width: length, height: length)) {
-            return scaledImage.jpegData(compressionQuality: 0.9)
+            return scaledImage.jpegData(compressionQuality: 0.7)
         }
         return nil
     }

@@ -33,7 +33,7 @@ struct IllustrationsGrid<Content: View>: View {
 #if targetEnvironment(macCatalyst)
     let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 120.0), spacing: 2.0)]
 #else
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 160.0), spacing: 4.0)]
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 120.0), spacing: 4.0)]
 #endif
 
 #if targetEnvironment(macCatalyst)

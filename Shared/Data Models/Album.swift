@@ -96,7 +96,7 @@ final class Album {
 
     static func makeCover(_ data: Data?) -> Data? {
         if let data, let sourceImage = UIImage(data: data) {
-            return sourceImage.jpegThumbnail(of: 350.0)
+            return sourceImage.jpegThumbnail(of: 160.0)
         }
         return nil
     }
