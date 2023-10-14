@@ -1528,6 +1528,22 @@
         }
       }
     },
+    "Shared.Sort" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並べ替え"
+          }
+        }
+      }
+    },
     "Shared.Thumbnails" : {
       "localizations" : {
         "en" : {

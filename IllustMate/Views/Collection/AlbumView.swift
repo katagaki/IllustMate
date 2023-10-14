@@ -15,30 +15,31 @@ struct AlbumView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
+    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     var illustrationTransitionNamespace: Namespace.ID
     @Namespace var albumTransitionNamespace
 
-    var currentAlbum: Album?
-    @State var albums: [Album] = []
-    @State var illustrations: [Illustration] = []
     @State var isDataLoadedFromInitialAppearance: Bool = false
 
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
-    @State var styleState: ViewStyle = .grid
-    // HACK: To get animations working as @AppStorage does not support animations
-
+    var currentAlbum: Album?
+    @State var albums: [Album] = []
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
+    @State var styleState: ViewStyle = .grid
+    // HACK: To get animations working as @AppStorage does not support animations
 
+    @State var illustrations: [Illustration] = []
     @State var isConfirmingDeleteIllustration: Bool = false
     @State var illustrationPendingDeletion: Illustration?
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
     @Binding var viewerManager: ViewerManager
+    @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
     var body: some View {
@@ -101,6 +102,14 @@ struct AlbumView: View {
                 }
                 Spacer(minLength: 20.0)
                 CollectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
+                    Button {
+                        isIllustrationSortReversed.toggle()
+                        withAnimation(.snappy.speed(2)) {
+                            refreshIllustrations()
+                        }
+                    } label: {
+                        Label("Shared.Sort", systemImage: isIllustrationSortReversed ? "arrow.down" : "arrow.up")
+                    }
                     Button {
                         startOrStopSelectingIllustrations()
                     } label: {
@@ -198,21 +207,22 @@ struct AlbumView: View {
                 }
             }
         }
-        .sheet(isPresented: $isAddingAlbum, onDismiss: {
+        .sheet(isPresented: $isAddingAlbum) {
             withAnimation(.snappy.speed(2)) {
                 refreshAlbums()
             }
-        }, content: {
+        } content: {
             NewAlbumView(albumToAddTo: currentAlbum)
-        })
-        .sheet(item: $albumToRename, onDismiss: {
+        }
+        .sheet(item: $albumToRename) {
             withAnimation(.snappy.speed(2)) {
                 refreshAlbums()
             }
-        }, content: { album in
+        } content: { album in
             RenameAlbumView(album: album)
-        })
-        .confirmationDialog("Shared.DeleteConfirmation.Album", isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
+        }
+        .confirmationDialog("Shared.DeleteConfirmation.Album",
+                            isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
                 confirmDeleteAlbum()
             }
@@ -349,24 +359,26 @@ struct AlbumView: View {
     }
 
     func refreshAlbums() {
-        do {
-            let currentAlbumID = currentAlbum?.id
-            albums = try modelContext.fetch(FetchDescriptor<Album>(
-                predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.name)]))
-        } catch {
-            debugPrint(error.localizedDescription)
+        let currentAlbumID = currentAlbum?.id
+        albums.removeAll()
+        concurrency.queue.addOperation {
+            Task {
+                albums = try modelContext.fetch(FetchDescriptor<Album>(
+                    predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
+                    sortBy: [SortDescriptor(\.name)]))
+            }
         }
     }
 
     func refreshIllustrations() {
-        do {
-            let currentAlbumID = currentAlbum?.id
-            illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
-                predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]))
-        } catch {
-            debugPrint(error.localizedDescription)
+        let currentAlbumID = currentAlbum?.id
+        illustrations.removeAll()
+        concurrency.queue.addOperation {
+            Task {
+                illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
+                    predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
+                    sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)]))
+            }
         }
     }
 }
