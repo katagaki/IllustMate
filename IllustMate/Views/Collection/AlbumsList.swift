@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AlbumsList: View {
+struct AlbumsList<Content: View>: View {
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -17,6 +17,7 @@ struct AlbumsList: View {
     var onRename: (Album) -> Void
     var onDelete: (Album) -> Void
     var onDrop: (Drop, Album) -> Void
+    @ViewBuilder var moveMenu: (Album) -> Content
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 0.0) {
@@ -34,6 +35,8 @@ struct AlbumsList: View {
                 .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                 .buttonStyle(.plain)
                 .contextMenu {
+                    moveMenu(album)
+                    Divider()
                     Button("Shared.ResetCover", systemImage: "photo") {
                         withAnimation(.snappy.speed(2)) {
                             album.coverPhoto = nil

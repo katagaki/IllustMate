@@ -80,6 +80,10 @@ final class Album {
         }
     }
 
+    func removeFromAlbum() {
+        parentAlbum = nil
+    }
+
     func removeChildIllustration(_ illustration: Illustration) {
         childIllustrations?.removeAll(where: { $0.id == illustration.id })
     }

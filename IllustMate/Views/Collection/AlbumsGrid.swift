@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct AlbumsGrid: View {
+struct AlbumsGrid<Content: View>: View {
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -18,6 +18,7 @@ struct AlbumsGrid: View {
     var onRename: (Album) -> Void
     var onDelete: (Album) -> Void
     var onDrop: (Drop, Album) -> Void
+    @ViewBuilder var moveMenu: (Album) -> Content
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
 #if targetEnvironment(macCatalyst)
@@ -45,6 +46,8 @@ struct AlbumsGrid: View {
                 .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                 .buttonStyle(.plain)
                 .contextMenu {
+                    moveMenu(album)
+                    Divider()
                     Button("Shared.ResetCover", systemImage: "photo") {
                         withAnimation(.snappy.speed(2)) {
                             album.coverPhoto = nil

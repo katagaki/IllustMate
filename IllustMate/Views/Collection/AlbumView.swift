@@ -78,6 +78,10 @@ struct AlbumView: View {
                                 deleteAlbum(album)
                             } onDrop: { transferable, album in
                                 moveDropToAlbum(transferable, to: album)
+                            } moveMenu: { album in
+                                AlbumMoveMenu(album: album) {
+                                    refreshDataAfterAlbumMoved()
+                                }
                             }
                             if colorScheme == .light {
                                 Divider()
@@ -89,6 +93,10 @@ struct AlbumView: View {
                                 deleteAlbum(album)
                             } onDrop: { transferable, album in
                                 moveDropToAlbum(transferable, to: album)
+                            } moveMenu: { album in
+                                AlbumMoveMenu(album: album) {
+                                    refreshDataAfterAlbumMoved()
+                                }
                             }
                             Divider()
                         }
@@ -152,16 +160,10 @@ struct AlbumView: View {
                         } onDelete: { illustration in
                             deleteIllustration(illustration)
                         } moveMenu: { illustration in
-                            if isSelectingIllustrations {
-                                IllustrationMoveMenu(illustrations: selectedIllustrations,
-                                                     containingAlbum: currentAlbum) {
-                                    refreshDataAfterIllustrationMovedToAlbum()
-                                }
-                            } else {
-                                IllustrationMoveMenu(illustrations: [illustration],
-                                                     containingAlbum: currentAlbum) {
-                                    refreshDataAfterIllustrationMovedToAlbum()
-                                }
+                            IllustrationMoveMenu(illustrations: isSelectingIllustrations ?
+                                                 selectedIllustrations : [illustration],
+                                                 containingAlbum: currentAlbum) {
+                                refreshDataAfterIllustrationMoved()
                             }
                         }
                         Divider()
@@ -201,7 +203,7 @@ struct AlbumView: View {
                 } menuItems: {
                     Menu("Shared.Move", systemImage: "tray.full") {
                         IllustrationMoveMenu(illustrations: selectedIllustrations, containingAlbum: currentAlbum) {
-                            refreshDataAfterIllustrationMovedToAlbum()
+                            refreshDataAfterIllustrationMoved()
                         }
                     }
                 }
@@ -241,11 +243,11 @@ struct AlbumView: View {
         }
         .onAppear {
             if !isDataLoadedFromInitialAppearance {
+                styleState = style
                 withAnimation(.snappy.speed(2)) {
-                    styleState = style
                     refreshData()
-                    isDataLoadedFromInitialAppearance = true
                 }
+                isDataLoadedFromInitialAppearance = true
             } else {
                 styleState = style
                 refreshData()
@@ -273,6 +275,13 @@ struct AlbumView: View {
             withAnimation(.snappy.speed(2)) {
                 refreshData()
             }
+        }
+    }
+
+    func refreshDataAfterAlbumMoved() {
+        // TODO: Fix animation here
+        withAnimation(.snappy.speed(2)) {
+            refreshAlbums()
         }
     }
 
@@ -332,7 +341,7 @@ struct AlbumView: View {
         }
     }
 
-    func refreshDataAfterIllustrationMovedToAlbum() {
+    func refreshDataAfterIllustrationMoved() {
         selectedIllustrations.removeAll()
         withAnimation(.snappy.speed(2)) {
             refreshIllustrations()
@@ -360,23 +369,23 @@ struct AlbumView: View {
 
     func refreshAlbums() {
         let currentAlbumID = currentAlbum?.id
-        concurrency.queue.addOperation {
-            Task {
-                albums = try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                    sortBy: [SortDescriptor(\.name)]))
-            }
+        do {
+            albums = try modelContext.fetch(FetchDescriptor<Album>(
+                predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
+                sortBy: [SortDescriptor(\.name)]))
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 
     func refreshIllustrations() {
         let currentAlbumID = currentAlbum?.id
-        concurrency.queue.addOperation {
-            Task {
-                illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
-                    predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                    sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)]))
-            }
+        do {
+            illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
+                predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
+                sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)]))
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 }
