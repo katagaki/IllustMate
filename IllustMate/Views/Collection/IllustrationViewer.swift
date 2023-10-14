@@ -14,7 +14,9 @@ struct IllustrationViewer: View {
     var illustration: Illustration
     var displayedImage: UIImage
 
-    @State var illustrationDisplayOffset: CGSize = .zero
+    @State var displayOffset: CGSize = .zero
+    @State var magnification: CGFloat = 1.0
+    @State var magnificationAnchor: UnitPoint = .center
 
     var closeAction: () -> Void
 
@@ -46,7 +48,8 @@ struct IllustrationViewer: View {
                 .transition(.opacity.animation(.snappy.speed(2)))
                 .zIndex(1)
                 .matchedGeometryEffect(id: illustration.id, in: namespace)
-                .offset(illustrationDisplayOffset)
+                .offset(displayOffset)
+                .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
             HStack(alignment: .center, spacing: 2.0) {
                 Group {
                     Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
@@ -81,22 +84,38 @@ struct IllustrationViewer: View {
         .gesture(
             DragGesture()
                 .onChanged { gesture in
-                    illustrationDisplayOffset = gesture.translation
+                    displayOffset = gesture.translation
                 }
                 .onEnded { gesture in
                     if hypotenuse(gesture.translation) > 100.0 {
                         closeAction()
                     } else {
                         withAnimation(.snappy.speed(2)) {
-                            illustrationDisplayOffset = .zero
+                            displayOffset = .zero
                         }
+                    }
+                }
+        )
+        .gesture(
+            MagnifyGesture()
+                .onChanged { gesture in
+                    if gesture.magnification > 1.0 {
+                        magnification = gesture.magnification
+                        magnificationAnchor = gesture.startAnchor
+                    }
+                }
+                .onEnded { _ in
+                    withAnimation(.snappy.speed(2)) {
+                        magnification = 1.0
+                    } completion: {
+                        magnificationAnchor = .center
                     }
                 }
         )
     }
 
     func opacityDuringGesture() -> Double {
-        1.0 - hypotenuse(illustrationDisplayOffset) / 100.0
+        1.0 - hypotenuse(displayOffset) / 100.0
     }
 
     func hypotenuse(_ translation: CGSize) -> Double {
