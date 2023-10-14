@@ -47,6 +47,11 @@ struct AlbumsList: View {
                         onDelete(album)
                     }
                 }
+#if targetEnvironment(macCatalyst)
+                .buttonStyle(.borderless)
+#else
+                .buttonStyle(.plain)
+#endif
                 if album != albums.last {
                     Divider()
                         .padding([.leading], 84.0)

@@ -239,7 +239,7 @@ struct AlbumView: View {
                 illustrationPendingDeletion = nil
             }
         }
-        .task {
+        .onAppear {
             if !isDataLoadedFromInitialAppearance {
                 withAnimation(.snappy.speed(2)) {
                     styleState = style
@@ -360,7 +360,6 @@ struct AlbumView: View {
 
     func refreshAlbums() {
         let currentAlbumID = currentAlbum?.id
-        albums.removeAll()
         concurrency.queue.addOperation {
             Task {
                 albums = try modelContext.fetch(FetchDescriptor<Album>(
@@ -372,7 +371,6 @@ struct AlbumView: View {
 
     func refreshIllustrations() {
         let currentAlbumID = currentAlbum?.id
-        illustrations.removeAll()
         concurrency.queue.addOperation {
             Task {
                 illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(

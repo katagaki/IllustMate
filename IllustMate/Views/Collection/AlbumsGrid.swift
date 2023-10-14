@@ -58,6 +58,11 @@ struct AlbumsGrid: View {
                         onDelete(album)
                     }
                 }
+#if targetEnvironment(macCatalyst)
+                .buttonStyle(.borderless)
+#else
+                .buttonStyle(.plain)
+#endif
             }
         }
         .padding(20.0)

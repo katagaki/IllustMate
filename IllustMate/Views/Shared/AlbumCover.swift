@@ -19,19 +19,22 @@ struct AlbumCover: View {
 
     var body: some View {
         ZStack(alignment: .center) {
+            Image("Album.Generic")
+                .resizable()
             if let image {
                 image
                     .resizable()
                     .transition(.opacity.animation(.snappy.speed(2)))
-            } else {
-                Image("Album.Generic")
-                    .resizable()
             }
         }
         .frame(width: length, height: length)
         .aspectRatio(1.0, contentMode: .fill)
         .clipShape(.rect(cornerRadius: cornerRadius))
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)
+        .overlay {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(.secondary, lineWidth: 1/3)
+        }
         .task {
             concurrency.queue.addOperation {
                 if let data, let coverPhoto = UIImage(data: data) {
