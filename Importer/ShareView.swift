@@ -87,7 +87,7 @@ struct ShareView: View {
                 Text("Importer.Note")
                     .font(.callout)
                     .foregroundStyle(.secondary)
-                if !isImporting || isCompleted {
+                if !isImporting || (isCompleted && failedItemCount > 0) {
                     Button {
                         if isCompleted {
                             close()
@@ -108,7 +108,9 @@ struct ShareView: View {
                                         isCompleted = true
                                     } completion: {
                                         if failedItemCount == 0 {
-                                            
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                close()
+                                            }
                                         }
                                     }
                                 }
@@ -140,6 +142,17 @@ struct ShareView: View {
                 }
             }
             .padding(20.0)
+        }
+        .overlay {
+            if !isImporting {
+                ZStack(alignment: .top) {
+                    Color.clear
+                    Text("ViewTitle.Importer")
+                        .font(.system(size: 17.0))
+                        .bold()
+                        .padding([.top], 18.0)
+                }
+            }
         }
     }
 

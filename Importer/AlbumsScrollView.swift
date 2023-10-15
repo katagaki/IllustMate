@@ -29,10 +29,6 @@ struct AlbumsScrollView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("ViewTitle.Importer")
-                    .bold()
-            }
             ToolbarItem(placement: .topBarTrailing) {
                 CloseButton {
                     close()
