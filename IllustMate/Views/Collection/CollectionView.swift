@@ -22,7 +22,6 @@ struct CollectionView: View {
     var body: some View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
             AlbumView(illustrationTransitionNamespace: illustrationTransitionNamespace,
-                      currentAlbum: nil,
                       viewerManager: $viewerManager)
                 .navigationDestination(for: ViewPath.self, destination: { viewPath in
                     switch viewPath {

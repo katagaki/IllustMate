@@ -1243,6 +1243,47 @@
         }
       }
     },
+    "Shared.DeleteConfirmation.Picture.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete the selected picture?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete the selected %lld pictures?"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した画像を削除してもよろしいですか？"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した%lld枚の画像を削除してもよろしいですか？"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Shared.DeselectAll" : {
       "extractionState" : "manual",
       "localizations" : {

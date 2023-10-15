@@ -27,9 +27,6 @@ struct SelectionBar<Content: View>: View {
             Divider()
             HStack(alignment: .center, spacing: 16.0) {
                 Spacer(minLength: 0)
-                if selectedIllustrations.count > 0 {
-                    menuItems
-                }
                 Button {
                     if illustrations.count == selectedIllustrations.count {
                         selectedIllustrations.removeAll()
@@ -43,6 +40,9 @@ struct SelectionBar<Content: View>: View {
                     } else {
                         Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
                     }
+                }
+                if selectedIllustrations.count > 0 {
+                    menuItems
                 }
                 Spacer(minLength: 0)
             }

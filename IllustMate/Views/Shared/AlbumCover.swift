@@ -9,20 +9,17 @@ import SwiftUI
 
 struct AlbumCover: View {
 
-    @Environment(ConcurrencyManager.self) var concurrency
-
     var length: CGFloat?
     var cornerRadius: Double = 6.0
     var shadowSize: Double = 2.0
     var data: Data?
-    @State var image: Image?
 
     var body: some View {
         ZStack(alignment: .center) {
             Image("Album.Generic")
                 .resizable()
-            if let image {
-                image
+            if let data, let coverPhoto = UIImage(data: data) {
+                Image(uiImage: coverPhoto)
                     .resizable()
                     .transition(.opacity.animation(.snappy.speed(2)))
             }
@@ -34,13 +31,6 @@ struct AlbumCover: View {
         .overlay {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(.secondary, lineWidth: 1/3)
-        }
-        .task {
-            concurrency.queue.addOperation {
-                if let data, let coverPhoto = UIImage(data: data) {
-                    image = Image(uiImage: coverPhoto)
-                }
-            }
         }
     }
 }

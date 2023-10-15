@@ -67,16 +67,7 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                 }
                 .contextMenu {
-                    if isSelecting {
-                        if isSelected(illustration) {
-                            Text("Shared.Selected.\(selectedCount())")
-                            Divider()
-                            moveMenu(illustration)
-                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                onDelete(illustration)
-                            }
-                        }
-                    } else {
+                    if !isSelecting {
                         if enableSelection {
                             Button("Shared.Select", systemImage: "checkmark.circle") {
                                 withAnimation(.snappy.speed(2)) {
