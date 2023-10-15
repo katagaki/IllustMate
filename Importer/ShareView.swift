@@ -151,7 +151,7 @@ struct ShareView: View {
 #if targetEnvironment(macCatalyst)
                         .font(.system(size: 13.0))
                         .bold()
-                        .padding([.top], 14.0)
+                        .padding([.top], 12.0)
 #else
                         .font(.system(size: 17.0))
                         .bold()
