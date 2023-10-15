@@ -50,6 +50,7 @@
 		E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D392ACB274700D751FB /* CollectionView.swift */; };
 		E4614D462ACB417500D751FB /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D452ACB417500D751FB /* ImportView.swift */; };
 		E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D472ACB46D700D751FB /* ProgressAlert.swift */; };
+		E463671B2ADC4BC90056F3C4 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E463671A2ADC4BC90056F3C4 /* InfoPlist.xcstrings */; };
 		E46712D32ADA55E7006CB15D /* AlbumMoveMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712D22ADA55E7006CB15D /* AlbumMoveMenu.swift */; };
 		E46712D52ADC17ED006CB15D /* AlbumView+Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712D42ADC17ED006CB15D /* AlbumView+Functions.swift */; };
 		E46712D72ADC24AF006CB15D /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712D62ADC24AF006CB15D /* ShareView.swift */; };
@@ -153,6 +154,7 @@
 		E4614D392ACB274700D751FB /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		E4614D452ACB417500D751FB /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
 		E4614D472ACB46D700D751FB /* ProgressAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlert.swift; sourceTree = "<group>"; };
+		E463671A2ADC4BC90056F3C4 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E46712D22ADA55E7006CB15D /* AlbumMoveMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumMoveMenu.swift; sourceTree = "<group>"; };
 		E46712D42ADC17ED006CB15D /* AlbumView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+Functions.swift"; sourceTree = "<group>"; };
 		E46712D62ADC24AF006CB15D /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				E4614D222ACB00B200D751FB /* Importer.entitlements */,
 				E4614D032ACA86ED00D751FB /* Info.plist */,
 				E43DFB212AD685E0002A6317 /* Assets.xcassets */,
+				E463671A2ADC4BC90056F3C4 /* InfoPlist.xcstrings */,
 				E4614D252ACB08E600D751FB /* Localizable.xcstrings */,
 				E4614CFE2ACA86EC00D751FB /* ShareViewController.swift */,
 				E46712D62ADC24AF006CB15D /* ShareView.swift */,
@@ -495,6 +498,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E463671B2ADC4BC90056F3C4 /* InfoPlist.xcstrings in Resources */,
 				E4614D262ACB08E600D751FB /* Localizable.xcstrings in Resources */,
 				E43DFB222AD685E0002A6317 /* Assets.xcassets in Resources */,
 			);
@@ -818,7 +822,7 @@
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Importer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Importer;
+				INFOPLIST_KEY_CFBundleDisplayName = "Save to PicMate";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -847,7 +851,7 @@
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Importer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Importer;
+				INFOPLIST_KEY_CFBundleDisplayName = "Save to PicMate";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

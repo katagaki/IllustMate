@@ -138,7 +138,7 @@ struct ShareView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .clipShape(RoundedRectangle(cornerRadius: 99))
+                    .buttonBorderShape(.capsule)
                 }
             }
             .padding(20.0)
@@ -148,9 +148,15 @@ struct ShareView: View {
                 ZStack(alignment: .top) {
                     Color.clear
                     Text("ViewTitle.Importer")
+#if targetEnvironment(macCatalyst)
+                        .font(.system(size: 13.0))
+                        .bold()
+                        .padding([.top], 14.0)
+#else
                         .font(.system(size: 17.0))
                         .bold()
                         .padding([.top], 18.0)
+#endif
                 }
             }
         }

@@ -149,13 +149,7 @@ struct AlbumView: View {
             .padding([.top], 20.0)
         }
         .background(Color.init(uiColor: .systemGroupedBackground))
-#if !targetEnvironment(macCatalyst)
-        .refreshable {
-            withAnimation(.snappy.speed(2)) {
-                refreshData()
-            }
-        }
-#else
+#if targetEnvironment(macCatalyst)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Shared.Refresh") {
@@ -163,6 +157,12 @@ struct AlbumView: View {
                         refreshData()
                     }
                 }
+            }
+        }
+#else
+        .refreshable {
+            withAnimation(.snappy.speed(2)) {
+                refreshData()
             }
         }
 #endif
