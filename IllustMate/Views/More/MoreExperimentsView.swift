@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MoreExperimentsView: View {
 
-    @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
     @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
                 store: defaults) var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugShowCloudStatusEverywhere") var showCloudStatusEverywhere: Bool
@@ -37,7 +36,6 @@ struct MoreExperimentsView: View {
                 .listRowBackground(Color.red)
             }
             Section {
-                Toggle("Experiments.ShowIllustrationIDs", isOn: $showIllustrationIDs)
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
             }

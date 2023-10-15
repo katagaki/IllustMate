@@ -9,7 +9,6 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-// swiftlint:disable type_body_length
 struct AlbumView: View {
 
     @Environment(\.modelContext) var modelContext
@@ -19,7 +18,6 @@ struct AlbumView: View {
     @EnvironmentObject var navigationManager: NavigationManager
 
     var illustrationTransitionNamespace: Namespace.ID
-    @Namespace var albumTransitionNamespace
 
     @State var isDataLoadedFromInitialAppearance: Bool = false
 
@@ -41,7 +39,6 @@ struct AlbumView: View {
     @State var selectedIllustrations: [Illustration] = []
     @Binding var viewerManager: ViewerManager
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
-    @AppStorage(wrappedValue: false, "DebugShowIllustrationIDs") var showIllustrationIDs: Bool
 
     var body: some View {
         ScrollView(.vertical) {
@@ -71,34 +68,18 @@ struct AlbumView: View {
                     if !albums.isEmpty {
                         Divider()
                             .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
-                        switch styleState {
-                        case .grid:
-                            AlbumsGrid(namespace: albumTransitionNamespace, albums: $albums) { album in
-                                albumToRename = album
-                            } onDelete: { album in
-                                deleteAlbum(album)
-                            } onDrop: { transferable, album in
-                                moveDropToAlbum(transferable, to: album)
-                            } moveMenu: { album in
-                                AlbumMoveMenu(album: album) {
-                                    refreshDataAfterAlbumMoved()
-                                }
+                        AlbumsSection(albums: $albums, style: $styleState) { album in
+                            albumToRename = album
+                        } onDelete: { album in
+                            deleteAlbum(album)
+                        } onDrop: { transferable, album in
+                            moveDropToAlbum(transferable, to: album)
+                        } moveMenu: { album in
+                            AlbumMoveMenu(album: album) {
+                                refreshDataAfterAlbumMoved()
                             }
-                            if colorScheme == .light {
-                                Divider()
-                            }
-                        case .list:
-                            AlbumsList(namespace: albumTransitionNamespace, albums: $albums) { album in
-                                albumToRename = album
-                            } onDelete: { album in
-                                deleteAlbum(album)
-                            } onDrop: { transferable, album in
-                                moveDropToAlbum(transferable, to: album)
-                            } moveMenu: { album in
-                                AlbumMoveMenu(album: album) {
-                                    refreshDataAfterAlbumMoved()
-                                }
-                            }
+                        }
+                        if colorScheme == .light || styleState == .list {
                             Divider()
                         }
                     } else {
@@ -136,18 +117,6 @@ struct AlbumView: View {
                 } else {
                     if !illustrations.isEmpty {
                         Divider()
-                        if showIllustrationIDs {
-                            VStack(alignment: .leading, spacing: 0.0) {
-                                ForEach(illustrations, id: \.id) { illustration in
-                                    Text(illustration.id)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .padding([.leading, .trailing], 20.0)
-                                }
-                                Divider()
-                            }
-                            .padding([.top, .bottom], 8.0)
-                        }
                         IllustrationsGrid(namespace: illustrationTransitionNamespace,
                                           illustrations: $illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
@@ -208,7 +177,7 @@ struct AlbumView: View {
                         }
                     }
                     Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                        deleteSelectedIllustrations()
+                        deleteIllustrations()
                     }
                 }
             }
@@ -249,6 +218,7 @@ struct AlbumView: View {
                             isPresented: $isConfirmingDeleteSelectedIllustrations, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
                 confirmDeleteIllustration()
+                selectedIllustrations.removeAll()
             }
             Button("Shared.No", role: .cancel) {
                 illustrationPendingDeletion = nil
@@ -276,4 +246,3 @@ struct AlbumView: View {
     }
 
 }
-// swiftlint:enable type_body_length

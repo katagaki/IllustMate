@@ -45,6 +45,9 @@ struct RenameAlbumView: View {
             .navigationTitle("ViewTitle.Albums.Rename")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .task {
+            newAlbumName = album?.name ?? ""
+        }
         .presentationDetents([.fraction(0.25)])
         .interactiveDismissDisabled()
     }

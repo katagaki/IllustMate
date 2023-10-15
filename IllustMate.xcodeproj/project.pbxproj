@@ -64,8 +64,7 @@
 		E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
 		E4E73BE22AD56B4C00372D05 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E73BE12AD56B4C00372D05 /* Defaults.swift */; };
 		E4E73BE32AD56B4C00372D05 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E73BE12AD56B4C00372D05 /* Defaults.swift */; };
-		E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892252AD28080005C9DBD /* AlbumsGrid.swift */; };
-		E4E8922A2AD2843A005C9DBD /* AlbumsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892292AD2843A005C9DBD /* AlbumsList.swift */; };
+		E4E8922A2AD2843A005C9DBD /* AlbumsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892292AD2843A005C9DBD /* AlbumsSection.swift */; };
 		E4E8922E2AD2871A005C9DBD /* IllustrationsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */; };
 		E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8922F2AD28F11005C9DBD /* IllustrationsView.swift */; };
 		E4E892322AD2F3C3005C9DBD /* MoreExperimentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892312AD2F3C3005C9DBD /* MoreExperimentsView.swift */; };
@@ -156,8 +155,7 @@
 		E4CD39A62AD52E9100D03298 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
 		E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		E4E73BE12AD56B4C00372D05 /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
-		E4E892252AD28080005C9DBD /* AlbumsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGrid.swift; sourceTree = "<group>"; };
-		E4E892292AD2843A005C9DBD /* AlbumsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsList.swift; sourceTree = "<group>"; };
+		E4E892292AD2843A005C9DBD /* AlbumsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsSection.swift; sourceTree = "<group>"; };
 		E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationsGrid.swift; sourceTree = "<group>"; };
 		E4E8922F2AD28F11005C9DBD /* IllustrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationsView.swift; sourceTree = "<group>"; };
 		E4E892312AD2F3C3005C9DBD /* MoreExperimentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreExperimentsView.swift; sourceTree = "<group>"; };
@@ -307,9 +305,8 @@
 				E4614CE82ACA86C900D751FB /* AlbumView.swift */,
 				E46712D42ADC17ED006CB15D /* AlbumView+Functions.swift */,
 				E45A8BFB2AD1958B00E3035E /* AlbumNavigationStack.swift */,
-				E4E892252AD28080005C9DBD /* AlbumsGrid.swift */,
+				E4E892292AD2843A005C9DBD /* AlbumsSection.swift */,
 				E45A8BCF2AD0389600E3035E /* AlbumGridLabel.swift */,
-				E4E892292AD2843A005C9DBD /* AlbumsList.swift */,
 				E45A8BD12AD03C5E00E3035E /* AlbumListRow.swift */,
 				E46712D22ADA55E7006CB15D /* AlbumMoveMenu.swift */,
 				E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */,
@@ -516,9 +513,8 @@
 				E4E8923F2AD3DF6F005C9DBD /* MoreDataManagementView.swift in Sources */,
 				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
-				E4E892262AD28080005C9DBD /* AlbumsGrid.swift in Sources */,
 				E45A8BD22AD03C5E00E3035E /* AlbumListRow.swift in Sources */,
-				E4E8922A2AD2843A005C9DBD /* AlbumsList.swift in Sources */,
+				E4E8922A2AD2843A005C9DBD /* AlbumsSection.swift in Sources */,
 				E45A8BD82AD04E1C00E3035E /* IllustrationViewer.swift in Sources */,
 				E4CA0B8C2ACC41D50063F06C /* SearchView.swift in Sources */,
 				E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */,

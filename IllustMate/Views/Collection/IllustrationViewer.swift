@@ -21,7 +21,7 @@ struct IllustrationViewer: View {
     var closeAction: () -> Void
 
     var body: some View {
-        VStack(alignment: .center, spacing: 16.0) {
+        VStack(alignment: .center, spacing: 20.0) {
             HStack(alignment: .center, spacing: 8.0) {
                 Text(illustration.name)
                     .bold()
@@ -50,19 +50,19 @@ struct IllustrationViewer: View {
                 .matchedGeometryEffect(id: illustration.id, in: namespace)
                 .offset(displayOffset)
                 .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
-            HStack(alignment: .center, spacing: 2.0) {
-                Group {
-                    Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
-                    Text(verbatim: "×")
-                    Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
-                }
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-            }
-            .opacity(opacityDuringGesture())
             Spacer(minLength: 0)
             if let cgImage = displayedImage.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
+                    HStack(alignment: .center, spacing: 2.0) {
+                        Group {
+                            Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                            Text(verbatim: "×")
+                            Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
+                        }
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
                         UIPasteboard.general.image = displayedImage
                     }
@@ -102,6 +102,8 @@ struct IllustrationViewer: View {
                     if gesture.magnification > 1.0 {
                         magnification = gesture.magnification
                         magnificationAnchor = gesture.startAnchor
+                    } else {
+                        magnification = 1.0
                     }
                 }
                 .onEnded { _ in

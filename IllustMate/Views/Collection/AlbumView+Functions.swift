@@ -31,12 +31,16 @@ extension AlbumView {
         }
     }
 
-    func deleteIllustration(_ illustration: Illustration) {
-        isConfirmingDeleteIllustration = true
-        illustrationPendingDeletion = illustration
+    func deleteIllustration(_ illustration: Illustration?) {
+        if let illustration {
+            isConfirmingDeleteIllustration = true
+            illustrationPendingDeletion = illustration
+        } else {
+            isConfirmingDeleteSelectedIllustrations = true
+        }
     }
 
-    func deleteSelectedIllustrations() {
+    func deleteIllustrations() {
         isConfirmingDeleteSelectedIllustrations = true
     }
 
