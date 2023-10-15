@@ -244,7 +244,7 @@ struct AlbumView: View {
         .onAppear {
             if !isDataLoadedFromInitialAppearance {
                 styleState = style
-                refreshData(concurrently: false)
+                refreshData()
                 isDataLoadedFromInitialAppearance = true
             } else {
                 styleState = style
@@ -359,56 +359,40 @@ struct AlbumView: View {
         }
     }
 
-    func refreshData(concurrently isConcurrent: Bool = true) {
-        refreshAlbums(concurrently: isConcurrent)
-        refreshIllustrations(concurrently: isConcurrent)
-    }
-
-    func refreshAlbums(concurrently isConcurrent: Bool = true) {
+    func refreshData() {
+        if modelContext.hasChanges {
+            modelContext.processPendingChanges()
+            try? modelContext.save()
+        }
         // TODO: Fix animations
-        let currentAlbumID = currentAlbum?.id
-        if isConcurrent {
-            concurrency.queue.addOperation {
-                do {
-                    albums = try modelContext.fetch(FetchDescriptor<Album>(
-                        predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                        sortBy: [SortDescriptor(\.name)]))
-                } catch {
-                    debugPrint(error.localizedDescription)
-                }
-            }
-        } else {
-            do {
-                albums = try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                    sortBy: [SortDescriptor(\.name)]))
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+        OperationQueue.main.addOperation {
+            refreshAlbums()
+            refreshIllustrations()
         }
     }
 
-    func refreshIllustrations(concurrently isConcurrent: Bool = true) {
-        // TODO: Fix animations
+    func refreshAlbums() {
         let currentAlbumID = currentAlbum?.id
-        if isConcurrent {
-            concurrency.queue.addOperation {
-                do {
-                    illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
-                        predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                        sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)]))
-                } catch {
-                    debugPrint(error.localizedDescription)
-                }
-            }
-        } else {
-            do {
-                illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
-                    predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                    sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)]))
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+        do {
+            albums = try modelContext.fetch(FetchDescriptor<Album>(
+                predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
+                sortBy: [SortDescriptor(\.name)]))
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+    }
+
+    func refreshIllustrations() {
+        let currentAlbumID = currentAlbum?.id
+        do {
+            var fetchDescriptor = FetchDescriptor<Illustration>(
+                predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
+                sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)])
+            fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
+            fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
+            illustrations = try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 }

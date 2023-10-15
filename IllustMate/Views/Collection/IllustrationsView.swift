@@ -15,8 +15,7 @@ struct IllustrationsView: View {
 
     @Namespace var illustrationTransitionNamespace
 
-    @Query(sort: [SortDescriptor<Illustration>(\.dateAdded, order: .reverse)],
-           animation: .snappy.speed(2)) var illustrations: [Illustration]
+    @Query(fetchDescriptorForQuery(), animation: .snappy.speed(2)) var illustrations: [Illustration]
 
     @State var viewerManager = ViewerManager()
 
@@ -57,5 +56,13 @@ struct IllustrationsView: View {
                 }
             }
         }
+    }
+
+    static func fetchDescriptorForQuery() -> FetchDescriptor<Illustration> {
+        var fetchDescriptor = FetchDescriptor<Illustration>(
+            sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
+        fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
+        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
+        return fetchDescriptor
     }
 }
