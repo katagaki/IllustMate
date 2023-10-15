@@ -17,7 +17,7 @@ struct AlbumView: View {
     @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
-    var illustrationTransitionNamespace: Namespace.ID
+    var namespace: Namespace.ID
 
     @State var isDataLoadedFromInitialAppearance: Bool = false
 
@@ -117,7 +117,7 @@ struct AlbumView: View {
                 } else {
                     if !illustrations.isEmpty {
                         Divider()
-                        IllustrationsGrid(namespace: illustrationTransitionNamespace,
+                        IllustrationsGrid(namespace: namespace,
                                           illustrations: $illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
                             illustration.id == viewerManager.displayedIllustration?.id
