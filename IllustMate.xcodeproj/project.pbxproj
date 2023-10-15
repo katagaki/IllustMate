@@ -280,6 +280,7 @@
 				E43DFB312AD8519A002A6317 /* ViewerManager.swift */,
 				E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */,
 				E4614D2F2ACB100B00D751FB /* NavigationManager.swift */,
+				E4614D312ACB103200D751FB /* TabManager.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -292,7 +293,6 @@
 				E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */,
 				E4614D2B2ACB0FD800D751FB /* ViewPath.swift */,
 				E4614D2D2ACB0FF500D751FB /* TabType.swift */,
-				E4614D312ACB103200D751FB /* TabManager.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
