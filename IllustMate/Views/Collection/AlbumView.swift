@@ -226,9 +226,13 @@ struct AlbumView: View {
         }
         .onAppear {
             if !isDataLoadedFromInitialAppearance {
-                styleState = style
-                refreshData()
-                isDataLoadedFromInitialAppearance = true
+                concurrency.queue.addOperation {
+                    styleState = style
+                    withAnimation(.snappy.speed(2)) {
+                        refreshData()
+                        isDataLoadedFromInitialAppearance = true
+                    }
+                }
             } else {
                 styleState = style
                 refreshData()

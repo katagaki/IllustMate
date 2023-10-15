@@ -121,11 +121,8 @@ extension AlbumView {
             modelContext.processPendingChanges()
             try? modelContext.save()
         }
-        // TODO: Fix animations
-        OperationQueue.main.addOperation {
-            refreshAlbums()
-            refreshIllustrations()
-        }
+        refreshAlbums()
+        refreshIllustrations()
     }
 
     func refreshAlbums() {
