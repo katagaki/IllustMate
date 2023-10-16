@@ -15,6 +15,7 @@ class ViewerManager {
     var displayedImage: UIImage?
 
     func setDisplay(_ illustration: Illustration) {
+        // TODO: Fix memory leak here
         displayedIllustration = illustration
         do {
             if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),

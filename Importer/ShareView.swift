@@ -83,10 +83,19 @@ struct ShareView: View {
                         })
                 }
             }
-            VStack(alignment: .center, spacing: 16.0) {
-                Text("Importer.Note")
+            VStack(alignment: .leading, spacing: 16.0) {
+                HStack(alignment: .top, spacing: 4.0) {
+                    Group {
+                        Image(systemName: "info.circle")
+                        Text("Importer.Note")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                }
+                .padding(10.0)
+                .background(.regularMaterial)
+                .clipShape(.rect(cornerRadius: 16.0))
                 if !isImporting || (isCompleted && failedItemCount > 0) {
                     Button {
                         if isCompleted {
@@ -151,7 +160,7 @@ struct ShareView: View {
 #if targetEnvironment(macCatalyst)
                         .font(.system(size: 13.0))
                         .bold()
-                        .padding([.top], 12.0)
+                        .padding([.top], 11.0)
 #else
                         .font(.system(size: 17.0))
                         .bold()

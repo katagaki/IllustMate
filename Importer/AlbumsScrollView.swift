@@ -24,8 +24,15 @@ struct AlbumsScrollView: View {
                 Divider()
                     .padding([.leading], 20.0)
                     .padding([.top], 10.0)
-                AlbumsSection(albums: .constant(albums), style: .constant(.grid),
-                              enablesContextMenu: false) { _ in }
+                if albums.count == 0 {
+                    Text("Albums.NoMoreAlbums")
+                        .foregroundStyle(.secondary)
+                        .padding([.leading, .trailing], 20.0)
+                        .padding([.top], 10.0)
+                } else {
+                    AlbumsSection(albums: .constant(albums), style: .constant(.grid),
+                                  enablesContextMenu: false) { _ in }
+                }
             }
         }
         .toolbar {

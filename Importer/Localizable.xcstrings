@@ -90,6 +90,23 @@
         }
       }
     },
+    "Albums.NoMoreAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This album does not contain any albums."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアルバムにはアルバムがありません。"
+          }
+        }
+      }
+    },
     "Importer.Album.None" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -188,13 +205,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importing large images? Use the importer in-app."
+            "value" : "Use the in-app importer when importing large images."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "大きい画像を保存する場合、アプリ内インポート機能のご利用を推薦します。"
+            "state" : "needs_review",
+            "value" : "大きい画像を保存する場合、アプリ内のインポート機能のご利用を推薦します。"
           }
         }
       }

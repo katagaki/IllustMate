@@ -11,11 +11,12 @@ import SwiftUI
 struct IllustrationsView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace
 
-    @Query(fetchDescriptorForQuery(), animation: .snappy.speed(2)) var illustrations: [Illustration]
+    @State var illustrations: [Illustration] = []
 
     @State var viewerManager = ViewerManager()
 
@@ -27,19 +28,12 @@ struct IllustrationsView: View {
                                   isSelecting: .constant(false),
                                   enableSelection: false) { illustration in
                     illustration.id == viewerManager.displayedIllustration?.id
-                } isSelected: { _ in
-                    return false
                 } onSelect: { illustration in
                     withAnimation(.snappy.speed(2)) {
                         viewerManager.setDisplay(illustration)
                     }
                 } selectedCount: {
                     return 0
-                } onDelete: { illustration in
-                    illustration.prepareForDeletion()
-                    withAnimation(.snappy.speed(2)) {
-                        modelContext.delete(illustration)
-                    }
                 } moveMenu: { _ in }
             }
             .navigationTitle("ViewTitle.Illustrations")
@@ -58,11 +52,17 @@ struct IllustrationsView: View {
         }
     }
 
-    static func fetchDescriptorForQuery() -> FetchDescriptor<Illustration> {
-        var fetchDescriptor = FetchDescriptor<Illustration>(
-            sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
-        fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
-        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
-        return fetchDescriptor
+    func refreshIllustrations() {
+        modelContext.autosaveEnabled = false
+        do {
+            var fetchDescriptor = FetchDescriptor<Illustration>(
+                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
+            fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
+            fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
+            illustrations = try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+        modelContext.autosaveEnabled = true
     }
 }

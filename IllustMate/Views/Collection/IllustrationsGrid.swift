@@ -18,10 +18,10 @@ struct IllustrationsGrid<Content: View>: View {
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
     var isViewing: (Illustration) -> Bool
-    var isSelected: (Illustration) -> Bool
+    var isSelected: ((Illustration) -> Bool)?
     var onSelect: (Illustration) -> Void
     var selectedCount: () -> Int
-    var onDelete: (Illustration) -> Void
+    var onDelete: ((Illustration) -> Void)?
     @ViewBuilder var moveMenu: (Illustration) -> Content
 
     @State var thumbnails: [String: Data] = [:]
@@ -53,7 +53,7 @@ struct IllustrationsGrid<Content: View>: View {
                     IllustrationLabel(namespace: namespace, illustration: illustration,
                                       isHiddenAndOverridesState: isViewing(illustration))
                         .overlay {
-                            if isSelected(illustration) {
+                            if let isSelected, isSelected(illustration) {
                                 SelectionOverlay()
                             }
                         }
@@ -99,15 +99,17 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                         Divider()
                         moveMenu(illustration)
-                        Divider()
                         if allowPerImageThumbnailRegeneration {
+                            Divider()
                             Button("Shared.RegenerateThumbnail", systemImage: "arrow.clockwise") {
                                 illustration.generateThumbnail()
                             }
-                            Divider()
                         }
-                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                            onDelete(illustration)
+                        if let onDelete {
+                            Divider()
+                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                                onDelete(illustration)
+                            }
                         }
                     }
                 } preview: {

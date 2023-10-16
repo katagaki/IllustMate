@@ -65,14 +65,16 @@ struct AlbumsSection<Content: View>: View {
                                         album.coverPhoto = nil
                                     }
                                 }
-                                Divider()
-                                Button("Shared.Rename", systemImage: "pencil") {
-                                    if let onRename {
+                                if onRename != nil || onDelete != nil {
+                                    Divider()
+                                }
+                                if let onRename {
+                                    Button("Shared.Rename", systemImage: "pencil") {
                                         onRename(album)
                                     }
                                 }
-                                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                    if let onDelete {
+                                if let onDelete {
+                                    Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                                         onDelete(album)
                                     }
                                 }
@@ -111,14 +113,16 @@ struct AlbumsSection<Content: View>: View {
                                     album.coverPhoto = nil
                                 }
                             }
-                            Divider()
-                            Button("Shared.Rename", systemImage: "pencil") {
-                                if let onRename {
+                            if onRename != nil || onDelete != nil {
+                                Divider()
+                            }
+                            if let onRename {
+                                Button("Shared.Rename", systemImage: "pencil") {
                                     onRename(album)
                                 }
                             }
-                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                if let onDelete {
+                            if let onDelete {
+                                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                                     onDelete(album)
                                 }
                             }
