@@ -50,6 +50,13 @@ struct IllustrationsView: View {
                 }
             }
         }
+        .onAppear {
+            concurrency.queue.addOperation {
+                withAnimation(.snappy.speed(2)) {
+                    refreshIllustrations()
+                }
+            }
+        }
     }
 
     func refreshIllustrations() {
