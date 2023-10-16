@@ -26,9 +26,6 @@ struct IllustMateApp: App {
                     MainTabView()
                 } else {
                     MainSplitView()
-#if targetEnvironment(macCatalyst)
-                        .frame(minWidth: 600.0, minHeight: 500.0)
-#endif
                 }
             }
             .overlay {
@@ -73,6 +70,9 @@ struct IllustMateApp: App {
             }
         }
         .modelContainer(sharedModelContainer)
+#if targetEnvironment(macCatalyst)
+        .defaultSize(CGSize(width: 600.0, height: 500.0))
+#endif
     }
 
     func createIfNotExists(_ url: URL?) {
