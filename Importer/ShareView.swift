@@ -109,8 +109,10 @@ struct ShareView: View {
                                 albums.removeAll()
                                 modelContext.autosaveEnabled = false
                                 for item in items {
-                                    importItem(modelContext, item)
-                                    progress += 1.0
+                                    autoreleasepool {
+                                        importItem(modelContext, item)
+                                        progress += 1.0
+                                    }
                                 }
                                 try? modelContext.save()
                                 withAnimation(.snappy.speed(2)) {
