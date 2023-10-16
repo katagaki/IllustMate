@@ -60,7 +60,6 @@ struct IllustrationsView: View {
     }
 
     func refreshIllustrations() {
-        modelContext.autosaveEnabled = false
         do {
             var fetchDescriptor = FetchDescriptor<Illustration>(
                 sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
@@ -70,6 +69,5 @@ struct IllustrationsView: View {
         } catch {
             debugPrint(error.localizedDescription)
         }
-        modelContext.autosaveEnabled = true
     }
 }

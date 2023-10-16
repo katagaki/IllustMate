@@ -13,7 +13,7 @@ struct ShareView: View {
     let modelContext = ModelContext(sharedModelContainer)
 
     @State var viewPath: [ViewPath] = []
-    var albums: [Album]
+    @State var albums: [Album]
     var items: [Any?]
     @State var progress: Float = 0
     @State var total: Float = 0
@@ -47,7 +47,8 @@ struct ShareView: View {
                             Text("Importer.ProgressText")
                                 .bold()
                             ProgressView(value: min(progress, total), total: total)
-                                .progressViewStyle(.linear)
+                                .progressViewStyle(.circular)
+                            // TODO: Fix threading issue to report progerss correctly
                             Spacer()
                         }
                     } else {
@@ -105,21 +106,20 @@ struct ShareView: View {
                             withAnimation(.snappy.speed(2)) {
                                 isImporting = true
                             } completion: {
-                                DispatchQueue.global(qos: .background).async {
-                                    let modelContext = ModelContext(sharedModelContainer)
-                                    for item in items {
-                                        importItem(modelContext, item)
-                                        DispatchQueue.main.async {
-                                            progress += 1.0
-                                        }
-                                    }
-                                    withAnimation(.snappy.speed(2)) {
-                                        isCompleted = true
-                                    } completion: {
-                                        if failedItemCount == 0 {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                close()
-                                            }
+                                albums.removeAll()
+                                let modelContext = ModelContext(sharedModelContainer)
+                                modelContext.autosaveEnabled = false
+                                for item in items {
+                                    importItem(modelContext, item)
+                                    progress += 1.0
+                                }
+                                try? modelContext.save()
+                                withAnimation(.snappy.speed(2)) {
+                                    isCompleted = true
+                                } completion: {
+                                    if failedItemCount == 0 {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                            close()
                                         }
                                     }
                                 }

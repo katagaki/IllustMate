@@ -122,7 +122,6 @@ extension AlbumView {
     }
 
     func refreshAlbums() {
-        modelContext.autosaveEnabled = false
         let currentAlbumID = currentAlbum?.id
         do {
             albums = try modelContext.fetch(FetchDescriptor<Album>(
@@ -131,11 +130,9 @@ extension AlbumView {
         } catch {
             debugPrint(error.localizedDescription)
         }
-        modelContext.autosaveEnabled = true
     }
 
     func refreshIllustrations() {
-        modelContext.autosaveEnabled = false
         let currentAlbumID = currentAlbum?.id
         do {
             var fetchDescriptor = FetchDescriptor<Illustration>(
@@ -147,7 +144,6 @@ extension AlbumView {
         } catch {
             debugPrint(error.localizedDescription)
         }
-        modelContext.autosaveEnabled = true
     }
 
 }
