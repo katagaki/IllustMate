@@ -107,7 +107,6 @@ struct ShareView: View {
                                 isImporting = true
                             } completion: {
                                 albums.removeAll()
-                                let modelContext = ModelContext(sharedModelContainer)
                                 modelContext.autosaveEnabled = false
                                 for item in items {
                                     importItem(modelContext, item)
