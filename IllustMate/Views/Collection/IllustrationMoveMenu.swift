@@ -11,23 +11,51 @@ import SwiftUI
 struct IllustrationMoveMenu: View {
 
     @Environment(\.modelContext) var modelContext
+
+    let actor = DataActor(modelContainer: sharedModelContainer)
+
     var illustrations: [Illustration]
     var containingAlbum: Album?
     var onMoved: () -> Void
 
+    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
+
     var body: some View {
         if containingAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                illustrations.forEach { illustration in
-                    illustration.removeFromAlbum()
+                if useThreadSafeLoading {
+                    Task.detached(priority: .userInitiated) {
+                        for illustration in illustrations {
+                            await actor.removeFromAlbum(illustration)
+                        }
+                        await MainActor.run {
+                            onMoved()
+                        }
+                    }
+                } else {
+                    illustrations.forEach { illustration in
+                        illustration.removeFromAlbum()
+                    }
+                    onMoved()
                 }
-                onMoved()
             }
         }
         if let containingAlbum, let parentAlbum = containingAlbum.parentAlbum {
             Button {
-                parentAlbum.addChildIllustrations(illustrations)
-                onMoved()
+                if useThreadSafeLoading {
+                    Task.detached(priority: .userInitiated) {
+                        for illustration in illustrations {
+                            await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                                        toAlbumWithIdentifier: parentAlbum.persistentModelID)
+                        }
+                        await MainActor.run {
+                            onMoved()
+                        }
+                    }
+                } else {
+                    parentAlbum.addChildIllustrations(illustrations)
+                    onMoved()
+                }
             } label: {
                 Label(
                     title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
@@ -38,8 +66,20 @@ struct IllustrationMoveMenu: View {
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
-                    album.addChildIllustrations(illustrations)
-                    onMoved()
+                    if useThreadSafeLoading {
+                        Task.detached(priority: .userInitiated) {
+                            for illustration in illustrations {
+                                await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                                            toAlbumWithIdentifier: album.persistentModelID)
+                            }
+                            await MainActor.run {
+                                onMoved()
+                            }
+                        }
+                    } else {
+                        album.addChildIllustrations(illustrations)
+                        onMoved()
+                    }
                 } label: {
                     Label(
                         title: { Text(album.name) },

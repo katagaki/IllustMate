@@ -12,6 +12,7 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
+    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
         List {
@@ -39,6 +40,7 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowAlbumCoverResolution", isOn: $showAlbumCoverResolution)
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
+                Toggle("Experiments.UseThreadSafeLoading", isOn: $useThreadSafeLoading)
             }
         }
         .navigationTitle("ViewTitle.Debug")

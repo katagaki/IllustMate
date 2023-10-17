@@ -22,9 +22,14 @@ struct MainTabView: View {
                     Label("TabTitle.Collection", image: "Tab.Collection")
                 }
                 .tag(TabType.collection)
+            AlbumsView()
+                .tabItem {
+                    Label("TabTitle.Albums", image: "Tab.Albums")
+                }
+                .tag(TabType.albums)
             IllustrationsView()
                 .tabItem {
-                    Label("TabTitle.Illustrations", systemImage: "photo.stack.fill")
+                    Label("TabTitle.Illustrations", image: "Tab.Illustrations")
                 }
                 .tag(TabType.illustrations)
             ImportView(progressAlertManager: $progressAlertManager)
@@ -32,11 +37,6 @@ struct MainTabView: View {
                     Label("TabTitle.Import", image: "Tab.Import")
                 }
                 .tag(TabType.importer)
-            SearchView()
-                .tabItem {
-                    Label("TabTitle.Search", systemImage: "magnifyingglass")
-                }
-                .tag(TabType.search)
             MoreView(progressAlertManager: $progressAlertManager)
                 .tabItem {
                     Label("TabTitle.More", systemImage: "ellipsis")

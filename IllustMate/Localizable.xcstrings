@@ -414,6 +414,22 @@
         }
       }
     },
+    "Experiments.UseThreadSafeLoading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Safe Threading"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セーフスレッディングを適用"
+          }
+        }
+      }
+    },
     "Illustration.Error.CouldNotOpen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -734,7 +750,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "こちらの設定は実験的なものであり、アプリを再起動する必要がある場合があります。\n本アプリの開発者は、こちらの設定によるデータ損失の責任を一切負いかねます。"
           }
         }
@@ -1600,6 +1616,22 @@
         }
       }
     },
+    "TabTitle.Albums" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
+          }
+        }
+      }
+    },
     "TabTitle.Collection" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1668,19 +1700,18 @@
         }
       }
     },
-    "TabTitle.Search" : {
-      "extractionState" : "manual",
+    "ViewTitle.Albums" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search"
+            "value" : "Albums"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "検索"
+            "value" : "アルバム"
           }
         }
       }
@@ -1833,23 +1864,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "孤立したファイル"
-          }
-        }
-      }
-    },
-    "ViewTitle.Search" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検索"
           }
         }
       }

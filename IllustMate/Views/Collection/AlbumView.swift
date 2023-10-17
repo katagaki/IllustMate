@@ -40,6 +40,9 @@ struct AlbumView: View {
     @Binding var viewerManager: ViewerManager
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
 
+    let actor = DataActor(modelContainer: sharedModelContainer)
+    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {

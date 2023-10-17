@@ -15,11 +15,15 @@ struct IllustrationsView: View {
     @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
+    let actor = DataActor(modelContainer: sharedModelContainer)
+
     @Namespace var illustrationTransitionNamespace
 
     @State var illustrations: [Illustration] = []
 
     @State var viewerManager = ViewerManager()
+
+    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager.illustrationsTabPath) {
@@ -43,26 +47,18 @@ struct IllustrationsView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Shared.Refresh") {
-                    withAnimation(.snappy.speed(2)) {
-                        refreshIllustrations()
-                    }
+                    refreshIllustrations()
                 }
             }
         }
 #else
         .refreshable {
-            withAnimation(.snappy.speed(2)) {
-                refreshIllustrations()
-            }
+            refreshIllustrations()
         }
 #endif
         .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
         .onAppear {
-            concurrency.queue.addOperation {
-                withAnimation(.snappy.speed(2)) {
-                    refreshIllustrations()
-                }
-            }
+            refreshIllustrations()
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
@@ -72,14 +68,31 @@ struct IllustrationsView: View {
     }
 
     func refreshIllustrations() {
-        do {
-            var fetchDescriptor = FetchDescriptor<Illustration>(
-                sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
-            fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
-            fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
-            illustrations = try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
+        if useThreadSafeLoading {
+            Task.detached(priority: .userInitiated) {
+                do {
+                    let illustrations = try await actor.illustrations()
+                    await MainActor.run {
+                        self.illustrations = illustrations
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+            }
+        } else {
+            concurrency.queue.addOperation {
+                withAnimation(.snappy.speed(2)) {
+                    do {
+                        var fetchDescriptor = FetchDescriptor<Illustration>(
+                            sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
+                        fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
+                        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
+                        illustrations = try modelContext.fetch(fetchDescriptor)
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
+                }
+            }
         }
     }
 }

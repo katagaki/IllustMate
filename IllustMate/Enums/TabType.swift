@@ -9,8 +9,8 @@ import Foundation
 
 enum TabType: Int {
     case collection = 0
-    case illustrations = 1
-    case importer = 2
-    case search = 3
+    case albums = 1
+    case illustrations = 2
+    case importer = 3
     case more = 4
 }
