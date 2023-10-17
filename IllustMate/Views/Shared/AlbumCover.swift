@@ -14,7 +14,7 @@ struct AlbumCover: View {
     var shadowSize: Double = 2.0
     var data: Data?
 
-    @AppStorage(wrappedValue: false, "DebugShowAlbumCoverResolution") var showAlbumCoverResolution: Bool
+    @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
 
     var body: some View {
         ZStack(alignment: .center) {

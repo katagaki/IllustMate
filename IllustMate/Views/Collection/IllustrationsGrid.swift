@@ -26,7 +26,7 @@ struct IllustrationsGrid<Content: View>: View {
 
     @State var thumbnails: [String: Data] = [:]
 
-    @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
+    @AppStorage(wrappedValue: false, "DebugThumbnailRegen",
                 store: defaults) var allowPerImageThumbnailRegeneration: Bool
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]

@@ -9,10 +9,9 @@ import SwiftUI
 
 struct MoreExperimentsView: View {
 
-    @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
-                store: defaults) var allowPerImageThumbnailRegeneration: Bool
-    @AppStorage(wrappedValue: false, "DebugShowAlbumCoverResolution") var showAlbumCoverResolution: Bool
-    @AppStorage(wrappedValue: false, "DebugShowCloudStatusEverywhere") var showCloudStatusEverywhere: Bool
+    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
+    @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
+    @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
 
     var body: some View {
         List {

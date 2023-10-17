@@ -11,7 +11,7 @@ import SwiftUI
 struct ShareView: View {
 
     let modelContext = ModelContext(sharedModelContainer)
-    
+
     var items: [Any?]
 
     @State var viewPath: [ViewPath] = []

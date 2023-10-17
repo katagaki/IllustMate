@@ -17,7 +17,7 @@ struct IllustMateApp: App {
     @State var concurrency = ConcurrencyManager()
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
-    @AppStorage(wrappedValue: false, "DebugShowCloudStatusEverywhere") var showCloudStatusEverywhere: Bool
+    @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
 
     var body: some Scene {
         WindowGroup {
