@@ -10,8 +10,6 @@ import SwiftUI
 
 struct ShareView: View {
 
-    let modelContext = ModelContext(sharedModelContainer)
-
     var items: [Any?]
 
     @State var viewPath: [ViewPath] = []
@@ -22,9 +20,12 @@ struct ShareView: View {
     @State var isCompleted: Bool = false
     @State var failedItemCount: Int
 
+    @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
+
     init(items: [Any?], failedItemCount: Int) {
         self.items = items
         self.failedItemCount = failedItemCount
+        let modelContext = ModelContext(sharedModelContainer)
         do {
             albums = try modelContext.fetch(FetchDescriptor<Album>(
                 predicate: #Predicate { $0.parentAlbum == nil },
@@ -48,8 +49,7 @@ struct ShareView: View {
                             Text("Importer.ProgressText")
                                 .bold()
                             ProgressView(value: min(progress, total), total: total)
-                                .progressViewStyle(.circular)
-                            // TODO: Fix threading issue to report progerss correctly
+                                .progressViewStyle(.linear)
                             Spacer()
                         }
                     } else {
@@ -107,21 +107,8 @@ struct ShareView: View {
                             withAnimation(.snappy.speed(2)) {
                                 isImporting = true
                             } completion: {
-                                albums.removeAll()
-                                for item in items {
-                                    autoreleasepool {
-                                        importItem(modelContext, item)
-                                        progress += 1.0
-                                    }
-                                }
-                                withAnimation(.snappy.speed(2)) {
-                                    isCompleted = true
-                                } completion: {
-                                    if failedItemCount == 0 {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            close()
-                                        }
-                                    }
+                                OperationQueue().addOperation {
+                                    importItems()
                                 }
                             }
                         }
@@ -185,32 +172,57 @@ struct ShareView: View {
         return nil
     }
 
-    func importItem(_ context: ModelContext, _ file: Any?, name: String = UUID().uuidString) {
+    func importItems() {
+        let modelContext = ModelContext(sharedModelContainer)
+        let albumID = albumInViewPath()?.id ?? ""
+        let album = try? modelContext.fetch(FetchDescriptor<Album>(
+            predicate: #Predicate { $0.id == albumID })).first
+        albums.removeAll()
+        for item in items {
+            autoreleasepool {
+                importItem(modelContext, item, to: album, named: "PIC_\(runningNumberForImageName)")
+                runningNumberForImageName += 1
+                Task {
+                    progress += 1.0
+                }
+            }
+        }
+        try? modelContext.save()
+        withAnimation(.snappy.speed(2)) {
+            isCompleted = true
+        } completion: {
+            if failedItemCount == 0 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    close()
+                }
+            }
+        }
+    }
+
+    func importItem(_ context: ModelContext, _ file: Any?, to album: Album?, named name: String) {
         if let url = file as? URL, let imageData = try? Data(contentsOf: url),
             let image = UIImage(data: imageData) {
-            importItem(context, image, name: url.lastPathComponent)
+            importItem(context, image, to: album, named: url.lastPathComponent)
         } else if let image = file as? UIImage {
             if let pngData = image.pngData() {
-                importIllustration(context, name, data: pngData)
+                importIllustration(context, name, data: pngData, to: album)
             } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
-                importIllustration(context, name, data: jpgData)
+                importIllustration(context, name, data: jpgData, to: album)
             } else if let heicData = image.heicData() {
-                importIllustration(context, name, data: heicData)
+                importIllustration(context, name, data: heicData, to: album)
             }
         } else {
             failedItemCount += 1
         }
     }
 
-    func importIllustration(_ context: ModelContext, _ name: String, data: Data) {
+    func importIllustration(_ context: ModelContext, _ name: String, data: Data, to album: Album?) {
         let illustration = Illustration(name: name, data: data)
-        if let selectedAlbum = albumInViewPath() {
-            illustration.containingAlbum = selectedAlbum
-        }
+        illustration.containingAlbum = album
         if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
             let thumbnail = Thumbnail(data: thumbnailData)
             illustration.cachedThumbnail = thumbnail
         }
-        modelContext.insert(illustration)
+        context.insert(illustration)
     }
 }
