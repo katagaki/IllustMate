@@ -11,6 +11,7 @@ import SwiftUI
 struct IllustrationsView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(\.scenePhase) var scenePhase
     @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
@@ -38,6 +39,23 @@ struct IllustrationsView: View {
             }
             .navigationTitle("ViewTitle.Illustrations")
         }
+#if targetEnvironment(macCatalyst)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Shared.Refresh") {
+                    withAnimation(.snappy.speed(2)) {
+                        refreshIllustrations()
+                    }
+                }
+            }
+        }
+#else
+        .refreshable {
+            withAnimation(.snappy.speed(2)) {
+                refreshIllustrations()
+            }
+        }
+#endif
         .overlay {
             if let illustration = viewerManager.displayedIllustration,
                let image = viewerManager.displayedImage {
@@ -55,6 +73,11 @@ struct IllustrationsView: View {
                 withAnimation(.snappy.speed(2)) {
                     refreshIllustrations()
                 }
+            }
+        }
+        .onChange(of: scenePhase) { _, newValue in
+            if newValue == .active {
+                refreshIllustrations()
             }
         }
     }
