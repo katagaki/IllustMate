@@ -382,6 +382,22 @@
         }
       }
     },
+    "Experiments.ShowAlbumCoverResolution" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Album Cover Resolution"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムカバーの大きさを表示"
+          }
+        }
+      }
+    },
     "Experiments.ShowCloudStatusEverywhere" : {
       "localizations" : {
         "en" : {
@@ -394,23 +410,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クラウド同期状況を常に表示"
-          }
-        }
-      }
-    },
-    "Experiments.ShowIllustrationIDs" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Illustration IDs"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像IDを表示"
           }
         }
       }
@@ -730,12 +729,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not responsible for any data loss caused by the following options."
+            "value" : "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not responsible for any data loss caused by any modification of the below options."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "こちらの設定は実験的なものであり、アプリを再起動する必要がある場合があります。\n本アプリの開発者は、こちらの設定によるデータ損失の責任を一切負いかねます。"
           }
         }

@@ -14,16 +14,30 @@ struct AlbumCover: View {
     var shadowSize: Double = 2.0
     var data: Data?
 
+    @AppStorage(wrappedValue: false, "DebugShowAlbumCoverResolution") var showAlbumCoverResolution: Bool
+
     var body: some View {
         ZStack(alignment: .center) {
-            Image("Album.Generic")
-                .resizable()
             if let data, let coverPhoto = UIImage(data: data) {
                 Image(uiImage: coverPhoto)
                     .resizable()
+                    .overlay {
+                        if showAlbumCoverResolution {
+                            Text(verbatim: "\(coverPhoto.size.width)x\(coverPhoto.size.height)")
+                                .font(.caption2)
+                                .foregroundStyle(.white)
+                                .padding(2.0)
+                                .background(.accent.opacity(0.7))
+                                .clipShape(.rect(cornerRadius: 6.0))
+                        }
+                    }
                     .transition(.opacity.animation(.snappy.speed(2)))
+            } else {
+                Image("Album.Generic")
+                    .resizable()
             }
         }
+        .background(.secondary)
         .frame(width: length, height: length)
         .aspectRatio(1.0, contentMode: .fill)
         .clipShape(.rect(cornerRadius: cornerRadius))

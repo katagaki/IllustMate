@@ -11,6 +11,7 @@ struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugAllowPerImageThumbnailRegeneration",
                 store: defaults) var allowPerImageThumbnailRegeneration: Bool
+    @AppStorage(wrappedValue: false, "DebugShowAlbumCoverResolution") var showAlbumCoverResolution: Bool
     @AppStorage(wrappedValue: false, "DebugShowCloudStatusEverywhere") var showCloudStatusEverywhere: Bool
 
     var body: some View {
@@ -37,6 +38,7 @@ struct MoreExperimentsView: View {
             }
             Section {
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
+                Toggle("Experiments.ShowAlbumCoverResolution", isOn: $showAlbumCoverResolution)
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
             }
         }

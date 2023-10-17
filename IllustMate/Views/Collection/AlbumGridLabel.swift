@@ -17,7 +17,6 @@ struct AlbumGridLabel: View {
         VStack(alignment: .leading, spacing: 8.0) {
             AlbumCover(cornerRadius: 8.0, shadowSize: 4.0, data: album.coverPhoto)
                 .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
-                .foregroundStyle(.accent)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
                     .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)

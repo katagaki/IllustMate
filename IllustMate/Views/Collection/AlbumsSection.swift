@@ -55,7 +55,6 @@ struct AlbumsSection<Content: View>: View {
                             }
                         }
                         .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
-                        .buttonStyle(.plain)
                         .contextMenu {
                             if enablesContextMenu {
                                 moveMenu(album)
@@ -104,7 +103,6 @@ struct AlbumsSection<Content: View>: View {
                                 }
                         }
                         .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
-                        .buttonStyle(.plain)
                         .contextMenu {
                             moveMenu(album)
                             Divider()
