@@ -38,17 +38,9 @@ struct AlbumsSection<Content: View>: View {
                     ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             if enablesContextMenu {
-                                AlbumGridLabel(namespace: albumTransitionNamespace,
-                                               album: album)
+                                AlbumGridLabel(namespace: albumTransitionNamespace, album: album)
                                 .draggable(AlbumTransferable(id: album.id))
-                                .dropDestination(for: Drop.self) { items, _ in
-                                    for item in items {
-                                        if let onDrop {
-                                            onDrop(item, album)
-                                        }
-                                    }
-                                    return true
-                                }
+                                .albumDropDestination(onDrop: onDrop, album: album)
                             } else {
                                 AlbumGridLabel(namespace: albumTransitionNamespace,
                                                album: album)
@@ -56,34 +48,9 @@ struct AlbumsSection<Content: View>: View {
                         }
                         .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                         .contextMenu {
-                            if enablesContextMenu {
-                                moveMenu(album)
-                                Divider()
-                                Button("Shared.ResetCover", systemImage: "photo") {
-                                    withAnimation(.snappy.speed(2)) {
-                                        album.coverPhoto = nil
-                                    }
-                                }
-                                if onRename != nil || onDelete != nil {
-                                    Divider()
-                                }
-                                if let onRename {
-                                    Button("Shared.Rename", systemImage: "pencil") {
-                                        onRename(album)
-                                    }
-                                }
-                                if let onDelete {
-                                    Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                        onDelete(album)
-                                    }
-                                }
-                            }
+                            contextMenu(album)
                         }
-#if targetEnvironment(macCatalyst)
-                        .buttonStyle(.borderless)
-#else
-                        .buttonStyle(.plain)
-#endif
+                        .buttonStyleAdaptive()
                     }
                 }
                           .padding(20.0)
@@ -93,43 +60,13 @@ struct AlbumsSection<Content: View>: View {
                         NavigationLink(value: ViewPath.album(album: album)) {
                             AlbumListRow(namespace: albumTransitionNamespace, album: album)
                                 .draggable(AlbumTransferable(id: album.id))
-                                .dropDestination(for: Drop.self) { items, _ in
-                                    for item in items {
-                                        if let onDrop {
-                                            onDrop(item, album)
-                                        }
-                                    }
-                                    return true
-                                }
+                                .albumDropDestination(onDrop: onDrop, album: album)
                         }
                         .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
                         .contextMenu {
-                            moveMenu(album)
-                            Divider()
-                            Button("Shared.ResetCover", systemImage: "photo") {
-                                withAnimation(.snappy.speed(2)) {
-                                    album.coverPhoto = nil
-                                }
-                            }
-                            if onRename != nil || onDelete != nil {
-                                Divider()
-                            }
-                            if let onRename {
-                                Button("Shared.Rename", systemImage: "pencil") {
-                                    onRename(album)
-                                }
-                            }
-                            if let onDelete {
-                                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                    onDelete(album)
-                                }
-                            }
+                            contextMenu(album)
                         }
-#if targetEnvironment(macCatalyst)
-                        .buttonStyle(.borderless)
-#else
-                        .buttonStyle(.plain)
-#endif
+                        .buttonStyleAdaptive()
                         if album != albums.last {
                             Divider()
                                 .padding([.leading], 84.0)
@@ -141,5 +78,31 @@ struct AlbumsSection<Content: View>: View {
         .background(colorScheme == .light ?
                     Color.init(uiColor: .secondarySystemGroupedBackground) :
                         Color.init(uiColor: .systemBackground))
+    }
+
+    @ViewBuilder
+    func contextMenu(_ album: Album) -> some View {
+        if enablesContextMenu {
+            moveMenu(album)
+            Divider()
+            Button("Shared.ResetCover", systemImage: "photo") {
+                withAnimation(.snappy.speed(2)) {
+                    album.coverPhoto = nil
+                }
+            }
+            if onRename != nil || onDelete != nil {
+                Divider()
+            }
+            if let onRename {
+                Button("Shared.Rename", systemImage: "pencil") {
+                    onRename(album)
+                }
+            }
+            if let onDelete {
+                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                    onDelete(album)
+                }
+            }
+        }
     }
 }

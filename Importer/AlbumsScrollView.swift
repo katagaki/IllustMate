@@ -13,6 +13,8 @@ struct AlbumsScrollView: View {
     var title: LocalizedStringKey
     var albums: [Album]
 
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
@@ -30,7 +32,7 @@ struct AlbumsScrollView: View {
                         .padding([.leading, .trailing], 20.0)
                         .padding([.top], 10.0)
                 } else {
-                    AlbumsSection(albums: .constant(albums), style: .constant(.grid),
+                    AlbumsSection(albums: .constant(albums), style: $style,
                                   enablesContextMenu: false) { _ in }
                 }
             }

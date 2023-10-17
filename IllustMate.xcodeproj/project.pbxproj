@@ -64,6 +64,10 @@
 		E46712E12ADC2B6E006CB15D /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E46712E02ADC2B6E006CB15D /* Komponents */; };
 		E46712E52ADC374E006CB15D /* AlbumsScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */; };
 		E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */; };
+		E4C834B02ADED6970056D47A /* ButtonStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */; };
+		E4C834B12ADED71C0056D47A /* ButtonStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */; };
+		E4C834B32ADED7460056D47A /* AlbumDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */; };
+		E4C834B42ADED7580056D47A /* AlbumDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */; };
 		E4CA0B8C2ACC41D50063F06C /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B8B2ACC41D50063F06C /* SearchView.swift */; };
 		E4CA0B8E2ACD17190063F06C /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B8D2ACD17190063F06C /* FileManager.swift */; };
 		E4CA0B8F2ACD17C10063F06C /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B8D2ACD17190063F06C /* FileManager.swift */; };
@@ -159,6 +163,8 @@
 		E46712D42ADC17ED006CB15D /* AlbumView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+Functions.swift"; sourceTree = "<group>"; };
 		E46712D62ADC24AF006CB15D /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsScrollView.swift; sourceTree = "<group>"; };
+		E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleModifier.swift; sourceTree = "<group>"; };
+		E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDropModifier.swift; sourceTree = "<group>"; };
 		E4CA0B8B2ACC41D50063F06C /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		E4CA0B8D2ACD17190063F06C /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameAlbumView.swift; sourceTree = "<group>"; };
@@ -230,6 +236,7 @@
 				E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */,
 				E4614D1B2ACAF42000D751FB /* Localizable.xcstrings */,
 				E4614D332ACB11A100D751FB /* Views */,
+				E4C834AE2ADED67D0056D47A /* View Modifiers */,
 				E4614D292ACB0FC500D751FB /* Classes */,
 				E4614D2A2ACB0FCA00D751FB /* Enums */,
 				E4DE2D8E2ACD56FB00F5EA8D /* Utilities */,
@@ -361,6 +368,15 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E4C834AE2ADED67D0056D47A /* View Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */,
+				E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */,
+			);
+			path = "View Modifiers";
 			sourceTree = "<group>";
 		};
 		E4CA0B8A2ACC41C20063F06C /* Search */ = {
@@ -564,12 +580,14 @@
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
 				E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */,
 				E45A8BCE2AD0362900E3035E /* IllustrationLabel.swift in Sources */,
+				E4C834B02ADED6970056D47A /* ButtonStyleModifier.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */,
 				E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */,
 				E4E892302AD28F11005C9DBD /* IllustrationsView.swift in Sources */,
 				E43DFB2A2AD7804A002A6317 /* Drop.swift in Sources */,
+				E4C834B32ADED7460056D47A /* AlbumDropModifier.swift in Sources */,
 				E4CD39A72AD52E9100D03298 /* Thumbnail.swift in Sources */,
 				E45A8BD42AD04A2400E3035E /* SelectionBar.swift in Sources */,
 				E4CD39A52AD524B100D03298 /* CloudImageState.swift in Sources */,
@@ -591,6 +609,7 @@
 			files = (
 				E46712D92ADC2593006CB15D /* AlbumsSection.swift in Sources */,
 				E4614CFF2ACA86EC00D751FB /* ShareViewController.swift in Sources */,
+				E4C834B12ADED71C0056D47A /* ButtonStyleModifier.swift in Sources */,
 				E46712E52ADC374E006CB15D /* AlbumsScrollView.swift in Sources */,
 				E4E73BE32AD56B4C00372D05 /* Defaults.swift in Sources */,
 				E46712DB2ADC2597006CB15D /* AlbumListRow.swift in Sources */,
@@ -603,6 +622,7 @@
 				E4614D212ACAFF6000D751FB /* Illustration.swift in Sources */,
 				E46712DE2ADC2680006CB15D /* AlbumCover.swift in Sources */,
 				E46712D72ADC24AF006CB15D /* ShareView.swift in Sources */,
+				E4C834B42ADED7580056D47A /* AlbumDropModifier.swift in Sources */,
 				E46712D82ADC2549006CB15D /* ViewPath.swift in Sources */,
 				E4614D202ACAFF5E00D751FB /* Album.swift in Sources */,
 				E4CA0B8F2ACD17C10063F06C /* FileManager.swift in Sources */,

@@ -27,7 +27,7 @@ struct AlbumView: View {
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle") var style: ViewStyle
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
     @State var styleState: ViewStyle = .grid
     // HACK: To get animations working as @AppStorage does not support animations
 
