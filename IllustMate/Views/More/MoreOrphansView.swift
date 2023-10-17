@@ -129,6 +129,7 @@ struct MoreOrphansView: View {
 
     func importIllustration(_ name: String, data: Data) {
         let illustration = Illustration(name: name, data: data)
+        illustration.generateThumbnail()
         modelContext.insert(illustration)
     }
 }
