@@ -29,9 +29,6 @@ struct MoreFileManagementView: View {
                 }
             }
             Section {
-                Button("More.FileManagement.RedownloadThumbnails") {
-                    redownloadThumbnails()
-                }
                 Button("More.FileManagement.RedownloadIllustrations") {
                     redownloadIllustrations()
                 }
@@ -99,46 +96,6 @@ struct MoreFileManagementView: View {
                         if !orphans.isEmpty {
                             navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
                         }
-                    }
-                }
-            } catch {
-                debugPrint(error.localizedDescription)
-                UIApplication.shared.isIdleTimerDisabled = false
-            }
-        }
-    }
-
-    func redownloadThumbnails() {
-        UIApplication.shared.isIdleTimerDisabled = true
-        concurrency.queue.addOperation {
-            do {
-                let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-                progressAlertManager.prepare("More.FileManagement.RedownloadThumbnails.Redownloading",
-                                             total: illustrations.count)
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.show()
-                }
-                for illustration in illustrations {
-                    do {
-                        try FileManager.default.startDownloadingUbiquitousItem(
-                            at: URL(filePath: illustration.thumbnailPath()))
-                        var isDownloaded: Bool = false
-                        while !isDownloaded {
-                            if FileManager.default.fileExists(atPath: illustration.thumbnailPath()) {
-                                isDownloaded = true
-                            }
-                        }
-                    } catch {
-                        debugPrint(error.localizedDescription)
-                    }
-                    progressAlertManager.incrementProgress()
-                }
-                DispatchQueue.main.async {
-                    UIApplication.shared.isIdleTimerDisabled = false
-                    withAnimation(.easeOut.speed(2)) {
-                        progressAlertManager.hide()
-                    } completion: {
-                        // TODO: Show an alert that the downloads may take some time to complete
                     }
                 }
             } catch {

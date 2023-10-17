@@ -64,8 +64,6 @@ struct IllustMateApp: App {
             .environment(concurrency)
             .task {
                 createIfNotExists(illustrationsFolder)
-                createIfNotExists(thumbnailsFolder)
-                createIfNotExists(importsFolder)
                 createIfNotExists(orphansFolder)
             }
         }

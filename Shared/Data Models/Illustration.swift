@@ -36,14 +36,6 @@ final class Illustration {
         return cachedThumbnail?.image()
     }
 
-    func thumbnailPath() -> String {
-        return thumbnailsFolder.appendingPathComponent(id).path(percentEncoded: false)
-    }
-
-    func thumbnailPathWhenUbiquitousFileNotDownloaded() -> String {
-        return thumbnailsFolder.appendingPathComponent(".\(id).icloud").path(percentEncoded: false)
-    }
-
     func isInAlbum(_ album: Album?) -> Bool {
         if let album {
             return containingAlbum?.id ?? "" == album.id
@@ -71,7 +63,6 @@ final class Illustration {
 
     func prepareForDeletion() {
         try? FileManager.default.removeItem(atPath: illustrationPath())
-        try? FileManager.default.removeItem(atPath: thumbnailPath())
     }
 
     static func makeThumbnail(_ data: Data?) -> Data? {

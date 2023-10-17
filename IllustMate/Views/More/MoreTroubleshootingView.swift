@@ -27,8 +27,6 @@ struct MoreTroubleshootingView: View {
             Button("Shared.Yes", role: .destructive) {
                 deleteData()
                 deleteContents(of: illustrationsFolder)
-                deleteContents(of: thumbnailsFolder)
-                deleteContents(of: importsFolder)
                 navigationManager.popAll()
             }
             Button("Shared.No", role: .cancel) { }

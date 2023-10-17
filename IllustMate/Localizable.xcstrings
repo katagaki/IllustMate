@@ -825,23 +825,6 @@
         }
       }
     },
-    "More.FileManagement.RedownloadThumbnails.Redownloading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sending thumbnail download request..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルのダウンロード要求を送信中…"
-          }
-        }
-      }
-    },
     "More.FileManagement.ScanForOrphans" : {
       "extractionState" : "manual",
       "localizations" : {
