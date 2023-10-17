@@ -59,11 +59,11 @@ actor DataActor: ModelActor {
         return try modelContext.fetch(fetchDescriptor)
     }
 
-    func illustrations(in album: Album?) throws -> [Illustration] {
+    func illustrations(in album: Album?, order: SortOrder) throws -> [Illustration] {
         let albumID = album?.id
         var fetchDescriptor = FetchDescriptor<Illustration>(
             predicate: #Predicate { $0.containingAlbum?.id == albumID },
-            sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
+            sortBy: [SortDescriptor(\.dateAdded, order: order)])
         fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
         return try modelContext.fetch(fetchDescriptor)

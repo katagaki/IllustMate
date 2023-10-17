@@ -208,7 +208,8 @@ extension AlbumView {
     func refreshIllustrationsUsingActor() {
         Task.detached(priority: .userInitiated) {
             do {
-                let illustrations = try await actor.illustrations(in: currentAlbum)
+                let illustrations = try await actor
+                    .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
                 await MainActor.run {
                     withAnimation(.snappy.speed(2)) {
                         self.illustrations = illustrations
