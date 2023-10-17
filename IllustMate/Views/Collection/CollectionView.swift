@@ -32,18 +32,7 @@ struct CollectionView: View {
                     }
                 })
         }
-        .overlay {
-            if let illustration = viewerManager.displayedIllustration,
-               let image = viewerManager.displayedImage {
-                IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   illustration: illustration,
-                                   displayedImage: image) {
-                    withAnimation(.snappy.speed(2)) {
-                        viewerManager.removeDisplay()
-                    }
-                }
-            }
-        }
+        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
 #if !targetEnvironment(macCatalyst)
         .navigationTransition(.default, interactivity: .pan)
 #endif

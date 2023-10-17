@@ -56,18 +56,7 @@ struct IllustrationsView: View {
             }
         }
 #endif
-        .overlay {
-            if let illustration = viewerManager.displayedIllustration,
-               let image = viewerManager.displayedImage {
-                IllustrationViewer(namespace: illustrationTransitionNamespace,
-                                   illustration: illustration,
-                                   displayedImage: image) {
-                    withAnimation(.snappy.speed(2)) {
-                        viewerManager.removeDisplay()
-                    }
-                }
-            }
-        }
+        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
         .onAppear {
             concurrency.queue.addOperation {
                 withAnimation(.snappy.speed(2)) {
