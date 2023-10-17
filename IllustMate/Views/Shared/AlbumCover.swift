@@ -44,7 +44,7 @@ struct AlbumCover: View {
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)
         .overlay {
             RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(.secondary, lineWidth: 1/3)
+                .stroke(.tertiary, lineWidth: 1/3)
         }
     }
 }
