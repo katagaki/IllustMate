@@ -11,10 +11,11 @@ import SwiftUI
 struct ShareView: View {
 
     let modelContext = ModelContext(sharedModelContainer)
+    
+    var items: [Any?]
 
     @State var viewPath: [ViewPath] = []
     @State var albums: [Album]
-    var items: [Any?]
     @State var progress: Float = 0
     @State var total: Float = 0
     @State var isImporting: Bool = false
@@ -107,14 +108,12 @@ struct ShareView: View {
                                 isImporting = true
                             } completion: {
                                 albums.removeAll()
-                                modelContext.autosaveEnabled = false
                                 for item in items {
                                     autoreleasepool {
                                         importItem(modelContext, item)
                                         progress += 1.0
                                     }
                                 }
-                                try? modelContext.save()
                                 withAnimation(.snappy.speed(2)) {
                                     isCompleted = true
                                 } completion: {
