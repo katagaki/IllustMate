@@ -21,7 +21,7 @@ struct IllustrationViewer: View {
     var closeAction: () -> Void
 
     var body: some View {
-        VStack(alignment: .center, spacing: 20.0) {
+        VStack(alignment: .center, spacing: 0.0) {
             HStack(alignment: .center, spacing: 8.0) {
                 Text(illustration.name)
                     .bold()
@@ -40,7 +40,7 @@ struct IllustrationViewer: View {
                 .buttonStyle(.plain)
             }
             .opacity(opacityDuringGesture())
-            Spacer(minLength: 0)
+            Spacer(minLength: 20)
             Image(uiImage: displayedImage)
                 .resizable()
                 .scaledToFit()
@@ -50,7 +50,7 @@ struct IllustrationViewer: View {
                 .matchedGeometryEffect(id: illustration.id, in: namespace)
                 .offset(displayOffset)
                 .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
-            Spacer(minLength: 0)
+            Spacer(minLength: 20)
             if let cgImage = displayedImage.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     HStack(alignment: .center, spacing: 2.0) {
