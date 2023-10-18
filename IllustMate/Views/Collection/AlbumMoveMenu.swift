@@ -14,17 +14,35 @@ struct AlbumMoveMenu: View {
     var album: Album
     var onMoved: () -> Void
 
+    let actor = DataActor(modelContainer: sharedModelContainer)
+    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
+
     var body: some View {
         if album.parentAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                album.removeFromAlbum()
-                onMoved()
+                if useThreadSafeLoading {
+                    Task.detached(priority: .userInitiated) {
+                        await actor.removeFromAlbum(album)
+                        onMoved()
+                    }
+                } else {
+                    album.removeFromAlbum()
+                    onMoved()
+                }
             }
         }
         if let parentAlbum = album.parentAlbum?.parentAlbum {
             Button {
-                parentAlbum.addChildAlbum(album)
-                onMoved()
+                if useThreadSafeLoading {
+                    Task.detached(priority: .userInitiated) {
+                        await actor.addAlbum(withIdentifier: album.persistentModelID,
+                                             toAlbumWithIdentifier: parentAlbum.persistentModelID)
+                        onMoved()
+                    }
+                } else {
+                    parentAlbum.addChildAlbum(album)
+                    onMoved()
+                }
             } label: {
                 Label(
                     title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
@@ -35,8 +53,16 @@ struct AlbumMoveMenu: View {
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatAlbumCanBeMovedTo()) { albumToMoveTo in
                 Button {
-                    albumToMoveTo.addChildAlbum(album)
-                    onMoved()
+                    if useThreadSafeLoading {
+                        Task.detached(priority: .userInitiated) {
+                            await actor.addAlbum(withIdentifier: album.persistentModelID,
+                                                 toAlbumWithIdentifier: albumToMoveTo.persistentModelID)
+                            onMoved()
+                        }
+                    } else {
+                        albumToMoveTo.addChildAlbum(album)
+                        onMoved()
+                    }
                 } label: {
                     Label(
                         title: { Text(albumToMoveTo.name) },

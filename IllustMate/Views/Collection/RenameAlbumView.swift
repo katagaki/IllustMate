@@ -10,7 +10,6 @@ import SwiftUI
 
 struct RenameAlbumView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     @State var album: Album?
     @State var newAlbumName: String = ""

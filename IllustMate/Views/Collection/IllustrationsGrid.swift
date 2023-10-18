@@ -9,7 +9,6 @@ import SwiftUI
 
 struct IllustrationsGrid<Content: View>: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
     var namespace: Namespace.ID

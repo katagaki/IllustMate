@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MainTabView: View {
 
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var tabManager: TabManager
     @EnvironmentObject var navigationManager: NavigationManager
 

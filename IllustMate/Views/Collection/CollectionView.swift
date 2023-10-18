@@ -12,7 +12,6 @@ import SwiftData
 
 struct CollectionView: View {
 
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
     @Namespace var illustrationTransitionNamespace

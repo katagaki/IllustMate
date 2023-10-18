@@ -45,6 +45,10 @@ actor DataActor: ModelActor {
         }
     }
 
+    func removeFromAlbum(_ album: Album) {
+        album.parentAlbum = nil
+    }
+
     func deleteAlbum(withIdentifier albumID: PersistentIdentifier) {
         if let album = self[albumID, as: Album.self] {
             modelContext.delete(album)

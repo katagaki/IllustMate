@@ -180,7 +180,8 @@ struct ShareView: View {
         albums.removeAll()
         for item in items {
             autoreleasepool {
-                importItem(modelContext, item, to: album, named: "PIC_\(runningNumberForImageName)")
+                importItem(modelContext, item, to: album,
+                           named: "PIC_\(String(format: "%04d", runningNumberForImageName))")
                 runningNumberForImageName += 1
                 Task {
                     progress += 1.0

@@ -789,6 +789,74 @@
         }
       }
     },
+    "More.FileManagement.Orphans" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan for Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Orphans.Moving" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを移動中…"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Orphans.Scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認中…"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Orphans.View" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを見る"
+          }
+        }
+      }
+    },
     "More.FileManagement.RedownloadIllustrations" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -836,74 +904,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのサムネイルをダウンロード"
-          }
-        }
-      }
-    },
-    "More.FileManagement.ScanForOrphans" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan for Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認"
-          }
-        }
-      }
-    },
-    "More.FileManagement.ScanForOrphans.Moving" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moving orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを移動中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.ScanForOrphans.Scanning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.ViewOrphans" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを見る"
           }
         }
       }
