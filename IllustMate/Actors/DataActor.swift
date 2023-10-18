@@ -55,6 +55,10 @@ actor DataActor: ModelActor {
         }
     }
 
+    func createIllustration(_ illustration: Illustration) {
+        modelContext.insert(illustration)
+    }
+
     func illustrations() throws -> [Illustration] {
         var fetchDescriptor = FetchDescriptor<Illustration>(
             sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
@@ -78,6 +82,12 @@ actor DataActor: ModelActor {
         if let illustration = self[illustrationID, as: Illustration.self],
             let album = self[albumID, as: Album.self] {
             illustration.addToAlbum(album)
+        }
+    }
+
+    func addIllustration(_ illustration: Illustration, toAlbumWithIdentifier albumID: PersistentIdentifier) {
+        if let album = self[albumID, as: Album.self] {
+            album.addChildIllustration(illustration)
         }
     }
 

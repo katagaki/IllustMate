@@ -17,11 +17,14 @@ struct ImporterView: View {
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
-
     @State var selectedAlbum: Album?
 
+    @State var isImporting: Bool = false
     @State var isImportCompleted: Bool = false
     @State var importCompletedCount: Int = 0
+
+    let actor = DataActor(modelContainer: sharedModelContainer)
+    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
 
@@ -40,11 +43,13 @@ struct ImporterView: View {
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
+            .disabled(isImporting)
             Spacer()
             Text("Import.SelectedPhotos.\(selectedPhotoItems.count)")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Button {
+                isImporting = true
                 progressAlertManager.prepare("Import.Importing",
                                              total: selectedPhotoItems.count)
                 withAnimation(.easeOut.speed(2)) {
@@ -61,7 +66,7 @@ struct ImporterView: View {
             .frame(maxWidth: .infinity)
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
-            .disabled(selectedPhotoItems.isEmpty)
+            .disabled(isImporting || selectedPhotoItems.isEmpty)
         }
         .padding(20.0)
         .alert("Alert.ImportCompleted.Title", isPresented: $isImportCompleted) {
@@ -78,9 +83,8 @@ struct ImporterView: View {
     func importPhotos() {
         UIApplication.shared.isIdleTimerDisabled = true
         let selectedPhotoItems = selectedPhotoItems
-        let selectedAlbum = selectedAlbum
         // TODO: Importer stops working after run once
-        Task.detached(priority: .high) {
+        Task.detached(priority: .userInitiated) {
             let illustrationsToAdd = await withTaskGroup(of: Illustration?.self,
                                                          returning: [Illustration].self) { group in
                 var illustrationsToAdd: [Illustration] = []
@@ -110,14 +114,23 @@ struct ImporterView: View {
                 }
                 return illustrationsToAdd
             }
-            await MainActor.run { [illustrationsToAdd] in
+            if useThreadSafeLoading {
+                for illustration in illustrationsToAdd {
+                    await actor.createIllustration(illustration)
+                    if let selectedAlbum {
+                        await actor.addIllustration(illustration,
+                                                    toAlbumWithIdentifier: selectedAlbum.persistentModelID)
+                    }
+                }
+            } else {
                 illustrationsToAdd.forEach { illustration in
                     modelContext.insert(illustration)
                 }
                 if let selectedAlbum {
                     selectedAlbum.addChildIllustrations(illustrationsToAdd)
                 }
-                self.runningNumberForImageName += selectedPhotoItems.count
+            }
+            await MainActor.run {
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = selectedPhotoItems.count
                 withAnimation(.easeOut.speed(2)) {
