@@ -114,7 +114,6 @@ struct IllustrationViewer: View {
                     }
                 }
         )
-        .id(illustration.id)
     }
 
     func opacityDuringGesture() -> Double {

@@ -47,10 +47,6 @@ struct MainSplitView: View {
                         Text("TabTitle.Illustrations")
                     } icon: {
                         Image(systemName: "photo.fill")
-#if targetEnvironment(macCatalyst)
-                            .resizable()
-                            .frame(width: 16.0, height: 16.0)
-#endif
                     }
                 }
                 NavigationLink(value: ViewPath.importer) {
@@ -100,6 +96,7 @@ struct MainSplitView: View {
             default: Color.clear
             }
             // TODO: Illustration viewer in pushed AlbumView is broken on iPad and Mac
+            // TODO: Move viewer to split view for iPad and Mac
         }
         .overlay {
             if progressAlertManager.isDisplayed {

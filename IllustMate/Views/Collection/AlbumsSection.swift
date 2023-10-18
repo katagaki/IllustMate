@@ -13,7 +13,7 @@ struct AlbumsSection<Content: View>: View {
 
     @Namespace var albumTransitionNamespace
 
-    @Binding var albums: [Album]
+    var albums: [Album]
     @Binding var style: ViewStyle
     var enablesContextMenu: Bool = true
     var onRename: ((Album) -> Void)?

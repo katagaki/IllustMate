@@ -32,7 +32,7 @@ struct AlbumsScrollView: View {
                         .padding([.leading, .trailing], 20.0)
                         .padding([.top], 10.0)
                 } else {
-                    AlbumsSection(albums: .constant(albums), style: $style,
+                    AlbumsSection(albums: albums, style: $style,
                                   enablesContextMenu: false) { _ in }
                 }
             }

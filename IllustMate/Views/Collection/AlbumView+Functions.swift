@@ -99,6 +99,7 @@ extension AlbumView {
                         for illustration in illustrations {
                             await actor.addIllustration(withIdentifier: illustration.persistentModelID,
                                                         toAlbumWithIdentifier: album.persistentModelID)
+                            await refreshData(animated: true)
                         }
                     }
                 } else {
@@ -117,6 +118,7 @@ extension AlbumView {
                                 await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
                                                      toAlbumWithIdentifier: album.persistentModelID)
                             }
+                            await refreshData(animated: true)
                         }
                     } else {
                         album.addChildAlbums(albums)
@@ -126,8 +128,10 @@ extension AlbumView {
         } else if let transferable = drop.importedPhoto {
             // TODO: Import photo dropped from outside app
         }
-        withAnimation(.snappy.speed(2)) {
-            refreshData()
+        if !useThreadSafeLoading {
+            withAnimation(.snappy.speed(2)) {
+                refreshData()
+            }
         }
     }
 

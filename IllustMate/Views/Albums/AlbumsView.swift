@@ -28,19 +28,21 @@ struct AlbumsView: View {
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
-        NavigationStack(path: $navigationManager.albumsTabPath) {
-            ScrollView(.vertical) {
-                AlbumsSection(albums: $albums, style: $style) { _ in }
-            }
-            .navigationDestination(for: ViewPath.self, destination: { viewPath in
-                switch viewPath {
-                case .album(let album): AlbumView(namespace: illustrationTransitionNamespace,
-                                                  currentAlbum: album,
-                                                  viewerManager: $viewerManager)
-                default: Color.clear
+        ZStack {
+            NavigationStack(path: $navigationManager.albumsTabPath) {
+                ScrollView(.vertical) {
+                    AlbumsSection(albums: albums, style: $style) { _ in }
                 }
-            })
-            .navigationTitle("ViewTitle.Albums")
+                .navigationDestination(for: ViewPath.self, destination: { viewPath in
+                    switch viewPath {
+                    case .album(let album): AlbumView(namespace: illustrationTransitionNamespace,
+                                                      currentAlbum: album,
+                                                      viewerManager: $viewerManager)
+                    default: Color.clear
+                    }
+                })
+                .navigationTitle("ViewTitle.Albums")
+            }
         }
         .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
 #if targetEnvironment(macCatalyst)

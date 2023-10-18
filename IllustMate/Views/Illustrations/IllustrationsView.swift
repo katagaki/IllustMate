@@ -26,22 +26,24 @@ struct IllustrationsView: View {
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
-        NavigationStack(path: $navigationManager.illustrationsTabPath) {
-            ScrollView(.vertical) {
-                IllustrationsGrid(namespace: illustrationTransitionNamespace,
-                                  illustrations: .constant(illustrations),
-                                  isSelecting: .constant(false),
-                                  enableSelection: false) { illustration in
-                    illustration.id == viewerManager.displayedIllustration?.id
-                } onSelect: { illustration in
-                    withAnimation(.snappy.speed(2)) {
-                        viewerManager.setDisplay(illustration)
-                    }
-                } selectedCount: {
-                    return 0
-                } moveMenu: { _ in }
+        ZStack {
+            NavigationStack(path: $navigationManager.illustrationsTabPath) {
+                ScrollView(.vertical) {
+                    IllustrationsGrid(namespace: illustrationTransitionNamespace,
+                                      illustrations: illustrations,
+                                      isSelecting: .constant(false),
+                                      enableSelection: false) { illustration in
+                        illustration.id == viewerManager.displayedIllustration?.id
+                    } onSelect: { illustration in
+                        withAnimation(.snappy.speed(2)) {
+                            viewerManager.setDisplay(illustration)
+                        }
+                    } selectedCount: {
+                        return 0
+                    } moveMenu: { _ in }
+                }
+                .navigationTitle("ViewTitle.Illustrations")
             }
-            .navigationTitle("ViewTitle.Illustrations")
         }
         .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
 #if targetEnvironment(macCatalyst)

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SelectionBar<Content: View>: View {
 
-    @Binding var illustrations: [Illustration]
+    var illustrations: [Illustration]
     @Binding var selectedIllustrations: [Illustration]
     var onStopSelecting: () -> Void
     @ViewBuilder var menuItems: Content

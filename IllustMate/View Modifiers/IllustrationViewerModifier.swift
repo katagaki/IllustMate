@@ -17,13 +17,12 @@ struct IllustrationViewerModifier: ViewModifier {
             .overlay {
                 if let image = viewerManager.displayedImage,
                    let illustration = viewerManager.displayedIllustration {
-                    IllustrationViewer(namespace: namespace,
-                                       illustration: illustration,
-                                       displayedImage: image) {
+                    IllustrationViewer(namespace: namespace, illustration: illustration, displayedImage: image) {
                         withAnimation(.snappy.speed(2)) {
                             viewerManager.removeDisplay()
                         }
                     }
+                    .id(illustration.id)
                 }
             }
     }

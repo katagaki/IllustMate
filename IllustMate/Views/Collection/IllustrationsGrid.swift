@@ -13,7 +13,7 @@ struct IllustrationsGrid<Content: View>: View {
 
     var namespace: Namespace.ID
 
-    @Binding var illustrations: [Illustration]
+    var illustrations: [Illustration]
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
     var isViewing: (Illustration) -> Bool

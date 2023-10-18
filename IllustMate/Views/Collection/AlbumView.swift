@@ -22,7 +22,7 @@ struct AlbumView: View {
     @State var isDataLoadedFromInitialAppearance: Bool = false
 
     var currentAlbum: Album?
-    @State var albums: [Album] = []
+    @State var albums: [Album]?
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
@@ -31,7 +31,7 @@ struct AlbumView: View {
     @State var styleState: ViewStyle = .grid
     // HACK: To get animations working as @AppStorage does not support animations
 
-    @State var illustrations: [Illustration] = []
+    @State var illustrations: [Illustration]?
     @State var isConfirmingDeleteIllustration: Bool = false
     @State var isConfirmingDeleteSelectedIllustrations: Bool = false
     @State var illustrationPendingDeletion: Illustration?
@@ -46,7 +46,7 @@ struct AlbumView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                CollectionHeader(title: "Albums.Albums", count: albums.count) {
+                CollectionHeader(title: "Albums.Albums", count: albums?.count ?? 0) {
                     Button {
                         withAnimation(.snappy.speed(2)) {
                             styleState = styleState == .grid ? .list : .grid
@@ -62,16 +62,11 @@ struct AlbumView: View {
                     }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                if !isDataLoadedFromInitialAppearance {
-                    Divider()
-                        .padding([.leading], 20.0)
-                    ProgressView()
-                        .padding(20.0)
-                } else {
+                if let albums {
                     if !albums.isEmpty {
                         Divider()
                             .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
-                        AlbumsSection(albums: $albums, style: $styleState) { album in
+                        AlbumsSection(albums: albums, style: $styleState) { album in
                             albumToRename = album
                         } onDelete: { album in
                             deleteAlbum(album)
@@ -92,9 +87,15 @@ struct AlbumView: View {
                             .foregroundStyle(.secondary)
                             .padding(20.0)
                     }
+                } else {
+                    Divider()
+                        .padding([.leading], 20.0)
+                    ProgressView()
+                        .padding(20.0)
                 }
-                Spacer(minLength: 20.0)
-                CollectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
+                Spacer()
+                    .frame(height: 20.0)
+                CollectionHeader(title: "Albums.Illustrations", count: illustrations?.count ?? 0) {
                     Button {
                         isIllustrationSortReversed.toggle()
                         withAnimation(.snappy.speed(2)) {
@@ -109,19 +110,13 @@ struct AlbumView: View {
                         Label("Shared.Select",
                               systemImage: isSelectingIllustrations ? "checkmark.circle.fill" : "checkmark.circle")
                     }
-                    .disabled(illustrations.isEmpty)
+                    .disabled(illustrations == nil || (illustrations?.isEmpty ?? true))
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                if !isDataLoadedFromInitialAppearance {
-                    Divider()
-                        .padding([.leading], 20.0)
-                    ProgressView()
-                        .padding(20.0)
-                } else {
+                if let illustrations {
                     if !illustrations.isEmpty {
                         Divider()
-                        IllustrationsGrid(namespace: namespace,
-                                          illustrations: $illustrations,
+                        IllustrationsGrid(namespace: namespace, illustrations: illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
                             illustration.id == viewerManager.displayedIllustration?.id
                         } isSelected: { illustration in
@@ -147,6 +142,11 @@ struct AlbumView: View {
                             .foregroundStyle(.secondary)
                             .padding(20.0)
                     }
+                } else {
+                    Divider()
+                        .padding([.leading], 20.0)
+                    ProgressView()
+                        .padding(20.0)
                 }
             }
             .padding([.top], 20.0)
@@ -170,8 +170,8 @@ struct AlbumView: View {
         }
 #endif
         .safeAreaInset(edge: .bottom) {
-            if isSelectingIllustrations {
-                SelectionBar(illustrations: $illustrations, selectedIllustrations: $selectedIllustrations) {
+            if isSelectingIllustrations, let illustrations {
+                SelectionBar(illustrations: illustrations, selectedIllustrations: $selectedIllustrations) {
                     startOrStopSelectingIllustrations()
                 } menuItems: {
                     Menu("Shared.Move", systemImage: "tray.full") {
@@ -229,13 +229,12 @@ struct AlbumView: View {
         }
         .onAppear {
             if useThreadSafeLoading {
-                if isDataLoadedFromInitialAppearance {
+                if albums != nil && illustrations != nil {
                     styleState = style
                     refreshData(animated: false)
                 } else {
                     styleState = style
                     refreshData()
-                    isDataLoadedFromInitialAppearance = true
                 }
             } else {
                 if isDataLoadedFromInitialAppearance {
