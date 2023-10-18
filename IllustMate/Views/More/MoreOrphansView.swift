@@ -91,13 +91,11 @@ struct MoreOrphansView: View {
                         } else {
                             try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
                             var isDownloaded: Bool = false
-                            debugPrint("\(orphan) - Waiting for download")
                             while !isDownloaded {
                                 if FileManager.default.fileExists(atPath: filePath) {
                                     isDownloaded = true
                                 }
                             }
-                            debugPrint("\(orphan) - Download appears to have completed")
                             if let image = UIImage(contentsOfFile: filePath) {
                                 orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
                             }
