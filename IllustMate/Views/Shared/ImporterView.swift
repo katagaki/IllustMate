@@ -29,53 +29,62 @@ struct ImporterView: View {
     @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
 
     var body: some View {
-        VStack(alignment: .center, spacing: 16.0) {
-            Text("Import.Instructions")
-            PhotosPicker(selection: $selectedPhotoItems, matching: .images, photoLibrary: .shared()) {
-                HStack(alignment: .center, spacing: 8.0) {
-                    Image("ListIcon.Photos")
-                        .resizable()
-                        .frame(width: 30.0, height: 30.0)
-                    Text("Import.SelectPhotos")
+        VStack(alignment: .leading, spacing: 16.0) {
+            if !isImportCompleted {
+                Text("Import.Instructions")
+                PhotosPicker(selection: $selectedPhotoItems, matching: .images, photoLibrary: .shared()) {
+                    HStack(alignment: .center, spacing: 8.0) {
+                        Image("ListIcon.Photos")
+                            .resizable()
+                            .frame(width: 30.0, height: 30.0)
+                        Text("Import.SelectPhotos")
+                            .bold()
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .disabled(isImporting)
+                Spacer()
+                Text("Import.SelectedPhotos.\(selectedPhotoItems.count)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Button {
+                    isImporting = true
+                    progressAlertManager.prepare("Import.Importing",
+                                                 total: selectedPhotoItems.count)
+                    withAnimation(.easeOut.speed(2)) {
+                        progressAlertManager.show()
+                    } completion: {
+                        importPhotos()
+                    }
+                } label: {
+                    Text("Import.StartImport")
                         .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
                 }
                 .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
-            .disabled(isImporting)
-            Spacer()
-            Text("Import.SelectedPhotos.\(selectedPhotoItems.count)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Button {
-                isImporting = true
-                progressAlertManager.prepare("Import.Importing",
-                                             total: selectedPhotoItems.count)
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.show()
-                } completion: {
-                    importPhotos()
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .disabled(isImporting || selectedPhotoItems.isEmpty)
+            } else {
+                Text("Import.Completed.Text.\(importCompletedCount)")
+                Spacer()
+                Button {
+                    dismiss()
+                } label: {
+                    Text("Shared.OK")
+                        .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
                 }
-            } label: {
-                Text("Import.StartImport")
-                    .bold()
-                    .padding(4.0)
-                    .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
             }
-            .frame(maxWidth: .infinity)
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
-            .disabled(isImporting || selectedPhotoItems.isEmpty)
         }
         .padding(20.0)
-        .alert("Alert.ImportCompleted.Title", isPresented: $isImportCompleted) {
-            Button("Shared.OK") {
-                dismiss()
-            }
-        } message: {
-            Text("Alert.ImportCompleted.Text.\(importCompletedCount)")
-        }
         .navigationTitle("ViewTitle.Import")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -136,10 +145,7 @@ struct ImporterView: View {
                 withAnimation(.easeOut.speed(2)) {
                     self.selectedPhotoItems.removeAll()
                     progressAlertManager.hide()
-                } completion: {
-                    DispatchQueue.main.async {
-                        isImportCompleted = true
-                    }
+                    isImportCompleted = true
                 }
             }
         }
