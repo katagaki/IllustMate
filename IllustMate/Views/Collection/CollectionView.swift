@@ -31,7 +31,7 @@ struct CollectionView: View {
                     }
                 })
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
+        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
 #if !targetEnvironment(macCatalyst)
         .navigationTransition(.default, interactivity: .pan)
 #endif

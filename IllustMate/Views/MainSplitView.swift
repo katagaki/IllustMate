@@ -31,11 +31,22 @@ struct MainSplitView: View {
 #endif
                     }
                 }
+                NavigationLink(value: ViewPath.albums) {
+                    Label {
+                        Text("TabTitle.Albums")
+                    } icon: {
+                        Image("Tab.Albums")
+#if targetEnvironment(macCatalyst)
+                            .resizable()
+                            .frame(width: 16.0, height: 16.0)
+#endif
+                    }
+                }
                 NavigationLink(value: ViewPath.illustrations) {
                     Label {
                         Text("TabTitle.Illustrations")
                     } icon: {
-                        Image(systemName: "photo.stack.fill")
+                        Image(systemName: "photo.fill")
 #if targetEnvironment(macCatalyst)
                             .resizable()
                             .frame(width: 16.0, height: 16.0)
@@ -79,22 +90,16 @@ struct MainSplitView: View {
             .navigationSplitViewColumnWidth(170.0)
 #endif
         } detail: {
-            ZStack {
-                switch viewPath {
-                case .collection:
-                    CollectionView()
-                case .illustrations:
-                    IllustrationsView()
-                case .importer:
-                    ImportView(progressAlertManager: $progressAlertManager)
-                case .more:
-                    MoreView(progressAlertManager: $progressAlertManager)
-                case .album(let album):
-                    AlbumNavigationStack(album: album)
-                        .id(album.id)
-                default: Color.clear
-                }
+            switch viewPath {
+            case .collection: CollectionView()
+            case .albums: AlbumsView()
+            case .illustrations: IllustrationsView()
+            case .importer: ImportView(progressAlertManager: $progressAlertManager)
+            case .more: MoreView(progressAlertManager: $progressAlertManager)
+            case .album(let album): AlbumNavigationStack(album: album)
+            default: Color.clear
             }
+            // TODO: Illustration viewer in pushed AlbumView is broken on iPad and Mac
         }
         .overlay {
             if progressAlertManager.isDisplayed {

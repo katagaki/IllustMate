@@ -10,13 +10,13 @@ import SwiftUI
 struct IllustrationViewerModifier: ViewModifier {
 
     var namespace: Namespace.ID
-    var viewerManager: ViewerManager
+    @Binding var viewerManager: ViewerManager
 
     func body(content: Content) -> some View {
         content
             .overlay {
-                if let illustration = viewerManager.displayedIllustration,
-                   let image = viewerManager.displayedImage {
+                if let image = viewerManager.displayedImage,
+                   let illustration = viewerManager.displayedIllustration {
                     IllustrationViewer(namespace: namespace,
                                        illustration: illustration,
                                        displayedImage: image) {
@@ -30,7 +30,7 @@ struct IllustrationViewerModifier: ViewModifier {
 }
 
 extension View {
-    func illustrationViewerOverlay(namespace: Namespace.ID, manager: ViewerManager) -> some View {
+    func illustrationViewerOverlay(namespace: Namespace.ID, manager: Binding<ViewerManager>) -> some View {
         modifier(IllustrationViewerModifier(namespace: namespace, viewerManager: manager))
     }
 }

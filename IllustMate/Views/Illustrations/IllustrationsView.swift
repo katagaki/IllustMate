@@ -43,6 +43,7 @@ struct IllustrationsView: View {
             }
             .navigationTitle("ViewTitle.Illustrations")
         }
+        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
 #if targetEnvironment(macCatalyst)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -56,7 +57,6 @@ struct IllustrationsView: View {
             refreshIllustrations()
         }
 #endif
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
         .onAppear {
             refreshIllustrations()
         }

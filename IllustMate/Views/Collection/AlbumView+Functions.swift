@@ -146,8 +146,10 @@ extension AlbumView {
                 selectedIllustrations.append(illustration)
             }
         } else {
-            withAnimation(.snappy.speed(2)) {
-                viewerManager.setDisplay(illustration)
+            concurrency.queue.addOperation {
+                withAnimation(.snappy.speed(2)) {
+                    viewerManager.setDisplay(illustration)
+                }
             }
         }
     }

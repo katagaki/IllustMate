@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import NavigationTransitions
 import SwiftData
 import SwiftUI
 
@@ -29,6 +30,7 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.General")
                         .font(.body)
                 }
+#if !targetEnvironment(macCatalyst)
                 Section {
                     NavigationLink(value: ViewPath.moreAppIcon) {
                         ListRow(image: "ListIcon.AppIcon",
@@ -38,6 +40,7 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.Customization")
                         .font(.body)
                 }
+#endif
                 Section {
                     NavigationLink(value: ViewPath.moreDebug) {
                         ListRow(image: "ListIcon.Debug", title: "More.Debug")
@@ -124,5 +127,8 @@ SOFTWARE.
                 }
             }
         }
+#if !targetEnvironment(macCatalyst)
+        .navigationTransition(.default, interactivity: .pan)
+#endif
     }
 }

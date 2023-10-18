@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/18.
 //
 
+import NavigationTransitions
 import SwiftData
 import SwiftUI
 
@@ -41,7 +42,7 @@ struct AlbumsView: View {
             })
             .navigationTitle("ViewTitle.Albums")
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
+        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
 #if targetEnvironment(macCatalyst)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -51,6 +52,7 @@ struct AlbumsView: View {
             }
         }
 #else
+        .navigationTransition(.default, interactivity: .pan)
         .refreshable {
             refreshAlbums()
         }

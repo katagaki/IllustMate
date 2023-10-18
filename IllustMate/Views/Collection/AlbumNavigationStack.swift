@@ -30,6 +30,7 @@ struct AlbumNavigationStack: View {
                     }
                 })
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: viewerManager)
+        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
+        .id(album.id)
     }
 }
