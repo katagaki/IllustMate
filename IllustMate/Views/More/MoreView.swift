@@ -30,6 +30,15 @@ struct MoreView: View {
                         .font(.body)
                 }
                 Section {
+                    NavigationLink(value: ViewPath.moreAppIcon) {
+                        ListRow(image: "ListIcon.AppIcon",
+                                title: "More.Customization.AppIcon")
+                    }
+                } header: {
+                    ListSectionHeader(text: "More.Customization")
+                        .font(.body)
+                }
+                Section {
                     NavigationLink(value: ViewPath.moreDebug) {
                         ListRow(image: "ListIcon.Debug", title: "More.Debug")
                     }
@@ -47,12 +56,10 @@ struct MoreView: View {
                     MoreDataManagementView(progressAlertManager: $progressAlertManager)
                 case .moreFileManagement:
                     MoreFileManagementView(progressAlertManager: $progressAlertManager)
-                case .moreDebug:
-                    MoreExperimentsView()
-                case .moreOrphans(let orphans):
-                    MoreOrphansView(orphans: orphans)
-                case .moreTroubleshooting:
-                    MoreTroubleshootingView()
+                case .moreAppIcon: MoreAppIconView()
+                case .moreDebug: MoreExperimentsView()
+                case .moreOrphans(let orphans): MoreOrphansView(orphans: orphans)
+                case .moreTroubleshooting: MoreTroubleshootingView()
                 case .moreAttributions: LicensesView(licenses: [
                     // swiftlint:disable line_length
                     License(libraryName: "CloudKitSyncMonitor", text:

@@ -73,7 +73,6 @@ struct MoreFileManagementView: View {
                 progressAlertManager.prepare("More.FileManagement.Orphans.Scanning",
                                              total: filesToCheck.count)
                 Task.detached(priority: .background) {
-                    debugPrint("Checking \(filesToCheck.count) files")
                     let orphans: [String] = await withTaskGroup(of: String?.self, returning: [String].self) { group in
                         var orphans: [String] = []
                         for file in filesToCheck {
@@ -102,7 +101,6 @@ struct MoreFileManagementView: View {
                         }
                     }
                     await MainActor.run {
-                        debugPrint("Completing orphan scan")
                         UIApplication.shared.isIdleTimerDisabled = false
                         withAnimation(.easeOut.speed(2)) {
                             progressAlertManager.hide()

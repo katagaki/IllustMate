@@ -15,6 +15,7 @@ enum ViewPath: Hashable {
     case more
     case moreDataManagement
     case moreFileManagement
+    case moreAppIcon
     case moreDebug
     case moreOrphans(orphans: [String])
     case moreTroubleshooting
