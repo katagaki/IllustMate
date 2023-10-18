@@ -28,7 +28,7 @@ struct MainTabView: View {
                 .tag(TabType.albums)
             IllustrationsView()
                 .tabItem {
-                    Label("TabTitle.Illustrations", image: "Tab.Illustrations")
+                    Label("TabTitle.Illustrations", systemImage: "photo.fill")
                 }
                 .tag(TabType.illustrations)
             ImportView(progressAlertManager: $progressAlertManager)
