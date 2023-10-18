@@ -14,6 +14,7 @@ struct IllustMateApp: App {
 
     @StateObject var tabManager = TabManager()
     @StateObject var navigationManager = NavigationManager()
+    @State var progressAlertManager = ProgressAlertManager()
     @State var concurrency = ConcurrencyManager()
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
@@ -61,6 +62,7 @@ struct IllustMateApp: App {
             }
             .environmentObject(tabManager)
             .environmentObject(navigationManager)
+            .environment(progressAlertManager)
             .environment(concurrency)
             .task {
                 createIfNotExists(illustrationsFolder)

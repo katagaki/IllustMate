@@ -13,15 +13,14 @@ import SwiftUI
 struct MoreDataManagementView: View {
 
     @Environment(\.modelContext) var modelContext
-    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(ConcurrencyManager.self) var concurrency
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
     @Query var illustrations: [Illustration]
     @Query var albums: [Album]
     @Query var thumbnails: [Thumbnail]
-
-    @Binding var progressAlertManager: ProgressAlertManager
 
     var body: some View {
         List {

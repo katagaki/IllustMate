@@ -10,7 +10,7 @@ import SwiftUI
 struct ProgressAlert: View {
 
     @Environment(\.colorScheme) var colorScheme
-    @Binding var manager: ProgressAlertManager
+    @Environment(ProgressAlertManager.self) var progressAlertManager
 
     var body: some View {
         ZStack(alignment: .center) {
@@ -18,10 +18,10 @@ struct ProgressAlert: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack(alignment: .center, spacing: 0.0) {
                 VStack(alignment: .center, spacing: 16.0) {
-                    Text(manager.title)
+                    Text(progressAlertManager.title)
                         .multilineTextAlignment(.center)
                         .bold()
-                    ProgressView(value: min(Float(manager.percentage), 100.0),
+                    ProgressView(value: min(Float(progressAlertManager.percentage), 100.0),
                                  total: 100.0)
                         .progressViewStyle(.linear)
                 }

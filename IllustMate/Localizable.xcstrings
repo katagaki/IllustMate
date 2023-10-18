@@ -464,22 +464,6 @@
         }
       }
     },
-    "Import.Album.None" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Album"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アルバムなし"
-          }
-        }
-      }
-    },
     "Import.Importing" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -503,30 +487,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select photos to import from your Photos app, then select Start Import."
+            "value" : "Select photos to import from the Photos app, then select Start Import."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "「写真」アプリからインポートしたい写真を選択し、「インポートを開始」をタップしてください。"
-          }
-        }
-      }
-    },
-    "Import.SelectAlbum" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Album to Import To"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "写真を追加するアルバム"
           }
         }
       }
@@ -1470,6 +1437,22 @@
         }
       }
     },
+    "Shared.Import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真をインポート"
+          }
+        }
+      }
+    },
     "Shared.Move" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1836,23 +1819,6 @@
         }
       }
     },
-    "TabTitle.Import" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importer"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インポート"
-          }
-        }
-      }
-    },
     "TabTitle.More" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2011,13 +1977,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importer"
+            "value" : "Import Photos"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "インポート"
+            "value" : "写真をインポート"
           }
         }
       }

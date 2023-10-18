@@ -13,8 +13,7 @@ import SwiftUI
 struct MoreView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
-
-    @Binding var progressAlertManager: ProgressAlertManager
+    @Environment(ProgressAlertManager.self) var progressAlertManager
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -56,7 +55,7 @@ struct MoreView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .moreDataManagement:
-                    MoreDataManagementView(progressAlertManager: $progressAlertManager)
+                    MoreDataManagementView()
                 case .moreDataAlbums(let albums):
                     List(albums) { album in
                         Text(album.name)
@@ -70,7 +69,7 @@ struct MoreView: View {
                     .listStyle(.plain)
                     .navigationTitle("Shared.Illustrations")
                 case .moreFileManagement:
-                    MoreFileManagementView(progressAlertManager: $progressAlertManager)
+                    MoreFileManagementView()
                 case .moreAppIcon: MoreAppIconView()
                 case .moreDebug: MoreExperimentsView()
                 case .moreOrphans(let orphans): MoreOrphansView(orphans: orphans)

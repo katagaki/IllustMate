@@ -11,10 +11,9 @@ import SwiftUI
 struct MoreFileManagementView: View {
 
     @Environment(\.modelContext) var modelContext
-    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
-
-    @Binding var progressAlertManager: ProgressAlertManager
+    @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(ConcurrencyManager.self) var concurrency
 
     var body: some View {
         List {

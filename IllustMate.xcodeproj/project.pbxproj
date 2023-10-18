@@ -49,7 +49,7 @@
 		E4614D322ACB103200D751FB /* TabManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D312ACB103200D751FB /* TabManager.swift */; };
 		E4614D382ACB1C9800D751FB /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */; };
 		E4614D3A2ACB274700D751FB /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D392ACB274700D751FB /* CollectionView.swift */; };
-		E4614D462ACB417500D751FB /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D452ACB417500D751FB /* ImportView.swift */; };
+		E4614D462ACB417500D751FB /* ImporterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D452ACB417500D751FB /* ImporterView.swift */; };
 		E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4614D472ACB46D700D751FB /* ProgressAlert.swift */; };
 		E463671B2ADC4BC90056F3C4 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E463671A2ADC4BC90056F3C4 /* InfoPlist.xcstrings */; };
 		E46712D32ADA55E7006CB15D /* AlbumMoveMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712D22ADA55E7006CB15D /* AlbumMoveMenu.swift */; };
@@ -163,7 +163,7 @@
 		E4614D312ACB103200D751FB /* TabManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabManager.swift; sourceTree = "<group>"; };
 		E4614D372ACB1C9800D751FB /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E4614D392ACB274700D751FB /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
-		E4614D452ACB417500D751FB /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
+		E4614D452ACB417500D751FB /* ImporterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImporterView.swift; sourceTree = "<group>"; };
 		E4614D472ACB46D700D751FB /* ProgressAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlert.swift; sourceTree = "<group>"; };
 		E463671A2ADC4BC90056F3C4 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E46712D22ADA55E7006CB15D /* AlbumMoveMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumMoveMenu.swift; sourceTree = "<group>"; };
@@ -328,7 +328,6 @@
 				E4614D342ACB11AC00D751FB /* Collection */,
 				E4C834BE2ADEF4000056D47A /* Albums */,
 				E4C834BD2ADEF3EF0056D47A /* Illustrations */,
-				E4614D442ACB416B00D751FB /* Import */,
 				E4E892332AD2F4CE005C9DBD /* More */,
 				E4614D3F2ACB2B7D00D751FB /* Shared */,
 			);
@@ -364,19 +363,12 @@
 				E45A8BD32AD04A2400E3035E /* SelectionBar.swift */,
 				E45A8BD52AD04CD100E3035E /* SelectionOverlay.swift */,
 				E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */,
+				E4614D452ACB417500D751FB /* ImporterView.swift */,
 				E4E892422AD45DD6005C9DBD /* OptionalImage.swift */,
 				E4614D472ACB46D700D751FB /* ProgressAlert.swift */,
 				E4C834C72ADFB3090056D47A /* ListAppIconRow.swift */,
 			);
 			path = Shared;
-			sourceTree = "<group>";
-		};
-		E4614D442ACB416B00D751FB /* Import */ = {
-			isa = PBXGroup;
-			children = (
-				E4614D452ACB417500D751FB /* ImportView.swift */,
-			);
-			path = Import;
 			sourceTree = "<group>";
 		};
 		E46712DF2ADC2B6E006CB15D /* Frameworks */ = {
@@ -622,7 +614,7 @@
 				E4C834C02ADEF40D0056D47A /* AlbumsView.swift in Sources */,
 				E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */,
 				E4E73BE22AD56B4C00372D05 /* Defaults.swift in Sources */,
-				E4614D462ACB417500D751FB /* ImportView.swift in Sources */,
+				E4614D462ACB417500D751FB /* ImporterView.swift in Sources */,
 				E4CA0B8E2ACD17190063F06C /* FileManager.swift in Sources */,
 				E43DFB302AD82A20002A6317 /* ConcurrencyManager.swift in Sources */,
 				E4E892322AD2F3C3005C9DBD /* MoreExperimentsView.swift in Sources */,

@@ -11,8 +11,7 @@ struct MainTabView: View {
 
     @EnvironmentObject var tabManager: TabManager
     @EnvironmentObject var navigationManager: NavigationManager
-
-    @State var progressAlertManager = ProgressAlertManager()
+    @Environment(ProgressAlertManager.self) var progressAlertManager
 
     var body: some View {
         TabView(selection: $tabManager.selectedTab) {
@@ -31,12 +30,7 @@ struct MainTabView: View {
                     Label("TabTitle.Illustrations", systemImage: "photo.fill")
                 }
                 .tag(TabType.illustrations)
-            ImportView(progressAlertManager: $progressAlertManager)
-                .tabItem {
-                    Label("TabTitle.Import", image: "Tab.Import")
-                }
-                .tag(TabType.importer)
-            MoreView(progressAlertManager: $progressAlertManager)
+            MoreView()
                 .tabItem {
                     Label("TabTitle.More", systemImage: "ellipsis")
                 }
@@ -44,7 +38,7 @@ struct MainTabView: View {
         }
         .overlay {
             if progressAlertManager.isDisplayed {
-                ProgressAlert(manager: $progressAlertManager)
+                ProgressAlert()
                     .ignoresSafeArea()
             }
         }

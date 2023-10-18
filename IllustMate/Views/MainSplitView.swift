@@ -10,15 +10,16 @@ import SwiftUI
 
 struct MainSplitView: View {
 
-    @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
-                                  sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
+    @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @Namespace var splitViewNamespace
+
+    @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
+                                  sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
 
     @State var selectedView: ViewPath? = .collection
 
     @State var viewerManager = ViewerManager()
-    @State var progressAlertManager = ProgressAlertManager()
 
     var body: some View {
         NavigationSplitView {
@@ -52,17 +53,6 @@ struct MainSplitView: View {
                         Image(systemName: "photo.fill")
                     }
                 }
-                NavigationLink(value: ViewPath.importer) {
-                    Label {
-                        Text("TabTitle.Import")
-                    } icon: {
-                        Image("Tab.Import")
-#if targetEnvironment(macCatalyst)
-                            .resizable()
-                            .frame(width: 16.0, height: 16.0)
-#endif
-                    }
-                }
                 NavigationLink(value: ViewPath.more) {
                     Label("TabTitle.More", systemImage: "ellipsis")
                 }
@@ -94,8 +84,8 @@ struct MainSplitView: View {
                 case .collection: CollectionView(viewerManager: viewerManager)
                 case .albums: AlbumsView(viewerManager: viewerManager)
                 case .illustrations: IllustrationsView(viewerManager: viewerManager)
-                case .importer: ImportView(progressAlertManager: $progressAlertManager)
-                case .more: MoreView(progressAlertManager: $progressAlertManager)
+                case .importer: ImporterView()
+                case .more: MoreView()
                 case .album(let album): AlbumNavigationStack(album: album, viewerManager: viewerManager)
                 default: Color.clear
                 }
@@ -116,7 +106,7 @@ struct MainSplitView: View {
         }
         .overlay {
             if progressAlertManager.isDisplayed {
-                ProgressAlert(manager: $progressAlertManager)
+                ProgressAlert()
                     .ignoresSafeArea()
             }
         }

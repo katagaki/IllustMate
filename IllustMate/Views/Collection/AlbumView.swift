@@ -148,13 +148,21 @@ struct AlbumView: View {
                     ProgressView()
                         .padding(20.0)
                 }
+                HStack(alignment: .center, spacing: 8.0) {
+                    Spacer()
+                    NavigationLink(value: ViewPath.importer(selectedAlbum: currentAlbum)) {
+                        Label("Shared.Import", systemImage: "square.and.arrow.down.on.square")
+                    }
+                }
+                .padding([.top, .bottom], 8.0)
+                .padding([.leading, .trailing], 20.0)
             }
             .padding([.top], 20.0)
         }
         .background(Color.init(uiColor: .systemGroupedBackground))
 #if targetEnvironment(macCatalyst)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("Shared.Refresh") {
                     withAnimation(.snappy.speed(2)) {
                         refreshData()

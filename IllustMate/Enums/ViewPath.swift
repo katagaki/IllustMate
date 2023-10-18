@@ -12,7 +12,7 @@ enum ViewPath: Hashable {
     case albums
     case illustrations
     case album(album: Album)
-    case importer
+    case importer(selectedAlbum: Album?)
     case more
     case moreDataManagement
     case moreDataAlbums(albums: [Album])
