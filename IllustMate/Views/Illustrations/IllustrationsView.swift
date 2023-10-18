@@ -23,7 +23,7 @@ struct IllustrationsView: View {
 
     @State var viewerManager = ViewerManager()
 
-    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
+    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
         NavigationStack(path: $navigationManager.illustrationsTabPath) {

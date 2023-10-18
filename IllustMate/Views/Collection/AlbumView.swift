@@ -41,7 +41,7 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
 
     let actor = DataActor(modelContainer: sharedModelContainer)
-    @AppStorage(wrappedValue: false, "DebugThreadSafety") var useThreadSafeLoading: Bool
+    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
         ScrollView(.vertical) {
