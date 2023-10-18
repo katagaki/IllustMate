@@ -107,7 +107,7 @@ struct ImporterView: View {
                     }
                 }
                 for await result in group {
-                    progressAlertManager.incrementProgress()
+                    await progressAlertManager.incrementProgress()
                     if let result {
                         illustrationsToAdd.append(result)
                     }

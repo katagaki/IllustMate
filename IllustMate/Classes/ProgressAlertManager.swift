@@ -38,11 +38,10 @@ class ProgressAlertManager {
         self.percentage = 0
     }
 
+    @MainActor
     func incrementProgress() {
-        DispatchQueue.main.async { [self] in
-            currentProgress += 1
-            setProgress()
-        }
+        currentProgress += 1
+        setProgress()
     }
 
     func setProgress() {
