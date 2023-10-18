@@ -137,7 +137,9 @@ struct ImporterView: View {
                     self.selectedPhotoItems.removeAll()
                     progressAlertManager.hide()
                 } completion: {
-                    isImportCompleted = true
+                    DispatchQueue.main.async {
+                        isImportCompleted = true
+                    }
                 }
             }
         }
