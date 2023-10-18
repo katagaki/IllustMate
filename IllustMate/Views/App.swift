@@ -32,30 +32,30 @@ struct IllustMateApp: App {
             .overlay {
                 if showCloudStatusEverywhere {
                     ZStack(alignment: .topTrailing) {
-                        Group {
-                            if syncMonitor.syncStateSummary.isBroken {
-                                HStack(alignment: .center, spacing: 2.0) {
-                                    Text(syncMonitor.lastError?.localizedDescription ?? "")
+                        VStack(alignment: .trailing, spacing: 2.0) {
+                            HStack(alignment: .center, spacing: 2.0) {
+                                Text(syncMonitor.syncStateSummary.description)
+                                if syncMonitor.syncStateSummary.isBroken {
                                     Image(systemName: "xmark.icloud.fill")
-                                }
-                            } else if syncMonitor.syncStateSummary.inProgress {
-                                Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                            } else {
-                                switch syncMonitor.syncStateSummary {
-                                case .notStarted, .succeeded:
-                                    Image(systemName: "checkmark.icloud.fill")
-                                case .noNetwork:
-                                    Image(systemName: "bolt.horizontal.icloud.fill")
-                                default:
-                                    HStack(alignment: .center, spacing: 2.0) {
-                                        Text(syncMonitor.lastError?.localizedDescription ?? "")
+                                } else if syncMonitor.syncStateSummary.inProgress {
+                                    Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
+                                } else {
+                                    switch syncMonitor.syncStateSummary {
+                                    case .notStarted, .succeeded:
+                                        Image(systemName: "checkmark.icloud.fill")
+                                    case .noNetwork:
+                                        Image(systemName: "bolt.horizontal.icloud.fill")
+                                    default:
                                         Image(systemName: "exclamationmark.icloud.fill")
                                     }
                                 }
                             }
+                            .foregroundStyle(.secondary)
+                            Text(syncMonitor.lastError?.localizedDescription ?? "")
+                                .foregroundStyle(.red)
                         }
-                        .foregroundStyle(.secondary)
                         .font(.caption2)
+                        .padding(4.0)
                         Color.clear
                     }
                 }

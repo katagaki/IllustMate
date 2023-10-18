@@ -13,6 +13,7 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
+    @AppStorage(wrappedValue: false, "DebugProblematicAnimsOff") var disableProblematicAnimations: Bool
 
     var body: some View {
         List {
@@ -41,6 +42,7 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.ShowAlbumCoverResolution", isOn: $showAlbumCoverResolution)
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
                 Toggle("Experiments.UseThreadSafeLoading", isOn: $useThreadSafeLoading)
+                Toggle("Experiments.DisableProblematicAnimations", isOn: $disableProblematicAnimations)
             }
         }
         .navigationTitle("ViewTitle.Debug")

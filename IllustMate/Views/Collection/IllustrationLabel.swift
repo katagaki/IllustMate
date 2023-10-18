@@ -18,20 +18,20 @@ struct IllustrationLabel: View {
         ZStack(alignment: .center) {
             Color.clear
             if !isHiddenAndOverridesState {
-                if let image = illustration.thumbnail() {
-                    Image(uiImage: image)
-                        .resizable()
-                        .transition(.opacity.animation(.snappy.speed(2)))
-                        .matchedGeometryEffect(id: illustration.id, in: namespace)
-                } else {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24.0, height: 24.0)
-                        .foregroundStyle(.primary)
-                        .symbolRenderingMode(.multicolor)
-                        .matchedGeometryEffect(id: illustration.id, in: namespace)
+                Group {
+                    if let image = illustration.thumbnail() {
+                        Image(uiImage: image)
+                            .resizable()
+                    } else {
+                        Image(systemName: "xmark.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24.0, height: 24.0)
+                            .foregroundStyle(.primary)
+                            .symbolRenderingMode(.multicolor)
+                    }
                 }
+                .matchedGeometryEffect(id: illustration.id, in: namespace)
             }
         }
         .background(.primary.opacity(0.05))
