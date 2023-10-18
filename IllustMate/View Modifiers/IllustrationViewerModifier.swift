@@ -13,18 +13,22 @@ struct IllustrationViewerModifier: ViewModifier {
     @Binding var viewerManager: ViewerManager
 
     func body(content: Content) -> some View {
-        content
-            .overlay {
-                if let image = viewerManager.displayedImage,
-                   let illustration = viewerManager.displayedIllustration {
-                    IllustrationViewer(namespace: namespace, illustration: illustration, displayedImage: image) {
-                        withAnimation(.snappy.speed(2)) {
-                            viewerManager.removeDisplay()
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            content
+                .overlay {
+                    if let image = viewerManager.displayedImage,
+                       let illustration = viewerManager.displayedIllustration {
+                        IllustrationViewer(namespace: namespace, illustration: illustration, displayedImage: image) {
+                            withAnimation(.snappy.speed(2)) {
+                                viewerManager.removeDisplay()
+                            }
                         }
+                        .id(illustration.id)
                     }
-                    .id(illustration.id)
                 }
-            }
+        } else {
+            content
+        }
     }
 }
 

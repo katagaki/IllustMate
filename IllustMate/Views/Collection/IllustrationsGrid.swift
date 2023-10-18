@@ -48,21 +48,28 @@ struct IllustrationsGrid<Content: View>: View {
                 Button {
                     onSelect(illustration)
                 } label: {
-                    IllustrationLabel(namespace: namespace, illustration: illustration,
-                                      isHiddenAndOverridesState: isViewing(illustration))
-                        .overlay {
-                            if let isSelected, isSelected(illustration) {
-                                SelectionOverlay()
-                            }
+                    Group {
+                        if UIDevice.current.userInterfaceIdiom == .phone {
+                            IllustrationLabel(namespace: namespace, illustration: illustration,
+                                              isHiddenAndOverridesState: isViewing(illustration))
+                        } else {
+                            IllustrationLabel(namespace: namespace, illustration: illustration,
+                                              isHiddenAndOverridesState: false)
                         }
-                        .draggable(IllustrationTransferable(id: illustration.id)) {
-                            if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100.0, height: 100.0)
-                            }
+                    }
+                    .overlay {
+                        if let isSelected, isSelected(illustration) {
+                            SelectionOverlay()
                         }
+                    }
+                    .draggable(IllustrationTransferable(id: illustration.id)) {
+                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100.0, height: 100.0)
+                        }
+                    }
                 }
                 .contextMenu {
                     if !isSelecting {

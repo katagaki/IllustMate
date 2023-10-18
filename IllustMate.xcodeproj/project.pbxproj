@@ -14,6 +14,7 @@
 		E43DFB2D2AD78224002A6317 /* ModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB2B2AD78220002A6317 /* ModelContainer.swift */; };
 		E43DFB302AD82A20002A6317 /* ConcurrencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB2E2AD82923002A6317 /* ConcurrencyManager.swift */; };
 		E43DFB332AD851BA002A6317 /* ViewerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB312AD8519A002A6317 /* ViewerManager.swift */; };
+		E456E2DD2ADFE9EA00B6E6D8 /* OverlayBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456E2DC2ADFE9EA00B6E6D8 /* OverlayBackgroundModifier.swift */; };
 		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
 		E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */; };
 		E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
@@ -127,6 +128,7 @@
 		E43DFB2B2AD78220002A6317 /* ModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelContainer.swift; sourceTree = "<group>"; };
 		E43DFB2E2AD82923002A6317 /* ConcurrencyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrencyManager.swift; sourceTree = "<group>"; };
 		E43DFB312AD8519A002A6317 /* ViewerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerManager.swift; sourceTree = "<group>"; };
+		E456E2DC2ADFE9EA00B6E6D8 /* OverlayBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayBackgroundModifier.swift; sourceTree = "<group>"; };
 		E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
 		E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumRow.swift; sourceTree = "<group>"; };
 		E45A8BCB2AD0332000E3035E /* CollectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionHeader.swift; sourceTree = "<group>"; };
@@ -347,7 +349,6 @@
 				E4E8922D2AD2871A005C9DBD /* IllustrationsGrid.swift */,
 				E45A8BCD2AD0362900E3035E /* IllustrationLabel.swift */,
 				E4E892342AD31058005C9DBD /* IllustrationMoveMenu.swift */,
-				E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */,
 				E4614D1D2ACAF8C100D751FB /* NewAlbumView.swift */,
 				E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */,
 			);
@@ -362,6 +363,7 @@
 				E4E892362AD3163B005C9DBD /* AlbumCover.swift */,
 				E45A8BD32AD04A2400E3035E /* SelectionBar.swift */,
 				E45A8BD52AD04CD100E3035E /* SelectionOverlay.swift */,
+				E45A8BD72AD04E1C00E3035E /* IllustrationViewer.swift */,
 				E4E892422AD45DD6005C9DBD /* OptionalImage.swift */,
 				E4614D472ACB46D700D751FB /* ProgressAlert.swift */,
 				E4C834C72ADFB3090056D47A /* ListAppIconRow.swift */,
@@ -390,6 +392,7 @@
 				E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */,
 				E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */,
 				E4C834B52ADED88D0056D47A /* IllustrationViewerModifier.swift */,
+				E456E2DC2ADFE9EA00B6E6D8 /* OverlayBackgroundModifier.swift */,
 			);
 			path = "View Modifiers";
 			sourceTree = "<group>";
@@ -632,6 +635,7 @@
 				E4C834B02ADED6970056D47A /* ButtonStyleModifier.swift in Sources */,
 				E4614D132ACAA7BF00D751FB /* Illustration.swift in Sources */,
 				E4C834B62ADED88D0056D47A /* IllustrationViewerModifier.swift in Sources */,
+				E456E2DD2ADFE9EA00B6E6D8 /* OverlayBackgroundModifier.swift in Sources */,
 				E4614D322ACB103200D751FB /* TabManager.swift in Sources */,
 				E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */,
 				E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */,

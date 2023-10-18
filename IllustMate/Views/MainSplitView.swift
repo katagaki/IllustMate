@@ -13,13 +13,16 @@ struct MainSplitView: View {
     @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
                                   sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
 
-    @State var viewPath: ViewPath? = .collection
+    @Namespace var splitViewNamespace
 
+    @State var selectedView: ViewPath? = .collection
+
+    @State var viewerManager = ViewerManager()
     @State var progressAlertManager = ProgressAlertManager()
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $viewPath) {
+            List(selection: $selectedView) {
                 NavigationLink(value: ViewPath.collection) {
                     Label {
                         Text("TabTitle.Collection")
@@ -85,18 +88,28 @@ struct MainSplitView: View {
 #if targetEnvironment(macCatalyst)
             .navigationSplitViewColumnWidth(170.0)
 #endif
-        } detail: {
-            switch viewPath {
-            case .collection: CollectionView()
-            case .albums: AlbumsView()
-            case .illustrations: IllustrationsView()
+        } content: {
+            switch selectedView {
+            case .collection: CollectionView(viewerManager: viewerManager)
+            case .albums: AlbumsView(viewerManager: viewerManager)
+            case .illustrations: IllustrationsView(viewerManager: viewerManager)
             case .importer: ImportView(progressAlertManager: $progressAlertManager)
             case .more: MoreView(progressAlertManager: $progressAlertManager)
-            case .album(let album): AlbumNavigationStack(album: album)
+            case .album(let album): AlbumNavigationStack(album: album, viewerManager: viewerManager)
             default: Color.clear
             }
-            // TODO: Illustration viewer in pushed AlbumView is broken on iPad and Mac
-            // TODO: Move viewer to split view for iPad and Mac
+        } detail: {
+            if let image = viewerManager.displayedImage,
+               let illustration = viewerManager.displayedIllustration {
+                IllustrationViewer(namespace: splitViewNamespace, illustration: illustration, displayedImage: image) {
+                    withAnimation(.snappy.speed(2)) {
+                        viewerManager.removeDisplay()
+                    }
+                }
+                .id(illustration.id)
+            } else {
+                ContentUnavailableView("Shared.SelectAnIllustration", systemImage: "photo.on.rectangle.angled")
+            }
         }
         .overlay {
             if progressAlertManager.isDisplayed {

@@ -80,7 +80,7 @@ struct IllustrationViewer: View {
         }
         .padding(20.0)
         .frame(maxHeight: .infinity)
-        .background(.regularMaterial.opacity(opacityDuringGesture()))
+        .overlayBackground(opacity: opacityDuringGesture())
         .gesture(
             DragGesture()
                 .onChanged { gesture in

@@ -25,7 +25,7 @@ struct AlbumsSection<Content: View>: View {
 #if targetEnvironment(macCatalyst)
     let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
 #else
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 160.0), spacing: 20.0)]
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 100.0), spacing: 20.0)]
 #endif
 
     var body: some View {
