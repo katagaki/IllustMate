@@ -84,26 +84,39 @@ struct ImportView: View {
     }
 
     func importPhotos() {
-        modelContext.autosaveEnabled = false
         UIApplication.shared.isIdleTimerDisabled = true
         let selectedPhotoItems = selectedPhotoItems
         let selectedAlbum = selectedAlbum
+        // TODO: Importer stops working after run once
         Task.detached(priority: .high) {
-            var illustrationsToAdd: [Illustration] = []
-            var runningNumberForImageName = await runningNumberForImageName
-            for selectedPhotoItem in selectedPhotoItems {
-                if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                    let illustration = Illustration(
-                        name: "PIC_\(String(format: "%04d", runningNumberForImageName))",
-                        data: data)
-                    if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
-                        let thumbnail = Thumbnail(data: thumbnailData)
-                        illustration.cachedThumbnail = thumbnail
+            let illustrationsToAdd = await withTaskGroup(of: Illustration?.self,
+                                                         returning: [Illustration].self) { group in
+                var illustrationsToAdd: [Illustration] = []
+                for selectedPhotoItem in selectedPhotoItems {
+                    group.addTask {
+                        var runningNumberForImageName = await runningNumberForImageName
+                        if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
+                            let illustration = Illustration(
+                                name: "PIC_\(String(format: "%04d", runningNumberForImageName))",
+                                data: data)
+                            if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
+                                let thumbnail = Thumbnail(data: thumbnailData)
+                                illustration.cachedThumbnail = thumbnail
+                            }
+                            runningNumberForImageName += 1
+                            return illustration
+                        } else {
+                            return nil
+                        }
                     }
-                    illustrationsToAdd.append(illustration)
-                    runningNumberForImageName += 1
                 }
-                await progressAlertManager.incrementProgress()
+                for await result in group {
+                    await progressAlertManager.incrementProgress()
+                    if let result {
+                        illustrationsToAdd.append(result)
+                    }
+                }
+                return illustrationsToAdd
             }
             await MainActor.run { [illustrationsToAdd] in
                 illustrationsToAdd.forEach { illustration in
@@ -113,7 +126,6 @@ struct ImportView: View {
                     selectedAlbum.addChildIllustrations(illustrationsToAdd)
                 }
                 self.runningNumberForImageName += selectedPhotoItems.count
-                modelContext.autosaveEnabled = true
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = selectedPhotoItems.count
                 withAnimation(.easeOut.speed(2)) {

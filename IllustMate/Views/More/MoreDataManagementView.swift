@@ -85,17 +85,31 @@ struct MoreDataManagementView: View {
                 }
             }
             Section {
-                HStack(alignment: .center, spacing: 8.0) {
-                    Text("Shared.Albums")
-                    Spacer(minLength: 0)
-                    Text("\(albums.count)")
-                        .foregroundStyle(.secondary)
+                NavigationLink {
+                    List(albums) { album in
+                        Text(album.name)
+                    }
+                    .listStyle(.plain)
+                } label: {
+                    HStack(alignment: .center, spacing: 8.0) {
+                        Text("Shared.Albums")
+                        Spacer(minLength: 0)
+                        Text("\(albums.count)")
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                HStack(alignment: .center, spacing: 8.0) {
-                    Text("Shared.Illustrations")
-                    Spacer(minLength: 0)
-                    Text("\(illustrations.count)")
-                        .foregroundStyle(.secondary)
+                NavigationLink {
+                    List(illustrations) { illustration in
+                        Text(illustration.name)
+                    }
+                    .listStyle(.plain)
+                } label: {
+                    HStack(alignment: .center, spacing: 8.0) {
+                        Text("Shared.Illustrations")
+                        Spacer(minLength: 0)
+                        Text("\(illustrations.count)")
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 HStack(alignment: .center, spacing: 8.0) {
                     Text("Shared.Thumbnails")

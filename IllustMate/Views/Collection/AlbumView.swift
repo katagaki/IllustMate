@@ -228,17 +228,31 @@ struct AlbumView: View {
             }
         }
         .onAppear {
-            if !isDataLoadedFromInitialAppearance {
-                concurrency.queue.addOperation {
+            if useThreadSafeLoading {
+                if isDataLoadedFromInitialAppearance {
                     styleState = style
-                    withAnimation(.snappy.speed(2)) {
-                        refreshData()
-                        isDataLoadedFromInitialAppearance = true
-                    }
+                    refreshData(animated: false)
+                } else {
+                    styleState = style
+                    refreshData()
+                    isDataLoadedFromInitialAppearance = true
                 }
             } else {
-                styleState = style
-                refreshData()
+                if isDataLoadedFromInitialAppearance {
+                    concurrency.queue.addOperation {
+                        styleState = style
+                        refreshData()
+                    }
+                } else {
+                    concurrency.queue.addOperation {
+                        styleState = style
+                        withAnimation(.snappy.speed(2)) {
+                            refreshData()
+                        } completion: {
+                            isDataLoadedFromInitialAppearance = true
+                        }
+                    }
+                }
             }
         }
         .onChange(of: styleState) { _, newValue in

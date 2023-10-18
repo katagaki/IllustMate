@@ -152,14 +152,14 @@ extension AlbumView {
         }
     }
 
-    func refreshData() {
-        refreshAlbums()
-        refreshIllustrations()
+    func refreshData(animated: Bool = true) {
+        refreshAlbums(animated: animated)
+        refreshIllustrations(animated: animated)
     }
 
-    func refreshAlbums() {
+    func refreshAlbums(animated: Bool = true) {
         if useThreadSafeLoading {
-            refreshAlbumsUsingActor()
+            refreshAlbumsUsingActor(animated: animated)
         } else {
             let currentAlbumID = currentAlbum?.id
             do {
@@ -172,12 +172,16 @@ extension AlbumView {
         }
     }
 
-    func refreshAlbumsUsingActor() {
+    func refreshAlbumsUsingActor(animated: Bool = true) {
         Task.detached(priority: .userInitiated) {
             do {
                 let albums = try await actor.albums(in: currentAlbum)
                 await MainActor.run {
-                    withAnimation(.snappy.speed(2)) {
+                    if animated {
+                        withAnimation(.snappy.speed(2)) {
+                            self.albums = albums
+                        }
+                    } else {
                         self.albums = albums
                     }
                 }
@@ -187,9 +191,9 @@ extension AlbumView {
         }
     }
 
-    func refreshIllustrations() {
+    func refreshIllustrations(animated: Bool = true) {
         if useThreadSafeLoading {
-            refreshIllustrationsUsingActor()
+            refreshIllustrationsUsingActor(animated: animated)
         } else {
             let currentAlbumID = currentAlbum?.id
             do {
@@ -205,13 +209,17 @@ extension AlbumView {
         }
     }
 
-    func refreshIllustrationsUsingActor() {
+    func refreshIllustrationsUsingActor(animated: Bool = true) {
         Task.detached(priority: .userInitiated) {
             do {
                 let illustrations = try await actor
                     .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
                 await MainActor.run {
-                    withAnimation(.snappy.speed(2)) {
+                    if animated {
+                        withAnimation(.snappy.speed(2)) {
+                            self.illustrations = illustrations
+                        }
+                    } else {
                         self.illustrations = illustrations
                     }
                 }
