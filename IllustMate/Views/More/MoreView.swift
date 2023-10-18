@@ -57,6 +57,18 @@ struct MoreView: View {
                 switch viewPath {
                 case .moreDataManagement:
                     MoreDataManagementView(progressAlertManager: $progressAlertManager)
+                case .moreDataAlbums(let albums):
+                    List(albums) { album in
+                        Text(album.name)
+                    }
+                    .listStyle(.plain)
+                    .navigationTitle("Shared.Albums")
+                case .moreDataIllustrations(let illustrations):
+                    List(illustrations) { illustration in
+                        Text(illustration.name)
+                    }
+                    .listStyle(.plain)
+                    .navigationTitle("Shared.Illustrations")
                 case .moreFileManagement:
                     MoreFileManagementView(progressAlertManager: $progressAlertManager)
                 case .moreAppIcon: MoreAppIconView()

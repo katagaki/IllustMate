@@ -89,15 +89,18 @@ struct MainSplitView: View {
             .navigationSplitViewColumnWidth(170.0)
 #endif
         } content: {
-            switch selectedView {
-            case .collection: CollectionView(viewerManager: viewerManager)
-            case .albums: AlbumsView(viewerManager: viewerManager)
-            case .illustrations: IllustrationsView(viewerManager: viewerManager)
-            case .importer: ImportView(progressAlertManager: $progressAlertManager)
-            case .more: MoreView(progressAlertManager: $progressAlertManager)
-            case .album(let album): AlbumNavigationStack(album: album, viewerManager: viewerManager)
-            default: Color.clear
+            Group {
+                switch selectedView {
+                case .collection: CollectionView(viewerManager: viewerManager)
+                case .albums: AlbumsView(viewerManager: viewerManager)
+                case .illustrations: IllustrationsView(viewerManager: viewerManager)
+                case .importer: ImportView(progressAlertManager: $progressAlertManager)
+                case .more: MoreView(progressAlertManager: $progressAlertManager)
+                case .album(let album): AlbumNavigationStack(album: album, viewerManager: viewerManager)
+                default: Color.clear
+                }
             }
+            .navigationSplitViewColumnWidth(min: 300.0, ideal: 370.0)
         } detail: {
             if let image = viewerManager.displayedImage,
                let illustration = viewerManager.displayedIllustration {

@@ -69,7 +69,7 @@ struct IllustMateApp: App {
         }
         .modelContainer(sharedModelContainer)
 #if targetEnvironment(macCatalyst)
-        .defaultSize(CGSize(width: 700.0, height: 500.0))
+        .defaultSize(CGSize(width: 880.0, height: 680.0))
 #endif
     }
 

@@ -44,8 +44,7 @@ struct MoreAppIconView: View {
                 .buttonStyle(.plain)
             }
         }
-        .font(.body)
-        .listStyle(.insetGrouped)
         .navigationTitle("ViewTitle.More.Customization.AppIcon")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
