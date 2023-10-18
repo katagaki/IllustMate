@@ -11,44 +11,58 @@ import SwiftUI
 @Observable
 class ViewerManager {
 
+    var displayedIllustrationID: String = ""
     var displayedIllustration: Illustration?
     var displayedImage: UIImage?
 
-    var imageCache: [String: UIImage] = [:]
+    @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
     func setDisplay(_ illustration: Illustration) {
-        displayedIllustration = illustration
-        do {
-            if let image = imageCache[illustration.id] {
+        if let image = imageCache[illustration.id] {
+            withAnimation(.snappy.speed(2)) {
+                displayedIllustrationID = illustration.id
                 displayedImage = image
-            } else {
-                if let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath())),
-                   let image = UIImage(data: data) {
-                    displayedImage = image
-                    imageCache[illustration.id] = image
-                } else {
-                    try FileManager.default.startDownloadingUbiquitousItem(
-                        at: URL(filePath: illustration.illustrationPath()))
-                    var isDownloaded: Bool = false
-                    while !isDownloaded {
-                        if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
-                            isDownloaded = true
+                displayedIllustration = illustration
+            }
+        } else {
+            Task.detached(priority: .userInitiated) {
+                do {
+                    var displayedImage: UIImage?
+                    if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                        displayedImage = image
+                    } else {
+                        try FileManager.default.startDownloadingUbiquitousItem(
+                            at: URL(filePath: illustration.illustrationPath()))
+                        var isDownloaded: Bool = false
+                        while !isDownloaded {
+                            if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
+                                isDownloaded = true
+                            }
+                        }
+                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                            displayedImage = image
                         }
                     }
-                    let data = try? Data(contentsOf: URL(filePath: illustration.illustrationPath()))
-                    if let data, let image = UIImage(data: data) {
-                        displayedImage = image
-                        imageCache[illustration.id] = image
+                    await MainActor.run { [displayedImage] in
+                        self.imageCache[illustration.id] = displayedImage
+                        withAnimation(.snappy.speed(2)) {
+                            self.displayedIllustrationID = illustration.id
+                            self.displayedImage = displayedImage
+                            self.displayedIllustration = illustration
+                        }
                     }
+                } catch {
+                    debugPrint(error.localizedDescription)
                 }
             }
-        } catch {
-            debugPrint(error.localizedDescription)
         }
     }
 
     func removeDisplay() {
-        displayedImage = nil
-        displayedIllustration = nil
+        withAnimation(.snappy.speed(2)) {
+            displayedImage = nil
+            displayedIllustration = nil
+            displayedIllustrationID = ""
+        }
     }
 }

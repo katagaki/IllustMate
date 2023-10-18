@@ -33,11 +33,9 @@ struct IllustrationsView: View {
                                       illustrations: illustrations,
                                       isSelecting: .constant(false),
                                       enableSelection: false) { illustration in
-                        illustration.id == viewerManager.displayedIllustration?.id
+                        illustration.id == viewerManager.displayedIllustrationID
                     } onSelect: { illustration in
-                        withAnimation(.snappy.speed(2)) {
-                            viewerManager.setDisplay(illustration)
-                        }
+                        viewerManager.setDisplay(illustration)
                     } selectedCount: {
                         return 0
                     } moveMenu: { _ in }

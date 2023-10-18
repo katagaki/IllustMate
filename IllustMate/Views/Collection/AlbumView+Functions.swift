@@ -150,11 +150,7 @@ extension AlbumView {
                 selectedIllustrations.append(illustration)
             }
         } else {
-            concurrency.queue.addOperation {
-                withAnimation(.snappy.speed(2)) {
-                    viewerManager.setDisplay(illustration)
-                }
-            }
+            viewerManager.setDisplay(illustration)
         }
     }
 

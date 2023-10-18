@@ -118,7 +118,7 @@ struct AlbumView: View {
                         Divider()
                         IllustrationsGrid(namespace: namespace, illustrations: illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
-                            illustration.id == viewerManager.displayedIllustration?.id
+                            illustration.id == viewerManager.displayedIllustrationID
                         } isSelected: { illustration in
                             selectedIllustrations.contains(illustration)
                         } onSelect: { illustration in

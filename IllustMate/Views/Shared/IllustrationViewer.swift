@@ -45,7 +45,6 @@ struct IllustrationViewer: View {
                 .resizable()
                 .scaledToFit()
                 .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                .transition(.opacity.animation(.snappy.speed(2)))
                 .zIndex(1)
                 .matchedGeometryEffect(id: illustration.id, in: namespace)
                 .offset(displayOffset)
