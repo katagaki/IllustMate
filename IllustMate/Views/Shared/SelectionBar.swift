@@ -42,7 +42,6 @@ struct SelectionBar<Content: View>: View {
                     .disabled(selectedIllustrations.count == 0)
             } label: {
                 Image(systemName: "ellipsis.circle.fill")
-                    .foregroundStyle(.primary)
                     .symbolRenderingMode(.hierarchical)
                     .font(.title2)
             }

@@ -48,6 +48,8 @@ struct IllustrationViewer: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
+                Spacer()
+                    .frame(width: 28.0)
             }
             .opacity(opacityDuringGesture())
             Spacer(minLength: 20)
