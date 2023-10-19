@@ -16,17 +16,13 @@ struct SelectionBar<Content: View>: View {
     @ViewBuilder var menuItems: Content
 
     var body: some View {
-        VStack(alignment: .center, spacing: 16.0) {
-            HStack(alignment: .center, spacing: 16.0) {
-                Text("Shared.Selected.\(selectedIllustrations.count)")
-                Spacer(minLength: 0)
-                CloseButton {
-                    onStopSelecting()
-                }
+        HStack(alignment: .center, spacing: 16.0) {
+            CloseButton {
+                onStopSelecting()
             }
-            Divider()
-            HStack(alignment: .center, spacing: 16.0) {
-                Spacer(minLength: 0)
+            Text("Shared.Selected.\(selectedIllustrations.count)")
+            Spacer()
+            Menu {
                 Button {
                     if illustrations.count == selectedIllustrations.count {
                         selectedIllustrations.removeAll()
@@ -41,10 +37,14 @@ struct SelectionBar<Content: View>: View {
                         Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
                     }
                 }
-                if selectedIllustrations.count > 0 {
-                    menuItems
-                }
-                Spacer(minLength: 0)
+                Divider()
+                menuItems
+                    .disabled(selectedIllustrations.count == 0)
+            } label: {
+                Image(systemName: "ellipsis.circle.fill")
+                    .foregroundStyle(.primary)
+                    .symbolRenderingMode(.hierarchical)
+                    .font(.title2)
             }
         }
         .padding(16.0)
