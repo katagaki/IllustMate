@@ -31,12 +31,16 @@ struct SectionHeader<Content: View>: View {
                 }
             }
             Spacer(minLength: 0)
+#if targetEnvironment(macCatalyst)
+            trailingViews
+#else
             Menu {
                 trailingViews
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .font(.title2)
             }
+#endif
         }
     }
 }

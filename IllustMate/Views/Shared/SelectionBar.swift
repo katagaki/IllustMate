@@ -22,6 +22,25 @@ struct SelectionBar<Content: View>: View {
             }
             Text("Shared.Selected.\(selectedIllustrations.count)")
             Spacer()
+#if targetEnvironment(macCatalyst)
+            Button {
+                if illustrations.count == selectedIllustrations.count {
+                    selectedIllustrations.removeAll()
+                } else {
+                    selectedIllustrations.removeAll()
+                    selectedIllustrations.append(contentsOf: illustrations)
+                }
+            } label: {
+                if illustrations.count == selectedIllustrations.count {
+                    Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                } else {
+                    Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                }
+            }
+            Divider()
+            menuItems
+                .disabled(selectedIllustrations.count == 0)
+#else
             Menu {
                 Button {
                     if illustrations.count == selectedIllustrations.count {
@@ -45,6 +64,7 @@ struct SelectionBar<Content: View>: View {
                     .symbolRenderingMode(.hierarchical)
                     .font(.title2)
             }
+#endif
         }
         .padding(16.0)
         .frame(maxWidth: .infinity)

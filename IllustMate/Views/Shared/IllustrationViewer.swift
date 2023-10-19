@@ -48,8 +48,10 @@ struct IllustrationViewer: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
+#if !targetEnvironment(macCatalyst)
                 Spacer()
                     .frame(width: 28.0)
+#endif
             }
             .opacity(opacityDuringGesture())
             Spacer(minLength: 20)
