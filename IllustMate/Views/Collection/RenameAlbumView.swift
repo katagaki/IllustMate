@@ -11,18 +11,32 @@ import SwiftUI
 struct RenameAlbumView: View {
 
     @Environment(\.dismiss) var dismiss
-    @State var album: Album?
+    @State var album: Album
     @State var newAlbumName: String = ""
 
     var body: some View {
         NavigationStack {
             List {
-                if let album {
-                    Section {
-                        TextField(album.name, text: $newAlbumName)
-                            .textInputAutocapitalization(.words)
-                    }
+                Section {
+                    TextField(album.name, text: $newAlbumName)
+                        .textInputAutocapitalization(.words)
                 }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    album.name = newAlbumName.trimmingCharacters(in: .whitespaces)
+                    dismiss()
+                } label: {
+                    Text("Shared.Rename")
+                        .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
+                .frame(maxWidth: .infinity)
+                .padding(20.0)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -31,23 +45,14 @@ struct RenameAlbumView: View {
                         dismiss()
                     }
                 }
-                if let album {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Shared.Rename") {
-                            album.name = newAlbumName.trimmingCharacters(in: .whitespaces)
-                            dismiss()
-                        }
-                        .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
-                    }
-                }
             }
             .navigationTitle("ViewTitle.Albums.Rename")
             .navigationBarTitleDisplayMode(.inline)
         }
         .task {
-            newAlbumName = album?.name ?? ""
+            newAlbumName = album.name
         }
-        .presentationDetents([.fraction(0.25)])
+        .presentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 }

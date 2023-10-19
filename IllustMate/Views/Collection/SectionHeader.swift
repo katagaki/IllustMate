@@ -1,5 +1,5 @@
 //
-//  CollectionHeader.swift
+//  SectionHeader.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/06.
@@ -8,7 +8,7 @@
 import Komponents
 import SwiftUI
 
-struct CollectionHeader<Content: View>: View {
+struct SectionHeader<Content: View>: View {
 
     var title: LocalizedStringKey
     var count: Int
@@ -31,7 +31,12 @@ struct CollectionHeader<Content: View>: View {
                 }
             }
             Spacer(minLength: 0)
-            trailingViews
+            Menu {
+                trailingViews
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title2)
+            }
         }
     }
 }

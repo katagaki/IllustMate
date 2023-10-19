@@ -12,14 +12,12 @@ class NavigationManager: ObservableObject {
     @Published var collectionTabPath: [ViewPath] = []
     @Published var albumsTabPath: [ViewPath] = []
     @Published var illustrationsTabPath: [ViewPath] = []
-    @Published var importerTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
 
     func popAll() {
         collectionTabPath.removeAll()
         albumsTabPath.removeAll()
         illustrationsTabPath.removeAll()
-        importerTabPath.removeAll()
         moreTabPath.removeAll()
     }
 
@@ -31,8 +29,6 @@ class NavigationManager: ObservableObject {
             albumsTabPath.removeAll()
         case .illustrations:
             illustrationsTabPath.removeAll()
-        case .importer:
-            importerTabPath.removeAll()
         case .more:
             moreTabPath.removeAll()
         }
@@ -46,8 +42,6 @@ class NavigationManager: ObservableObject {
             albumsTabPath.append(viewPath)
         case .illustrations:
             illustrationsTabPath.append(viewPath)
-        case .importer:
-            importerTabPath.append(viewPath)
         case .more:
             moreTabPath.append(viewPath)
         }

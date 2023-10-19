@@ -211,19 +211,35 @@
         }
       }
     },
+    "Albums.Style" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示スタイル"
+          }
+        }
+      }
+    },
     "Albums.Style.Grid" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grid"
+            "value" : "Grid View"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "グリッド"
+            "value" : "グリッド表示"
           }
         }
       }
@@ -234,13 +250,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "List"
+            "value" : "List View"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リスト"
+            "value" : "リスト表示"
           }
         }
       }
@@ -1898,6 +1914,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並べ替え"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort Ascending"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昇順で並べ替える"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort Descending"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "降順で並べ替える"
           }
         }
       }

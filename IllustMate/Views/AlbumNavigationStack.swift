@@ -27,8 +27,6 @@ struct AlbumNavigationStack: View {
                     case .album(let album): AlbumView(namespace: illustrationTransitionNamespace,
                                                       currentAlbum: album,
                                                       viewerManager: $viewerManager)
-                    case .importer(let album):
-                        ImporterView(selectedAlbum: album)
                     default: Color.clear
                     }
                 })

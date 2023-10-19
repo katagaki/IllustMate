@@ -23,6 +23,27 @@ struct NewAlbumView: View {
                         .textInputAutocapitalization(.words)
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
+                    if let albumToAddTo {
+                        albumToAddTo.addChildAlbum(newAlbum)
+                    } else {
+                        modelContext.insert(newAlbum)
+                    }
+                    dismiss()
+                } label: {
+                    Text("Shared.Create")
+                        .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
+                .frame(maxWidth: .infinity)
+                .padding(20.0)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Shared.Cancel", role: .cancel) {
@@ -30,23 +51,11 @@ struct NewAlbumView: View {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Shared.Create") {
-                        let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
-                        if let albumToAddTo {
-                            albumToAddTo.addChildAlbum(newAlbum)
-                        } else {
-                            modelContext.insert(newAlbum)
-                        }
-                        dismiss()
-                    }
-                    .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
-                }
             }
             .navigationTitle("ViewTitle.Albums.Create")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.fraction(0.25)])
+        .presentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 }

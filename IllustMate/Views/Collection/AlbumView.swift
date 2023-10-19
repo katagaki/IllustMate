@@ -37,6 +37,7 @@ struct AlbumView: View {
     @State var illustrationPendingDeletion: Illustration?
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
+    @State var isImportingPhotos: Bool = false
     @Binding var viewerManager: ViewerManager
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
@@ -47,19 +48,15 @@ struct AlbumView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                CollectionHeader(title: "Albums.Albums", count: albums?.count ?? 0) {
-                    Button {
-                        doWithAnimation {
-                            styleState = styleState == .grid ? .list : .grid
-                        }
-                    } label: {
-                        switch style {
-                        case .grid: Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                        case .list: Label("Albums.Style.List", systemImage: "list.bullet")
-                        }
-                    }
+                SectionHeader(title: "Albums.Albums", count: albums?.count ?? 0) {
                     Button("Shared.Create", systemImage: "plus") {
                         isAddingAlbum = true
+                    }
+                    Picker("Albums.Style", selection: $styleState.animation(.snappy.speed(2))) {
+                        Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                            .tag(ViewStyle.grid)
+                        Label("Albums.Style.List", systemImage: "list.bullet")
+                            .tag(ViewStyle.list)
                     }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
@@ -96,22 +93,20 @@ struct AlbumView: View {
                 }
                 Spacer()
                     .frame(height: 20.0)
-                CollectionHeader(title: "Albums.Illustrations", count: illustrations?.count ?? 0) {
-                    Button {
-                        isIllustrationSortReversed.toggle()
-                        doWithAnimation {
-                            refreshIllustrations()
-                        }
-                    } label: {
-                        Label("Shared.Sort", systemImage: isIllustrationSortReversed ? "arrow.down" : "arrow.up")
-                    }
-                    Button {
+                SectionHeader(title: "Albums.Illustrations", count: illustrations?.count ?? 0) {
+                    Button("Shared.Select", systemImage: "checkmark.circle") {
                         startOrStopSelectingIllustrations()
-                    } label: {
-                        Label("Shared.Select",
-                              systemImage: isSelectingIllustrations ? "checkmark.circle.fill" : "checkmark.circle")
                     }
-                    .disabled(illustrations == nil || (illustrations?.isEmpty ?? true))
+                    .disabled(isSelectingIllustrations || illustrations == nil || (illustrations?.isEmpty ?? true))
+                    Picker("Shared.Sort", selection: $isIllustrationSortReversed) {
+                        Label("Shared.Sort.Ascending", systemImage: "arrow.down")
+                            .tag(true)
+                        Label("Shared.Sort.Descending", systemImage: "arrow.up")
+                            .tag(false)
+                    }
+                    Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
+                        isImportingPhotos = true
+                    }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if let illustrations {
@@ -149,14 +144,6 @@ struct AlbumView: View {
                     ProgressView()
                         .padding(20.0)
                 }
-                HStack(alignment: .center, spacing: 8.0) {
-                    Spacer()
-                    NavigationLink(value: ViewPath.importer(selectedAlbum: currentAlbum)) {
-                        Label("Shared.Import", systemImage: "square.and.arrow.down.on.square")
-                    }
-                }
-                .padding([.top, .bottom], 8.0)
-                .padding([.leading, .trailing], 20.0)
             }
             .padding([.top], 20.0)
         }
@@ -207,6 +194,9 @@ struct AlbumView: View {
             }
         } content: { album in
             RenameAlbumView(album: album)
+        }
+        .sheet(isPresented: $isImportingPhotos) {
+            ImporterView(selectedAlbum: currentAlbum)
         }
         .confirmationDialog("Shared.DeleteConfirmation.Album",
                             isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
@@ -265,6 +255,11 @@ struct AlbumView: View {
         }
         .onChange(of: styleState) { _, newValue in
             style = newValue
+        }
+        .onChange(of: isIllustrationSortReversed) { _, _ in
+            doWithAnimation {
+                refreshIllustrations()
+            }
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {

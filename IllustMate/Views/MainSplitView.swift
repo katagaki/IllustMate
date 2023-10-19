@@ -84,7 +84,6 @@ struct MainSplitView: View {
                 case .collection: CollectionView(viewerManager: viewerManager)
                 case .albums: AlbumsView(viewerManager: viewerManager)
                 case .illustrations: IllustrationsView(viewerManager: viewerManager)
-                case .importer: ImporterView()
                 case .more: MoreView()
                 case .album(let album): AlbumNavigationStack(album: album, viewerManager: viewerManager)
                 default: Color.clear
