@@ -23,9 +23,17 @@ struct IllustrationViewer: View {
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             HStack(alignment: .center, spacing: 8.0) {
-                Text(illustration.name)
-                    .bold()
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: 2.0) {
+                    Text(illustration.name)
+                        .bold()
+                        .lineLimit(1)
+                    if let containingAlbum = illustration.containingAlbum {
+                        Text(containingAlbum.name)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
                 Spacer(minLength: 0)
 #if !targetEnvironment(macCatalyst)
                 Button {
@@ -60,7 +68,7 @@ struct IllustrationViewer: View {
                             Text(verbatim: "×")
                             Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
                         }
-                        .font(.body)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 0)

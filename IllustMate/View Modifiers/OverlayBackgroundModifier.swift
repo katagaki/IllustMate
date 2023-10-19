@@ -14,7 +14,8 @@ struct OverlayBackgroundModifier: ViewModifier {
     func body(content: Content) -> some View {
         if UIDevice.current.userInterfaceIdiom == .phone {
             content
-                .background(.regularMaterial.opacity(opacity))
+                .background(.background.opacity(opacity * 0.65))
+                .background(.ultraThinMaterial.opacity(opacity))
         } else {
             content
         }
