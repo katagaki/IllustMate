@@ -24,7 +24,7 @@ class ViewerManager {
                 displayedImage = image
                 displayedIllustration = illustration
             } else {
-                withAnimation(.snappy.speed(2)) {
+                doWithAnimationAsynchronously { [self] in
                     displayedIllustrationID = illustration.id
                     displayedImage = image
                     displayedIllustration = illustration
@@ -56,7 +56,7 @@ class ViewerManager {
                             self.displayedImage = displayedImage
                             self.displayedIllustration = illustration
                         } else {
-                            withAnimation(.snappy.speed(2)) {
+                            doWithAnimation {
                                 self.displayedIllustrationID = illustration.id
                                 self.displayedImage = displayedImage
                                 self.displayedIllustration = illustration
@@ -76,7 +76,7 @@ class ViewerManager {
             displayedIllustration = nil
             displayedIllustrationID = ""
         } else {
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimationAsynchronously { [self] in
                 displayedImage = nil
                 displayedIllustration = nil
                 displayedIllustrationID = ""

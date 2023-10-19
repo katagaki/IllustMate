@@ -56,7 +56,7 @@ struct MoreOrphansView: View {
                         .contextMenu {
                             Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                                 try? FileManager.default.removeItem(at: orphansFolder.appendingPathComponent(orphan))
-                                withAnimation(.snappy.speed(2)) {
+                                doWithAnimation {
                                     orphans.removeAll(where: { $0 == orphan })
                                 }
                             }
@@ -119,7 +119,7 @@ struct MoreOrphansView: View {
                 importIllustration(UUID().uuidString, data: heicData)
             }
             try? FileManager.default.removeItem(at: orphansFolder.appendingPathComponent(fileName))
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimationAsynchronously {
                 orphans.removeAll(where: { $0 == fileName })
             }
         }

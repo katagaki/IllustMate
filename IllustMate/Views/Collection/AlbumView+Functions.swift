@@ -25,14 +25,14 @@ extension AlbumView {
             } else {
                 modelContext.delete(albumPendingDeletion)
             }
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimation {
                 refreshData()
             }
         }
     }
 
     func refreshDataAfterAlbumMoved() {
-        withAnimation(.snappy.speed(2)) {
+        doWithAnimation {
             refreshAlbums()
         }
     }
@@ -74,13 +74,13 @@ extension AlbumView {
                 }
             }
         }
-        withAnimation(.snappy.speed(2)) {
+        doWithAnimation {
             refreshIllustrations()
         }
     }
 
     func startOrStopSelectingIllustrations() {
-        withAnimation(.snappy.speed(2)) {
+        doWithAnimation {
             if isSelectingIllustrations {
                 selectedIllustrations.removeAll()
             }
@@ -94,50 +94,62 @@ extension AlbumView {
                 predicate: #Predicate<Illustration> { $0.id == transferable.id }
             )
             if let illustrations = try? modelContext.fetch(fetchDescriptor) {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        for illustration in illustrations {
-                            await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                                        toAlbumWithIdentifier: album.persistentModelID)
-                            await refreshData(animated: true)
-                        }
-                    }
-                } else {
-                    album.addChildIllustrations(illustrations)
-                }
+                moveIllustrationsToAlbum(illustrations, to: album)
             }
         } else if let transferable = drop.album {
             let fetchDescriptor = FetchDescriptor<Album>(
                 predicate: #Predicate<Album> { $0.id == transferable.id }
             )
             if let albums = try? modelContext.fetch(fetchDescriptor) {
-                if !albums.contains(where: { $0.id == album.id }) {
-                    if useThreadSafeLoading {
-                        Task.detached(priority: .userInitiated) {
-                            for destinationAlbum in albums {
-                                await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
-                                                     toAlbumWithIdentifier: album.persistentModelID)
-                            }
-                            await refreshData(animated: true)
-                        }
-                    } else {
-                        album.addChildAlbums(albums)
-                    }
-                }
+                moveAlbumsToAlbum(albums, to: album)
             }
         } else if let transferable = drop.importedPhoto {
-            // TODO: Import photo dropped from outside app
+            importPhotoToAlbum(transferable, to: album)
         }
         if !useThreadSafeLoading {
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimation {
                 refreshData()
             }
         }
     }
 
+    func moveIllustrationsToAlbum(_ illustrations: [Illustration], to album: Album) {
+        if useThreadSafeLoading {
+            Task.detached(priority: .userInitiated) {
+                for illustration in illustrations {
+                    await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                                toAlbumWithIdentifier: album.persistentModelID)
+                    await refreshData(animated: true)
+                }
+            }
+        } else {
+            album.addChildIllustrations(illustrations)
+        }
+    }
+
+    func moveAlbumsToAlbum(_ albums: [Album], to album: Album) {
+        if !albums.contains(where: { $0.id == album.id }) {
+            if useThreadSafeLoading {
+                Task.detached(priority: .userInitiated) {
+                    for destinationAlbum in albums {
+                        await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
+                                             toAlbumWithIdentifier: album.persistentModelID)
+                    }
+                    await refreshData(animated: true)
+                }
+            } else {
+                album.addChildAlbums(albums)
+            }
+        }
+    }
+
+    func importPhotoToAlbum(_ photo: Image, to album: Album) {
+        // TODO: Import photo dropped from outside app
+    }
+
     func refreshDataAfterIllustrationMoved() {
         selectedIllustrations.removeAll()
-        withAnimation(.snappy.speed(2)) {
+        doWithAnimation {
             refreshIllustrations()
         }
     }
@@ -180,7 +192,7 @@ extension AlbumView {
                 let albums = try await actor.albums(in: currentAlbum)
                 await MainActor.run {
                     if animated {
-                        withAnimation(.snappy.speed(2)) {
+                        doWithAnimation {
                             self.albums = albums
                         }
                     } else {
@@ -218,7 +230,7 @@ extension AlbumView {
                     .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
                 await MainActor.run {
                     if animated {
-                        withAnimation(.snappy.speed(2)) {
+                        doWithAnimation {
                             self.illustrations = illustrations
                         }
                     } else {

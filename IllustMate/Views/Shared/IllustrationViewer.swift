@@ -89,7 +89,7 @@ struct IllustrationViewer: View {
                     if hypotenuse(gesture.translation) > 100.0 {
                         closeAction()
                     } else {
-                        withAnimation(.snappy.speed(2)) {
+                        doWithAnimation {
                             displayOffset = .zero
                         }
                     }
@@ -106,7 +106,7 @@ struct IllustrationViewer: View {
                     }
                 }
                 .onEnded { _ in
-                    withAnimation(.snappy.speed(2)) {
+                    doWithAnimation {
                         magnification = 1.0
                     } completion: {
                         magnificationAnchor = .center

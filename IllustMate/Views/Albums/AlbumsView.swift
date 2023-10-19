@@ -85,7 +85,7 @@ struct AlbumsView: View {
             }
         } else {
             concurrency.queue.addOperation {
-                withAnimation(.snappy.speed(2)) {
+                doWithAnimation {
                     do {
                         var fetchDescriptor = FetchDescriptor<Album>(
                             sortBy: [SortDescriptor(\.name)])

@@ -48,7 +48,7 @@ struct AlbumView: View {
             VStack(alignment: .leading, spacing: 0.0) {
                 CollectionHeader(title: "Albums.Albums", count: albums?.count ?? 0) {
                     Button {
-                        withAnimation(.snappy.speed(2)) {
+                        doWithAnimation {
                             styleState = styleState == .grid ? .list : .grid
                         }
                     } label: {
@@ -98,7 +98,7 @@ struct AlbumView: View {
                 CollectionHeader(title: "Albums.Illustrations", count: illustrations?.count ?? 0) {
                     Button {
                         isIllustrationSortReversed.toggle()
-                        withAnimation(.snappy.speed(2)) {
+                        doWithAnimation {
                             refreshIllustrations()
                         }
                     } label: {
@@ -164,7 +164,7 @@ struct AlbumView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Shared.Refresh") {
-                    withAnimation(.snappy.speed(2)) {
+                    doWithAnimation {
                         refreshData()
                     }
                 }
@@ -172,7 +172,7 @@ struct AlbumView: View {
         }
 #else
         .refreshable {
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimation {
                 refreshData()
             }
         }
@@ -194,14 +194,14 @@ struct AlbumView: View {
             }
         }
         .sheet(isPresented: $isAddingAlbum) {
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimation {
                 refreshAlbums()
             }
         } content: {
             NewAlbumView(albumToAddTo: currentAlbum)
         }
         .sheet(item: $albumToRename) {
-            withAnimation(.snappy.speed(2)) {
+            doWithAnimation {
                 refreshAlbums()
             }
         } content: { album in
@@ -253,7 +253,7 @@ struct AlbumView: View {
                 } else {
                     concurrency.queue.addOperation {
                         styleState = style
-                        withAnimation(.snappy.speed(2)) {
+                        doWithAnimation {
                             refreshData()
                         } completion: {
                             isDataLoadedFromInitialAppearance = true

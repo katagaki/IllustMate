@@ -81,7 +81,7 @@ struct IllustrationsView: View {
             }
         } else {
             concurrency.queue.addOperation {
-                withAnimation(.snappy.speed(2)) {
+                doWithAnimation {
                     do {
                         var fetchDescriptor = FetchDescriptor<Illustration>(
                             sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])

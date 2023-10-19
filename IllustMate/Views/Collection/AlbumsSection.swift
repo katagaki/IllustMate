@@ -86,7 +86,7 @@ struct AlbumsSection<Content: View>: View {
             moveMenu(album)
             Divider()
             Button("Shared.ResetCover", systemImage: "photo") {
-                withAnimation(.snappy.speed(2)) {
+                doWithAnimationAsynchronously {
                     album.coverPhoto = nil
                 }
             }

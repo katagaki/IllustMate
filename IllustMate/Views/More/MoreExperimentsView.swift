@@ -14,6 +14,8 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
     @AppStorage(wrappedValue: false, "DebugProblematicAnimsOff") var disableProblematicAnimations: Bool
+    @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
+    @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
 
     var body: some View {
         List {
@@ -43,6 +45,8 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
                 Toggle("Experiments.UseThreadSafeLoading", isOn: $useThreadSafeLoading)
                 Toggle("Experiments.DisableProblematicAnimations", isOn: $disableProblematicAnimations)
+                Toggle("Experiments.DisableAllAnimations", isOn: $disableAllAnimations)
+                Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
             }
         }
         .navigationTitle("ViewTitle.Debug")

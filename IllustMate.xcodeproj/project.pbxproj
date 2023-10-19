@@ -65,6 +65,8 @@
 		E46712E12ADC2B6E006CB15D /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E46712E02ADC2B6E006CB15D /* Komponents */; };
 		E46712E52ADC374E006CB15D /* AlbumsScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */; };
 		E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */; };
+		E49E363F2AE0FEB6005001B2 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E363E2AE0FEB6005001B2 /* Animations.swift */; };
+		E49E36402AE0FEB6005001B2 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E363E2AE0FEB6005001B2 /* Animations.swift */; };
 		E4C834B02ADED6970056D47A /* ButtonStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */; };
 		E4C834B12ADED71C0056D47A /* ButtonStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */; };
 		E4C834B32ADED7460056D47A /* AlbumDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */; };
@@ -170,6 +172,7 @@
 		E46712D42ADC17ED006CB15D /* AlbumView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+Functions.swift"; sourceTree = "<group>"; };
 		E46712D62ADC24AF006CB15D /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsScrollView.swift; sourceTree = "<group>"; };
+		E49E363E2AE0FEB6005001B2 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleModifier.swift; sourceTree = "<group>"; };
 		E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDropModifier.swift; sourceTree = "<group>"; };
 		E4C834B52ADED88D0056D47A /* IllustrationViewerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewerModifier.swift; sourceTree = "<group>"; };
@@ -431,6 +434,7 @@
 		E4DE2D8E2ACD56FB00F5EA8D /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				E49E363E2AE0FEB6005001B2 /* Animations.swift */,
 				E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */,
 			);
 			path = Utilities;
@@ -620,6 +624,7 @@
 				E4E892322AD2F3C3005C9DBD /* MoreExperimentsView.swift in Sources */,
 				E45A8BCC2AD0332000E3035E /* CollectionHeader.swift in Sources */,
 				E43DFB252AD69D95002A6317 /* MoreFileManagementView.swift in Sources */,
+				E49E363F2AE0FEB6005001B2 /* Animations.swift in Sources */,
 				E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */,
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
 				E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */,
@@ -661,6 +666,7 @@
 				E46712E52ADC374E006CB15D /* AlbumsScrollView.swift in Sources */,
 				E4E73BE32AD56B4C00372D05 /* Defaults.swift in Sources */,
 				E46712DB2ADC2597006CB15D /* AlbumListRow.swift in Sources */,
+				E49E36402AE0FEB6005001B2 /* Animations.swift in Sources */,
 				E46712DC2ADC25D1006CB15D /* ViewStyle.swift in Sources */,
 				E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */,
 				E43DFB2C2AD78220002A6317 /* ModelContainer.swift in Sources */,

@@ -69,7 +69,7 @@ struct IllustrationsGrid<Content: View>: View {
                     if !isSelecting {
                         if enableSelection {
                             Button("Shared.Select", systemImage: "checkmark.circle") {
-                                withAnimation(.snappy.speed(2)) {
+                                doWithAnimation {
                                     isSelecting = true
                                     onSelect(illustration)
                                 }

@@ -325,6 +325,22 @@
         }
       }
     },
+    "Experiments.DisableAllAnimations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable All Animations"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アニメーションをすべて無効化"
+          }
+        }
+      }
+    },
     "Experiments.DisableProblematicAnimations" : {
       "localizations" : {
         "en" : {
@@ -369,6 +385,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クラウド同期状況を常に表示"
+          }
+        }
+      }
+    },
+    "Experiments.SlowDownAnimations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slow Down Animations"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アニメーションの速度を下げる"
           }
         }
       }
