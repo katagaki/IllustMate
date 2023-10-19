@@ -27,6 +27,7 @@ struct IllustrationViewer: View {
                     .bold()
                     .lineLimit(1)
                 Spacer(minLength: 0)
+#if !targetEnvironment(macCatalyst)
                 Button {
                     closeAction()
                 } label: {
@@ -38,6 +39,7 @@ struct IllustrationViewer: View {
                         .symbolRenderingMode(.hierarchical)
                 }
                 .buttonStyle(.plain)
+#endif
             }
             .opacity(opacityDuringGesture())
             Spacer(minLength: 20)
@@ -79,6 +81,7 @@ struct IllustrationViewer: View {
         }
         .padding(20.0)
         .frame(maxHeight: .infinity)
+#if !targetEnvironment(macCatalyst)
         .overlayBackground(opacity: opacityDuringGesture())
         .gesture(
             DragGesture()
@@ -113,6 +116,7 @@ struct IllustrationViewer: View {
                     }
                 }
         )
+#endif
     }
 
     func opacityDuringGesture() -> Double {
