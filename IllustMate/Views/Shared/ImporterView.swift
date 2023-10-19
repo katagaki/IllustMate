@@ -92,32 +92,35 @@ struct ImporterView: View {
     func importPhotos() {
         UIApplication.shared.isIdleTimerDisabled = true
         let selectedPhotoItems = selectedPhotoItems
-        // TODO: Importer stops working after run once
         Task.detached(priority: .userInitiated) {
             let illustrationsToAdd = await withTaskGroup(of: Illustration?.self,
                                                          returning: [Illustration].self) { group in
                 var illustrationsToAdd: [Illustration] = []
                 for selectedPhotoItem in selectedPhotoItems {
                     group.addTask {
-                        var runningNumberForImageName = runningNumberForImageName
                         if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                             let illustration = Illustration(
-                                name: "PIC_\(String(format: "%04d", runningNumberForImageName))",
+                                name: UUID().uuidString,
                                 data: data)
                             if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
                                 let thumbnail = Thumbnail(data: thumbnailData)
                                 illustration.cachedThumbnail = thumbnail
                             }
-                            runningNumberForImageName += 1
+                            await progressAlertManager.incrementProgress()
                             return illustration
                         } else {
+                            await progressAlertManager.incrementProgress()
                             return nil
                         }
                     }
                 }
+                progressAlertManager.currentProgress = 0
+                progressAlertManager.setProgress()
                 for await result in group {
                     await progressAlertManager.incrementProgress()
                     if let result {
+                        result.name = "PIC_\(String(format: "%04d", runningNumberForImageName))"
+                        runningNumberForImageName += 1
                         illustrationsToAdd.append(result)
                     }
                 }
