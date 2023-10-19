@@ -16,53 +16,67 @@ struct SelectionBar<Content: View>: View {
     @ViewBuilder var menuItems: Content
 
     var body: some View {
-        HStack(alignment: .center, spacing: 16.0) {
-            CloseButton {
-                onStopSelecting()
-            }
-            Text("Shared.Selected.\(selectedIllustrations.count)")
-            Spacer()
+        Group {
 #if targetEnvironment(macCatalyst)
-            Button {
-                if illustrations.count == selectedIllustrations.count {
-                    selectedIllustrations.removeAll()
-                } else {
-                    selectedIllustrations.removeAll()
-                    selectedIllustrations.append(contentsOf: illustrations)
-                }
-            } label: {
-                if illustrations.count == selectedIllustrations.count {
-                    Label("Shared.DeselectAll", systemImage: "rectangle.stack")
-                } else {
-                    Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
-                }
-            }
-            Divider()
-            menuItems
-                .disabled(selectedIllustrations.count == 0)
-#else
-            Menu {
-                Button {
-                    if illustrations.count == selectedIllustrations.count {
-                        selectedIllustrations.removeAll()
-                    } else {
-                        selectedIllustrations.removeAll()
-                        selectedIllustrations.append(contentsOf: illustrations)
+            VStack(alignment: .leading, spacing: 16.0) {
+                HStack(alignment: .center, spacing: 16.0) {
+                    CloseButton {
+                        onStopSelecting()
                     }
-                } label: {
-                    if illustrations.count == selectedIllustrations.count {
-                        Label("Shared.DeselectAll", systemImage: "rectangle.stack")
-                    } else {
-                        Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
-                    }
+                    Text("Shared.Selected.\(selectedIllustrations.count)")
                 }
                 Divider()
-                menuItems
-                    .disabled(selectedIllustrations.count == 0)
-            } label: {
-                Image(systemName: "ellipsis.circle.fill")
-                    .symbolRenderingMode(.hierarchical)
-                    .font(.title2)
+                HStack(alignment: .center, spacing: 16.0) {
+                    Spacer()
+                    Button {
+                        if illustrations.count == selectedIllustrations.count {
+                            selectedIllustrations.removeAll()
+                        } else {
+                            selectedIllustrations.removeAll()
+                            selectedIllustrations.append(contentsOf: illustrations)
+                        }
+                    } label: {
+                        if illustrations.count == selectedIllustrations.count {
+                            Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                        } else {
+                            Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                        }
+                    }
+                    menuItems
+                        .disabled(selectedIllustrations.count == 0)
+                    Spacer()
+                }
+            }
+#else
+            HStack(alignment: .center, spacing: 16.0) {
+                CloseButton {
+                    onStopSelecting()
+                }
+                Text("Shared.Selected.\(selectedIllustrations.count)")
+                Spacer()
+                Menu {
+                    Button {
+                        if illustrations.count == selectedIllustrations.count {
+                            selectedIllustrations.removeAll()
+                        } else {
+                            selectedIllustrations.removeAll()
+                            selectedIllustrations.append(contentsOf: illustrations)
+                        }
+                    } label: {
+                        if illustrations.count == selectedIllustrations.count {
+                            Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                        } else {
+                            Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                        }
+                    }
+                    Divider()
+                    menuItems
+                        .disabled(selectedIllustrations.count == 0)
+                } label: {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .symbolRenderingMode(.hierarchical)
+                        .font(.title2)
+                }
             }
 #endif
         }
