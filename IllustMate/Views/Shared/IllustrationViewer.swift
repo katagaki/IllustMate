@@ -23,18 +23,6 @@ struct IllustrationViewer: View {
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             HStack(alignment: .center, spacing: 8.0) {
-                VStack(alignment: .leading, spacing: 2.0) {
-                    Text(illustration.name)
-                        .bold()
-                        .lineLimit(1)
-                    if let containingAlbum = illustration.containingAlbum {
-                        Text(containingAlbum.name)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                Spacer(minLength: 0)
 #if !targetEnvironment(macCatalyst)
                 Button {
                     closeAction()
@@ -48,6 +36,18 @@ struct IllustrationViewer: View {
                 }
                 .buttonStyle(.plain)
 #endif
+                VStack(alignment: .center, spacing: 2.0) {
+                    Text(illustration.name)
+                        .bold()
+                        .lineLimit(1)
+                    if let containingAlbum = illustration.containingAlbum {
+                        Text(containingAlbum.name)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+                .frame(maxWidth: .infinity)
             }
             .opacity(opacityDuringGesture())
             Spacer(minLength: 20)
