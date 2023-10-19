@@ -5,14 +5,16 @@
 //  Created by シン・ジャスティン on 2023/10/08.
 //
 
+import Komponents
 import SwiftUI
 
 struct MoreExperimentsView: View {
 
-    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
-    @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
+    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
+    @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
+    @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
     @AppStorage(wrappedValue: false, "DebugProblematicAnimsOff") var disableProblematicAnimations: Bool
     @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
@@ -40,13 +42,37 @@ struct MoreExperimentsView: View {
                 .listRowBackground(Color.red)
             }
             Section {
+                Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
+            } header: {
+                ListSectionHeader(text: "Experiments.Section.Cloud")
+                    .font(.body)
+            }
+            Section {
+                Toggle("Experiments.UseThreadSafeLoading", isOn: $useThreadSafeLoading)
+            } header: {
+                ListSectionHeader(text: "Experiments.Section.Threading")
+                    .font(.body)
+            }
+            Section {
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowAlbumCoverResolution", isOn: $showAlbumCoverResolution)
-                Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
-                Toggle("Experiments.UseThreadSafeLoading", isOn: $useThreadSafeLoading)
+            } header: {
+                ListSectionHeader(text: "Experiments.Section.Imaging")
+                    .font(.body)
+            }
+            Section {
+                Toggle("Experiments.DeleteIllustrationWithoutFile", isOn: $deleteWithoutFile)
+            } header: {
+                ListSectionHeader(text: "Experiments.Section.Filesystem")
+                    .font(.body)
+            }
+            Section {
                 Toggle("Experiments.DisableProblematicAnimations", isOn: $disableProblematicAnimations)
                 Toggle("Experiments.DisableAllAnimations", isOn: $disableAllAnimations)
                 Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
+            } header: {
+                ListSectionHeader(text: "Experiments.Section.Animations")
+                    .font(.body)
             }
         }
         .navigationTitle("ViewTitle.Debug")

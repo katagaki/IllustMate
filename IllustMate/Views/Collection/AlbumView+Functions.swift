@@ -58,7 +58,9 @@ extension AlbumView {
                         await actor.deleteIllustration(withIdentifier: illustration.persistentModelID)
                     }
                 } else {
-                    illustration.prepareForDeletion()
+                    if !deleteWithoutFile {
+                        illustration.prepareForDeletion()
+                    }
                     modelContext.delete(illustration)
                 }
             }
@@ -69,7 +71,9 @@ extension AlbumView {
                         await actor.deleteIllustration(withIdentifier: illustrationPendingDeletion.persistentModelID)
                     }
                 } else {
-                    illustrationPendingDeletion.prepareForDeletion()
+                    if !deleteWithoutFile {
+                        illustrationPendingDeletion.prepareForDeletion()
+                    }
                     modelContext.delete(illustrationPendingDeletion)
                 }
             }

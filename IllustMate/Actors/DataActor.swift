@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 actor DataActor: ModelActor {
 
@@ -96,8 +97,11 @@ actor DataActor: ModelActor {
     }
 
     func deleteIllustration(withIdentifier illustrationID: PersistentIdentifier) {
+        @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
         if let illustration = self[illustrationID, as: Illustration.self] {
-            illustration.prepareForDeletion()
+            if !deleteWithoutFile {
+                illustration.prepareForDeletion()
+            }
             modelContext.delete(illustration)
         }
     }

@@ -39,6 +39,7 @@ struct AlbumView: View {
     @State var selectedIllustrations: [Illustration] = []
     @Binding var viewerManager: ViewerManager
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
+    @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
     let actor = DataActor(modelContainer: sharedModelContainer)
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
