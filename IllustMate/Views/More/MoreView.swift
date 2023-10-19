@@ -15,6 +15,8 @@ struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
+    @AppStorage(wrappedValue: false, "DebugAdvancedFiles") var showAdvancedFileOptions: Bool
+
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
@@ -22,8 +24,10 @@ struct MoreView: View {
                     NavigationLink(value: ViewPath.moreDataManagement) {
                         ListRow(image: "ListIcon.DataManagement", title: "More.DataManagement")
                     }
-                    NavigationLink(value: ViewPath.moreFileManagement) {
-                        ListRow(image: "ListIcon.FileManagement", title: "More.FileManagement")
+                    if showAdvancedFileOptions {
+                        NavigationLink(value: ViewPath.moreFileManagement) {
+                            ListRow(image: "ListIcon.FileManagement", title: "More.FileManagement")
+                        }
                     }
                 } header: {
                     ListSectionHeader(text: "More.General")

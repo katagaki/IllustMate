@@ -335,7 +335,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "画像を削除する際にファイルを削除しない"
           }
         }
@@ -454,6 +454,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スレッディング"
+          }
+        }
+      }
+    },
+    "Experiments.ShowAdvancedFileOptions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Advanced File Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度ファイルオプションを表示"
+          }
+        }
+      }
+    },
+    "Experiments.ShowAdvancedThumbnailOptions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Advanced Thumbnail Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度サムネイルオプションを表示"
           }
         }
       }

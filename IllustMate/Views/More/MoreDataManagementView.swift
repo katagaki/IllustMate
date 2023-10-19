@@ -22,6 +22,8 @@ struct MoreDataManagementView: View {
     @Query var albums: [Album]
     @Query var thumbnails: [Thumbnail]
 
+    @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
+
     var body: some View {
         List {
             Section {
@@ -107,15 +109,17 @@ struct MoreDataManagementView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            Section {
-                Button("More.DataManagement.RebuildThumbnails") {
-                    rebuildThumbnails()
-                }
-                Button("More.DataManagement.RebuildThumbnails.MissingOnly") {
-                    rebuildMissingThumbnails()
-                }
-                Button("More.DataManagement.UnorphanThumbnails", role: .destructive) {
-                    removeOrphanedThumbnails()
+            if showAdvancedThumbnailOptions {
+                Section {
+                    Button("More.DataManagement.RebuildThumbnails") {
+                        rebuildThumbnails()
+                    }
+                    Button("More.DataManagement.RebuildThumbnails.MissingOnly") {
+                        rebuildMissingThumbnails()
+                    }
+                    Button("More.DataManagement.UnorphanThumbnails", role: .destructive) {
+                        removeOrphanedThumbnails()
+                    }
                 }
             }
         }
@@ -129,9 +133,7 @@ struct MoreDataManagementView: View {
             let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
             progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
                                          total: illustrations.count)
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.show()
-            } completion: {
+            progressAlertManager.show {
                 try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
                 modelContext.autosaveEnabled = false
                 illustrations.forEach { illustration in
@@ -168,9 +170,7 @@ struct MoreDataManagementView: View {
             ))
             progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
                                          total: illustrations.count)
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.show()
-            } completion: {
+            progressAlertManager.show {
                 modelContext.autosaveEnabled = false
                 illustrations.forEach { illustration in
                     autoreleasepool {
@@ -206,9 +206,7 @@ struct MoreDataManagementView: View {
             ))
             progressAlertManager.prepare("More.DataManagement.UnorphanThumbnails.Unorphaning",
                                          total: thumbnails.count)
-            withAnimation(.easeOut.speed(2)) {
-                progressAlertManager.show()
-            } completion: {
+            progressAlertManager.show {
                 thumbnails.forEach { thumbnail in
                     modelContext.delete(thumbnail)
                     progressAlertManager.incrementProgress()

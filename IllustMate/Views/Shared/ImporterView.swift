@@ -53,9 +53,7 @@ struct ImporterView: View {
                     isImporting = true
                     progressAlertManager.prepare("Import.Importing",
                                                  total: selectedPhotoItems.count)
-                    withAnimation(.easeOut.speed(2)) {
-                        progressAlertManager.show()
-                    } completion: {
+                    progressAlertManager.show {
                         importPhotos()
                     }
                 } label: {
@@ -114,10 +112,7 @@ struct ImporterView: View {
                         }
                     }
                 }
-                progressAlertManager.currentProgress = 0
-                progressAlertManager.setProgress()
                 for await result in group {
-                    await progressAlertManager.incrementProgress()
                     if let result {
                         result.name = "PIC_\(String(format: "%04d", runningNumberForImageName))"
                         runningNumberForImageName += 1

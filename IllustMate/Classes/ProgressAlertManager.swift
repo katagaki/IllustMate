@@ -16,12 +16,24 @@ class ProgressAlertManager {
     var total: Int = 0
     var percentage: Int = 0
 
-    func show() {
-        isDisplayed = true
+    func show(completion: (() -> Void)? = nil) {
+        withAnimation(.easeOut.speed(2)) {
+            isDisplayed = true
+        } completion: {
+            if let completion {
+                completion()
+            }
+        }
     }
 
-    func hide() {
-        isDisplayed = false
+    func hide(completion: (() -> Void)? = nil) {
+        withAnimation(.easeOut.speed(2)) {
+            isDisplayed = false
+        } completion: {
+            if let completion {
+                completion()
+            }
+        }
     }
 
     func prepare(_ title: LocalizedStringKey, total: Int = 0) {

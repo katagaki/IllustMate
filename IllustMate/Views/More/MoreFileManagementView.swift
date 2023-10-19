@@ -64,9 +64,7 @@ struct MoreFileManagementView: View {
                 fetchDescriptor.propertiesToFetch = [\.id]
                 let illustrations = try modelContext.fetch(fetchDescriptor)
                 progressAlertManager.prepare("More.FileManagement.Orphans.Scanning")
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.show()
-                }
+                progressAlertManager.show()
                 let filesToCheck = try FileManager.default
                     .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
                 progressAlertManager.prepare("More.FileManagement.Orphans.Scanning",
@@ -98,12 +96,8 @@ struct MoreFileManagementView: View {
                                 to: orphansFolder.appendingPathComponent(orphan))
                             progressAlertManager.incrementProgress()
                         }
-                    }
-                    await MainActor.run {
                         UIApplication.shared.isIdleTimerDisabled = false
-                        withAnimation(.easeOut.speed(2)) {
-                            progressAlertManager.hide()
-                        } completion: {
+                        progressAlertManager.hide {
                             if !orphans.isEmpty {
                                 navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
                             }
@@ -124,9 +118,7 @@ struct MoreFileManagementView: View {
                 let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
                 progressAlertManager.prepare("More.FileManagement.RedownloadIllustrations.Redownloading",
                                              total: illustrations.count)
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.show()
-                }
+                progressAlertManager.show()
                 for illustration in illustrations {
                     do {
                         try FileManager.default.startDownloadingUbiquitousItem(
@@ -144,9 +136,7 @@ struct MoreFileManagementView: View {
                 }
                 DispatchQueue.main.async {
                     UIApplication.shared.isIdleTimerDisabled = false
-                    withAnimation(.easeOut.speed(2)) {
-                        progressAlertManager.hide()
-                    } completion: {
+                    progressAlertManager.hide {
                         // TODO: Show an alert that the downloads may take some time to complete
                     }
                 }
