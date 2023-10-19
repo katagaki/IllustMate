@@ -93,7 +93,10 @@ struct IllustrationViewer: View {
                         closeAction()
                     } else {
                         doWithAnimation {
+                            magnification = 1.0
                             displayOffset = .zero
+                        } completion: {
+                            magnificationAnchor = .center
                         }
                     }
                 }
@@ -111,6 +114,7 @@ struct IllustrationViewer: View {
                 .onEnded { _ in
                     doWithAnimation {
                         magnification = 1.0
+                        displayOffset = .zero
                     } completion: {
                         magnificationAnchor = .center
                     }
