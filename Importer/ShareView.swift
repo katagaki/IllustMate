@@ -85,7 +85,7 @@ struct ShareView: View {
                         })
                 }
             }
-            VStack(alignment: .leading, spacing: 16.0) {
+            VStack(alignment: .center, spacing: 16.0) {
                 HStack(alignment: .top, spacing: 4.0) {
                     Group {
                         Image(systemName: "info.circle")
