@@ -29,7 +29,7 @@ struct IllustrationsGrid<Content: View>: View {
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #if targetEnvironment(macCatalyst)
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 100.0), spacing: 2.0)]
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #else
     let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 120.0), spacing: 2.0)]
 #endif

@@ -18,15 +18,15 @@ struct SelectionBar<Content: View>: View {
     var body: some View {
         Group {
 #if targetEnvironment(macCatalyst)
-            VStack(alignment: .leading, spacing: 16.0) {
-                HStack(alignment: .center, spacing: 16.0) {
+            VStack(alignment: .leading, spacing: 8.0) {
+                HStack(alignment: .center, spacing: 8.0) {
                     CloseButton {
                         onStopSelecting()
                     }
                     Text("Shared.Selected.\(selectedIllustrations.count)")
                 }
                 Divider()
-                HStack(alignment: .center, spacing: 16.0) {
+                HStack(alignment: .center, spacing: 8.0) {
                     Spacer()
                     Button {
                         if illustrations.count == selectedIllustrations.count {
@@ -47,6 +47,7 @@ struct SelectionBar<Content: View>: View {
                     Spacer()
                 }
             }
+            .padding(8.0)
 #else
             HStack(alignment: .center, spacing: 16.0) {
                 CloseButton {
@@ -78,9 +79,9 @@ struct SelectionBar<Content: View>: View {
                         .font(.title2)
                 }
             }
+            .padding(16.0)
 #endif
         }
-        .padding(16.0)
         .frame(maxWidth: .infinity)
         .background(.regularMaterial)
         .clipShape(.rect(cornerRadius: 16.0))

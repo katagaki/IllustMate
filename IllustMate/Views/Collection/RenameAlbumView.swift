@@ -13,6 +13,7 @@ struct RenameAlbumView: View {
     @Environment(\.dismiss) var dismiss
     @State var album: Album
     @State var newAlbumName: String = ""
+    @FocusState var focusedField: FocusedField?
 
     var body: some View {
         NavigationStack {
@@ -20,6 +21,7 @@ struct RenameAlbumView: View {
                 Section {
                     TextField(album.name, text: $newAlbumName)
                         .textInputAutocapitalization(.words)
+                        .focused($focusedField, equals: .newAlbumName)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -49,10 +51,21 @@ struct RenameAlbumView: View {
             .navigationTitle("ViewTitle.Albums.Rename")
             .navigationBarTitleDisplayMode(.inline)
         }
+#if targetEnvironment(macCatalyst)
+        .defaultFocus($focusedField, .newAlbumName)
+#else
+        .onAppear {
+            focusedField = .newAlbumName
+        }
+#endif
         .task {
             newAlbumName = album.name
         }
         .presentationDetents([.medium])
         .interactiveDismissDisabled()
+    }
+
+    enum FocusedField {
+        case newAlbumName
     }
 }

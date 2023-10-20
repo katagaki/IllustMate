@@ -14,6 +14,7 @@ struct NewAlbumView: View {
     @Environment(\.dismiss) var dismiss
     @State var albumToAddTo: Album?
     @State var newAlbumName: String = ""
+    @FocusState var focusedField: FocusedField?
 
     var body: some View {
         NavigationStack {
@@ -21,6 +22,7 @@ struct NewAlbumView: View {
                 Section {
                     TextField("Albums.Create.Placeholder", text: $newAlbumName)
                         .textInputAutocapitalization(.words)
+                        .focused($focusedField, equals: .newAlbumName)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -55,7 +57,18 @@ struct NewAlbumView: View {
             .navigationTitle("ViewTitle.Albums.Create")
             .navigationBarTitleDisplayMode(.inline)
         }
+#if targetEnvironment(macCatalyst)
+        .defaultFocus($focusedField, .newAlbumName)
+#else
+        .onAppear {
+            focusedField = .newAlbumName
+        }
+#endif
         .presentationDetents([.medium])
         .interactiveDismissDisabled()
+    }
+
+    enum FocusedField {
+        case newAlbumName
     }
 }

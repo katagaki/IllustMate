@@ -89,7 +89,7 @@ struct MainSplitView: View {
                 default: Color.clear
                 }
             }
-            .navigationSplitViewColumnWidth(min: 300.0, ideal: 370.0, max: 600.0)
+            .navigationSplitViewColumnWidth(375.0)
         } detail: {
             if let image = viewerManager.displayedImage,
                let illustration = viewerManager.displayedIllustration {
