@@ -57,7 +57,7 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                     }
                     .draggable(IllustrationTransferable(id: illustration.id)) {
-                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                        if let image = illustration.thumbnail() {
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
