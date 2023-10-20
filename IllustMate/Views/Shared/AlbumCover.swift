@@ -31,7 +31,7 @@ struct AlbumCover: View {
                                 .clipShape(.rect(cornerRadius: 6.0))
                         }
                     }
-                    .transition(.opacity.animation(.snappy.speed(2)))
+                    .transitionRespectingAnimationSetting(.opacity.animation(.snappy.speed(2)))
             } else {
                 Image("Album.Generic")
                     .resizable()

@@ -149,9 +149,7 @@ struct MoreDataManagementView: View {
                         try? modelContext.save()
                         modelContext.autosaveEnabled = true
                         UIApplication.shared.isIdleTimerDisabled = false
-                        withAnimation(.easeOut.speed(2)) {
-                            progressAlertManager.hide()
-                        }
+                        progressAlertManager.hide()
                     }
                 }
             }
@@ -185,9 +183,7 @@ struct MoreDataManagementView: View {
                         try? modelContext.save()
                         modelContext.autosaveEnabled = true
                         UIApplication.shared.isIdleTimerDisabled = false
-                        withAnimation(.easeOut.speed(2)) {
-                            progressAlertManager.hide()
-                        }
+                        progressAlertManager.hide()
                     }
                 }
             }
@@ -214,9 +210,7 @@ struct MoreDataManagementView: View {
                 try? modelContext.save()
                 modelContext.autosaveEnabled = true
                 UIApplication.shared.isIdleTimerDisabled = false
-                withAnimation(.easeOut.speed(2)) {
-                    progressAlertManager.hide()
-                }
+                progressAlertManager.hide()
             }
         } catch {
             debugPrint(error.localizedDescription)

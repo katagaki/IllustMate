@@ -42,6 +42,8 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
+    @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
+
     let actor = DataActor(modelContainer: sharedModelContainer)
     @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
@@ -52,11 +54,20 @@ struct AlbumView: View {
                     Button("Shared.Create", systemImage: "plus") {
                         isAddingAlbum = true
                     }
-                    Picker("Albums.Style", selection: $styleState.animation(.snappy.speed(2))) {
-                        Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                            .tag(ViewStyle.grid)
-                        Label("Albums.Style.List", systemImage: "list.bullet")
-                            .tag(ViewStyle.list)
+                    if disableAllAnimations {
+                        Picker("Albums.Style", selection: $styleState) {
+                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                                .tag(ViewStyle.grid)
+                            Label("Albums.Style.List", systemImage: "list.bullet")
+                                .tag(ViewStyle.list)
+                        }
+                    } else {
+                        Picker("Albums.Style", selection: $styleState.animation(.snappy.speed(2))) {
+                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                                .tag(ViewStyle.grid)
+                            Label("Albums.Style.List", systemImage: "list.bullet")
+                                .tag(ViewStyle.list)
+                        }
                     }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
@@ -228,13 +239,8 @@ struct AlbumView: View {
         }
         .onAppear {
             if useThreadSafeLoading {
-                if albums != nil && illustrations != nil {
-                    styleState = style
-                    refreshData(animated: false)
-                } else {
-                    styleState = style
-                    refreshData()
-                }
+                styleState = style
+                refreshData()
             } else {
                 if isDataLoadedFromInitialAppearance {
                     concurrency.queue.addOperation {
