@@ -24,55 +24,60 @@ struct MainSplitView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedView) {
-                NavigationLink(value: ViewPath.collection) {
-                    Label {
-                        Text("TabTitle.Collection")
-                    } icon: {
-                        Image("Tab.Collection")
-#if targetEnvironment(macCatalyst)
-                            .resizable()
-                            .frame(width: 16.0, height: 16.0)
-#endif
-                    }
-                }
-                NavigationLink(value: ViewPath.albums) {
-                    Label {
-                        Text("TabTitle.Albums")
-                    } icon: {
-                        Image("Tab.Albums")
-#if targetEnvironment(macCatalyst)
-                            .resizable()
-                            .frame(width: 16.0, height: 16.0)
-#endif
-                    }
-                }
-                NavigationLink(value: ViewPath.illustrations) {
-                    Label {
-                        Text("TabTitle.Illustrations")
-                    } icon: {
-                        Image(systemName: "photo.fill")
-                    }
-                }
-                NavigationLink(value: ViewPath.more) {
-                    Label("TabTitle.More", systemImage: "ellipsis")
-                }
-                Divider()
-                ForEach(albums, id: \.id) { album in
-                    NavigationLink(value: ViewPath.album(album: album)) {
+                Section {
+                    NavigationLink(value: ViewPath.collection) {
                         Label {
-                            Text(album.name)
+                            Text("TabTitle.Collection")
                         } icon: {
-                            Image(uiImage: album.cover())
-                                .resizable()
+                            Image("Tab.Collection")
 #if targetEnvironment(macCatalyst)
+                                .resizable()
                                 .frame(width: 16.0, height: 16.0)
-                                .clipShape(.rect(cornerRadius: 3.0))
-#else
-                                .frame(width: 28.0, height: 28.0)
-                                .clipShape(.rect(cornerRadius: 6.0))
 #endif
                         }
                     }
+                    NavigationLink(value: ViewPath.albums) {
+                        Label {
+                            Text("TabTitle.Albums")
+                        } icon: {
+                            Image("Tab.Albums")
+#if targetEnvironment(macCatalyst)
+                                .resizable()
+                                .frame(width: 16.0, height: 16.0)
+#endif
+                        }
+                    }
+                    NavigationLink(value: ViewPath.illustrations) {
+                        Label {
+                            Text("TabTitle.Illustrations")
+                        } icon: {
+                            Image(systemName: "photo.fill")
+                        }
+                    }
+                    NavigationLink(value: ViewPath.more) {
+                        Label("TabTitle.More", systemImage: "ellipsis")
+                    }
+                }
+                Section {
+                    ForEach(albums, id: \.id) { album in
+                        NavigationLink(value: ViewPath.album(album: album)) {
+                            Label {
+                                Text(album.name)
+                            } icon: {
+                                Image(uiImage: album.cover())
+                                    .resizable()
+#if targetEnvironment(macCatalyst)
+                                    .frame(width: 16.0, height: 16.0)
+                                    .clipShape(.rect(cornerRadius: 3.0))
+#else
+                                    .frame(width: 28.0, height: 28.0)
+                                    .clipShape(.rect(cornerRadius: 6.0))
+#endif
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Shared.Albums")
                 }
             }
 #if targetEnvironment(macCatalyst)
