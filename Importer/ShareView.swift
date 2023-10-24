@@ -178,6 +178,7 @@ struct ShareView: View {
         let album = try? modelContext.fetch(FetchDescriptor<Album>(
             predicate: #Predicate { $0.id == albumID })).first
         albums.removeAll()
+        modelContext.autosaveEnabled = false
         for item in items {
             autoreleasepool {
                 importItem(modelContext, item, to: album,
