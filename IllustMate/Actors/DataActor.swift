@@ -20,22 +20,33 @@ actor DataActor: ModelActor {
         self.modelExecutor = DefaultSerialModelExecutor(modelContext: context)
     }
 
-    func albums() throws -> [Album] {
-        var fetchDescriptor = FetchDescriptor<Album>(
-            sortBy: [SortDescriptor(\.name, order: .forward)])
+    func albums(sortedBy sortType: SortType) throws -> [Album] {
+        var fetchDescriptor = FetchDescriptor<Album>()
         fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.childIllustrations]
-        return try modelContext.fetch(fetchDescriptor)
+        var albums = try modelContext.fetch(fetchDescriptor)
+        return sortAlbum(albums, sortedBy: sortType)
     }
 
-    func albums(in album: Album?) throws -> [Album] {
+    func albums(in album: Album?, sortedBy sortType: SortType) throws -> [Album] {
         let albumID = album?.id
         var fetchDescriptor = FetchDescriptor<Album>(
-            predicate: #Predicate { $0.parentAlbum?.id == albumID },
-            sortBy: [SortDescriptor(\.name, order: .forward)])
+            predicate: #Predicate { $0.parentAlbum?.id == albumID })
         fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.childIllustrations]
-        return try modelContext.fetch(fetchDescriptor)
+        var albums = try modelContext.fetch(fetchDescriptor)
+        return sortAlbum(albums, sortedBy: sortType)
+    }
+
+    func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
+        var albums = albums
+        switch sortType {
+        case .nameAscending: albums.sort(by: { $0.name < $1.name })
+        case .nameDescending: albums.sort(by: { $0.name > $1.name })
+        case .illustrationCountAscending: albums.sort(by: { $0.illustrations().count < $1.illustrations().count })
+        case .illustrationCountDescending: albums.sort(by: { $0.illustrations().count > $1.illustrations().count })
+        }
+        return albums
     }
 
     func addAlbum(withIdentifier albumID: PersistentIdentifier,

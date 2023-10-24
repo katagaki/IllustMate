@@ -151,7 +151,7 @@ extension AlbumView {
     func refreshAlbums(animated: Bool = true) {
         Task.detached(priority: .background) {
             do {
-                let albums = try await actor.albums(in: currentAlbum)
+                let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
                 await MainActor.run {
                     if animated {
                         doWithAnimation {

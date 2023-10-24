@@ -1869,34 +1869,98 @@
         }
       }
     },
-    "Shared.Sort.Ascending" : {
+    "Shared.Sort.DateAdded.Ascending" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort Ascending"
+            "value" : "Sort By Date Added (Ascending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "昇順で並べ替える"
+            "value" : "追加日で並べ替える（昇順）"
           }
         }
       }
     },
-    "Shared.Sort.Descending" : {
+    "Shared.Sort.DateAdded.Descending" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort Descending"
+            "value" : "Sort By Date Added (Descending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "降順で並べ替える"
+            "value" : "追加日で並べ替える（降順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.IllustrationCount.Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By Illustration Count (Ascending)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像数で並べ替える（昇順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.IllustrationCount.Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By Illustration Count (Descending)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像数で並べ替える（降順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Name.Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By Name (Ascending)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前で並べ替える（昇順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Name.Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By Name (Descending)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前で並べ替える（降順）"
           }
         }
       }

@@ -75,7 +75,7 @@ struct AlbumsView: View {
     func refreshAlbums() {
         Task.detached(priority: .background) {
             do {
-                let albums = try await actor.albums()
+                let albums = try await actor.albums(sortedBy: .nameAscending)
                 await MainActor.run {
                     doWithAnimation {
                         self.albums = albums

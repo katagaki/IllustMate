@@ -27,9 +27,10 @@ struct AlbumView: View {
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
+    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
+    @State var albumSortState: SortType = .nameAscending
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
     @State var styleState: ViewStyle = .grid
-    // HACK: To get animations working as @AppStorage does not support animations
 
     @State var illustrations: [Illustration]?
     @State var isConfirmingDeleteIllustration: Bool = false
@@ -52,6 +53,16 @@ struct AlbumView: View {
                 SectionHeader(title: "Albums.Albums", count: albums?.count ?? 0) {
                     Button("Shared.Create", systemImage: "plus") {
                         isAddingAlbum = true
+                    }
+                    Picker("Shared.Sort", selection: $albumSortState) {
+                        Label("Shared.Sort.Name.Ascending", image: "Sort.Name.Ascending")
+                            .tag(SortType.nameAscending)
+                        Label("Shared.Sort.Name.Descending", image: "Sort.Name.Descending")
+                            .tag(SortType.nameDescending)
+                        Label("Shared.Sort.IllustrationCount.Ascending", image: "Sort.Count.Ascending")
+                            .tag(SortType.illustrationCountAscending)
+                        Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
+                            .tag(SortType.illustrationCountDescending)
                     }
                     if disableAllAnimations {
                         Picker("Albums.Style", selection: $styleState) {
@@ -109,9 +120,9 @@ struct AlbumView: View {
                     }
                     .disabled(isSelectingIllustrations || illustrations == nil || (illustrations?.isEmpty ?? true))
                     Picker("Shared.Sort", selection: $isIllustrationSortReversed) {
-                        Label("Shared.Sort.Ascending", systemImage: "arrow.down")
+                        Label("Shared.Sort.DateAdded.Ascending", image: "Sort.Count.Ascending")
                             .tag(true)
-                        Label("Shared.Sort.Descending", systemImage: "arrow.up")
+                        Label("Shared.Sort.DateAdded.Descending", image: "Sort.Count.Descending")
                             .tag(false)
                     }
                     Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
@@ -240,10 +251,17 @@ struct AlbumView: View {
         }
         .onAppear {
             styleState = style
+            albumSortState = albumSort
             refreshData()
         }
         .onChange(of: styleState) { _, newValue in
             style = newValue
+        }
+        .onChange(of: albumSortState) { _, newValue in
+            albumSort = newValue
+        }
+        .onChange(of: albumSort) { _, _ in
+            refreshAlbums()
         }
         .onChange(of: isIllustrationSortReversed) { _, _ in
             doWithAnimation {
