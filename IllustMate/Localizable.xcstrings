@@ -457,23 +457,6 @@
         }
       }
     },
-    "Experiments.Section.Threading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Threading"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スレッディング"
-          }
-        }
-      }
-    },
     "Experiments.ShowAdvancedFileOptions" : {
       "localizations" : {
         "en" : {
@@ -550,22 +533,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アニメーションの速度を下げる"
-          }
-        }
-      }
-    },
-    "Experiments.UseThreadSafeLoading" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Safe Threading"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セーフスレッディングを適用"
           }
         }
       }

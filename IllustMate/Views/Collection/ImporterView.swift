@@ -25,7 +25,6 @@ struct ImporterView: View {
     @State var importCompletedCount: Int = 0
 
     let actor = DataActor(modelContainer: sharedModelContainer)
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
 
@@ -148,20 +147,11 @@ struct ImporterView: View {
                 }
                 return illustrationsToAdd
             }
-            if useThreadSafeLoading {
-                for illustration in illustrationsToAdd {
-                    await actor.createIllustration(illustration)
-                    if let selectedAlbum {
-                        await actor.addIllustration(illustration,
-                                                    toAlbumWithIdentifier: selectedAlbum.persistentModelID)
-                    }
-                }
-            } else {
-                illustrationsToAdd.forEach { illustration in
-                    modelContext.insert(illustration)
-                }
+            for illustration in illustrationsToAdd {
+                await actor.createIllustration(illustration)
                 if let selectedAlbum {
-                    selectedAlbum.addChildIllustrations(illustrationsToAdd)
+                    await actor.addIllustration(illustration,
+                                                toAlbumWithIdentifier: selectedAlbum.persistentModelID)
                 }
             }
             await MainActor.run {

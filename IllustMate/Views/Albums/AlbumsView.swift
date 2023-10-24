@@ -25,8 +25,6 @@ struct AlbumsView: View {
 
     @State var viewerManager = ViewerManager()
 
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
-
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationManager.albumsTabPath) {
@@ -70,29 +68,14 @@ struct AlbumsView: View {
     }
 
     func refreshAlbums() {
-        if useThreadSafeLoading {
-            Task.detached(priority: .userInitiated) {
-                do {
-                    let albums = try await actor.albums()
-                    await MainActor.run {
-                        self.albums = albums
-                    }
-                } catch {
-                    debugPrint(error.localizedDescription)
+        Task.detached(priority: .userInitiated) {
+            do {
+                let albums = try await actor.albums()
+                await MainActor.run {
+                    self.albums = albums
                 }
-            }
-        } else {
-            concurrency.queue.addOperation {
-                doWithAnimation {
-                    do {
-                        var fetchDescriptor = FetchDescriptor<Album>(
-                            sortBy: [SortDescriptor(\.name)])
-                        fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
-                        albums = try modelContext.fetch(fetchDescriptor)
-                    } catch {
-                        debugPrint(error.localizedDescription)
-                    }
-                }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
         }
     }

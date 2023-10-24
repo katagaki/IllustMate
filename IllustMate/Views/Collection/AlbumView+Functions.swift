@@ -18,15 +18,13 @@ extension AlbumView {
 
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
-            if useThreadSafeLoading {
-                Task.detached(priority: .userInitiated) {
-                    await actor.deleteAlbum(withIdentifier: albumPendingDeletion.persistentModelID)
+            Task.detached(priority: .userInitiated) {
+                await actor.deleteAlbum(withIdentifier: albumPendingDeletion.persistentModelID)
+                await MainActor.run {
+                    doWithAnimation {
+                        refreshData()
+                    }
                 }
-            } else {
-                modelContext.delete(albumPendingDeletion)
-            }
-            doWithAnimation {
-                refreshData()
             }
         }
     }
@@ -51,35 +49,21 @@ extension AlbumView {
     }
 
     func confirmDeleteIllustration() {
-        if isSelectingIllustrations {
-            for illustration in selectedIllustrations {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        await actor.deleteIllustration(withIdentifier: illustration.persistentModelID)
-                    }
-                } else {
-                    if !deleteWithoutFile {
-                        illustration.prepareForDeletion()
-                    }
-                    modelContext.delete(illustration)
+        Task.detached(priority: .userInitiated) {
+            if await isSelectingIllustrations {
+                for illustration in await selectedIllustrations {
+                    await actor.deleteIllustration(withIdentifier: illustration.persistentModelID)
+                }
+            } else {
+                if let illustrationPendingDeletion = await illustrationPendingDeletion {
+                    await actor.deleteIllustration(withIdentifier: illustrationPendingDeletion.persistentModelID)
                 }
             }
-        } else {
-            if let illustrationPendingDeletion {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        await actor.deleteIllustration(withIdentifier: illustrationPendingDeletion.persistentModelID)
-                    }
-                } else {
-                    if !deleteWithoutFile {
-                        illustrationPendingDeletion.prepareForDeletion()
-                    }
-                    modelContext.delete(illustrationPendingDeletion)
+            await MainActor.run {
+                doWithAnimation {
+                    refreshIllustrations()
                 }
             }
-        }
-        doWithAnimation {
-            refreshIllustrations()
         }
     }
 
@@ -110,39 +94,28 @@ extension AlbumView {
         } else if let transferable = drop.importedPhoto {
             importPhotoToAlbum(transferable, to: album)
         }
-        if !useThreadSafeLoading {
-            doWithAnimation {
-                refreshData()
-            }
-        }
     }
 
     func moveIllustrationsToAlbum(_ illustrations: [Illustration], to album: Album) {
-        if useThreadSafeLoading {
-            Task.detached(priority: .userInitiated) {
-                for illustration in illustrations {
-                    await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                                toAlbumWithIdentifier: album.persistentModelID)
-                    await refreshData(animated: true)
-                }
+        Task.detached(priority: .userInitiated) {
+            for illustration in illustrations {
+                await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                            toAlbumWithIdentifier: album.persistentModelID)
             }
-        } else {
-            album.addChildIllustrations(illustrations)
+            await MainActor.run {
+                refreshData(animated: true)
+            }
         }
     }
 
     func moveAlbumsToAlbum(_ albums: [Album], to album: Album) {
         if !albums.contains(where: { $0.id == album.id }) {
-            if useThreadSafeLoading {
-                Task.detached(priority: .userInitiated) {
-                    for destinationAlbum in albums {
-                        await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
-                                             toAlbumWithIdentifier: album.persistentModelID)
-                    }
-                    await refreshData(animated: true)
+            Task.detached(priority: .userInitiated) {
+                for destinationAlbum in albums {
+                    await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
+                                         toAlbumWithIdentifier: album.persistentModelID)
                 }
-            } else {
-                album.addChildAlbums(albums)
+                await refreshData(animated: true)
             }
         }
     }
@@ -176,21 +149,6 @@ extension AlbumView {
     }
 
     func refreshAlbums(animated: Bool = true) {
-        if useThreadSafeLoading {
-            refreshAlbumsUsingActor(animated: animated)
-        } else {
-            let currentAlbumID = currentAlbum?.id
-            do {
-                albums = try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum?.id == currentAlbumID },
-                    sortBy: [SortDescriptor(\.name)]))
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
-
-    func refreshAlbumsUsingActor(animated: Bool = true) {
         Task.detached(priority: .userInitiated) {
             do {
                 let albums = try await actor.albums(in: currentAlbum)
@@ -210,24 +168,6 @@ extension AlbumView {
     }
 
     func refreshIllustrations(animated: Bool = true) {
-        if useThreadSafeLoading {
-            refreshIllustrationsUsingActor(animated: animated)
-        } else {
-            let currentAlbumID = currentAlbum?.id
-            do {
-                var fetchDescriptor = FetchDescriptor<Illustration>(
-                    predicate: #Predicate { $0.containingAlbum?.id == currentAlbumID },
-                    sortBy: [SortDescriptor(\.dateAdded, order: isIllustrationSortReversed ? .forward : .reverse)])
-                fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
-                fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
-                illustrations = try modelContext.fetch(fetchDescriptor)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
-
-    func refreshIllustrationsUsingActor(animated: Bool = true) {
         Task.detached(priority: .userInitiated) {
             do {
                 let illustrations = try await actor

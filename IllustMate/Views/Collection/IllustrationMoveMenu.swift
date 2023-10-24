@@ -18,43 +18,29 @@ struct IllustrationMoveMenu: View {
     var containingAlbum: Album?
     var onMoved: () -> Void
 
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
-
     var body: some View {
         if containingAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        for illustration in illustrations {
-                            await actor.removeFromAlbum(illustration)
-                        }
-                        await MainActor.run {
-                            onMoved()
-                        }
+                Task.detached(priority: .userInitiated) {
+                    for illustration in illustrations {
+                        await actor.removeFromAlbum(illustration)
                     }
-                } else {
-                    illustrations.forEach { illustration in
-                        illustration.removeFromAlbum()
+                    await MainActor.run {
+                        onMoved()
                     }
-                    onMoved()
                 }
             }
         }
         if let containingAlbum, let parentAlbum = containingAlbum.parentAlbum {
             Button {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        for illustration in illustrations {
-                            await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                                        toAlbumWithIdentifier: parentAlbum.persistentModelID)
-                        }
-                        await MainActor.run {
-                            onMoved()
-                        }
+                Task.detached(priority: .userInitiated) {
+                    for illustration in illustrations {
+                        await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                                    toAlbumWithIdentifier: parentAlbum.persistentModelID)
                     }
-                } else {
-                    parentAlbum.addChildIllustrations(illustrations)
-                    onMoved()
+                    await MainActor.run {
+                        onMoved()
+                    }
                 }
             } label: {
                 Label(
@@ -66,19 +52,14 @@ struct IllustrationMoveMenu: View {
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
-                    if useThreadSafeLoading {
-                        Task.detached(priority: .userInitiated) {
-                            for illustration in illustrations {
-                                await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                                            toAlbumWithIdentifier: album.persistentModelID)
-                            }
-                            await MainActor.run {
-                                onMoved()
-                            }
+                    Task.detached(priority: .userInitiated) {
+                        for illustration in illustrations {
+                            await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                                        toAlbumWithIdentifier: album.persistentModelID)
                         }
-                    } else {
-                        album.addChildIllustrations(illustrations)
-                        onMoved()
+                        await MainActor.run {
+                            onMoved()
+                        }
                     }
                 } label: {
                     Label(

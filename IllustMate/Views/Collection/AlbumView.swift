@@ -45,7 +45,6 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
 
     let actor = DataActor(modelContainer: sharedModelContainer)
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
         ScrollView(.vertical) {
@@ -238,26 +237,8 @@ struct AlbumView: View {
             }
         }
         .onAppear {
-            if useThreadSafeLoading {
-                styleState = style
-                refreshData()
-            } else {
-                if isDataLoadedFromInitialAppearance {
-                    concurrency.queue.addOperation {
-                        styleState = style
-                        refreshData()
-                    }
-                } else {
-                    concurrency.queue.addOperation {
-                        styleState = style
-                        doWithAnimation {
-                            refreshData()
-                        } completion: {
-                            isDataLoadedFromInitialAppearance = true
-                        }
-                    }
-                }
-            }
+            styleState = style
+            refreshData()
         }
         .onChange(of: styleState) { _, newValue in
             style = newValue

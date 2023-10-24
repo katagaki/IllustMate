@@ -15,33 +15,26 @@ struct AlbumMoveMenu: View {
     var onMoved: () -> Void
 
     let actor = DataActor(modelContainer: sharedModelContainer)
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
 
     var body: some View {
         if album.parentAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        await actor.removeFromAlbum(album)
+                Task.detached(priority: .userInitiated) {
+                    await actor.removeFromAlbum(album)
+                    await MainActor.run {
                         onMoved()
                     }
-                } else {
-                    album.removeFromAlbum()
-                    onMoved()
                 }
             }
         }
         if let parentAlbum = album.parentAlbum?.parentAlbum {
             Button {
-                if useThreadSafeLoading {
-                    Task.detached(priority: .userInitiated) {
-                        await actor.addAlbum(withIdentifier: album.persistentModelID,
-                                             toAlbumWithIdentifier: parentAlbum.persistentModelID)
+                Task.detached(priority: .userInitiated) {
+                    await actor.addAlbum(withIdentifier: album.persistentModelID,
+                                         toAlbumWithIdentifier: parentAlbum.persistentModelID)
+                    await MainActor.run {
                         onMoved()
                     }
-                } else {
-                    parentAlbum.addChildAlbum(album)
-                    onMoved()
                 }
             } label: {
                 Label(
@@ -53,15 +46,12 @@ struct AlbumMoveMenu: View {
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatAlbumCanBeMovedTo()) { albumToMoveTo in
                 Button {
-                    if useThreadSafeLoading {
-                        Task.detached(priority: .userInitiated) {
-                            await actor.addAlbum(withIdentifier: album.persistentModelID,
-                                                 toAlbumWithIdentifier: albumToMoveTo.persistentModelID)
+                    Task.detached(priority: .userInitiated) {
+                        await actor.addAlbum(withIdentifier: album.persistentModelID,
+                                             toAlbumWithIdentifier: albumToMoveTo.persistentModelID)
+                        await MainActor.run {
                             onMoved()
                         }
-                    } else {
-                        albumToMoveTo.addChildAlbum(album)
-                        onMoved()
                     }
                 } label: {
                     Label(

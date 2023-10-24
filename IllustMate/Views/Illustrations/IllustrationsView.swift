@@ -23,8 +23,6 @@ struct IllustrationsView: View {
 
     @State var viewerManager = ViewerManager()
 
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
-
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationManager.illustrationsTabPath) {
@@ -68,30 +66,14 @@ struct IllustrationsView: View {
     }
 
     func refreshIllustrations() {
-        if useThreadSafeLoading {
-            Task.detached(priority: .userInitiated) {
-                do {
-                    let illustrations = try await actor.illustrations()
-                    await MainActor.run {
-                        self.illustrations = illustrations
-                    }
-                } catch {
-                    debugPrint(error.localizedDescription)
+        Task.detached(priority: .userInitiated) {
+            do {
+                let illustrations = try await actor.illustrations()
+                await MainActor.run {
+                    self.illustrations = illustrations
                 }
-            }
-        } else {
-            concurrency.queue.addOperation {
-                doWithAnimation {
-                    do {
-                        var fetchDescriptor = FetchDescriptor<Illustration>(
-                            sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
-                        fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
-                        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
-                        illustrations = try modelContext.fetch(fetchDescriptor)
-                    } catch {
-                        debugPrint(error.localizedDescription)
-                    }
-                }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
         }
     }

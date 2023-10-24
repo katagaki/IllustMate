@@ -69,7 +69,7 @@ struct MoreFileManagementView: View {
                     .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
                 progressAlertManager.prepare("More.FileManagement.Orphans.Scanning",
                                              total: filesToCheck.count)
-                Task.detached(priority: .background) {
+                Task.detached(priority: .userInitiated) {
                     let orphans: [String] = await withTaskGroup(of: String?.self, returning: [String].self) { group in
                         var orphans: [String] = []
                         for file in filesToCheck {

@@ -11,7 +11,6 @@ import SwiftUI
 struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
-    @AppStorage(wrappedValue: true, "DebugThreadSafety") var useThreadSafeLoading: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
     @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
@@ -47,12 +46,6 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
             } header: {
                 ListSectionHeader(text: "Experiments.Section.Cloud")
-                    .font(.body)
-            }
-            Section {
-                Toggle("Experiments.UseThreadSafeLoading", isOn: $useThreadSafeLoading)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.Threading")
                     .font(.body)
             }
             Section {
