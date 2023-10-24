@@ -58,6 +58,7 @@ struct IllustrationViewer: View {
             Image(uiImage: displayedImage)
                 .resizable()
                 .scaledToFit()
+                .clipShape(.rect(cornerRadius: 8.0))
                 .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                 .zIndex(1)
                 .matchedGeometryEffect(id: illustration.id, in: namespace)

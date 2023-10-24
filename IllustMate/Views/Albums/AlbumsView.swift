@@ -68,7 +68,7 @@ struct AlbumsView: View {
     }
 
     func refreshAlbums() {
-        Task.detached(priority: .userInitiated) {
+        Task.detached(priority: .background) {
             do {
                 let albums = try await actor.albums()
                 await MainActor.run {

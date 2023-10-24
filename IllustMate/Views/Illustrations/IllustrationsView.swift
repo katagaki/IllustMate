@@ -66,7 +66,7 @@ struct IllustrationsView: View {
     }
 
     func refreshIllustrations() {
-        Task.detached(priority: .userInitiated) {
+        Task.detached(priority: .background) {
             do {
                 let illustrations = try await actor.illustrations()
                 await MainActor.run {

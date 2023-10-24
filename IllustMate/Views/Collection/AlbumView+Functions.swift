@@ -149,7 +149,7 @@ extension AlbumView {
     }
 
     func refreshAlbums(animated: Bool = true) {
-        Task.detached(priority: .userInitiated) {
+        Task.detached(priority: .background) {
             do {
                 let albums = try await actor.albums(in: currentAlbum)
                 await MainActor.run {
@@ -168,7 +168,7 @@ extension AlbumView {
     }
 
     func refreshIllustrations(animated: Bool = true) {
-        Task.detached(priority: .userInitiated) {
+        Task.detached(priority: .background) {
             do {
                 let illustrations = try await actor
                     .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
