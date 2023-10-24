@@ -38,23 +38,28 @@ struct IllustrationsView: View {
                         return 0
                     } moveMenu: { _ in }
                 }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        HStack(alignment: .center, spacing: 8.0) {
+                            Text("\(illustrations.count)")
+                                .foregroundStyle(.secondary)
+#if targetEnvironment(macCatalyst)
+                            Button("Shared.Refresh") {
+                                refreshIllustrations()
+                            }
+#endif
+                        }
+                    }
+                }
+#if !targetEnvironment(macCatalyst)
+                .refreshable {
+                    refreshIllustrations()
+                }
+#endif
                 .navigationTitle("ViewTitle.Illustrations")
             }
         }
         .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
-#if targetEnvironment(macCatalyst)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Shared.Refresh") {
-                    refreshIllustrations()
-                }
-            }
-        }
-#else
-        .refreshable {
-            refreshIllustrations()
-        }
-#endif
         .onAppear {
             refreshIllustrations()
         }
@@ -70,7 +75,9 @@ struct IllustrationsView: View {
             do {
                 let illustrations = try await actor.illustrations()
                 await MainActor.run {
-                    self.illustrations = illustrations
+                    doWithAnimation {
+                        self.illustrations = illustrations
+                    }
                 }
             } catch {
                 debugPrint(error.localizedDescription)

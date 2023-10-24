@@ -86,21 +86,17 @@ struct MoreDataManagementView: View {
                 }
             }
             Section {
-                NavigationLink(value: ViewPath.moreDataAlbums(albums: albums)) {
-                    HStack(alignment: .center, spacing: 8.0) {
-                        Text("Shared.Albums")
-                        Spacer(minLength: 0)
-                        Text("\(albums.count)")
-                            .foregroundStyle(.secondary)
-                    }
+                HStack(alignment: .center, spacing: 8.0) {
+                    Text("Shared.Albums")
+                    Spacer(minLength: 0)
+                    Text("\(albums.count)")
+                        .foregroundStyle(.secondary)
                 }
-                NavigationLink(value: ViewPath.moreDataIllustrations(illustrations: illustrations)) {
-                    HStack(alignment: .center, spacing: 8.0) {
-                        Text("Shared.Illustrations")
-                        Spacer(minLength: 0)
-                        Text("\(illustrations.count)")
-                            .foregroundStyle(.secondary)
-                    }
+                HStack(alignment: .center, spacing: 8.0) {
+                    Text("Shared.Illustrations")
+                    Spacer(minLength: 0)
+                    Text("\(illustrations.count)")
+                        .foregroundStyle(.secondary)
                 }
                 HStack(alignment: .center, spacing: 8.0) {
                     Text("Shared.Thumbnails")

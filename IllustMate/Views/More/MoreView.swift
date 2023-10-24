@@ -58,22 +58,8 @@ struct MoreView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .moreDataManagement:
-                    MoreDataManagementView()
-                case .moreDataAlbums(let albums):
-                    List(albums) { album in
-                        Text(album.name)
-                    }
-                    .listStyle(.plain)
-                    .navigationTitle("Shared.Albums")
-                case .moreDataIllustrations(let illustrations):
-                    List(illustrations) { illustration in
-                        Text(illustration.name)
-                    }
-                    .listStyle(.plain)
-                    .navigationTitle("Shared.Illustrations")
-                case .moreFileManagement:
-                    MoreFileManagementView()
+                case .moreDataManagement: MoreDataManagementView()
+                case .moreFileManagement: MoreFileManagementView()
                 case .moreAppIcon: MoreAppIconView()
                 case .moreDebug: MoreExperimentsView()
                 case .moreOrphans(let orphans): MoreOrphansView(orphans: orphans)

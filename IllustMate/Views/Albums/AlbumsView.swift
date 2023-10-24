@@ -39,24 +39,29 @@ struct AlbumsView: View {
                     default: Color.clear
                     }
                 })
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        HStack(alignment: .center, spacing: 8.0) {
+                            Text("\(albums.count)")
+                                .foregroundStyle(.secondary)
+#if targetEnvironment(macCatalyst)
+                            Button("Shared.Refresh") {
+                                refreshAlbums()
+                            }
+#endif
+                        }
+                    }
+                }
+#if !targetEnvironment(macCatalyst)
+                .navigationTransition(.default, interactivity: .pan)
+                .refreshable {
+                    refreshAlbums()
+                }
+#endif
                 .navigationTitle("ViewTitle.Albums")
             }
         }
         .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
-#if targetEnvironment(macCatalyst)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Shared.Refresh") {
-                    refreshAlbums()
-                }
-            }
-        }
-#else
-        .navigationTransition(.default, interactivity: .pan)
-        .refreshable {
-            refreshAlbums()
-        }
-#endif
         .onAppear {
             refreshAlbums()
         }
@@ -72,7 +77,9 @@ struct AlbumsView: View {
             do {
                 let albums = try await actor.albums()
                 await MainActor.run {
-                    self.albums = albums
+                    doWithAnimation {
+                        self.albums = albums
+                    }
                 }
             } catch {
                 debugPrint(error.localizedDescription)

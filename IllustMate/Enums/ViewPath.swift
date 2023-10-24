@@ -14,8 +14,6 @@ enum ViewPath: Hashable {
     case album(album: Album)
     case more
     case moreDataManagement
-    case moreDataAlbums(albums: [Album])
-    case moreDataIllustrations(illustrations: [Illustration])
     case moreFileManagement
     case moreAppIcon
     case moreDebug
