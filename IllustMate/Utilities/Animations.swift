@@ -21,7 +21,7 @@ func doWithAnimationAsynchronously(task: @escaping () -> Void, completion: (() -
 
 @MainActor
 func doWithAnimation(task: @escaping () -> Void, completion: (() -> Void)? = nil) {
-    @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
+    @AppStorage(wrappedValue: true, "DebugAllAnimsOff") var disableAllAnimations: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
 
     if disableAllAnimations {

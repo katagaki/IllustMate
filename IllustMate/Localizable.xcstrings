@@ -373,22 +373,6 @@
         }
       }
     },
-    "Experiments.DisableProblematicAnimations" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disable Viewer Animations"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ビュワーアニメーションを無効化"
-          }
-        }
-      }
-    },
     "Experiments.Section.Animations" : {
       "extractionState" : "manual",
       "localizations" : {

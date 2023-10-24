@@ -19,7 +19,7 @@ class ViewerManager {
 
     func setDisplay(_ illustration: Illustration) {
         if let image = imageCache[illustration.id] {
-            if UserDefaults.standard.bool(forKey: "DebugProblematicAnimsOff") {
+            if UserDefaults.standard.bool(forKey: "DebugAllAnimsOff") {
                 displayedIllustrationID = illustration.id
                 displayedImage = image
                 displayedIllustration = illustration

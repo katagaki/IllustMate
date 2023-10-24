@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TransitionModifier: ViewModifier {
 
-    @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
+    @AppStorage(wrappedValue: true, "DebugAllAnimsOff") var disableAllAnimations: Bool
     var transition: AnyTransition
 
     func body(content: Content) -> some View {
