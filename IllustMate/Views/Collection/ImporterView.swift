@@ -157,6 +157,7 @@ struct ImporterView: View {
             await MainActor.run {
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = selectedPhotoItems.count
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
                 doWithAnimation {
                     isImportCompleted = true
                 }

@@ -195,9 +195,12 @@ struct ShareView: View {
             isCompleted = true
         } completion: {
             if failedItemCount == 0 {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     close()
                 }
+            } else {
+                UINotificationFeedbackGenerator().notificationOccurred(.warning)
             }
         }
     }
