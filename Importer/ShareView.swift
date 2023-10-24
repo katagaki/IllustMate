@@ -26,6 +26,7 @@ struct ShareView: View {
         self.items = items
         self.failedItemCount = failedItemCount
         let modelContext = ModelContext(sharedModelContainer)
+        modelContext.autosaveEnabled = false
         do {
             albums = try modelContext.fetch(FetchDescriptor<Album>(
                 predicate: #Predicate { $0.parentAlbum == nil },
