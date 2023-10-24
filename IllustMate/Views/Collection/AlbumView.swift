@@ -206,6 +206,8 @@ struct AlbumView: View {
             RenameAlbumView(album: album)
         }
         .sheet(isPresented: $isImportingPhotos) {
+            refreshIllustrations()
+        } content: {
             ImporterView(selectedAlbum: currentAlbum)
         }
         .confirmationDialog("Shared.DeleteConfirmation.Album",
