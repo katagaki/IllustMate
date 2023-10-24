@@ -14,23 +14,13 @@ struct AlbumCover: View {
     var shadowSize: Double = 2.0
     var data: Data?
 
-    @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
+    @State var coverPhoto: Image?
 
     var body: some View {
         ZStack(alignment: .center) {
-            if let data, let coverPhoto = UIImage(data: data) {
-                Image(uiImage: coverPhoto)
+            if let coverPhoto {
+                coverPhoto
                     .resizable()
-                    .overlay {
-                        if showAlbumCoverResolution {
-                            Text(verbatim: "\(coverPhoto.size.width)x\(coverPhoto.size.height)")
-                                .font(.caption2)
-                                .foregroundStyle(.white)
-                                .padding(2.0)
-                                .background(.accent.opacity(0.7))
-                                .clipShape(.rect(cornerRadius: 6.0))
-                        }
-                    }
                     .transitionRespectingAnimationSetting(.opacity.animation(.snappy.speed(2)))
             } else {
                 Image("Album.Generic")
@@ -45,6 +35,11 @@ struct AlbumCover: View {
         .overlay {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(.tertiary, lineWidth: 1/3)
+        }
+        .task {
+            if let data, let coverImage = UIImage(data: data) {
+                coverPhoto = Image(uiImage: coverImage)
+            }
         }
     }
 }

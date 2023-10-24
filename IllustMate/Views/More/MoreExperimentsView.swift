@@ -13,7 +13,6 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
-    @AppStorage(wrappedValue: false, "DebugAlbumCoverRes") var showAlbumCoverResolution: Bool
     @AppStorage(wrappedValue: false, "DebugAdvancedFiles") var showAdvancedFileOptions: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
     @AppStorage(wrappedValue: true, "DebugAllAnimsOff") var disableAllAnimations: Bool
@@ -50,7 +49,6 @@ struct MoreExperimentsView: View {
             Section {
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowAdvancedThumbnailOptions", isOn: $showAdvancedThumbnailOptions)
-                Toggle("Experiments.ShowAlbumCoverResolution", isOn: $showAlbumCoverResolution)
             } header: {
                 ListSectionHeader(text: "Experiments.Section.Imaging")
                     .font(.body)

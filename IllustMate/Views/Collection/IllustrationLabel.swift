@@ -14,13 +14,16 @@ struct IllustrationLabel: View {
     var illustration: Illustration
     var isHiddenAndOverridesState: Bool
 
+    @State var isThumbnailReadyToPresent: Bool = false
+    @State var thumbnail: Image?
+
     var body: some View {
         ZStack(alignment: .center) {
             Color.clear
-            if !isHiddenAndOverridesState {
+            if isThumbnailReadyToPresent && !isHiddenAndOverridesState {
                 Group {
-                    if let image = illustration.thumbnail() {
-                        Image(uiImage: image)
+                    if let thumbnail {
+                        thumbnail
                             .resizable()
                     } else {
                         Image(systemName: "xmark.circle.fill")
@@ -31,11 +34,18 @@ struct IllustrationLabel: View {
                             .symbolRenderingMode(.multicolor)
                     }
                 }
-                .matchedGeometryEffect(id: illustration.id, in: namespace)
+                .toggledMatchedGeometryEffect(id: illustration.id, in: namespace)
+                .transitionRespectingAnimationSetting(.opacity.animation(.snappy.speed(2)))
             }
         }
         .background(.primary.opacity(0.05))
         .aspectRatio(1.0, contentMode: .fill)
         .contentShape(.rect)
+        .task {
+            if let image = illustration.thumbnail() {
+                thumbnail = Image(uiImage: image)
+            }
+            isThumbnailReadyToPresent = true
+        }
     }
 }

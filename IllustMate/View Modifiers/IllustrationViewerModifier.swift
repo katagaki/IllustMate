@@ -21,7 +21,7 @@ struct IllustrationViewerModifier: ViewModifier {
                         IllustrationViewer(namespace: namespace, illustration: illustration, displayedImage: image) {
                             viewerManager.removeDisplay()
                         }
-                        .id(illustration.id)
+                        .id(viewerManager.displayedIllustrationID)
                     }
                 }
         } else {

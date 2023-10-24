@@ -24,7 +24,7 @@ actor DataActor: ModelActor {
         var fetchDescriptor = FetchDescriptor<Album>()
         fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.childIllustrations]
-        var albums = try modelContext.fetch(fetchDescriptor)
+        let albums = try modelContext.fetch(fetchDescriptor)
         return sortAlbum(albums, sortedBy: sortType)
     }
 
@@ -34,19 +34,17 @@ actor DataActor: ModelActor {
             predicate: #Predicate { $0.parentAlbum?.id == albumID })
         fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.childIllustrations]
-        var albums = try modelContext.fetch(fetchDescriptor)
+        let albums = try modelContext.fetch(fetchDescriptor)
         return sortAlbum(albums, sortedBy: sortType)
     }
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
-        var albums = albums
         switch sortType {
-        case .nameAscending: albums.sort(by: { $0.name < $1.name })
-        case .nameDescending: albums.sort(by: { $0.name > $1.name })
-        case .illustrationCountAscending: albums.sort(by: { $0.illustrations().count < $1.illustrations().count })
-        case .illustrationCountDescending: albums.sort(by: { $0.illustrations().count > $1.illustrations().count })
+        case .nameAscending: albums.sorted(by: { $0.name < $1.name })
+        case .nameDescending: albums.sorted(by: { $0.name > $1.name })
+        case .illustrationCountAscending: albums.sorted(by: { $0.illustrations().count < $1.illustrations().count })
+        case .illustrationCountDescending: albums.sorted(by: { $0.illustrations().count > $1.illustrations().count })
         }
-        return albums
     }
 
     func addAlbum(withIdentifier albumID: PersistentIdentifier,

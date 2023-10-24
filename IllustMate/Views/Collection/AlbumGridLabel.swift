@@ -16,10 +16,10 @@ struct AlbumGridLabel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             AlbumCover(cornerRadius: 8.0, shadowSize: 4.0, data: album.coverPhoto)
-                .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
+                .toggledMatchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
-                    .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
+                    .toggledMatchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 HStack(alignment: .center, spacing: 8.0) {

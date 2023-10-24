@@ -51,16 +51,10 @@ class ViewerManager {
                     }
                     await MainActor.run { [displayedImage] in
                         self.imageCache[illustration.id] = displayedImage
-                        if UserDefaults.standard.bool(forKey: "DebugProblematicAnimsOff") {
+                        doWithAnimation {
                             self.displayedIllustrationID = illustration.id
                             self.displayedImage = displayedImage
                             self.displayedIllustration = illustration
-                        } else {
-                            doWithAnimation {
-                                self.displayedIllustrationID = illustration.id
-                                self.displayedImage = displayedImage
-                                self.displayedIllustration = illustration
-                            }
                         }
                     }
                 } catch {
@@ -71,16 +65,10 @@ class ViewerManager {
     }
 
     func removeDisplay() {
-        if UserDefaults.standard.bool(forKey: "DebugProblematicAnimsOff") {
+        doWithAnimationAsynchronously { [self] in
             displayedImage = nil
             displayedIllustration = nil
             displayedIllustrationID = ""
-        } else {
-            doWithAnimationAsynchronously { [self] in
-                displayedImage = nil
-                displayedIllustration = nil
-                displayedIllustrationID = ""
-            }
         }
     }
 }

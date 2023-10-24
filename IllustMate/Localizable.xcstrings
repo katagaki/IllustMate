@@ -473,22 +473,6 @@
         }
       }
     },
-    "Experiments.ShowAlbumCoverResolution" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Album Cover Resolution"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アルバムカバーの大きさを表示"
-          }
-        }
-      }
-    },
     "Experiments.ShowCloudStatusEverywhere" : {
       "localizations" : {
         "en" : {

@@ -13,7 +13,6 @@ struct AlbumsView: View {
 
     @Environment(\.modelContext) var modelContext
     @Environment(\.scenePhase) var scenePhase
-    @Environment(ConcurrencyManager.self) var concurrency
     @EnvironmentObject var navigationManager: NavigationManager
 
     let actor = DataActor(modelContainer: sharedModelContainer)

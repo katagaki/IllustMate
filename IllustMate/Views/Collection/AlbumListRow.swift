@@ -18,10 +18,10 @@ struct AlbumListRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
             AlbumCover(length: 48.0, data: album.coverPhoto)
-                .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
+                .toggledMatchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
-                    .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
+                    .toggledMatchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
