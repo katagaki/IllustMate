@@ -21,17 +21,9 @@ extension AlbumView {
             Task.detached(priority: .userInitiated) {
                 await actor.deleteAlbum(withIdentifier: albumPendingDeletion.persistentModelID)
                 await MainActor.run {
-                    doWithAnimation {
-                        refreshData()
-                    }
+                    refreshData()
                 }
             }
-        }
-    }
-
-    func refreshDataAfterAlbumMoved() {
-        doWithAnimation {
-            refreshAlbums()
         }
     }
 
@@ -60,9 +52,7 @@ extension AlbumView {
                 }
             }
             await MainActor.run {
-                doWithAnimation {
-                    refreshIllustrations()
-                }
+                refreshIllustrations()
             }
         }
     }
@@ -103,7 +93,7 @@ extension AlbumView {
                                             toAlbumWithIdentifier: album.persistentModelID)
             }
             await MainActor.run {
-                refreshData(animated: true)
+                refreshData()
             }
         }
     }
@@ -115,7 +105,7 @@ extension AlbumView {
                     await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
                                          toAlbumWithIdentifier: album.persistentModelID)
                 }
-                await refreshData(animated: true)
+                await refreshData()
             }
         }
     }
@@ -126,9 +116,7 @@ extension AlbumView {
 
     func refreshDataAfterIllustrationMoved() {
         selectedIllustrations.removeAll()
-        doWithAnimation {
-            refreshIllustrations()
-        }
+        refreshIllustrations()
     }
 
     func selectOrDeselectIllustration(_ illustration: Illustration) {
@@ -143,21 +131,17 @@ extension AlbumView {
         }
     }
 
-    func refreshData(animated: Bool = true) {
-        refreshAlbums(animated: animated)
-        refreshIllustrations(animated: animated)
+    func refreshData() {
+        refreshAlbums()
+        refreshIllustrations()
     }
 
-    func refreshAlbums(animated: Bool = true) {
-        Task.detached(priority: .background) {
+    func refreshAlbums() {
+        Task.detached(priority: .high) {
             do {
                 let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
                 await MainActor.run {
-                    if animated {
-                        doWithAnimation {
-                            self.albums = albums
-                        }
-                    } else {
+                    doWithAnimation {
                         self.albums = albums
                     }
                 }
@@ -167,17 +151,13 @@ extension AlbumView {
         }
     }
 
-    func refreshIllustrations(animated: Bool = true) {
-        Task.detached(priority: .background) {
+    func refreshIllustrations() {
+        Task.detached(priority: .high) {
             do {
                 let illustrations = try await actor
                     .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
                 await MainActor.run {
-                    if animated {
-                        doWithAnimation {
-                            self.illustrations = illustrations
-                        }
-                    } else {
+                    doWithAnimation {
                         self.illustrations = illustrations
                     }
                 }

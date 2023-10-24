@@ -93,7 +93,7 @@ struct AlbumView: View {
                             moveDropToAlbum(transferable, to: album)
                         } moveMenu: { album in
                             AlbumMoveMenu(album: album) {
-                                refreshDataAfterAlbumMoved()
+                                refreshAlbums()
                             }
                         }
                         if colorScheme == .light || styleState == .list {
@@ -173,17 +173,13 @@ struct AlbumView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Shared.Refresh") {
-                    doWithAnimation {
-                        refreshData()
-                    }
+                    refreshData()
                 }
             }
         }
 #else
         .refreshable {
-            doWithAnimation {
-                refreshData()
-            }
+            refreshData()
         }
 #endif
         .safeAreaInset(edge: .bottom) {
@@ -203,16 +199,12 @@ struct AlbumView: View {
             }
         }
         .sheet(isPresented: $isAddingAlbum) {
-            doWithAnimation {
-                refreshAlbums()
-            }
+            refreshAlbums()
         } content: {
             NewAlbumView(albumToAddTo: currentAlbum)
         }
         .sheet(item: $albumToRename) {
-            doWithAnimation {
-                refreshAlbums()
-            }
+            refreshAlbums()
         } content: { album in
             RenameAlbumView(album: album)
         }
@@ -264,9 +256,7 @@ struct AlbumView: View {
             refreshAlbums()
         }
         .onChange(of: isIllustrationSortReversed) { _, _ in
-            doWithAnimation {
-                refreshIllustrations()
-            }
+            refreshIllustrations()
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
