@@ -52,6 +52,7 @@ extension AlbumView {
                 }
             }
             await MainActor.run {
+                self.selectedIllustrations.removeAll()
                 refreshIllustrations()
             }
         }

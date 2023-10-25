@@ -234,7 +234,6 @@ struct AlbumView: View {
                             isPresented: $isConfirmingDeleteSelectedIllustrations, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
                 confirmDeleteIllustration()
-                selectedIllustrations.removeAll()
             }
             Button("Shared.No", role: .cancel) {
                 illustrationPendingDeletion = nil
