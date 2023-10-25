@@ -224,11 +224,11 @@ struct ShareView: View {
 
     func importIllustration(_ context: ModelContext, _ name: String, data: Data, to album: Album?) {
         let illustration = Illustration(name: name, data: data)
-        illustration.containingAlbum = album
         if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
             let thumbnail = Thumbnail(data: thumbnailData)
             illustration.cachedThumbnail = thumbnail
         }
         context.insert(illustration)
+        album?.addChildIllustration(illustration)
     }
 }

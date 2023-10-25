@@ -41,9 +41,9 @@ extension AlbumView {
     }
 
     func confirmDeleteIllustration() {
-        Task.detached(priority: .userInitiated) {
-            if await isSelectingIllustrations {
-                for illustration in await selectedIllustrations {
+        Task.detached(priority: .userInitiated) { [isSelectingIllustrations, selectedIllustrations] in
+            if isSelectingIllustrations {
+                for illustration in selectedIllustrations {
                     await actor.deleteIllustration(withIdentifier: illustration.persistentModelID)
                 }
             } else {
