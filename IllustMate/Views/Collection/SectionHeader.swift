@@ -15,27 +15,6 @@ struct SectionHeader<Content: View>: View {
     @ViewBuilder var trailingViews: Content
 
     var body: some View {
-#if targetEnvironment(macCatalyst)
-        VStack(alignment: .leading, spacing: 8.0) {
-            HStack(alignment: .center, spacing: 8.0) {
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                    .textCase(nil)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .allowsTightening(true)
-                if count != 0 {
-                    Text("(\(count))")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            HStack(alignment: .center, spacing: 8.0) {
-                trailingViews
-            }
-        }
-#else
         HStack(alignment: .center, spacing: 16.0) {
             HStack(alignment: .center, spacing: 8.0) {
                 Text(title)
@@ -52,13 +31,18 @@ struct SectionHeader<Content: View>: View {
                 }
             }
             Spacer(minLength: 0)
+#if targetEnvironment(macCatalyst)
+            Menu("Shared.More") {
+                trailingViews
+            }
+#else
             Menu {
                 trailingViews
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .font(.title2)
             }
-        }
 #endif
+        }
     }
 }
