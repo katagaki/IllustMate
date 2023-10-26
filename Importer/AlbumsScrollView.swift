@@ -13,6 +13,7 @@ struct AlbumsScrollView: View {
     var title: LocalizedStringKey
     var parentAlbum: Album?
     @State var albums: [Album] = []
+    @State var isAlbumsLoaded: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
     @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
@@ -30,20 +31,28 @@ struct AlbumsScrollView: View {
                 Divider()
                     .padding([.leading], 20.0)
                     .padding([.top], 10.0)
-                if albums.count == 0 {
-                    Text("Albums.NoMoreAlbums")
-                        .foregroundStyle(.secondary)
+                if isAlbumsLoaded {
+                    if albums.count == 0 {
+                        Text("Albums.NoMoreAlbums")
+                            .foregroundStyle(.secondary)
+                            .padding([.leading, .trailing], 20.0)
+                            .padding([.top], 10.0)
+                    } else {
+                        AlbumsSection(albums: albums, style: $style,
+                                      enablesContextMenu: false) { _ in }
+                    }
+                } else {
+                    ProgressView()
+                        .progressViewStyle(.circular)
                         .padding([.leading, .trailing], 20.0)
                         .padding([.top], 10.0)
-                } else {
-                    AlbumsSection(albums: albums, style: $style,
-                                  enablesContextMenu: false) { _ in }
                 }
             }
         }
         .task {
             do {
                 albums = try await actor.albums(in: parentAlbum, sortedBy: albumSort)
+                isAlbumsLoaded = true
             } catch {
                 debugPrint(error.localizedDescription)
             }
