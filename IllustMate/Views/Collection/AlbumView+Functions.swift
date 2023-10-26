@@ -129,6 +129,9 @@ extension AlbumView {
     }
 
     func refreshData() async {
+        if slowItDown {
+            try? await Task.sleep(nanoseconds: 2000000000)
+        }
         await refreshAlbums()
         await refreshIllustrations()
     }

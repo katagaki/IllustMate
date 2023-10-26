@@ -42,6 +42,7 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
+    @AppStorage(wrappedValue: false, "DebugSlowItDown") var slowItDown: Bool
     @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
 
     let actor = DataActor(modelContainer: sharedModelContainer)
@@ -259,11 +260,7 @@ struct AlbumView: View {
         .task {
             styleState = style
             albumSortState = albumSort
-        }
-        .onAppear {
-            Task.detached(priority: .background) {
-                await refreshData()
-            }
+            await refreshData()
         }
         .onChange(of: styleState) { _, newValue in
             style = newValue
