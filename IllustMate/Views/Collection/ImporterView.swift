@@ -118,7 +118,7 @@ struct ImporterView: View {
     func importPhotos() {
         UIApplication.shared.isIdleTimerDisabled = true
         let selectedPhotoItems = selectedPhotoItems
-        Task.detached(priority: .userInitiated) {
+        Task {
             let illustrationsToAdd = await withTaskGroup(of: Illustration?.self,
                                                          returning: [Illustration].self) { group in
                 var illustrationsToAdd: [Illustration] = []
