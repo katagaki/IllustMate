@@ -92,7 +92,9 @@ struct AlbumView: View {
                             moveDropToAlbum(transferable, to: album)
                         } moveMenu: { album in
                             AlbumMoveMenu(album: album) {
-                                refreshAlbums()
+                                Task.detached(priority: .userInitiated) {
+                                    await refreshAlbums()
+                                }
                             }
                         }
                         if colorScheme == .light || styleState == .list {
@@ -172,13 +174,22 @@ struct AlbumView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Shared.Refresh") {
-                    refreshData()
+                    Task {
+                        await refreshData()
+                    }
                 }
             }
         }
 #else
         .refreshable {
-            refreshData()
+            doWithAnimation {
+                albums?.removeAll()
+                illustrations?.removeAll()
+            } completion: {
+                Task {
+                    await refreshData()
+                }
+            }
         }
 #endif
         .safeAreaInset(edge: .bottom) {
@@ -198,17 +209,23 @@ struct AlbumView: View {
             }
         }
         .sheet(isPresented: $isAddingAlbum) {
-            refreshAlbums()
+            Task.detached(priority: .userInitiated) {
+                await refreshAlbums()
+            }
         } content: {
             NewAlbumView(albumToAddTo: currentAlbum)
         }
         .sheet(item: $albumToRename) {
-            refreshAlbums()
+            Task.detached(priority: .userInitiated) {
+                await refreshAlbums()
+            }
         } content: { album in
             RenameAlbumView(album: album)
         }
         .sheet(isPresented: $isImportingPhotos) {
-            refreshIllustrations()
+            Task.detached(priority: .userInitiated) {
+                await refreshIllustrations()
+            }
         } content: {
             ImporterView(selectedAlbum: currentAlbum)
         }
@@ -239,10 +256,14 @@ struct AlbumView: View {
                 illustrationPendingDeletion = nil
             }
         }
-        .onAppear {
+        .task {
             styleState = style
             albumSortState = albumSort
-            refreshData()
+        }
+        .onAppear {
+            Task.detached(priority: .background) {
+                await refreshData()
+            }
         }
         .onChange(of: styleState) { _, newValue in
             style = newValue
@@ -251,14 +272,20 @@ struct AlbumView: View {
             albumSort = newValue
         }
         .onChange(of: albumSort) { _, _ in
-            refreshAlbums()
+            Task.detached(priority: .userInitiated) {
+                await refreshAlbums()
+            }
         }
         .onChange(of: isIllustrationSortReversed) { _, _ in
-            refreshIllustrations()
+            Task.detached(priority: .userInitiated) {
+                await refreshIllustrations()
+            }
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
-                refreshData()
+                Task.detached(priority: .userInitiated) {
+                    await refreshData()
+                }
             }
         }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))

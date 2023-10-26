@@ -22,12 +22,12 @@ struct MainTabView: View {
                 .tag(TabType.collection)
             AlbumsView()
                 .tabItem {
-                    Label("TabTitle.Albums", image: "Tab.Albums")
+                    Label("TabTitle.Albums", systemImage: "rectangle.stack.fill")
                 }
                 .tag(TabType.albums)
             IllustrationsView()
                 .tabItem {
-                    Label("TabTitle.Illustrations", systemImage: "photo.fill")
+                    Label("TabTitle.Illustrations", systemImage: "photo.on.rectangle.angled")
                 }
                 .tag(TabType.illustrations)
             MoreView()

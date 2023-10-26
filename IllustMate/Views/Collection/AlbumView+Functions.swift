@@ -18,11 +18,9 @@ extension AlbumView {
 
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
-            Task.detached(priority: .userInitiated) {
+            Task {
                 await actor.deleteAlbum(withIdentifier: albumPendingDeletion.persistentModelID)
-                await MainActor.run {
-                    refreshData()
-                }
+                await refreshData()
             }
         }
     }
@@ -41,20 +39,18 @@ extension AlbumView {
     }
 
     func confirmDeleteIllustration() {
-        Task.detached(priority: .userInitiated) { [isSelectingIllustrations, selectedIllustrations] in
+        Task { [isSelectingIllustrations, selectedIllustrations] in
             if isSelectingIllustrations {
                 for illustration in selectedIllustrations {
                     await actor.deleteIllustration(withIdentifier: illustration.persistentModelID)
                 }
             } else {
-                if let illustrationPendingDeletion = await illustrationPendingDeletion {
+                if let illustrationPendingDeletion = illustrationPendingDeletion {
                     await actor.deleteIllustration(withIdentifier: illustrationPendingDeletion.persistentModelID)
                 }
             }
-            await MainActor.run {
-                self.selectedIllustrations.removeAll()
-                refreshIllustrations()
-            }
+            self.selectedIllustrations.removeAll()
+            await refreshIllustrations()
         }
     }
 
@@ -88,20 +84,18 @@ extension AlbumView {
     }
 
     func moveIllustrationsToAlbum(_ illustrations: [Illustration], to album: Album) {
-        Task.detached(priority: .userInitiated) {
+        Task(priority: .userInitiated) {
             for illustration in illustrations {
                 await actor.addIllustration(withIdentifier: illustration.persistentModelID,
                                             toAlbumWithIdentifier: album.persistentModelID)
             }
-            await MainActor.run {
-                refreshData()
-            }
+            await refreshData()
         }
     }
 
     func moveAlbumsToAlbum(_ albums: [Album], to album: Album) {
         if !albums.contains(where: { $0.id == album.id }) {
-            Task.detached(priority: .userInitiated) {
+            Task(priority: .userInitiated) {
                 for destinationAlbum in albums {
                     await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
                                          toAlbumWithIdentifier: album.persistentModelID)
@@ -117,7 +111,9 @@ extension AlbumView {
 
     func refreshDataAfterIllustrationMoved() {
         selectedIllustrations.removeAll()
-        refreshIllustrations()
+        Task(priority: .userInitiated) {
+            await refreshIllustrations()
+        }
     }
 
     func selectOrDeselectIllustration(_ illustration: Illustration) {
@@ -132,39 +128,35 @@ extension AlbumView {
         }
     }
 
-    func refreshData() {
-        refreshAlbums()
-        refreshIllustrations()
+    func refreshData() async {
+        await refreshAlbums()
+        await refreshIllustrations()
     }
 
-    func refreshAlbums() {
-        Task.detached(priority: .high) {
-            do {
-                let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
-                await MainActor.run {
-                    doWithAnimation {
-                        self.albums = albums
-                    }
+    func refreshAlbums() async {
+        do {
+            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
+            await MainActor.run {
+                doWithAnimation {
+                    self.albums = albums
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
             }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 
-    func refreshIllustrations() {
-        Task.detached(priority: .high) {
-            do {
-                let illustrations = try await actor
-                    .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
-                await MainActor.run {
-                    doWithAnimation {
-                        self.illustrations = illustrations
-                    }
+    func refreshIllustrations() async {
+        do {
+            let illustrations = try await actor
+                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+            await MainActor.run {
+                doWithAnimation {
+                    self.illustrations = illustrations
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
             }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 }

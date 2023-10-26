@@ -40,7 +40,7 @@ struct MainSplitView: View {
                         Label {
                             Text("TabTitle.Albums")
                         } icon: {
-                            Image("Tab.Albums")
+                            Image(systemName: "rectangle.stack.fill")
 #if targetEnvironment(macCatalyst)
                                 .resizable()
                                 .frame(width: 16.0, height: 16.0)
@@ -51,7 +51,7 @@ struct MainSplitView: View {
                         Label {
                             Text("TabTitle.Illustrations")
                         } icon: {
-                            Image(systemName: "photo.fill")
+                            Image(systemName: "photo.on.rectangle.angled")
                         }
                     }
                     NavigationLink(value: ViewPath.more) {
