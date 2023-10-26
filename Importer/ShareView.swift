@@ -229,6 +229,8 @@ struct ShareView: View {
             illustration.cachedThumbnail = thumbnail
         }
         context.insert(illustration)
-        album?.addChildIllustration(illustration)
+        if let album {
+            album.addChildIllustration(illustration)
+        }
     }
 }
