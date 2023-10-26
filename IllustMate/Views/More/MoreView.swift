@@ -64,7 +64,6 @@ struct MoreView: View {
                 case .moreOrphans(let orphans): MoreOrphansView(orphans: orphans)
                 case .moreTroubleshooting: MoreTroubleshootingView()
                 case .moreAttributions: LicensesView(licenses: [
-                    // swiftlint:disable line_length
                     License(libraryName: "CloudKitSyncMonitor", text:
 """
 Copyright (c) 2020 Grant Grueninger
@@ -87,7 +86,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """)])
-                    // swiftlint:enable line_length
                 default: Color.clear
                 }
             }
