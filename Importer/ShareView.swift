@@ -13,7 +13,7 @@ struct ShareView: View {
     var items: [Any?]
 
     @State var viewPath: [ViewPath] = []
-    @State var albums: [Album]
+    @State var albums: [Album] = []
     @State var progress: Float = 0
     @State var total: Float = 0
     @State var isImporting: Bool = false
@@ -21,20 +21,15 @@ struct ShareView: View {
     @State var failedItemCount: Int
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
+    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
+
+    let actor = DataActor(modelContainer: sharedModelContainer)
 
     init(items: [Any?], failedItemCount: Int) {
         self.items = items
         self.failedItemCount = failedItemCount
         let modelContext = ModelContext(sharedModelContainer)
         modelContext.autosaveEnabled = false
-        do {
-            albums = try modelContext.fetch(FetchDescriptor<Album>(
-                predicate: #Predicate { $0.parentAlbum == nil },
-                sortBy: [SortDescriptor(\.name)]))
-        } catch {
-            debugPrint(error.localizedDescription)
-            albums = []
-        }
     }
 
     var body: some View {
@@ -140,6 +135,13 @@ struct ShareView: View {
             }
             .padding(20.0)
         }
+        .task {
+            do {
+                albums = try await actor.albums(in: nil, sortedBy: albumSort)
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
         .overlay {
             if !isImporting {
                 ZStack(alignment: .top) {
@@ -174,64 +176,60 @@ struct ShareView: View {
     }
 
     func importItems() {
-        let modelContext = ModelContext(sharedModelContainer)
-        let albumID = albumInViewPath()?.id ?? ""
-        let album = try? modelContext.fetch(FetchDescriptor<Album>(
-            predicate: #Predicate { $0.id == albumID })).first
+        let albumID = albumInViewPath()?.persistentModelID
         albums.removeAll()
-        modelContext.autosaveEnabled = false
-        for item in items {
-            autoreleasepool {
-                importItem(modelContext, item, to: album,
-                           named: "PIC_\(String(format: "%04d", runningNumberForImageName))")
+        Task {
+            for item in items {
+                let illustrationName = "PIC_\(String(format: "%04d", runningNumberForImageName))"
+                await importItem(item, to: albumID, named: illustrationName)
                 runningNumberForImageName += 1
-                Task {
+                await MainActor.run {
                     progress += 1.0
                 }
             }
-        }
-        try? modelContext.save()
-        withAnimation(.snappy.speed(2)) {
-            isCompleted = true
-        } completion: {
-            if failedItemCount == 0 {
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    close()
+            await MainActor.run {
+                withAnimation(.snappy.speed(2)) {
+                    isCompleted = true
+                } completion: {
+                    if failedItemCount == 0 {
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            close()
+                        }
+                    } else {
+                        UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                    }
                 }
-            } else {
-                UINotificationFeedbackGenerator().notificationOccurred(.warning)
             }
         }
     }
 
-    func importItem(_ context: ModelContext, _ file: Any?, to album: Album?, named name: String) {
+    func importItem(_ file: Any?, to albumID: PersistentIdentifier?, named name: String) async {
         if let url = file as? URL, let imageData = try? Data(contentsOf: url),
             let image = UIImage(data: imageData) {
-            importItem(context, image, to: album, named: url.lastPathComponent)
+            await importItem(image, to: albumID, named: url.lastPathComponent)
         } else if let image = file as? UIImage {
             if let pngData = image.pngData() {
-                importIllustration(context, name, data: pngData, to: album)
+                await importIllustration(name, data: pngData, to: albumID)
             } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
-                importIllustration(context, name, data: jpgData, to: album)
+                await importIllustration(name, data: jpgData, to: albumID)
             } else if let heicData = image.heicData() {
-                importIllustration(context, name, data: heicData, to: album)
+                await importIllustration(name, data: heicData, to: albumID)
             }
         } else {
             failedItemCount += 1
         }
     }
 
-    func importIllustration(_ context: ModelContext, _ name: String, data: Data, to album: Album?) {
+    func importIllustration(_ name: String, data: Data, to albumID: PersistentIdentifier?) async {
         let illustration = Illustration(name: name, data: data)
         if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
             let thumbnail = Thumbnail(data: thumbnailData)
             illustration.cachedThumbnail = thumbnail
         }
-        if let album {
-            album.addChildIllustration(illustration)
-        } else {
-            context.insert(illustration)
+        await actor.createIllustration(illustration)
+        if let albumID {
+            await actor.addIllustration(illustration, toAlbumWithIdentifier: albumID)
         }
     }
 }
