@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/18.
 //
 
-import NavigationTransitions
 import SwiftData
 import SwiftUI
 
@@ -52,7 +51,6 @@ struct AlbumsView: View {
                     }
                 }
 #if !targetEnvironment(macCatalyst)
-                .navigationTransition(.default, interactivity: .pan)
                 .refreshable {
                     refreshAlbums()
                 }

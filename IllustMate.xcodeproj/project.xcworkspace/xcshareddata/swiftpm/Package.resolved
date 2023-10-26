@@ -17,24 +17,6 @@
         "branch" : "main",
         "revision" : "0e998a9d61416a0744768ef59a2096e142e53eef"
       }
-    },
-    {
-      "identity" : "swiftui-introspect",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/siteline/swiftui-introspect",
-      "state" : {
-        "revision" : "3ced72fccb284235c266c1e8a32f1bf93129fc74",
-        "version" : "1.1.0"
-      }
-    },
-    {
-      "identity" : "swiftui-navigation-transitions",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
-      "state" : {
-        "revision" : "4a1397f6402ec0f14173ff51855ff307e5e08ac4",
-        "version" : "0.13.1"
-      }
     }
   ],
   "version" : 2

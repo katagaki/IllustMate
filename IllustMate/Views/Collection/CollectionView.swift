@@ -6,7 +6,6 @@
 //
 
 import Komponents
-import NavigationTransitions
 import SwiftUI
 import SwiftData
 
@@ -34,8 +33,5 @@ struct CollectionView: View {
             }
         }
         .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
-#if !targetEnvironment(macCatalyst)
-        .navigationTransition(.default, interactivity: .pan)
-#endif
     }
 }

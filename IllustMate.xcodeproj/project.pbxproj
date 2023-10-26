@@ -21,7 +21,6 @@
 		E45A8BBE2ACD98EF00E3035E /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BBD2ACD98EF00E3035E /* ViewStyle.swift */; };
 		E45A8BC22ACDB5E500E3035E /* AlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BC12ACDB5E500E3035E /* AlbumRow.swift */; };
 		E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */; };
-		E45A8BC82ACF23C400E3035E /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = E45A8BC72ACF23C400E3035E /* NavigationTransitions */; };
 		E45A8BCC2AD0332000E3035E /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BCB2AD0332000E3035E /* SectionHeader.swift */; };
 		E45A8BCE2AD0362900E3035E /* IllustrationLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BCD2AD0362900E3035E /* IllustrationLabel.swift */; };
 		E45A8BD02AD0389600E3035E /* AlbumGridLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45A8BCF2AD0389600E3035E /* AlbumGridLabel.swift */; };
@@ -212,7 +211,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */,
-				E45A8BC82ACF23C400E3035E /* NavigationTransitions in Frameworks */,
 				E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -484,7 +482,6 @@
 			packageProductDependencies = (
 				E4614D192ACAB6AD00D751FB /* Komponents */,
 				E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */,
-				E45A8BC72ACF23C400E3035E /* NavigationTransitions */,
 			);
 			productName = IllustMate;
 			productReference = E4614CE32ACA86C900D751FB /* PicMate.app */;
@@ -541,7 +538,6 @@
 			packageReferences = (
 				E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */,
 				E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
-				E45A8BC62ACF23C400E3035E /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
 			);
 			productRefGroup = E4614CE42ACA86C900D751FB /* Products */;
 			projectDirPath = "";
@@ -992,14 +988,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E45A8BC62ACF23C400E3035E /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions";
-			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 0.13.1;
-			};
-		};
 		E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/katagaki/Komponents";
@@ -1019,11 +1007,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E45A8BC72ACF23C400E3035E /* NavigationTransitions */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E45A8BC62ACF23C400E3035E /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */;
-			productName = NavigationTransitions;
-		};
 		E4614D192ACAB6AD00D751FB /* Komponents */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */;
