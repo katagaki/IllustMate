@@ -13,7 +13,6 @@ struct ShareView: View {
     var items: [Any?]
 
     @State var viewPath: [ViewPath] = []
-    @State var albums: [Album] = []
     @State var progress: Float = 0
     @State var total: Float = 0
     @State var isImporting: Bool = false
@@ -21,7 +20,6 @@ struct ShareView: View {
     @State var failedItemCount: Int
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
-    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
 
     let actor = DataActor(modelContainer: sharedModelContainer)
 
@@ -71,11 +69,11 @@ struct ShareView: View {
                 .padding(20.0)
             } else {
                 NavigationStack(path: $viewPath) {
-                    AlbumsScrollView(title: "Shared.Collection", albums: albums)
+                    AlbumsScrollView(title: "Shared.Collection")
                         .navigationDestination(for: ViewPath.self, destination: { viewPath in
                             switch viewPath {
-                            case .album(let album): AlbumsScrollView(title: LocalizedStringKey(album.name),
-                                                                     albums: album.albums())
+                            case .album(let album):
+                                AlbumsScrollView(title: LocalizedStringKey(album.name), parentAlbum: album)
                             default: Color.clear
                             }
                         })
@@ -135,13 +133,6 @@ struct ShareView: View {
             }
             .padding(20.0)
         }
-        .task {
-            do {
-                albums = try await actor.albums(in: nil, sortedBy: albumSort)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
         .overlay {
             if !isImporting {
                 ZStack(alignment: .top) {
@@ -177,7 +168,6 @@ struct ShareView: View {
 
     func importItems() {
         let albumID = albumInViewPath()?.persistentModelID
-        albums.removeAll()
         Task {
             for item in items {
                 let illustrationName = "PIC_\(String(format: "%04d", runningNumberForImageName))"
