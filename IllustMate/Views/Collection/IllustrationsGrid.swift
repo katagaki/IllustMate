@@ -95,9 +95,8 @@ struct IllustrationsGrid<Content: View>: View {
                         Divider()
                         if let containingAlbum = illustration.containingAlbum {
                             Button("Shared.SetAsCover", systemImage: "photo") {
-                                let image = UIImage(contentsOfFile: illustration.illustrationPath())
-                                if let data = image?.jpegData(compressionQuality: 1.0) {
-                                    containingAlbum.coverPhoto = Album.makeCover(data)
+                                Task {
+                                    await actor.setAsAlbumCover(for: illustration.persistentModelID)
                                 }
                             }
                         }

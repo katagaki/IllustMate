@@ -142,6 +142,16 @@ actor DataActor: ModelActor {
         try? modelContext.save()
     }
 
+    func setAsAlbumCover(for illustrationID: PersistentIdentifier) {
+        if let illustration = self[illustrationID, as: Illustration.self] {
+            let image = UIImage(contentsOfFile: illustration.illustrationPath())
+            if let data = image?.jpegData(compressionQuality: 1.0), let containingAlbum = illustration.containingAlbum {
+                containingAlbum.coverPhoto = Album.makeCover(data)
+                try? modelContext.save()
+            }
+        }
+    }
+
     func deleteIllustration(withIdentifier illustrationID: PersistentIdentifier) {
         @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
         if let illustration = self[illustrationID, as: Illustration.self] {
