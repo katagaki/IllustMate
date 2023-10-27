@@ -14,16 +14,30 @@ struct IllustrationViewerModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            content
-                .overlay {
-                    if let image = viewerManager.displayedImage,
-                       let illustration = viewerManager.displayedIllustration {
-                        IllustrationViewer(namespace: namespace, illustration: illustration, displayedImage: image) {
-                            viewerManager.removeDisplay()
+            if isFB13295421Fixed {
+                content
+                    .overlay {
+                        if let image = viewerManager.displayedImage,
+                           let illustration = viewerManager.displayedIllustration {
+                            IllustrationViewer(namespace: namespace,
+                                               illustration: illustration, displayedImage: image) {
+                                viewerManager.removeDisplay()
+                            }
+                            .id(viewerManager.displayedIllustrationID)
                         }
-                        .id(viewerManager.displayedIllustrationID)
                     }
-                }
+            } else {
+                content
+                    .fullScreenCover(item: $viewerManager.displayedIllustration) { illustration in
+                        if let image = viewerManager.displayedImage {
+                            IllustrationViewer(namespace: namespace,
+                                               illustration: illustration, displayedImage: image) {
+                                viewerManager.removeDisplay()
+                            }
+                            .presentationBackground(.clear)
+                        }
+                    }
+            }
         } else {
             content
         }

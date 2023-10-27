@@ -74,7 +74,11 @@ struct AlbumsView: View {
             do {
                 let albums = try await actor.albums(sortedBy: .nameAscending)
                 await MainActor.run {
-                    doWithAnimation {
+                    if isFB13295421Fixed {
+                        doWithAnimation {
+                            self.albums = albums
+                        }
+                    } else {
                         self.albums = albums
                     }
                 }

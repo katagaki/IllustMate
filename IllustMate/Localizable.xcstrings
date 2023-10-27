@@ -358,6 +358,7 @@
       }
     },
     "Experiments.DisableAllAnimations" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

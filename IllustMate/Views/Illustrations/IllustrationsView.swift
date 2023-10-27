@@ -74,7 +74,11 @@ struct IllustrationsView: View {
             do {
                 let illustrations = try await actor.illustrations()
                 await MainActor.run {
-                    doWithAnimation {
+                    if isFB13295421Fixed {
+                        doWithAnimation {
+                            self.illustrations = illustrations
+                        }
+                    } else {
                         self.illustrations = illustrations
                     }
                 }

@@ -41,7 +41,6 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
     @AppStorage(wrappedValue: false, "DebugSlowItDown") var slowItDown: Bool
-    @AppStorage(wrappedValue: false, "DebugAllAnimsOff") var disableAllAnimations: Bool
 
     let actor = DataActor(modelContainer: sharedModelContainer)
 
@@ -62,20 +61,11 @@ struct AlbumView: View {
                         Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
                             .tag(SortType.illustrationCountDescending)
                     }
-                    if disableAllAnimations {
-                        Picker("Albums.Style", selection: $albumStyleState) {
-                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                                .tag(ViewStyle.grid)
-                            Label("Albums.Style.List", systemImage: "list.bullet")
-                                .tag(ViewStyle.list)
-                        }
-                    } else {
-                        Picker("Albums.Style", selection: $albumStyleState.animation(.snappy.speed(2))) {
-                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                                .tag(ViewStyle.grid)
-                            Label("Albums.Style.List", systemImage: "list.bullet")
-                                .tag(ViewStyle.list)
-                        }
+                    Picker("Albums.Style", selection: $albumStyleState.animation(.snappy.speed(2))) {
+                        Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                            .tag(ViewStyle.grid)
+                        Label("Albums.Style.List", systemImage: "list.bullet")
+                            .tag(ViewStyle.list)
                     }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))

@@ -44,8 +44,13 @@ struct IllustrationsGrid<Content: View>: View {
                 } label: {
                     Group {
                         if UIDevice.current.userInterfaceIdiom == .phone {
-                            IllustrationLabel(namespace: namespace, illustration: illustration,
-                                              isHiddenAndOverridesState: isViewing(illustration))
+                            if isFB13295421Fixed {
+                                IllustrationLabel(namespace: namespace, illustration: illustration,
+                                                  isHiddenAndOverridesState: isViewing(illustration))
+                            } else {
+                                IllustrationLabel(namespace: namespace, illustration: illustration,
+                                                  isHiddenAndOverridesState: false)
+                            }
                         } else {
                             IllustrationLabel(namespace: namespace, illustration: illustration,
                                               isHiddenAndOverridesState: false)

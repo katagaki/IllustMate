@@ -9,16 +9,11 @@ import SwiftUI
 
 struct TransitionModifier: ViewModifier {
 
-    @AppStorage(wrappedValue: true, "DebugAllAnimsOff") var disableAllAnimations: Bool
     var transition: AnyTransition
 
     func body(content: Content) -> some View {
-        if disableAllAnimations {
-            content
-        } else {
-            content
-                .transition(transition)
-        }
+        content
+            .transition(transition)
     }
 }
 

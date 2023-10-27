@@ -130,28 +130,22 @@ extension AlbumView {
         if slowItDown {
             try? await Task.sleep(nanoseconds: 2000000000)
         }
-        let albums = await refreshAlbums()
-        let illustrations = await refreshIllustrations()
+        let albums = await fetchAlbums()
+        let illustrations = await fetchIllustrations()
         await MainActor.run {
-            doWithAnimation {
+            if isFB13295421Fixed {
+                doWithAnimation {
+                    self.albums = albums
+                    self.illustrations = illustrations
+                }
+            } else {
                 self.albums = albums
                 self.illustrations = illustrations
             }
         }
     }
 
-    func refreshAlbumsAndSet() {
-        Task.detached(priority: .userInitiated) {
-            let albums = await refreshAlbums()
-            await MainActor.run {
-                doWithAnimation {
-                    self.albums = albums
-                }
-            }
-        }
-    }
-
-    func refreshAlbums() async -> [Album] {
+    func fetchAlbums() async -> [Album] {
         do {
             let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
             return albums
@@ -161,18 +155,22 @@ extension AlbumView {
         }
     }
 
-    func refreshIllustrationsAndSet() {
+    func refreshAlbumsAndSet() {
         Task.detached(priority: .userInitiated) {
-            let illustrations = await refreshIllustrations()
+            let albums = await fetchAlbums()
             await MainActor.run {
-                doWithAnimation {
-                    self.illustrations = illustrations
+                if isFB13295421Fixed {
+                    doWithAnimation {
+                        self.albums = albums
+                    }
+                } else {
+                    self.albums = albums
                 }
             }
         }
     }
 
-    func refreshIllustrations() async -> [Illustration] {
+    func fetchIllustrations() async -> [Illustration] {
         do {
             let illustrations = try await actor
                 .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
@@ -180,6 +178,21 @@ extension AlbumView {
         } catch {
             debugPrint(error.localizedDescription)
             return []
+        }
+    }
+
+    func refreshIllustrationsAndSet() {
+        Task.detached(priority: .userInitiated) {
+            let illustrations = await fetchIllustrations()
+            await MainActor.run {
+                if isFB13295421Fixed {
+                    doWithAnimation {
+                        self.illustrations = illustrations
+                    }
+                } else {
+                    self.illustrations = illustrations
+                }
+            }
         }
     }
 }

@@ -12,8 +12,6 @@ struct ToggledMatchedGeometryEffectModifier: ViewModifier {
     var id: String
     var namespace: Namespace.ID
 
-    let isFB13295421Fixed: Bool = false
-
     func body(content: Content) -> some View {
         if isFB13295421Fixed {
             content

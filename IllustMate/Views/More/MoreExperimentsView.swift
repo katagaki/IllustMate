@@ -16,7 +16,6 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
     @AppStorage(wrappedValue: false, "DebugAdvancedFiles") var showAdvancedFileOptions: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
-    @AppStorage(wrappedValue: true, "DebugAllAnimsOff") var disableAllAnimations: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
 
     var body: some View {
@@ -68,7 +67,6 @@ struct MoreExperimentsView: View {
                     .font(.body)
             }
             Section {
-                Toggle("Experiments.DisableAllAnimations", isOn: $disableAllAnimations)
                 Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
             } header: {
                 ListSectionHeader(text: "Experiments.Section.Animations")

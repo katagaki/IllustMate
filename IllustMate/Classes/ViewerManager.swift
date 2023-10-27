@@ -27,16 +27,10 @@ class ViewerManager {
 
     func setDisplay(_ illustration: Illustration) {
         if let image = imageCache[illustration.id] {
-            if UserDefaults.standard.bool(forKey: "DebugAllAnimsOff") {
+            doWithAnimationAsynchronously { [self] in
                 displayedIllustrationID = illustration.id
                 displayedImage = image
                 displayedIllustration = illustration
-            } else {
-                doWithAnimationAsynchronously { [self] in
-                    displayedIllustrationID = illustration.id
-                    displayedImage = image
-                    displayedIllustration = illustration
-                }
             }
         } else {
             let intent = NSFileAccessIntent.readingIntent(with: URL(filePath: illustration.illustrationPath()))
@@ -50,21 +44,21 @@ class ViewerManager {
                         displayedImage = image
                     }
                     self.imageCache[illustration.id] = displayedImage
-                    doWithAnimationAsynchronously {
-                        self.displayedIllustrationID = illustration.id
-                        self.displayedImage = displayedImage
-                        self.displayedIllustration = illustration
-                    }
+                    // doWithAnimationAsynchronously {
+                    self.displayedIllustrationID = illustration.id
+                    self.displayedImage = displayedImage
+                    self.displayedIllustration = illustration
+                    // }
                 }
             }
         }
     }
 
     func removeDisplay() {
-        doWithAnimationAsynchronously { [self] in
-            displayedImage = nil
-            displayedIllustration = nil
-            displayedIllustrationID = ""
-        }
+        // doWithAnimationAsynchronously { [self] in
+        displayedImage = nil
+        displayedIllustration = nil
+        displayedIllustrationID = ""
+        // }
     }
 }
