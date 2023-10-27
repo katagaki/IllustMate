@@ -23,9 +23,7 @@ struct IllustrationMoveMenu: View {
                     for illustration in illustrations {
                         await actor.removeFromAlbum(illustration)
                     }
-                    await MainActor.run {
-                        onMoved()
-                    }
+                    onMoved()
                 }
             }
         }
@@ -36,9 +34,7 @@ struct IllustrationMoveMenu: View {
                         await actor.addIllustration(withIdentifier: illustration.persistentModelID,
                                                     toAlbumWithIdentifier: parentAlbum.persistentModelID)
                     }
-                    await MainActor.run {
-                        onMoved()
-                    }
+                    onMoved()
                 }
             } label: {
                 Label(
@@ -55,9 +51,7 @@ struct IllustrationMoveMenu: View {
                             await actor.addIllustration(withIdentifier: illustration.persistentModelID,
                                                         toAlbumWithIdentifier: album.persistentModelID)
                         }
-                        await MainActor.run {
-                            onMoved()
-                        }
+                        onMoved()
                     }
                 } label: {
                     Label(
