@@ -25,9 +25,12 @@ struct MoreTroubleshootingView: View {
         }
         .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
             Button("Shared.Yes", role: .destructive) {
-                deleteData()
-                deleteContents(of: illustrationsFolder)
-                navigationManager.popAll()
+                Task {
+                    await deleteData()
+                    deleteContents(of: illustrationsFolder)
+                    deleteContents(of: orphansFolder)
+                    navigationManager.popAll()
+                }
             }
             Button("Shared.No", role: .cancel) { }
         } message: {
@@ -37,19 +40,8 @@ struct MoreTroubleshootingView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    func deleteData() {
-        try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
-        try? modelContext.delete(model: Album.self, includeSubclasses: true)
-        do {
-            for illustration in try modelContext.fetch(FetchDescriptor<Illustration>()) {
-                modelContext.delete(illustration)
-            }
-            for album in try modelContext.fetch(FetchDescriptor<Album>()) {
-                modelContext.delete(album)
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
+    func deleteData() async {
+        await actor.deleteAll()
     }
 
     func deleteContents(of url: URL?) {

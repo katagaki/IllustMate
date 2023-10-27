@@ -165,4 +165,23 @@ actor DataActor: ModelActor {
         }
         try? modelContext.save()
     }
+
+    func deleteAll() {
+        try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
+        try? modelContext.delete(model: Album.self, includeSubclasses: true)
+        try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
+        do {
+            for illustration in try modelContext.fetch(FetchDescriptor<Illustration>()) {
+                modelContext.delete(illustration)
+            }
+            for album in try modelContext.fetch(FetchDescriptor<Album>()) {
+                modelContext.delete(album)
+            }
+            for thumbnail in try modelContext.fetch(FetchDescriptor<Thumbnail>()) {
+                modelContext.delete(thumbnail)
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+    }
 }

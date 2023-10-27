@@ -262,7 +262,6 @@
 				E4C834C12ADFAF750056D47A /* Icons */,
 				E4614D332ACB11A100D751FB /* Views */,
 				E4C834AE2ADED67D0056D47A /* View Modifiers */,
-				E4C834B82ADEE4170056D47A /* Actors */,
 				E4C834C22ADFB2A70056D47A /* Structs */,
 				E4614D292ACB0FC500D751FB /* Classes */,
 				E4614D2A2ACB0FCA00D751FB /* Enums */,
@@ -292,6 +291,7 @@
 				E4614D102ACAA7A500D751FB /* Data Models */,
 				E4CA0B8D2ACD17190063F06C /* FileManager.swift */,
 				E4E73BE12AD56B4C00372D05 /* Defaults.swift */,
+				E4C834B92ADEE42B0056D47A /* DataActor.swift */,
 				E43DFB2B2AD78220002A6317 /* SwiftData.swift */,
 				E4A335742AEC04AE00A1F68E /* Radar.swift */,
 			);
@@ -402,14 +402,6 @@
 				E4C904502AE21F390091D879 /* TransitionModifier.swift */,
 			);
 			path = "View Modifiers";
-			sourceTree = "<group>";
-		};
-		E4C834B82ADEE4170056D47A /* Actors */ = {
-			isa = PBXGroup;
-			children = (
-				E4C834B92ADEE42B0056D47A /* DataActor.swift */,
-			);
-			path = Actors;
 			sourceTree = "<group>";
 		};
 		E4C834BD2ADEF3EF0056D47A /* Illustrations */ = {
