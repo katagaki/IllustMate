@@ -14,6 +14,7 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugSlowItDown") var slowItDown: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
+    @AppStorage(wrappedValue: false, "DebugNamingTools") var showNamingOptions: Bool
     @AppStorage(wrappedValue: false, "DebugAdvancedFiles") var showAdvancedFileOptions: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
@@ -55,8 +56,9 @@ struct MoreExperimentsView: View {
             Section {
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowAdvancedThumbnailOptions", isOn: $showAdvancedThumbnailOptions)
+                Toggle("Experiments.ShowNamingOptions", isOn: $showNamingOptions)
             } header: {
-                ListSectionHeader(text: "Experiments.Section.Imaging")
+                ListSectionHeader(text: "Experiments.Section.Data")
                     .font(.body)
             }
             Section {

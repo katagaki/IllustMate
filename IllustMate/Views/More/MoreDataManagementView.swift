@@ -21,6 +21,7 @@ struct MoreDataManagementView: View {
     @Query var thumbnails: [Thumbnail]
 
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
+    @AppStorage(wrappedValue: false, "DebugNamingTools") var showNamingOptions: Bool
 
     var body: some View {
         List {
@@ -117,6 +118,15 @@ struct MoreDataManagementView: View {
                     }
                 }
             }
+            if showNamingOptions {
+                Section {
+                    Button("More.DataManagement.RestoreImageNames") {
+                        Task {
+                            await rebuildImageNames()
+                        }
+                    }
+                }
+            }
         }
         .navigationTitle("ViewTitle.DataManagement")
         .navigationBarTitleDisplayMode(.inline)
@@ -173,6 +183,30 @@ struct MoreDataManagementView: View {
             for thumbnail in thumbnails {
                 if thumbnail.illustration == nil {
                     await actor.deleteThumbnail(withIdentifier: thumbnail.persistentModelID)
+                }
+                await MainActor.run {
+                    progressAlertManager.incrementProgress()
+                }
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            progressAlertManager.hide()
+        } catch {
+            debugPrint(error.localizedDescription)
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    func rebuildImageNames() async {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let illustrations = try await actor.illustrations()
+            progressAlertManager.prepare("More.DataManagement.RestoreImageNames.Renaming", total: thumbnails.count)
+            progressAlertManager.show()
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyyMMddHHmmssSSSS"
+            for illustration in illustrations {
+                if illustration.name.starts(with: "PIC_") || illustration.name.starts(with: "ILLUST_") {
+                    illustration.name = "PIC_" + dateFormatter.string(from: illustration.dateAdded)
                 }
                 await MainActor.run {
                     progressAlertManager.incrementProgress()

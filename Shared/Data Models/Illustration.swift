@@ -63,6 +63,13 @@ final class Illustration {
         try? FileManager.default.removeItem(atPath: illustrationPath())
     }
 
+    static func newFilename() -> String {
+        let date = Date.now
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMddHHmmssSSSS"
+        return "PIC_" + dateFormatter.string(from: date)
+    }
+
     static func makeThumbnail(_ data: Data?) -> Data? {
         if let data, let sourceImage = UIImage(data: data) {
             return sourceImage.jpegThumbnail(of: 120.0)

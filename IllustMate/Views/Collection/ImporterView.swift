@@ -23,8 +23,6 @@ struct ImporterView: View {
     @State var importTotalCount: Int = 0
     @State var importCompletedCount: Int = 0
 
-    @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
-
     var body: some View {
         NavigationStack {
             ScrollView(.vertical) {
@@ -116,39 +114,21 @@ struct ImporterView: View {
         UIApplication.shared.isIdleTimerDisabled = true
         let selectedPhotoItems = selectedPhotoItems
         Task {
-            let illustrationsToAdd = await withTaskGroup(of: Illustration?.self,
-                                                         returning: [Illustration].self) { group in
-                var illustrationsToAdd: [Illustration] = []
+            await withDiscardingTaskGroup { group in
                 for selectedPhotoItem in selectedPhotoItems {
                     group.addTask {
                         if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                            let illustration = Illustration(name: UUID().uuidString, data: data)
-                            if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
-                                let thumbnail = Thumbnail(data: thumbnailData)
-                                illustration.cachedThumbnail = thumbnail
+                            let illustration = Illustration(name: Illustration.newFilename(), data: data)
+                            await actor.createIllustration(illustration)
+                            if let selectedAlbum {
+                                await actor.addIllustration(illustration,
+                                                            toAlbumWithIdentifier: selectedAlbum.persistentModelID)
                             }
+                        }
+                        await MainActor.run {
                             importCurrentCount += 1
-                            return illustration
-                        } else {
-                            importCurrentCount += 1
-                            return nil
                         }
                     }
-                }
-                for await result in group {
-                    if let result {
-                        result.name = "PIC_\(String(format: "%04d", runningNumberForImageName))"
-                        runningNumberForImageName += 1
-                        illustrationsToAdd.append(result)
-                    }
-                }
-                return illustrationsToAdd
-            }
-            for illustration in illustrationsToAdd {
-                await actor.createIllustration(illustration)
-                if let selectedAlbum {
-                    await actor.addIllustration(illustration,
-                                                toAlbumWithIdentifier: selectedAlbum.persistentModelID)
                 }
             }
             await MainActor.run {

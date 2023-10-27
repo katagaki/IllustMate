@@ -357,23 +357,6 @@
         }
       }
     },
-    "Experiments.DisableAllAnimations" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disable All Animations"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アニメーションをすべて無効化"
-          }
-        }
-      }
-    },
     "Experiments.Section.Animations" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -408,6 +391,23 @@
         }
       }
     },
+    "Experiments.Section.Data" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ"
+          }
+        }
+      }
+    },
     "Experiments.Section.Filesystem" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -421,23 +421,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイル"
-          }
-        }
-      }
-    },
-    "Experiments.Section.Imaging" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Images"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
           }
         }
       }
@@ -503,6 +486,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クラウド同期状況を常に表示"
+          }
+        }
+      }
+    },
+    "Experiments.ShowNamingOptions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Naming Options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像名オプションを表示"
           }
         }
       }
@@ -944,6 +943,38 @@
         }
       }
     },
+    "More.DataManagement.RestoreImageNames" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Picture Names"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像名を復元"
+          }
+        }
+      }
+    },
+    "More.DataManagement.RestoreImageNames.Renaming" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring picture names..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像名を復元中…"
+          }
+        }
+      }
+    },
     "More.DataManagement.UnorphanThumbnails" : {
       "localizations" : {
         "en" : {
@@ -970,7 +1001,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "孤立したサムネイルを削除中…"
           }
         }

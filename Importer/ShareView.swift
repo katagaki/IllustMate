@@ -19,8 +19,6 @@ struct ShareView: View {
     @State var isCompleted: Bool = false
     @State var failedItemCount: Int
 
-    @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
-
     let actor = DataActor(modelContainer: sharedModelContainer)
 
     init(items: [Any?], failedItemCount: Int) {
@@ -168,9 +166,7 @@ struct ShareView: View {
         let albumID = albumInViewPath()?.persistentModelID
         Task {
             for item in items {
-                let illustrationName = "PIC_\(String(format: "%04d", runningNumberForImageName))"
-                await importItem(item, to: albumID, named: illustrationName)
-                runningNumberForImageName += 1
+                await importItem(item, to: albumID, named: Illustration.newFilename())
                 await MainActor.run {
                     progress += 1.0
                 }
