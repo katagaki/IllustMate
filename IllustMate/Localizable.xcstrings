@@ -926,23 +926,6 @@
         }
       }
     },
-    "More.DataManagement.RebuildThumbnails.MissingOnly" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recreate Missing Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "破損したサムネイルを再生成"
-          }
-        }
-      }
-    },
     "More.DataManagement.RebuildThumbnails.Rebuilding" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -986,7 +969,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "孤立したサムネイルを削除中…"
           }
         }

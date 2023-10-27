@@ -17,6 +17,14 @@ class ViewerManager {
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
+    let queue: OperationQueue
+
+    init() {
+        queue = OperationQueue()
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = 2
+    }
+
     func setDisplay(_ illustration: Illustration) {
         if let image = imageCache[illustration.id] {
             if UserDefaults.standard.bool(forKey: "DebugAllAnimsOff") {
@@ -31,34 +39,22 @@ class ViewerManager {
                 }
             }
         } else {
-            Task.detached(priority: .userInitiated) {
-                do {
+            let intent = NSFileAccessIntent.readingIntent(with: URL(filePath: illustration.illustrationPath()))
+            let coordinator = NSFileCoordinator()
+            coordinator.coordinate(with: [intent], queue: queue) { error in
+                if let error {
+                    debugPrint(error.localizedDescription)
+                } else {
                     var displayedImage: UIImage?
                     if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
                         displayedImage = image
-                    } else {
-                        try FileManager.default.startDownloadingUbiquitousItem(
-                            at: URL(filePath: illustration.illustrationPath()))
-                        var isDownloaded: Bool = false
-                        while !isDownloaded {
-                            if FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
-                                isDownloaded = true
-                            }
-                        }
-                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                            displayedImage = image
-                        }
                     }
-                    await MainActor.run { [displayedImage] in
-                        self.imageCache[illustration.id] = displayedImage
-                        doWithAnimation {
-                            self.displayedIllustrationID = illustration.id
-                            self.displayedImage = displayedImage
-                            self.displayedIllustration = illustration
-                        }
+                    self.imageCache[illustration.id] = displayedImage
+                    doWithAnimationAsynchronously {
+                        self.displayedIllustrationID = illustration.id
+                        self.displayedImage = displayedImage
+                        self.displayedIllustration = illustration
                     }
-                } catch {
-                    debugPrint(error.localizedDescription)
                 }
             }
         }

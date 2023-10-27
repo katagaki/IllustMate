@@ -20,6 +20,10 @@ actor DataActor: ModelActor {
         self.modelExecutor = DefaultSerialModelExecutor(modelContext: context)
     }
 
+    func save() {
+        try? modelContext.save()
+    }
+
     func albums(sortedBy sortType: SortType) throws -> [Album] {
         var fetchDescriptor = FetchDescriptor<Album>()
         fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
@@ -119,6 +123,25 @@ actor DataActor: ModelActor {
                 illustration.prepareForDeletion()
             }
             modelContext.delete(illustration)
+        }
+        try? modelContext.save()
+    }
+
+    func thumbnails() throws -> [Thumbnail] {
+        let fetchDescriptor = FetchDescriptor<Thumbnail>()
+        return try modelContext.fetch(fetchDescriptor)
+    }
+
+    func deleteAllThumbnails() {
+        for thumbnail in ((try? thumbnails()) ?? []) {
+            modelContext.delete(thumbnail)
+        }
+        try? modelContext.save()
+    }
+
+    func deleteThumbnail(withIdentifier thumbnailID: PersistentIdentifier) {
+        if let thumbnail = self[thumbnailID, as: Thumbnail.self] {
+            modelContext.delete(thumbnail)
         }
         try? modelContext.save()
     }

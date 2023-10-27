@@ -13,7 +13,6 @@ struct MoreFileManagementView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
-    @Environment(ConcurrencyManager.self) var concurrency
 
     @State var showOrphanedFilesViewFlag: Bool = false
 
@@ -47,9 +46,7 @@ struct MoreFileManagementView: View {
     }
 
     func scanAndMoveOrphans() async {
-        await MainActor.run {
-            UIApplication.shared.isIdleTimerDisabled = true
-        }
+        UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try await actor.illustrations()
             let filesToCheck = try FileManager.default.contentsOfDirectory(at: illustrationsFolder,
@@ -92,9 +89,7 @@ struct MoreFileManagementView: View {
         } catch {
             debugPrint(error.localizedDescription)
         }
-        await MainActor.run {
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func showOrphans() {

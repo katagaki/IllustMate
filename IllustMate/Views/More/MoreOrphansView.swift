@@ -10,6 +10,7 @@ import SwiftUI
 struct MoreOrphansView: View {
 
     @Environment(\.modelContext) var modelContext
+    @Environment(ConcurrencyManager.self) var concurrency
 
     @Namespace var orphanTransitionNamespace
 
@@ -81,27 +82,16 @@ struct MoreOrphansView: View {
     }
 
     func loadOrphanThumbnails() async {
-        await withDiscardingTaskGroup { group in
-            for orphan in orphans {
-                group.addTask {
-                    do {
-                        let filePath = orphansFolder.appendingPathComponent(orphan).path(percentEncoded: false)
-                        if let image = UIImage(contentsOfFile: filePath) {
-                            orphanThumbnails[orphan] = image.jpegThumbnail(of: 120.0)
-                        } else {
-                            try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
-                            var isDownloaded: Bool = false
-                            while !isDownloaded {
-                                if FileManager.default.fileExists(atPath: filePath) {
-                                    isDownloaded = true
-                                }
-                            }
-                            if let image = UIImage(contentsOfFile: filePath) {
-                                orphanThumbnails[orphan] = image.jpegThumbnail(of: 120.0)
-                            }
-                        }
-                    } catch {
-                        debugPrint(error.localizedDescription)
+        for orphan in orphans {
+            let url = URL(filePath: orphansFolder.appendingPathComponent(orphan).path(percentEncoded: false))
+            let intent = NSFileAccessIntent.readingIntent(with: url)
+            let coordinator = NSFileCoordinator()
+            coordinator.coordinate(with: [intent], queue: concurrency.queue) { error in
+                if let error {
+                    debugPrint(error.localizedDescription)
+                } else {
+                    if let image = UIImage(contentsOfFile: url.path(percentEncoded: false)) {
+                        orphanThumbnails[orphan] = image.jpegThumbnail(of: 120.0)
                     }
                 }
             }

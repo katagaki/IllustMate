@@ -24,6 +24,8 @@ struct MoreDataManagementView: View {
 
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
 
+    let actor = DataActor(modelContainer: sharedModelContainer)
+
     var body: some View {
         List {
             Section {
@@ -108,13 +110,14 @@ struct MoreDataManagementView: View {
             if showAdvancedThumbnailOptions {
                 Section {
                     Button("More.DataManagement.RebuildThumbnails") {
-                        rebuildThumbnails()
-                    }
-                    Button("More.DataManagement.RebuildThumbnails.MissingOnly") {
-                        rebuildMissingThumbnails()
+                        Task {
+                            await rebuildThumbnails()
+                        }
                     }
                     Button("More.DataManagement.UnorphanThumbnails", role: .destructive) {
-                        removeOrphanedThumbnails()
+                        Task {
+                            await removeOrphanedThumbnails()
+                        }
                     }
                 }
             }
@@ -123,94 +126,66 @@ struct MoreDataManagementView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    func rebuildThumbnails() {
+    func rebuildThumbnails() async {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
-            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>())
-            progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
-                                         total: illustrations.count)
-            progressAlertManager.show {
-                try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
-                modelContext.autosaveEnabled = false
-                illustrations.forEach { illustration in
-                    autoreleasepool {
-                        concurrency.queue.addOperation {
-                            illustration.generateThumbnail()
-                            progressAlertManager.incrementProgress()
+            let illustrations = try await actor.illustrations()
+            progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding", total: illustrations.count)
+            await actor.deleteAllThumbnails()
+            progressAlertManager.show()
+            let coordinator = NSFileCoordinator()
+            for illustration in illustrations {
+                let url = URL(filePath: illustration.illustrationPath())
+                let intent = NSFileAccessIntent.readingIntent(with: url)
+                coordinator.coordinate(with: [intent], queue: concurrency.queue) { error in
+                    if let error {
+                        debugPrint(error.localizedDescription)
+                        Task {
+                            await MainActor.run {
+                                progressAlertManager.incrementProgress()
+                            }
                         }
-                    }
-                }
-                concurrency.queue.addBarrierBlock {
-                    DispatchQueue.main.async {
-                        try? modelContext.save()
-                        modelContext.autosaveEnabled = true
-                        UIApplication.shared.isIdleTimerDisabled = false
-                        progressAlertManager.hide()
+                    } else {
+                        Task {
+                            illustration.generateThumbnail()
+                            await MainActor.run {
+                                progressAlertManager.incrementProgress()
+                                if progressAlertManager.percentage >= 100 {
+                                    Task {
+                                        await actor.save()
+                                    }
+                                    UIApplication.shared.isIdleTimerDisabled = false
+                                    progressAlertManager.hide()
+                                }
+                            }
+                        }
                     }
                 }
             }
         } catch {
             debugPrint(error.localizedDescription)
-            modelContext.autosaveEnabled = true
             UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 
-    func rebuildMissingThumbnails() {
+    func removeOrphanedThumbnails() async {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
-            let illustrations = try modelContext.fetch(FetchDescriptor<Illustration>(
-                predicate: #Predicate { $0.cachedThumbnail == nil }
-            ))
-            progressAlertManager.prepare("More.DataManagement.RebuildThumbnails.Rebuilding",
-                                         total: illustrations.count)
-            progressAlertManager.show {
-                modelContext.autosaveEnabled = false
-                illustrations.forEach { illustration in
-                    autoreleasepool {
-                        concurrency.queue.addOperation {
-                            illustration.generateThumbnail()
-                            progressAlertManager.incrementProgress()
-                        }
-                    }
+            let thumbnails = try await actor.thumbnails()
+            progressAlertManager.prepare("More.DataManagement.UnorphanThumbnails.Unorphaning", total: thumbnails.count)
+            progressAlertManager.show()
+            for thumbnail in thumbnails {
+                if thumbnail.illustration == nil {
+                    await actor.deleteThumbnail(withIdentifier: thumbnail.persistentModelID)
                 }
-                concurrency.queue.addBarrierBlock {
-                    DispatchQueue.main.async {
-                        try? modelContext.save()
-                        modelContext.autosaveEnabled = true
-                        UIApplication.shared.isIdleTimerDisabled = false
-                        progressAlertManager.hide()
-                    }
-                }
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            modelContext.autosaveEnabled = true
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-    }
-
-    func removeOrphanedThumbnails() {
-        UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let thumbnails = try modelContext.fetch(FetchDescriptor<Thumbnail>(
-                predicate: #Predicate { $0.illustration == nil }
-            ))
-            progressAlertManager.prepare("More.DataManagement.UnorphanThumbnails.Unorphaning",
-                                         total: thumbnails.count)
-            progressAlertManager.show {
-                thumbnails.forEach { thumbnail in
-                    modelContext.delete(thumbnail)
+                await MainActor.run {
                     progressAlertManager.incrementProgress()
                 }
-                try? modelContext.save()
-                modelContext.autosaveEnabled = true
-                UIApplication.shared.isIdleTimerDisabled = false
-                progressAlertManager.hide()
             }
+            UIApplication.shared.isIdleTimerDisabled = false
+            progressAlertManager.hide()
         } catch {
             debugPrint(error.localizedDescription)
-            modelContext.autosaveEnabled = true
             UIApplication.shared.isIdleTimerDisabled = false
         }
     }
