@@ -188,7 +188,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "アルバムがありません"
           }
         }
@@ -205,7 +205,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "画像がありません"
           }
         }
@@ -1058,23 +1058,6 @@
         }
       }
     },
-    "More.FileManagement.Orphans" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan for Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認"
-          }
-        }
-      }
-    },
     "More.FileManagement.Orphans.Moving" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1105,23 +1088,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "孤立したファイルを確認中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Orphans.View" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを見る"
           }
         }
       }
@@ -1173,6 +1139,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのサムネイルをダウンロード"
+          }
+        }
+      }
+    },
+    "More.FileManagement.ScanAndMoveOrphans" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan and Move Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを移動"
+          }
+        }
+      }
+    },
+    "More.FileManagement.ShowOrphanedFiles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを表示"
           }
         }
       }

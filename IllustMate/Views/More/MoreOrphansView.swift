@@ -21,9 +21,9 @@ struct MoreOrphansView: View {
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #if targetEnvironment(macCatalyst)
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 120.0), spacing: 2.0)]
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #else
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 160.0), spacing: 4.0)]
+    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 120.0), spacing: 4.0)]
 #endif
 
 #if targetEnvironment(macCatalyst)
@@ -87,7 +87,7 @@ struct MoreOrphansView: View {
                     do {
                         let filePath = orphansFolder.appendingPathComponent(orphan).path(percentEncoded: false)
                         if let image = UIImage(contentsOfFile: filePath) {
-                            orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                            orphanThumbnails[orphan] = image.jpegThumbnail(of: 120.0)
                         } else {
                             try FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: filePath))
                             var isDownloaded: Bool = false
@@ -97,7 +97,7 @@ struct MoreOrphansView: View {
                                 }
                             }
                             if let image = UIImage(contentsOfFile: filePath) {
-                                orphanThumbnails[orphan] = image.jpegThumbnail(of: 150.0)
+                                orphanThumbnails[orphan] = image.jpegThumbnail(of: 120.0)
                             }
                         }
                     } catch {

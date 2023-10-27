@@ -36,6 +36,7 @@ class ProgressAlertManager {
         }
     }
 
+    @MainActor
     func prepare(_ title: LocalizedStringKey, total: Int = 0) {
         self.title = title
         self.currentProgress = 0
@@ -43,6 +44,7 @@ class ProgressAlertManager {
         self.percentage = 0
     }
 
+    @MainActor
     func reset(using total: Int = 0) {
         self.title = ""
         self.currentProgress = 0
@@ -56,6 +58,7 @@ class ProgressAlertManager {
         setProgress()
     }
 
+    @MainActor
     func setProgress() {
         if total > 0 {
             percentage = Int((Float(currentProgress) / Float(total)) * 100.0)
