@@ -19,7 +19,7 @@ struct IllustrationMoveMenu: View {
     var body: some View {
         if containingAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                Task.detached(priority: .userInitiated) {
+                Task {
                     for illustration in illustrations {
                         await actor.removeFromAlbum(illustration)
                     }
@@ -31,7 +31,7 @@ struct IllustrationMoveMenu: View {
         }
         if let containingAlbum, let parentAlbum = containingAlbum.parentAlbum {
             Button {
-                Task.detached(priority: .userInitiated) {
+                Task {
                     for illustration in illustrations {
                         await actor.addIllustration(withIdentifier: illustration.persistentModelID,
                                                     toAlbumWithIdentifier: parentAlbum.persistentModelID)
@@ -50,7 +50,7 @@ struct IllustrationMoveMenu: View {
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
-                    Task.detached(priority: .userInitiated) {
+                    Task {
                         for illustration in illustrations {
                             await actor.addIllustration(withIdentifier: illustration.persistentModelID,
                                                         toAlbumWithIdentifier: album.persistentModelID)

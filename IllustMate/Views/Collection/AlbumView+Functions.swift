@@ -144,7 +144,7 @@ extension AlbumView {
     }
 
     func refreshAlbumsAndSet() {
-        Task.detached(priority: .userInitiated) {
+        Task {
             let albums = await fetchAlbums()
             await MainActor.run {
                 if isFB13295421Fixed {
@@ -170,7 +170,7 @@ extension AlbumView {
     }
 
     func refreshIllustrationsAndSet() {
-        Task.detached(priority: .userInitiated) {
+        Task {
             let illustrations = await fetchIllustrations()
             await MainActor.run {
                 if isFB13295421Fixed {

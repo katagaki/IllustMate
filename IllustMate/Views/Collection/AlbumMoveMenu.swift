@@ -17,7 +17,7 @@ struct AlbumMoveMenu: View {
     var body: some View {
         if album.parentAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                Task.detached(priority: .userInitiated) {
+                Task {
                     await actor.removeFromAlbum(album)
                     await MainActor.run {
                         onMoved()
@@ -27,7 +27,7 @@ struct AlbumMoveMenu: View {
         }
         if let parentAlbum = album.parentAlbum?.parentAlbum {
             Button {
-                Task.detached(priority: .userInitiated) {
+                Task {
                     await actor.addAlbum(withIdentifier: album.persistentModelID,
                                          toAlbumWithIdentifier: parentAlbum.persistentModelID)
                     await MainActor.run {
@@ -44,7 +44,7 @@ struct AlbumMoveMenu: View {
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatAlbumCanBeMovedTo()) { albumToMoveTo in
                 Button {
-                    Task.detached(priority: .userInitiated) {
+                    Task {
                         await actor.addAlbum(withIdentifier: album.persistentModelID,
                                              toAlbumWithIdentifier: albumToMoveTo.persistentModelID)
                         await MainActor.run {
