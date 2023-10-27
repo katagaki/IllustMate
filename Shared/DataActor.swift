@@ -79,6 +79,12 @@ actor DataActor: ModelActor {
 
     func deleteAlbum(withIdentifier albumID: PersistentIdentifier) {
         if let album = self[albumID, as: Album.self] {
+            if let parentAlbum = album.parentAlbum {
+                for illustration in album.illustrations() {
+                    addIllustration(withIdentifier: illustration.persistentModelID,
+                                    toAlbumWithIdentifier: parentAlbum.persistentModelID)
+                }
+            }
             modelContext.delete(album)
             try? modelContext.save()
         }
@@ -183,5 +189,6 @@ actor DataActor: ModelActor {
         } catch {
             debugPrint(error.localizedDescription)
         }
+        try? modelContext.save()
     }
 }

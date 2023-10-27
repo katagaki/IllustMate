@@ -1463,13 +1463,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete this album?\nPictures in the album will be moved to your collection."
+            "value" : "Are you sure you want to delete this album?\nPictures in the album will be moved to its containing album."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアルバムを削除してもよろしいですか？\nアルバム内の画像はコレクションに戻されます。"
+            "value" : "このアルバムを削除してもよろしいですか？\nアルバム内の画像はそのアルバムの包含アルバムに戻されます。"
           }
         }
       }
