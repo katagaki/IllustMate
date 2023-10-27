@@ -53,10 +53,12 @@ actor DataActor: ModelActor {
             let destinationAlbum = self[destinationAlbumID, as: Album.self] {
             destinationAlbum.addChildAlbum(album)
         }
+        try? modelContext.save()
     }
 
     func removeFromAlbum(_ album: Album) {
         album.parentAlbum = nil
+        try? modelContext.save()
     }
 
     func deleteAlbum(withIdentifier albumID: PersistentIdentifier) {
@@ -67,6 +69,7 @@ actor DataActor: ModelActor {
 
     func createIllustration(_ illustration: Illustration) {
         modelContext.insert(illustration)
+        try? modelContext.save()
     }
 
     func illustrations() throws -> [Illustration] {
@@ -93,16 +96,19 @@ actor DataActor: ModelActor {
             let album = self[albumID, as: Album.self] {
             illustration.addToAlbum(album)
         }
+        try? modelContext.save()
     }
 
     func addIllustration(_ illustration: Illustration, toAlbumWithIdentifier albumID: PersistentIdentifier) {
         if let album = self[albumID, as: Album.self] {
             album.addChildIllustration(illustration)
         }
+        try? modelContext.save()
     }
 
     func removeFromAlbum(_ illustration: Illustration) {
         illustration.containingAlbum = nil
+        try? modelContext.save()
     }
 
     func deleteIllustration(withIdentifier illustrationID: PersistentIdentifier) {
@@ -113,5 +119,6 @@ actor DataActor: ModelActor {
             }
             modelContext.delete(illustration)
         }
+        try? modelContext.save()
     }
 }
