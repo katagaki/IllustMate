@@ -148,6 +148,9 @@ actor DataActor: ModelActor {
             if !deleteWithoutFile {
                 illustration.prepareForDeletion()
             }
+            if let cachedThumbnail = illustration.cachedThumbnail {
+                modelContext.delete(cachedThumbnail)
+            }
             modelContext.delete(illustration)
         }
         try? modelContext.save()
