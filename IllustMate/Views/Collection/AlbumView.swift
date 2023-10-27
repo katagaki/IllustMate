@@ -18,8 +18,6 @@ struct AlbumView: View {
 
     var namespace: Namespace.ID
 
-    @State var isDataLoadedFromInitialAppearance: Bool = false
-
     var currentAlbum: Album?
     @State var albums: [Album]?
     @State var isConfirmingDeleteAlbum: Bool = false
@@ -28,8 +26,8 @@ struct AlbumView: View {
     @State var albumToRename: Album?
     @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
     @State var albumSortState: SortType = .nameAscending
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
-    @State var styleState: ViewStyle = .grid
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var albumStyle: ViewStyle
+    @State var albumStyleState: ViewStyle = .grid
 
     @State var illustrations: [Illustration]?
     @State var isConfirmingDeleteIllustration: Bool = false
@@ -65,14 +63,14 @@ struct AlbumView: View {
                             .tag(SortType.illustrationCountDescending)
                     }
                     if disableAllAnimations {
-                        Picker("Albums.Style", selection: $styleState) {
+                        Picker("Albums.Style", selection: $albumStyleState) {
                             Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)
                             Label("Albums.Style.List", systemImage: "list.bullet")
                                 .tag(ViewStyle.list)
                         }
                     } else {
-                        Picker("Albums.Style", selection: $styleState.animation(.snappy.speed(2))) {
+                        Picker("Albums.Style", selection: $albumStyleState.animation(.snappy.speed(2))) {
                             Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)
                             Label("Albums.Style.List", systemImage: "list.bullet")
@@ -85,7 +83,7 @@ struct AlbumView: View {
                     if !albums.isEmpty {
                         Divider()
                             .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
-                        AlbumsSection(albums: albums, style: $styleState) { album in
+                        AlbumsSection(albums: albums, style: $albumStyleState) { album in
                             albumToRename = album
                         } onDelete: { album in
                             deleteAlbum(album)
@@ -96,7 +94,7 @@ struct AlbumView: View {
                                 refreshAlbumsAndSet()
                             }
                         }
-                        if colorScheme == .light || styleState == .list {
+                        if colorScheme == .light || albumStyleState == .list {
                             Divider()
                         }
                     } else {
@@ -255,15 +253,15 @@ struct AlbumView: View {
                     await refreshData()
                 }
             } else {
-                styleState = style
+                albumStyleState = albumStyle
                 albumSortState = albumSort
                 Task.detached(priority: .userInitiated) {
                     await refreshData()
                 }
             }
         }
-        .onChange(of: styleState) { _, newValue in
-            style = newValue
+        .onChange(of: albumStyleState) { _, newValue in
+            albumStyle = newValue
         }
         .onChange(of: albumSortState) { _, newValue in
             albumSort = newValue

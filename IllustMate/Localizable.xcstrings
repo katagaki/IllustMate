@@ -183,12 +183,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No albums found"
+            "value" : "This album does not contain any albums."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "アルバムがありません"
           }
         }
@@ -200,12 +200,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No pictures found"
+            "value" : "This album does not contain any pictures."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "画像がありません"
           }
         }

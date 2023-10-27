@@ -15,6 +15,8 @@ struct MoreFileManagementView: View {
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(ConcurrencyManager.self) var concurrency
 
+    let actor = DataActor(modelContainer: sharedModelContainer)
+
     var body: some View {
         List {
             Section {
@@ -58,55 +60,52 @@ struct MoreFileManagementView: View {
 
     func scanForOrphans() {
         UIApplication.shared.isIdleTimerDisabled = true
-        DispatchQueue.global(qos: .userInitiated).async {
+        Task.detached(priority: .userInitiated) {
             do {
-                var fetchDescriptor = FetchDescriptor<Illustration>()
-                fetchDescriptor.propertiesToFetch = [\.id]
-                let illustrations = try modelContext.fetch(fetchDescriptor)
-                progressAlertManager.prepare("More.FileManagement.Orphans.Scanning")
-                progressAlertManager.show()
+                let illustrations = try await actor.illustrations()
+                await progressAlertManager.prepare("More.FileManagement.Orphans.Scanning")
+                await progressAlertManager.show()
                 let filesToCheck = try FileManager.default
                     .contentsOfDirectory(at: illustrationsFolder, includingPropertiesForKeys: nil)
-                progressAlertManager.prepare("More.FileManagement.Orphans.Scanning",
-                                             total: filesToCheck.count)
-                Task.detached(priority: .userInitiated) {
-                    let orphans: [String] = await withTaskGroup(of: String?.self, returning: [String].self) { group in
-                        var orphans: [String] = []
-                        for file in filesToCheck {
-                            group.addTask {
-                                if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
-                                    return file.lastPathComponent
-                                }
-                                return nil
+                await progressAlertManager.prepare("More.FileManagement.Orphans.Scanning", total: filesToCheck.count)
+                let orphans: [String] = await withTaskGroup(of: String?.self, returning: [String].self) { group in
+                    var orphans: [String] = []
+                    for file in filesToCheck {
+                        group.addTask {
+                            if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
+                                return file.lastPathComponent
                             }
-                            await progressAlertManager.incrementProgress()
+                            return nil
                         }
-                        for await result in group {
-                            if let result {
-                                orphans.append(result)
-                            }
-                        }
-                        return orphans
+                        await progressAlertManager.incrementProgress()
                     }
-                    await progressAlertManager.prepare("More.FileManagement.Orphans.Moving", total: orphans.count)
-                    await MainActor.run { [orphans] in
-                        orphans.forEach { orphan in
-                            try? FileManager.default.moveItem(
-                                at: illustrationsFolder.appendingPathComponent(orphan),
-                                to: orphansFolder.appendingPathComponent(orphan))
-                            progressAlertManager.incrementProgress()
+                    for await result in group {
+                        if let result {
+                            orphans.append(result)
                         }
-                        UIApplication.shared.isIdleTimerDisabled = false
-                        progressAlertManager.hide {
-                            if !orphans.isEmpty {
-                                navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
-                            }
+                    }
+                    return orphans
+                }
+                await progressAlertManager.prepare("More.FileManagement.Orphans.Moving", total: orphans.count)
+                for orphan in orphans {
+                    try? FileManager.default.moveItem(
+                        at: illustrationsFolder.appendingPathComponent(orphan),
+                        to: orphansFolder.appendingPathComponent(orphan))
+                    await progressAlertManager.incrementProgress()
+                }
+                await MainActor.run {
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    progressAlertManager.hide {
+                        if !orphans.isEmpty {
+                            navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
                         }
                     }
                 }
             } catch {
                 debugPrint(error.localizedDescription)
-                UIApplication.shared.isIdleTimerDisabled = false
+                await MainActor.run {
+                    UIApplication.shared.isIdleTimerDisabled = false
+                }
             }
         }
     }
