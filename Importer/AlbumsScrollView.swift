@@ -49,12 +49,17 @@ struct AlbumsScrollView: View {
                 }
             }
         }
-        .task {
-            do {
-                albums = try await actor.albums(in: parentAlbum, sortedBy: albumSort)
-                isAlbumsLoaded = true
-            } catch {
-                debugPrint(error.localizedDescription)
+        .onAppear {
+            Task {
+                do {
+                    let albums = try await actor.albums(in: parentAlbum, sortedBy: albumSort)
+                    await MainActor.run {
+                        self.albums = albums
+                        isAlbumsLoaded = true
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
             }
         }
         .toolbar {
