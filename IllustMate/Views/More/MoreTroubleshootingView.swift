@@ -10,7 +10,6 @@ import SwiftUI
 
 struct MoreTroubleshootingView: View {
 
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
 
     @State var isDeleteConfirming: Bool = false

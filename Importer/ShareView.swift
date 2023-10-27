@@ -26,8 +26,6 @@ struct ShareView: View {
     init(items: [Any?], failedItemCount: Int) {
         self.items = items
         self.failedItemCount = failedItemCount
-        let modelContext = ModelContext(sharedModelContainer)
-        modelContext.autosaveEnabled = false
     }
 
     var body: some View {
@@ -213,10 +211,6 @@ struct ShareView: View {
 
     func importIllustration(_ name: String, data: Data, to albumID: PersistentIdentifier?) async {
         let illustration = Illustration(name: name, data: data)
-        if let thumbnailData = UIImage(data: data)?.jpegThumbnail(of: 150.0) {
-            let thumbnail = Thumbnail(data: thumbnailData)
-            illustration.cachedThumbnail = thumbnail
-        }
         await actor.createIllustration(illustration)
         if let albumID {
             await actor.addIllustration(illustration, toAlbumWithIdentifier: albumID)

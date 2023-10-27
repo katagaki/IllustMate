@@ -53,11 +53,9 @@ final class Illustration {
 
     func generateThumbnail() {
         if let data = try? Data(contentsOf: URL(filePath: illustrationPath())),
-            let thumbnailData = Illustration.makeThumbnail(data) {
-            DispatchQueue.main.async { [self] in
-                let thumbnail = Thumbnail(data: thumbnailData)
-                cachedThumbnail = thumbnail
-            }
+           let thumbnailData = Illustration.makeThumbnail(data) {
+            let thumbnail = Thumbnail(data: thumbnailData)
+            cachedThumbnail = thumbnail
         }
     }
 
