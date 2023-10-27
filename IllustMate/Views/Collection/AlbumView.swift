@@ -93,9 +93,7 @@ struct AlbumView: View {
                             moveDropToAlbum(transferable, to: album)
                         } moveMenu: { album in
                             AlbumMoveMenu(album: album) {
-                                Task.detached(priority: .userInitiated) {
-                                    await refreshAlbums()
-                                }
+                                refreshAlbumsAndSet()
                             }
                         }
                         if colorScheme == .light || styleState == .list {
@@ -210,23 +208,17 @@ struct AlbumView: View {
             }
         }
         .sheet(isPresented: $isAddingAlbum) {
-            Task.detached(priority: .userInitiated) {
-                await refreshAlbums()
-            }
+            refreshAlbumsAndSet()
         } content: {
             NewAlbumView(albumToAddTo: currentAlbum)
         }
         .sheet(item: $albumToRename) {
-            Task.detached(priority: .userInitiated) {
-                await refreshAlbums()
-            }
+            refreshAlbumsAndSet()
         } content: { album in
             RenameAlbumView(album: album)
         }
         .sheet(isPresented: $isImportingPhotos) {
-            Task.detached(priority: .userInitiated) {
-                await refreshIllustrations()
-            }
+            refreshIllustrationsAndSet()
         } content: {
             ImporterView(selectedAlbum: currentAlbum)
         }
@@ -257,10 +249,18 @@ struct AlbumView: View {
                 illustrationPendingDeletion = nil
             }
         }
-        .task {
-            styleState = style
-            albumSortState = albumSort
-            await refreshData()
+        .onAppear {
+            if albums != nil && illustrations != nil {
+                Task.detached(priority: .userInitiated) {
+                    await refreshData()
+                }
+            } else {
+                styleState = style
+                albumSortState = albumSort
+                Task.detached(priority: .userInitiated) {
+                    await refreshData()
+                }
+            }
         }
         .onChange(of: styleState) { _, newValue in
             style = newValue
@@ -269,14 +269,10 @@ struct AlbumView: View {
             albumSort = newValue
         }
         .onChange(of: albumSort) { _, _ in
-            Task.detached(priority: .userInitiated) {
-                await refreshAlbums()
-            }
+            refreshAlbumsAndSet()
         }
         .onChange(of: isIllustrationSortReversed) { _, _ in
-            Task.detached(priority: .userInitiated) {
-                await refreshIllustrations()
-            }
+            refreshIllustrationsAndSet()
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {

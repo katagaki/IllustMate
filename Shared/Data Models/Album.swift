@@ -6,6 +6,7 @@
 //
 
 import CoreTransferable
+import CryptoKit
 import Foundation
 import SwiftData
 import UIKit
@@ -22,6 +23,10 @@ final class Album {
 
     init(name: String) {
         self.name = name
+    }
+
+    func identifiableString() -> String {
+        return "\(id)-\(coverHash())-\(albumCount())-\(illustrationCount())"
     }
 
     func albums() -> [Album] {
@@ -45,6 +50,14 @@ final class Album {
             return uiImage.scalePreservingAspectRatio(targetSize: CGSize(width: 60.0, height: 60.0))
         }
         return UIImage(named: "Album.Generic")!
+    }
+
+    func coverHash() -> String {
+        if let coverPhoto {
+            return SHA256.hash(data: coverPhoto).compactMap { String(format: "%02x", $0) }.joined()
+        } else {
+            return ""
+        }
     }
 
     func isInAlbum(_ album: Album?) -> Bool {

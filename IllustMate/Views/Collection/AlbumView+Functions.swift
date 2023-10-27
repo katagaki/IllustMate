@@ -50,7 +50,7 @@ extension AlbumView {
                 }
             }
             self.selectedIllustrations.removeAll()
-            await refreshIllustrations()
+            refreshIllustrationsAndSet()
         }
     }
 
@@ -111,9 +111,7 @@ extension AlbumView {
 
     func refreshDataAfterIllustrationMoved() {
         selectedIllustrations.removeAll()
-        Task(priority: .userInitiated) {
-            await refreshIllustrations()
-        }
+        refreshIllustrationsAndSet()
     }
 
     func selectOrDeselectIllustration(_ illustration: Illustration) {
@@ -132,34 +130,56 @@ extension AlbumView {
         if slowItDown {
             try? await Task.sleep(nanoseconds: 2000000000)
         }
-        await refreshAlbums()
-        await refreshIllustrations()
+        let albums = await refreshAlbums()
+        let illustrations = await refreshIllustrations()
+        await MainActor.run {
+            doWithAnimation {
+                self.albums = albums
+                self.illustrations = illustrations
+            }
+        }
     }
 
-    func refreshAlbums() async {
-        do {
-            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
+    func refreshAlbumsAndSet() {
+        Task.detached(priority: .userInitiated) {
+            let albums = await refreshAlbums()
             await MainActor.run {
                 doWithAnimation {
                     self.albums = albums
                 }
             }
-        } catch {
-            debugPrint(error.localizedDescription)
         }
     }
 
-    func refreshIllustrations() async {
+    func refreshAlbums() async -> [Album] {
         do {
-            let illustrations = try await actor
-                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
+            return albums
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func refreshIllustrationsAndSet() {
+        Task.detached(priority: .userInitiated) {
+            let illustrations = await refreshIllustrations()
             await MainActor.run {
                 doWithAnimation {
                     self.illustrations = illustrations
                 }
             }
+        }
+    }
+
+    func refreshIllustrations() async -> [Illustration] {
+        do {
+            let illustrations = try await actor
+                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+            return illustrations
         } catch {
             debugPrint(error.localizedDescription)
+            return []
         }
     }
 }

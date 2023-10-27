@@ -28,8 +28,8 @@ struct AlbumCover: View {
             }
         }
         .background(.secondary)
+        .scaledToFill()
         .frame(width: length, height: length)
-        .aspectRatio(1.0, contentMode: .fill)
         .clipShape(.rect(cornerRadius: cornerRadius))
         .shadow(color: .black.opacity(0.2), radius: shadowSize, x: 0.0, y: shadowSize)
         .overlay {
