@@ -54,6 +54,7 @@ extension AlbumView {
         }
     }
 
+    @MainActor
     func startOrStopSelectingIllustrations() {
         doWithAnimation {
             if isSelectingIllustrations {
@@ -65,43 +66,35 @@ extension AlbumView {
 
     func moveDropToAlbum(_ drop: Drop, to album: Album) {
         if let transferable = drop.illustration {
-            let fetchDescriptor = FetchDescriptor<Illustration>(
-                predicate: #Predicate<Illustration> { $0.id == transferable.id }
-            )
-            if let illustrations = try? modelContext.fetch(fetchDescriptor) {
-                moveIllustrationsToAlbum(illustrations, to: album)
-            }
+            moveIllustrationsToAlbum([transferable.id], to: album)
         } else if let transferable = drop.album {
-            let fetchDescriptor = FetchDescriptor<Album>(
-                predicate: #Predicate<Album> { $0.id == transferable.id }
-            )
-            if let albums = try? modelContext.fetch(fetchDescriptor) {
-                moveAlbumsToAlbum(albums, to: album)
-            }
+            moveAlbumsToAlbum([transferable.id], to: album)
         } else if let transferable = drop.importedPhoto {
             importPhotoToAlbum(transferable, to: album)
         }
     }
 
-    func moveIllustrationsToAlbum(_ illustrations: [Illustration], to album: Album) {
+    func moveIllustrationsToAlbum(_ illustrationIDs: [String], to album: Album) {
         Task(priority: .userInitiated) {
-            for illustration in illustrations {
-                await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                            toAlbumWithIdentifier: album.persistentModelID)
+            for illustrationID in illustrationIDs {
+                if let illustration = await actor.illustration(for: illustrationID) {
+                    await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                                toAlbumWithIdentifier: album.persistentModelID)
+                }
             }
             await refreshData()
         }
     }
 
-    func moveAlbumsToAlbum(_ albums: [Album], to album: Album) {
-        if !albums.contains(where: { $0.id == album.id }) {
-            Task(priority: .userInitiated) {
-                for destinationAlbum in albums {
+    func moveAlbumsToAlbum(_ albumIDs: [String], to album: Album) {
+        Task(priority: .userInitiated) {
+            for albumID in albumIDs {
+                if let destinationAlbum = await actor.album(for: albumID) {
                     await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
                                          toAlbumWithIdentifier: album.persistentModelID)
                 }
-                await refreshData()
             }
+            await refreshData()
         }
     }
 

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MoreOrphansView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(ConcurrencyManager.self) var concurrency
 
     @Namespace var orphanTransitionNamespace
@@ -116,8 +115,9 @@ struct MoreOrphansView: View {
     }
 
     func importIllustration(_ name: String, data: Data) {
-        let illustration = Illustration(name: name, data: data)
-        illustration.generateThumbnail()
-        modelContext.insert(illustration)
+        Task {
+            let illustration = Illustration(name: name, data: data)
+            await actor.createIllustration(illustration)
+        }
     }
 }

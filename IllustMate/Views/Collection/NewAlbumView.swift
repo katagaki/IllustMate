@@ -10,7 +10,6 @@ import SwiftUI
 
 struct NewAlbumView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     @State var albumToAddTo: Album?
     @State var newAlbumName: String = ""
@@ -27,13 +26,15 @@ struct NewAlbumView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 Button {
-                    let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
-                    if let albumToAddTo {
-                        albumToAddTo.addChildAlbum(newAlbum)
-                    } else {
-                        modelContext.insert(newAlbum)
+                    Task {
+                        let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
+                        await actor.createAlbum(newAlbum)
+                        if let albumToAddTo {
+                            await actor.addAlbum(withIdentifier: newAlbum.persistentModelID,
+                                                 toAlbumWithIdentifier: albumToAddTo.persistentModelID)
+                        }
+                        dismiss()
                     }
-                    dismiss()
                 } label: {
                     Text("Shared.Create")
                         .bold()

@@ -12,8 +12,6 @@ import SwiftUI
 
 struct MoreDataManagementView: View {
 
-    @Environment(\.modelContext) var modelContext
-    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(ConcurrencyManager.self) var concurrency
     @ObservedObject var syncMonitor = SyncMonitor.shared
@@ -23,8 +21,6 @@ struct MoreDataManagementView: View {
     @Query var thumbnails: [Thumbnail]
 
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     var body: some View {
         List {

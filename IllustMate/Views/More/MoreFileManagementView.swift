@@ -10,13 +10,10 @@ import SwiftUI
 
 struct MoreFileManagementView: View {
 
-    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @State var showOrphanedFilesViewFlag: Bool = false
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     var body: some View {
         List {

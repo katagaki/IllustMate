@@ -12,8 +12,6 @@ struct IllustrationMoveMenu: View {
 
     @Environment(\.modelContext) var modelContext
 
-    let actor = DataActor(modelContainer: sharedModelContainer)
-
     var illustrations: [Illustration]
     var containingAlbum: Album?
     var onMoved: () -> Void

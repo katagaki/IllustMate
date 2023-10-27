@@ -12,7 +12,6 @@ import SwiftUI
 
 struct ImporterView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
@@ -23,8 +22,6 @@ struct ImporterView: View {
     @State var importCurrentCount: Int = 0
     @State var importTotalCount: Int = 0
     @State var importCompletedCount: Int = 0
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     @AppStorage(wrappedValue: 0, "ImageSequence", store: defaults) var runningNumberForImageName: Int
 

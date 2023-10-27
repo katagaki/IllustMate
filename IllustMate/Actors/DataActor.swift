@@ -42,6 +42,18 @@ actor DataActor: ModelActor {
         return sortAlbum(albums, sortedBy: sortType)
     }
 
+    func album(for id: String) -> Album? {
+        let fetchDescriptor = FetchDescriptor<Album>(
+            predicate: #Predicate<Album> { $0.id == id }
+        )
+        return try? modelContext.fetch(fetchDescriptor).first
+    }
+
+    func createAlbum(_ album: Album) {
+        modelContext.insert(album)
+        try? modelContext.save()
+    }
+
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
         switch sortType {
         case .nameAscending: albums.sorted(by: { $0.name < $1.name })
@@ -72,11 +84,6 @@ actor DataActor: ModelActor {
         }
     }
 
-    func createIllustration(_ illustration: Illustration) {
-        modelContext.insert(illustration)
-        try? modelContext.save()
-    }
-
     func illustrations() throws -> [Illustration] {
         var fetchDescriptor = FetchDescriptor<Illustration>(
             sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
@@ -93,6 +100,19 @@ actor DataActor: ModelActor {
         fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
         return try modelContext.fetch(fetchDescriptor)
+    }
+
+    func illustration(for id: String) -> Illustration? {
+        let fetchDescriptor = FetchDescriptor<Illustration>(
+            predicate: #Predicate<Illustration> { $0.id == id }
+        )
+        return try? modelContext.fetch(fetchDescriptor).first
+    }
+
+    func createIllustration(_ illustration: Illustration) {
+        modelContext.insert(illustration)
+        illustration.generateThumbnail()
+        try? modelContext.save()
     }
 
     func addIllustration(withIdentifier illustrationID: PersistentIdentifier,

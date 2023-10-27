@@ -11,10 +11,8 @@ import SwiftUI
 
 struct AlbumView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
-    @EnvironmentObject var navigationManager: NavigationManager
 
     var namespace: Namespace.ID
 
@@ -41,8 +39,6 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
     @AppStorage(wrappedValue: false, "DebugSlowItDown") var slowItDown: Bool
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     var body: some View {
         ScrollView(.vertical) {

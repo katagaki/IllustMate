@@ -10,16 +10,12 @@ import SwiftUI
 
 struct IllustrationsView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     @Namespace var illustrationTransitionNamespace
 
     @State var illustrations: [Illustration] = []
-
     @State var viewerManager = ViewerManager()
 
     var body: some View {

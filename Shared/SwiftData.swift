@@ -1,5 +1,5 @@
 //
-//  ModelContainer.swift
+//  SwiftData.swift
 //  Importer
 //
 //  Created by シン・ジャスティン on 2023/10/12.
@@ -20,3 +20,5 @@ var sharedModelContainer: ModelContainer = {
         fatalError("Could not create ModelContainer: \(error)")
     }
 }()
+
+let actor = DataActor(modelContainer: sharedModelContainer)

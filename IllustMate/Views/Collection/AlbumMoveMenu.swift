@@ -14,8 +14,6 @@ struct AlbumMoveMenu: View {
     var album: Album
     var onMoved: () -> Void
 
-    let actor = DataActor(modelContainer: sharedModelContainer)
-
     var body: some View {
         if album.parentAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {

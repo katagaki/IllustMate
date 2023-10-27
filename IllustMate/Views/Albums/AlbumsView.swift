@@ -10,11 +10,8 @@ import SwiftUI
 
 struct AlbumsView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     @Namespace var illustrationTransitionNamespace
 
