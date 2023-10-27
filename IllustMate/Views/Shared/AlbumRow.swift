@@ -18,7 +18,7 @@ struct AlbumRow: View {
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
                     .font(.body)
-                Text("Shared.Album.\(album.illustrations().count)")
+                Text("Shared.Album.\(album.illustrationCount())")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

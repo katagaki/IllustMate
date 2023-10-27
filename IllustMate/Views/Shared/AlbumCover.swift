@@ -36,7 +36,7 @@ struct AlbumCover: View {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(.tertiary, lineWidth: 1/3)
         }
-        .task {
+        .onAppear {
             if let data, let coverImage = UIImage(data: data) {
                 coverPhoto = Image(uiImage: coverImage)
             }

@@ -42,8 +42,8 @@ actor DataActor: ModelActor {
         switch sortType {
         case .nameAscending: albums.sorted(by: { $0.name < $1.name })
         case .nameDescending: albums.sorted(by: { $0.name > $1.name })
-        case .illustrationCountAscending: albums.sorted(by: { $0.illustrations().count < $1.illustrations().count })
-        case .illustrationCountDescending: albums.sorted(by: { $0.illustrations().count > $1.illustrations().count })
+        case .illustrationCountAscending: albums.sorted(by: { $0.illustrationCount() < $1.illustrationCount() })
+        case .illustrationCountDescending: albums.sorted(by: { $0.illustrationCount() > $1.illustrationCount() })
         }
     }
 
@@ -64,6 +64,7 @@ actor DataActor: ModelActor {
     func deleteAlbum(withIdentifier albumID: PersistentIdentifier) {
         if let album = self[albumID, as: Album.self] {
             modelContext.delete(album)
+            try? modelContext.save()
         }
     }
 

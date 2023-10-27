@@ -32,6 +32,14 @@ final class Album {
         return childIllustrations ?? []
     }
 
+    func albumCount() -> Int {
+        return childAlbums?.count ?? 0
+    }
+
+    func illustrationCount() -> Int {
+        return childIllustrations?.count ?? 0
+    }
+
     func cover() -> UIImage {
         if let coverPhoto, let uiImage = UIImage(data: coverPhoto) {
             return uiImage.scalePreservingAspectRatio(targetSize: CGSize(width: 60.0, height: 60.0))

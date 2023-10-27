@@ -46,7 +46,7 @@ struct AlbumsSection<Content: View>: View {
                                                album: album)
                             }
                         }
-                        .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
+                        .id("\(album.id)-\(album.albumCount())-\(album.illustrationCount())")
                         .contextMenu {
                             contextMenu(album)
                         }
@@ -62,7 +62,7 @@ struct AlbumsSection<Content: View>: View {
                                 .draggable(AlbumTransferable(id: album.id))
                                 .albumDropDestination(onDrop: onDrop, album: album)
                         }
-                        .id("\(album.id)-\(album.albums().count)-\(album.illustrations().count)")
+                        .id("\(album.id)-\(album.albumCount())-\(album.illustrationCount())")
                         .contextMenu {
                             contextMenu(album)
                         }

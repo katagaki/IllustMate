@@ -24,7 +24,7 @@ struct AlbumListRow: View {
                     .toggledMatchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                Text("Albums.Detail.\(album.illustrations().count),\(album.albums().count)")
+                Text("Albums.Detail.\(album.illustrationCount()),\(album.albumCount())")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

@@ -26,7 +26,7 @@ struct AlbumGridLabel: View {
                     HStack(alignment: .center, spacing: 4.0) {
                         Group {
                             Image(systemName: "photo.fill")
-                            Text(String(album.illustrations().count))
+                            Text(String(album.illustrationCount()))
                                 .lineLimit(1)
                         }
                         .foregroundStyle(.secondary)
@@ -35,7 +35,7 @@ struct AlbumGridLabel: View {
                     HStack(alignment: .center, spacing: 4.0) {
                         Group {
                             Image(systemName: "rectangle.stack.fill")
-                            Text(String(album.albums().count))
+                            Text(String(album.albumCount()))
                                 .lineLimit(1)
                         }
                         .foregroundStyle(.secondary)
