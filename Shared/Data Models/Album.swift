@@ -10,6 +10,7 @@ import CryptoKit
 import Foundation
 import SwiftData
 import UIKit
+import UniformTypeIdentifiers
 
 @Model
 final class Album {
@@ -128,6 +129,10 @@ struct AlbumTransferable: Codable, Transferable {
     var id: String
 
     static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(for: AlbumTransferable.self, contentType: .folder)
+        CodableRepresentation(for: AlbumTransferable.self, contentType: .album)
     }
+}
+
+extension UTType {
+    static var album: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Album") }
 }

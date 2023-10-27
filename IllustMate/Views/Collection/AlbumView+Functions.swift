@@ -65,41 +65,39 @@ extension AlbumView {
     }
 
     func moveDropToAlbum(_ drop: Drop, to album: Album) {
-        if let transferable = drop.illustration {
-            moveIllustrationsToAlbum([transferable.id], to: album)
-        } else if let transferable = drop.album {
-            moveAlbumsToAlbum([transferable.id], to: album)
-        } else if let transferable = drop.importedPhoto {
-            importPhotoToAlbum(transferable, to: album)
-        }
-    }
-
-    func moveIllustrationsToAlbum(_ illustrationIDs: [String], to album: Album) {
         Task(priority: .userInitiated) {
-            for illustrationID in illustrationIDs {
-                if let illustration = await actor.illustration(for: illustrationID) {
-                    await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                                toAlbumWithIdentifier: album.persistentModelID)
-                }
+            if let transferable = drop.illustration {
+                await moveIllustrationToAlbum(transferable.id, to: album)
+            } else if let transferable = drop.album {
+                await moveAlbumToAlbum(transferable.id, to: album)
+            } else if let transferable = drop.importedPhoto {
+                await importPhotoToAlbum(transferable, to: album)
             }
             await refreshData()
         }
     }
 
-    func moveAlbumsToAlbum(_ albumIDs: [String], to album: Album) {
-        Task(priority: .userInitiated) {
-            for albumID in albumIDs {
-                if let destinationAlbum = await actor.album(for: albumID) {
-                    await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
-                                         toAlbumWithIdentifier: album.persistentModelID)
-                }
-            }
-            await refreshData()
+    func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
+        if let illustration = await actor.illustration(for: illustrationID) {
+            await actor.addIllustration(withIdentifier: illustration.persistentModelID,
+                                        toAlbumWithIdentifier: album.persistentModelID)
         }
     }
 
-    func importPhotoToAlbum(_ photo: Image, to album: Album) {
-        // TODO: Import photo dropped from outside app
+    func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
+        if let destinationAlbum = await actor.album(for: albumID) {
+            await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
+                                 toAlbumWithIdentifier: album.persistentModelID)
+        }
+    }
+
+    func importPhotoToAlbum(_ photo: Image, to album: Album) async {
+        let uiImage = await photo.render()
+        if let data = uiImage?.data() {
+            let illustration = Illustration(name: Illustration.newFilename(), data: data)
+            await actor.createIllustration(illustration)
+            await actor.addIllustration(illustration, toAlbumWithIdentifier: album.persistentModelID)
+        }
     }
 
     func refreshDataAfterIllustrationMoved() {
@@ -120,9 +118,6 @@ extension AlbumView {
     }
 
     func refreshData() async {
-        if slowItDown {
-            try? await Task.sleep(nanoseconds: 2000000000)
-        }
         let albums = await fetchAlbums()
         let illustrations = await fetchIllustrations()
         await MainActor.run {

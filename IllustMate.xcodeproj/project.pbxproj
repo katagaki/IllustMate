@@ -66,6 +66,7 @@
 		E46712DE2ADC2680006CB15D /* AlbumCover.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892362AD3163B005C9DBD /* AlbumCover.swift */; };
 		E46712E12ADC2B6E006CB15D /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E46712E02ADC2B6E006CB15D /* Komponents */; };
 		E46712E52ADC374E006CB15D /* AlbumsScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */; };
+		E47162DE2AEC1D540065E9B1 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47162DD2AEC1D540065E9B1 /* View.swift */; };
 		E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */; };
 		E486C9AD2AEA526400FD334E /* SortType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E453B5852AE823F600D45278 /* SortType.swift */; };
 		E486C9AE2AEA52F500FD334E /* DataActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834B92ADEE42B0056D47A /* DataActor.swift */; };
@@ -181,6 +182,7 @@
 		E46712D42ADC17ED006CB15D /* AlbumView+Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumView+Functions.swift"; sourceTree = "<group>"; };
 		E46712D62ADC24AF006CB15D /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsScrollView.swift; sourceTree = "<group>"; };
+		E47162DD2AEC1D540065E9B1 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		E49E363E2AE0FEB6005001B2 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		E4A335742AEC04AE00A1F68E /* Radar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Radar.swift; sourceTree = "<group>"; };
 		E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleModifier.swift; sourceTree = "<group>"; };
@@ -440,6 +442,7 @@
 			children = (
 				E49E363E2AE0FEB6005001B2 /* Animations.swift */,
 				E4DE2D8F2ACD570F00F5EA8D /* UIImage.swift */,
+				E47162DD2AEC1D540065E9B1 /* View.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -601,6 +604,7 @@
 				E4E892352AD31058005C9DBD /* IllustrationMoveMenu.swift in Sources */,
 				E4C834BA2ADEE42B0056D47A /* DataActor.swift in Sources */,
 				E4E8923F2AD3DF6F005C9DBD /* MoreDataManagementView.swift in Sources */,
+				E47162DE2AEC1D540065E9B1 /* View.swift in Sources */,
 				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
 				E45A8BD22AD03C5E00E3035E /* AlbumListRow.swift in Sources */,

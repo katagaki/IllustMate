@@ -11,7 +11,6 @@ import SwiftUI
 struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
-    @AppStorage(wrappedValue: false, "DebugSlowItDown") var slowItDown: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
     @AppStorage(wrappedValue: false, "DebugNamingTools") var showNamingOptions: Bool
@@ -45,12 +44,6 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
             } header: {
                 ListSectionHeader(text: "Experiments.Section.Cloud")
-                    .font(.body)
-            }
-            Section {
-                Toggle("Experiments.SlowItDown", isOn: $slowItDown)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.Threading")
                     .font(.body)
             }
             Section {

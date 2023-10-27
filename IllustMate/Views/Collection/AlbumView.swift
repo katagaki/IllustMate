@@ -38,8 +38,6 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
-    @AppStorage(wrappedValue: false, "DebugSlowItDown") var slowItDown: Bool
-
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {

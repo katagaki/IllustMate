@@ -9,6 +9,7 @@ import CoreTransferable
 import Foundation
 import SwiftData
 import UIKit
+import UniformTypeIdentifiers
 
 @Model
 final class Illustration {
@@ -83,6 +84,10 @@ struct IllustrationTransferable: Codable, Transferable {
     var id: String
 
     static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(for: IllustrationTransferable.self, contentType: .image)
+        CodableRepresentation(for: IllustrationTransferable.self, contentType: .picture)
     }
+}
+
+extension UTType {
+    static var picture: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Picture") }
 }
