@@ -38,7 +38,7 @@ struct IllustrationsGrid<Content: View>: View {
         LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
                   phoneColumnConfiguration : padOrMacColumnConfiguration,
                   spacing: 2.0) {
-            ForEach(illustrations, id: \.id) { illustration in
+            ForEach(illustrations, id: \.persistentModelID) { illustration in
                 Button {
                     onSelect(illustration)
                 } label: {
@@ -61,14 +61,14 @@ struct IllustrationsGrid<Content: View>: View {
                             SelectionOverlay()
                         }
                     }
-                    .draggable(IllustrationTransferable(id: illustration.id)) {
-                        if let image = illustration.thumbnail() {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100.0, height: 100.0)
-                        }
-                    }
+//                    .draggable(IllustrationTransferable(id: illustration.id)) {
+//                        if let image = illustration.thumbnail() {
+//                            Image(uiImage: image)
+//                                .resizable()
+//                                .scaledToFill()
+//                                .frame(width: 100.0, height: 100.0)
+//                        }
+//                    }
                 }
                 .contextMenu {
                     if !isSelecting {

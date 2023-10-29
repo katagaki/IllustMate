@@ -141,11 +141,14 @@ actor DataActor: ModelActor {
 
     func addIllustrations(withIdentifiers illustrationIDs: [PersistentIdentifier],
                           toAlbumWithIdentifier albumID: PersistentIdentifier) {
-        for illustrationID in illustrationIDs {
-            if let illustration = self[illustrationID, as: Illustration.self],
-                let album = self[albumID, as: Album.self] {
-                illustration.addToAlbum(album)
+        if let album = self[albumID, as: Album.self] {
+            var illustrations: [Illustration] = []
+            for illustrationID in illustrationIDs {
+                if let illustration = self[illustrationID, as: Illustration.self] {
+                    illustrations.append(illustration)
+                }
             }
+            album.addChildIllustrations(illustrations)
         }
         try? modelContext.save()
     }
@@ -164,7 +167,9 @@ actor DataActor: ModelActor {
 
     func removeFromAlbum(_ illustrations: [Illustration]) {
         for illustration in illustrations {
-            illustration.containingAlbum = nil
+            if let containingAlbum = illustration.containingAlbum {
+                containingAlbum.removeChildIllustration(illustration)
+            }
         }
         try? modelContext.save()
     }

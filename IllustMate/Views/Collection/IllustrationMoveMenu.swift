@@ -28,7 +28,8 @@ struct IllustrationMoveMenu: View {
         if let containingAlbum, let parentAlbum = containingAlbum.parentAlbum {
             Button {
                 Task {
-                    await actor.addIllustrations(withIdentifiers: illustrations.map { $0.persistentModelID },
+                    let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
+                    await actor.addIllustrations(withIdentifiers: illustrationPersistentModelIDs,
                                                  toAlbumWithIdentifier: parentAlbum.persistentModelID)
                     onMoved()
                 }
@@ -43,7 +44,8 @@ struct IllustrationMoveMenu: View {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
                     Task {
-                        await actor.addIllustrations(withIdentifiers: illustrations.map { $0.persistentModelID },
+                        let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
+                        await actor.addIllustrations(withIdentifiers: illustrationPersistentModelIDs,
                                                      toAlbumWithIdentifier: album.persistentModelID)
                         onMoved()
                     }

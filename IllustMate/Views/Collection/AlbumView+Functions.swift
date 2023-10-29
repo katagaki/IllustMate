@@ -102,7 +102,9 @@ extension AlbumView {
 
     func refreshDataAfterIllustrationMoved() {
         selectedIllustrations.removeAll()
-        refreshDataAsynchronously()
+        Task {
+            await refreshData()
+        }
     }
 
     func selectOrDeselectIllustration(_ illustration: Illustration) {
@@ -114,12 +116,6 @@ extension AlbumView {
             }
         } else {
             viewerManager.setDisplay(illustration)
-        }
-    }
-
-    func refreshDataAsynchronously() {
-        Task {
-            await refreshData()
         }
     }
 
