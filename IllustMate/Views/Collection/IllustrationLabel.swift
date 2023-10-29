@@ -35,7 +35,7 @@ struct IllustrationLabel: View {
                     }
                 }
                 .toggledMatchedGeometryEffect(id: illustration.id, in: namespace)
-                .transitionRespectingAnimationSetting(.opacity.animation(.snappy.speed(2)))
+                .toggledTransition(.opacity.animation(.snappy.speed(2)))
             }
         }
         .background(.primary.opacity(0.05))

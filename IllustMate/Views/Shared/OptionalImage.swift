@@ -16,7 +16,7 @@ struct OptionalImage: View {
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
-                .transitionRespectingAnimationSetting(.opacity.animation(.snappy.speed(2)))
+                .toggledTransition(.opacity.animation(.snappy.speed(2)))
         } else {
             Rectangle()
                 .foregroundStyle(.primary.opacity(0.1))

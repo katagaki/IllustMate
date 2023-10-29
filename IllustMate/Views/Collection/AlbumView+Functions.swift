@@ -39,6 +39,7 @@ extension AlbumView {
     }
 
     func confirmDeleteIllustration() {
+        // TODO: Use actor to delete multiple illustrations instead of for loop here
         Task { [isSelectingIllustrations, selectedIllustrations] in
             if isSelectingIllustrations {
                 for illustration in selectedIllustrations {

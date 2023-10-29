@@ -84,8 +84,8 @@
 		E4C834C42ADFB2B20056D47A /* AppIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834C32ADFB2B20056D47A /* AppIcon.swift */; };
 		E4C834C62ADFB2C30056D47A /* MoreAppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834C52ADFB2C30056D47A /* MoreAppIconView.swift */; };
 		E4C834C82ADFB3090056D47A /* ListAppIconRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834C72ADFB3090056D47A /* ListAppIconRow.swift */; };
-		E4C904512AE21F390091D879 /* TransitionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C904502AE21F390091D879 /* TransitionModifier.swift */; };
-		E4C904522AE220220091D879 /* TransitionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C904502AE21F390091D879 /* TransitionModifier.swift */; };
+		E4C904512AE21F390091D879 /* ToggledTransitionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C904502AE21F390091D879 /* ToggledTransitionModifier.swift */; };
+		E4C904522AE220220091D879 /* ToggledTransitionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C904502AE21F390091D879 /* ToggledTransitionModifier.swift */; };
 		E4CA0B8E2ACD17190063F06C /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B8D2ACD17190063F06C /* FileManager.swift */; };
 		E4CA0B8F2ACD17C10063F06C /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B8D2ACD17190063F06C /* FileManager.swift */; };
 		E4CA0B912ACD2F8A0063F06C /* RenameAlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */; };
@@ -193,7 +193,7 @@
 		E4C834C32ADFB2B20056D47A /* AppIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIcon.swift; sourceTree = "<group>"; };
 		E4C834C52ADFB2C30056D47A /* MoreAppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreAppIconView.swift; sourceTree = "<group>"; };
 		E4C834C72ADFB3090056D47A /* ListAppIconRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListAppIconRow.swift; sourceTree = "<group>"; };
-		E4C904502AE21F390091D879 /* TransitionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionModifier.swift; sourceTree = "<group>"; };
+		E4C904502AE21F390091D879 /* ToggledTransitionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggledTransitionModifier.swift; sourceTree = "<group>"; };
 		E4CA0B8D2ACD17190063F06C /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		E4CA0B902ACD2F8A0063F06C /* RenameAlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameAlbumView.swift; sourceTree = "<group>"; };
 		E4CD39A62AD52E9100D03298 /* Thumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbnail.swift; sourceTree = "<group>"; };
@@ -399,9 +399,9 @@
 				E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */,
 				E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */,
 				E4C834B52ADED88D0056D47A /* IllustrationViewerModifier.swift */,
-				E453B5872AE83D5600D45278 /* ToggledMatchedGeometryEffectModifier.swift */,
 				E456E2DC2ADFE9EA00B6E6D8 /* OverlayBackgroundModifier.swift */,
-				E4C904502AE21F390091D879 /* TransitionModifier.swift */,
+				E453B5872AE83D5600D45278 /* ToggledMatchedGeometryEffectModifier.swift */,
+				E4C904502AE21F390091D879 /* ToggledTransitionModifier.swift */,
 			);
 			path = "View Modifiers";
 			sourceTree = "<group>";
@@ -614,7 +614,7 @@
 				E4C834C42ADFB2B20056D47A /* AppIcon.swift in Sources */,
 				E4DE2D902ACD570F00F5EA8D /* UIImage.swift in Sources */,
 				E4614D2C2ACB0FD800D751FB /* ViewPath.swift in Sources */,
-				E4C904512AE21F390091D879 /* TransitionModifier.swift in Sources */,
+				E4C904512AE21F390091D879 /* ToggledTransitionModifier.swift in Sources */,
 				E4614CE92ACA86C900D751FB /* AlbumView.swift in Sources */,
 				E43DFB2D2AD78224002A6317 /* SwiftData.swift in Sources */,
 				E4E8922E2AD2871A005C9DBD /* IllustrationsGrid.swift in Sources */,
@@ -677,7 +677,7 @@
 				E486C9AE2AEA52F500FD334E /* DataActor.swift in Sources */,
 				E46712DB2ADC2597006CB15D /* AlbumListRow.swift in Sources */,
 				E49E36402AE0FEB6005001B2 /* Animations.swift in Sources */,
-				E4C904522AE220220091D879 /* TransitionModifier.swift in Sources */,
+				E4C904522AE220220091D879 /* ToggledTransitionModifier.swift in Sources */,
 				E46712DC2ADC25D1006CB15D /* ViewStyle.swift in Sources */,
 				E45A8BC52ACF13F700E3035E /* UIImage.swift in Sources */,
 				E43DFB2C2AD78220002A6317 /* SwiftData.swift in Sources */,
