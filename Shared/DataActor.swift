@@ -82,7 +82,7 @@ actor DataActor: ModelActor {
     }
 
     func removeFromAlbum(_ album: Album) {
-        album.parentAlbum = nil
+        album.parentAlbum?.removeAlbum(album)
         try? modelContext.save()
     }
 
@@ -161,7 +161,7 @@ actor DataActor: ModelActor {
     }
 
     func removeFromAlbum(_ illustration: Illustration) {
-        illustration.containingAlbum = nil
+        illustration.containingAlbum?.removeChildIllustration(illustration)
         try? modelContext.save()
     }
 

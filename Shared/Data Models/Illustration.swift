@@ -49,7 +49,7 @@ final class Illustration {
     }
 
     func removeFromAlbum() {
-        containingAlbum = nil
+        containingAlbum?.removeChildIllustration(self)
     }
 
     func generateThumbnail() {

@@ -92,7 +92,6 @@ final class Album {
     }
 
     func addChildIllustration(_ illustration: Illustration) {
-//        illustration.removeFromAlbum()
         childIllustrations?.append(illustration)
     }
 
@@ -103,7 +102,11 @@ final class Album {
     }
 
     func removeFromAlbum() {
-        parentAlbum = nil
+        parentAlbum?.removeAlbum(self)
+    }
+
+    func removeAlbum(_ album: Album) {
+        childAlbums?.removeAll(where: { $0.id == album.id })
     }
 
     func removeChildIllustration(_ illustration: Illustration) {
