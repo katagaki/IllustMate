@@ -93,7 +93,7 @@ struct IllustrationsGrid<Content: View>: View {
                             }
                         }
                         Divider()
-                        if let containingAlbum = illustration.containingAlbum {
+                        if illustration.containingAlbum != nil {
                             Button("Shared.SetAsCover", systemImage: "photo") {
                                 Task {
                                     await actor.setAsAlbumCover(for: illustration.persistentModelID)

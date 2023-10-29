@@ -130,6 +130,17 @@ actor DataActor: ModelActor {
         try? modelContext.save()
     }
 
+    func addIllustrations(withIdentifiers illustrationIDs: [PersistentIdentifier],
+                          toAlbumWithIdentifier albumID: PersistentIdentifier) {
+        for illustrationID in illustrationIDs {
+            if let illustration = self[illustrationID, as: Illustration.self],
+                let album = self[albumID, as: Album.self] {
+                illustration.addToAlbum(album)
+            }
+        }
+        try? modelContext.save()
+    }
+
     func addIllustration(_ illustration: Illustration, toAlbumWithIdentifier albumID: PersistentIdentifier) {
         if let album = self[albumID, as: Album.self] {
             album.addChildIllustration(illustration)
@@ -139,6 +150,13 @@ actor DataActor: ModelActor {
 
     func removeFromAlbum(_ illustration: Illustration) {
         illustration.containingAlbum = nil
+        try? modelContext.save()
+    }
+
+    func removeFromAlbum(_ illustrations: [Illustration]) {
+        for illustration in illustrations {
+            illustration.containingAlbum = nil
+        }
         try? modelContext.save()
     }
 
