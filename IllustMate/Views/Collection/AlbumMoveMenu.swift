@@ -19,9 +19,7 @@ struct AlbumMoveMenu: View {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
                     await actor.removeFromAlbum(album)
-                    await MainActor.run {
-                        onMoved()
-                    }
+                    onMoved()
                 }
             }
         }
@@ -30,9 +28,7 @@ struct AlbumMoveMenu: View {
                 Task {
                     await actor.addAlbum(withIdentifier: album.persistentModelID,
                                          toAlbumWithIdentifier: parentAlbum.persistentModelID)
-                    await MainActor.run {
-                        onMoved()
-                    }
+                    onMoved()
                 }
             } label: {
                 Label(
@@ -47,9 +43,7 @@ struct AlbumMoveMenu: View {
                     Task {
                         await actor.addAlbum(withIdentifier: album.persistentModelID,
                                              toAlbumWithIdentifier: albumToMoveTo.persistentModelID)
-                        await MainActor.run {
-                            onMoved()
-                        }
+                        onMoved()
                     }
                 } label: {
                     Label(

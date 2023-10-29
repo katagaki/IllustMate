@@ -26,8 +26,12 @@ struct RenameAlbumView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 Button {
-                    album.name = newAlbumName.trimmingCharacters(in: .whitespaces)
-                    dismiss()
+                    Task {
+                        await actor.renameAlbum(withIdentifier: album.persistentModelID, to: newAlbumName)
+                        await MainActor.run {
+                            dismiss()
+                        }
+                    }
                 } label: {
                     Text("Shared.Rename")
                         .bold()

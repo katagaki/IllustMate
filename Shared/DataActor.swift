@@ -49,8 +49,17 @@ actor DataActor: ModelActor {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
-    func createAlbum(_ album: Album) {
-        modelContext.insert(album)
+    func createAlbum(_ albumName: String) -> Album {
+        let newAlbum = Album(name: albumName.trimmingCharacters(in: .whitespaces))
+        modelContext.insert(newAlbum)
+        try? modelContext.save()
+        return newAlbum
+    }
+
+    func renameAlbum(withIdentifier albumID: PersistentIdentifier, to newName: String) {
+        if let album = self[albumID, as: Album.self] {
+            album.name = newName.trimmingCharacters(in: .whitespaces)
+        }
         try? modelContext.save()
     }
 

@@ -27,8 +27,7 @@ struct NewAlbumView: View {
             .safeAreaInset(edge: .bottom) {
                 Button {
                     Task {
-                        let newAlbum = Album(name: newAlbumName.trimmingCharacters(in: .whitespaces))
-                        await actor.createAlbum(newAlbum)
+                        let newAlbum = await actor.createAlbum(newAlbumName)
                         if let albumToAddTo {
                             await actor.addAlbum(withIdentifier: newAlbum.persistentModelID,
                                                  toAlbumWithIdentifier: albumToAddTo.persistentModelID)

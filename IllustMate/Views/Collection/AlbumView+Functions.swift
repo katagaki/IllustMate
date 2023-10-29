@@ -65,7 +65,7 @@ extension AlbumView {
     }
 
     func moveDropToAlbum(_ drop: Drop, to album: Album) {
-        Task(priority: .userInitiated) {
+        Task {
             if let transferable = drop.illustration {
                 await moveIllustrationToAlbum(transferable.id, to: album)
             } else if let transferable = drop.album {
