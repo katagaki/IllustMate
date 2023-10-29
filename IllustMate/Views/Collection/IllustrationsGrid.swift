@@ -61,14 +61,14 @@ struct IllustrationsGrid<Content: View>: View {
                             SelectionOverlay()
                         }
                     }
-//                    .draggable(IllustrationTransferable(id: illustration.id)) {
-//                        if let image = illustration.thumbnail() {
-//                            Image(uiImage: image)
-//                                .resizable()
-//                                .scaledToFill()
-//                                .frame(width: 100.0, height: 100.0)
-//                        }
-//                    }
+                    .draggable(IllustrationTransferable(id: illustration.id)) {
+                        if let image = illustration.thumbnail() {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100.0, height: 100.0)
+                        }
+                    }
                 }
                 .contextMenu {
                     if !isSelecting {
