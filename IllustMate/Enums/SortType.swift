@@ -10,6 +10,6 @@ import Foundation
 enum SortType: String {
     case nameAscending
     case nameDescending
-    case illustrationCountAscending
-    case illustrationCountDescending
+    case sizeAscending
+    case sizeDescending
 }

@@ -51,9 +51,9 @@ struct AlbumView: View {
                         Label("Shared.Sort.Name.Descending", image: "Sort.Name.Descending")
                             .tag(SortType.nameDescending)
                         Label("Shared.Sort.IllustrationCount.Ascending", image: "Sort.Count.Ascending")
-                            .tag(SortType.illustrationCountAscending)
+                            .tag(SortType.sizeAscending)
                         Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
-                            .tag(SortType.illustrationCountDescending)
+                            .tag(SortType.sizeDescending)
                     }
                     Picker("Albums.Style",
                            selection: (isFB13295421Fixed ? $albumStyleState.animation(.snappy.speed(2)) :

@@ -72,9 +72,35 @@ actor DataActor: ModelActor {
         switch sortType {
         case .nameAscending: albums.sorted(by: { $0.name < $1.name })
         case .nameDescending: albums.sorted(by: { $0.name > $1.name })
-        case .illustrationCountAscending: albums.sorted(by: { $0.illustrationCount() < $1.illustrationCount() })
-        case .illustrationCountDescending: albums.sorted(by: { $0.illustrationCount() > $1.illustrationCount() })
+        case .sizeAscending:
+            albums.sorted(by: {
+                objectCount(inAlbumWithID: $0.persistentModelID) <
+                    objectCount(inAlbumWithID: $1.persistentModelID)
+            })
+        case .sizeDescending:
+            albums.sorted(by: {
+                objectCount(inAlbumWithID: $0.persistentModelID) >
+                objectCount(inAlbumWithID: $1.persistentModelID)
+            })
         }
+    }
+
+    func objectCount(inAlbumWithID albumID: ModelID) -> Int {
+        return albumCount(inAlbumWithID: albumID) + illustrationCount(inAlbumWithID: albumID)
+    }
+
+    func albumCount(inAlbumWithID albumID: ModelID) -> Int {
+        let fetchDescriptor = FetchDescriptor<Album>(
+            predicate: #Predicate { $0.parentAlbum?.persistentModelID == albumID })
+        let albumCount = try? modelContext.fetchCount(fetchDescriptor)
+        return albumCount ?? 0
+    }
+
+    func illustrationCount(inAlbumWithID albumID: ModelID) -> Int {
+        let fetchDescriptor = FetchDescriptor<Illustration>(
+            predicate: #Predicate { $0.containingAlbum?.persistentModelID == albumID })
+        let illustrationCount = try? modelContext.fetchCount(fetchDescriptor)
+        return illustrationCount ?? 0
     }
 
     func addAlbum(withID albumID: ModelID,

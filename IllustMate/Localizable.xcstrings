@@ -1919,13 +1919,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort By Illustration Count (Ascending)"
+            "value" : "Sort By Size (Ascending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像数で並べ替える（昇順）"
+            "value" : "アルバムおよび画像数で並べ替える（昇順）"
           }
         }
       }
@@ -1935,13 +1935,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort By Illustration Count (Descending)"
+            "value" : "Sort By Size (Descending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像数で並べ替える（降順）"
+            "value" : "アルバムおよび画像数で並べ替える（降順）"
           }
         }
       }
