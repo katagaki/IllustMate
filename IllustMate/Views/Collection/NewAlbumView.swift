@@ -29,8 +29,8 @@ struct NewAlbumView: View {
                     Task {
                         let newAlbum = await actor.createAlbum(newAlbumName)
                         if let albumToAddTo {
-                            await actor.addAlbum(withIdentifier: newAlbum.persistentModelID,
-                                                 toAlbumWithIdentifier: albumToAddTo.persistentModelID)
+                            await actor.addAlbum(withID: newAlbum.persistentModelID,
+                                                 toAlbumWithID: albumToAddTo.persistentModelID)
                         }
                         dismiss()
                     }

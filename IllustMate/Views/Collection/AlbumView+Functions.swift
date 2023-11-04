@@ -19,7 +19,7 @@ extension AlbumView {
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
             Task {
-                await actor.deleteAlbum(withIdentifier: albumPendingDeletion.persistentModelID)
+                await actor.deleteAlbum(withID: albumPendingDeletion.persistentModelID)
                 await refreshData()
             }
         }
@@ -43,11 +43,11 @@ extension AlbumView {
         Task { [isSelectingIllustrations, selectedIllustrations] in
             if isSelectingIllustrations {
                 for illustration in selectedIllustrations {
-                    await actor.deleteIllustration(withIdentifier: illustration.persistentModelID)
+                    await actor.deleteIllustration(withID: illustration.persistentModelID)
                 }
             } else {
                 if let illustrationPendingDeletion = illustrationPendingDeletion {
-                    await actor.deleteIllustration(withIdentifier: illustrationPendingDeletion.persistentModelID)
+                    await actor.deleteIllustration(withID: illustrationPendingDeletion.persistentModelID)
                 }
             }
             self.selectedIllustrations.removeAll()
@@ -80,24 +80,22 @@ extension AlbumView {
 
     func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
         if let illustration = await actor.illustration(for: illustrationID) {
-            await actor.addIllustration(withIdentifier: illustration.persistentModelID,
-                                        toAlbumWithIdentifier: album.persistentModelID)
+            await actor.addIllustration(withID: illustration.persistentModelID,
+                                        toAlbumWithID: album.persistentModelID)
         }
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
         if let destinationAlbum = await actor.album(for: albumID) {
-            await actor.addAlbum(withIdentifier: destinationAlbum.persistentModelID,
-                                 toAlbumWithIdentifier: album.persistentModelID)
+            await actor.addAlbum(withID: destinationAlbum.persistentModelID,
+                                 toAlbumWithID: album.persistentModelID)
         }
     }
 
     func importPhotoToAlbum(_ photo: Image, to album: Album) async {
         let uiImage = await photo.render()
         if let data = uiImage?.data() {
-            let illustration = Illustration(name: Illustration.newFilename(), data: data)
-            await actor.createIllustration(illustration)
-            await actor.addIllustration(illustration, toAlbumWithIdentifier: album.persistentModelID)
+            await actor.createIllustration(Illustration.newFilename(), data: data)
         }
     }
 

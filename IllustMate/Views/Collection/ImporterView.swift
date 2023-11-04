@@ -112,23 +112,14 @@ struct ImporterView: View {
 
     func importPhotos() {
         UIApplication.shared.isIdleTimerDisabled = true
-        let selectedPhotoItems = selectedPhotoItems
         Task {
-            await withDiscardingTaskGroup { group in
-                for selectedPhotoItem in selectedPhotoItems {
-                    group.addTask {
-                        if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                            let illustration = Illustration(name: Illustration.newFilename(), data: data)
-                            await actor.createIllustration(illustration)
-                            if let selectedAlbum {
-                                await actor.addIllustration(illustration,
-                                                            toAlbumWithIdentifier: selectedAlbum.persistentModelID)
-                            }
-                        }
-                        await MainActor.run {
-                            importCurrentCount += 1
-                        }
-                    }
+            for selectedPhotoItem in selectedPhotoItems {
+                if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
+                    await actor.createIllustration(Illustration.newFilename(), data: data,
+                                                   inAlbumWithID: selectedAlbum?.persistentModelID)
+                }
+                await MainActor.run {
+                    importCurrentCount += 1
                 }
             }
             await MainActor.run {

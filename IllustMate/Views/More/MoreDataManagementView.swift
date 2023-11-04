@@ -182,7 +182,7 @@ struct MoreDataManagementView: View {
             progressAlertManager.show()
             for thumbnail in thumbnails {
                 if thumbnail.illustration == nil {
-                    await actor.deleteThumbnail(withIdentifier: thumbnail.persistentModelID)
+                    await actor.deleteThumbnail(withID: thumbnail.persistentModelID)
                 }
                 await MainActor.run {
                     progressAlertManager.incrementProgress()

@@ -55,7 +55,9 @@ struct AlbumView: View {
                         Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
                             .tag(SortType.illustrationCountDescending)
                     }
-                    Picker("Albums.Style", selection: $albumStyleState.animation(.snappy.speed(2))) {
+                    Picker("Albums.Style",
+                           selection: (isFB13295421Fixed ? $albumStyleState.animation(.snappy.speed(2)) :
+                                        $albumStyleState)) {
                         Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                             .tag(ViewStyle.grid)
                         Label("Albums.Style.List", systemImage: "list.bullet")

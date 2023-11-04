@@ -206,10 +206,6 @@ struct ShareView: View {
     }
 
     func importIllustration(_ name: String, data: Data, to albumID: PersistentIdentifier?) async {
-        let illustration = Illustration(name: name, data: data)
-        await actor.createIllustration(illustration)
-        if let albumID {
-            await actor.addIllustration(illustration, toAlbumWithIdentifier: albumID)
-        }
+        await actor.createIllustration(name, data: data, inAlbumWithID: albumID)
     }
 }

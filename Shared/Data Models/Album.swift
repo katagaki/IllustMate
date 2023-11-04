@@ -61,64 +61,6 @@ final class Album {
         }
     }
 
-    func isInAlbum(_ album: Album?) -> Bool {
-        if let album {
-            return parentAlbum == album
-        } else {
-            return isNotInAnyAlbums()
-        }
-    }
-
-    func isNotInAnyAlbums() -> Bool {
-        parentAlbum == nil
-    }
-
-    func hasAlbums() -> Bool {
-        return !albums().isEmpty
-    }
-
-    func hasIllustrations() -> Bool {
-        return !illustrations().isEmpty
-    }
-
-    func addChildAlbum(_ album: Album) {
-        childAlbums?.append(album)
-    }
-
-    func addChildAlbums(_ albums: [Album]) {
-        albums.forEach { album in
-            addChildAlbum(album)
-        }
-    }
-
-    func addChildIllustration(_ illustration: Illustration) {
-        childIllustrations?.append(illustration)
-    }
-
-    func addChildIllustrations(_ illustrations: [Illustration]) {
-        for illustration in illustrations {
-            addChildIllustration(illustration)
-        }
-    }
-
-    func removeFromAlbum() {
-        parentAlbum?.removeAlbum(self)
-    }
-
-    func removeAlbum(_ album: Album) {
-        childAlbums?.removeAll(where: { $0.id == album.id })
-    }
-
-    func removeChildIllustration(_ illustration: Illustration) {
-        childIllustrations?.removeAll(where: { $0.id == illustration.id })
-    }
-
-    func removeChildIllustration(_ illustrations: [Illustration]) {
-        illustrations.forEach { illustration in
-            removeChildIllustration(illustration)
-        }
-    }
-
     static func makeCover(_ data: Data?) -> Data? {
         if let data, let sourceImage = UIImage(data: data) {
             return sourceImage.jpegThumbnail(of: 160.0)

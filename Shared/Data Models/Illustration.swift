@@ -37,21 +37,6 @@ final class Illustration {
         return cachedThumbnail?.image()
     }
 
-    func isInAlbum(_ album: Album?) -> Bool {
-        if let album {
-            return containingAlbum?.id ?? "" == album.id
-        }
-        return true
-    }
-
-    func addToAlbum(_ album: Album) {
-        containingAlbum = album
-    }
-
-    func removeFromAlbum() {
-        containingAlbum?.removeChildIllustration(self)
-    }
-
     func generateThumbnail() {
         if let data = try? Data(contentsOf: URL(filePath: illustrationPath())),
            let thumbnailData = Illustration.makeThumbnail(data) {

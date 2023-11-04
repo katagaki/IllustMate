@@ -27,7 +27,7 @@ struct RenameAlbumView: View {
             .safeAreaInset(edge: .bottom) {
                 Button {
                     Task {
-                        await actor.renameAlbum(withIdentifier: album.persistentModelID, to: newAlbumName)
+                        await actor.renameAlbum(withID: album.persistentModelID, to: newAlbumName)
                         await MainActor.run {
                             dismiss()
                         }

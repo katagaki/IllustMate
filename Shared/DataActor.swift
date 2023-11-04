@@ -14,6 +14,8 @@ actor DataActor: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
 
+    typealias ModelID = PersistentIdentifier
+
     init(modelContainer: ModelContainer) {
         self.modelContainer = modelContainer
         let context = ModelContext(modelContainer)
@@ -21,8 +23,11 @@ actor DataActor: ModelActor {
     }
 
     func save() {
+        modelContext.processPendingChanges()
         try? modelContext.save()
     }
+
+    // MARK: Albums
 
     func albums(sortedBy sortType: SortType) throws -> [Album] {
         var fetchDescriptor = FetchDescriptor<Album>()
@@ -52,15 +57,15 @@ actor DataActor: ModelActor {
     func createAlbum(_ albumName: String) -> Album {
         let newAlbum = Album(name: albumName.trimmingCharacters(in: .whitespaces))
         modelContext.insert(newAlbum)
-        try? modelContext.save()
+        save()
         return newAlbum
     }
 
-    func renameAlbum(withIdentifier albumID: PersistentIdentifier, to newName: String) {
+    func renameAlbum(withID albumID: ModelID, to newName: String) {
         if let album = self[albumID, as: Album.self] {
             album.name = newName.trimmingCharacters(in: .whitespaces)
         }
-        try? modelContext.save()
+        save()
     }
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
@@ -72,32 +77,36 @@ actor DataActor: ModelActor {
         }
     }
 
-    func addAlbum(withIdentifier albumID: PersistentIdentifier,
-                  toAlbumWithIdentifier destinationAlbumID: PersistentIdentifier) {
+    func addAlbum(withID albumID: ModelID,
+                  toAlbumWithID destinationAlbumID: ModelID) {
         if let album = self[albumID, as: Album.self],
             let destinationAlbum = self[destinationAlbumID, as: Album.self] {
-            destinationAlbum.addChildAlbum(album)
+            destinationAlbum.childAlbums?.append(album)
         }
-        try? modelContext.save()
+        save()
     }
 
-    func removeFromAlbum(_ album: Album) {
-        album.parentAlbum?.removeAlbum(album)
-        try? modelContext.save()
+    func removeParentAlbum(forAlbumWithidentifier albumID: ModelID) {
+        if let album = self[albumID, as: Album.self] {
+            album.parentAlbum?.childAlbums?.removeAll(where: { $0.id == album.id })
+            save()
+        }
     }
 
-    func deleteAlbum(withIdentifier albumID: PersistentIdentifier) {
+    func deleteAlbum(withID albumID: ModelID) {
         if let album = self[albumID, as: Album.self] {
             if let parentAlbum = album.parentAlbum {
                 for illustration in album.illustrations() {
-                    addIllustration(withIdentifier: illustration.persistentModelID,
-                                    toAlbumWithIdentifier: parentAlbum.persistentModelID)
+                    addIllustration(withID: illustration.persistentModelID,
+                                    toAlbumWithID: parentAlbum.persistentModelID)
                 }
             }
             modelContext.delete(album)
-            try? modelContext.save()
+            save()
         }
     }
+
+    // MARK: Illustrations
 
     func illustrations() throws -> [Illustration] {
         var fetchDescriptor = FetchDescriptor<Illustration>(
@@ -124,23 +133,17 @@ actor DataActor: ModelActor {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
-    func createIllustration(_ illustration: Illustration) {
+    func createIllustration(_ name: String, data: Data, inAlbumWithID albumID: ModelID? = nil) {
+        let illustration = Illustration(name: name, data: data)
         modelContext.insert(illustration)
         illustration.generateThumbnail()
-        try? modelContext.save()
-    }
-
-    func addIllustration(withIdentifier illustrationID: PersistentIdentifier,
-                         toAlbumWithIdentifier albumID: PersistentIdentifier) {
-        if let illustration = self[illustrationID, as: Illustration.self],
-            let album = self[albumID, as: Album.self] {
-            illustration.addToAlbum(album)
+        if let albumID, let album = self[albumID, as: Album.self] {
+            album.childIllustrations?.append(illustration)
         }
-        try? modelContext.save()
+        save()
     }
 
-    func addIllustrations(withIdentifiers illustrationIDs: [PersistentIdentifier],
-                          toAlbumWithIdentifier albumID: PersistentIdentifier) {
+    func addIllustrations(withIDs illustrationIDs: [ModelID], toAlbumWithID albumID: ModelID) {
         if let album = self[albumID, as: Album.self] {
             var illustrations: [Illustration] = []
             for illustrationID in illustrationIDs {
@@ -148,43 +151,48 @@ actor DataActor: ModelActor {
                     illustrations.append(illustration)
                 }
             }
-            album.addChildIllustrations(illustrations)
+            album.childIllustrations?.append(contentsOf: illustrations)
         }
-        try? modelContext.save()
+        save()
     }
 
-    func addIllustration(_ illustration: Illustration, toAlbumWithIdentifier albumID: PersistentIdentifier) {
-        if let album = self[albumID, as: Album.self] {
-            album.addChildIllustration(illustration)
+    func addIllustration(withID illustrationID: ModelID, toAlbumWithID albumID: ModelID) {
+        if let illustration = self[illustrationID, as: Illustration.self],
+            let album = self[albumID, as: Album.self] {
+            album.childIllustrations?.append(illustration)
         }
-        try? modelContext.save()
+        save()
     }
 
-    func removeFromAlbum(_ illustration: Illustration) {
-        illustration.containingAlbum?.removeChildIllustration(illustration)
-        try? modelContext.save()
+    func removeParentAlbum(forIllustrationWithID illustrationID: ModelID) {
+        if let illustration = self[illustrationID, as: Illustration.self] {
+            illustration.containingAlbum?.childIllustrations?
+                .removeAll(where: { $0.id == illustration.id })
+            save()
+        }
     }
 
-    func removeFromAlbum(_ illustrations: [Illustration]) {
-        for illustration in illustrations {
-            if let containingAlbum = illustration.containingAlbum {
-                containingAlbum.removeChildIllustration(illustration)
+    func removeParentAlbum(forIllustrationsWithIDs illustrationIDs: [ModelID]) {
+        for illustrationID in illustrationIDs {
+            if let illustration = self[illustrationID, as: Illustration.self] {
+                illustration.containingAlbum?.childIllustrations?
+                    .removeAll(where: { $0.id == illustration.id })
             }
         }
-        try? modelContext.save()
+        save()
     }
 
-    func setAsAlbumCover(for illustrationID: PersistentIdentifier) {
+    func setAsAlbumCover(for illustrationID: ModelID) {
         if let illustration = self[illustrationID, as: Illustration.self] {
             let image = UIImage(contentsOfFile: illustration.illustrationPath())
             if let data = image?.jpegData(compressionQuality: 1.0), let containingAlbum = illustration.containingAlbum {
                 containingAlbum.coverPhoto = Album.makeCover(data)
-                try? modelContext.save()
+                save()
             }
         }
     }
 
-    func deleteIllustration(withIdentifier illustrationID: PersistentIdentifier) {
+    func deleteIllustration(withID illustrationID: ModelID) {
         @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
         if let illustration = self[illustrationID, as: Illustration.self] {
             if !deleteWithoutFile {
@@ -195,7 +203,7 @@ actor DataActor: ModelActor {
             }
             modelContext.delete(illustration)
         }
-        try? modelContext.save()
+        save()
     }
 
     func thumbnails() throws -> [Thumbnail] {
@@ -207,14 +215,14 @@ actor DataActor: ModelActor {
         for thumbnail in ((try? thumbnails()) ?? []) {
             modelContext.delete(thumbnail)
         }
-        try? modelContext.save()
+        save()
     }
 
-    func deleteThumbnail(withIdentifier thumbnailID: PersistentIdentifier) {
+    func deleteThumbnail(withID thumbnailID: ModelID) {
         if let thumbnail = self[thumbnailID, as: Thumbnail.self] {
             modelContext.delete(thumbnail)
         }
-        try? modelContext.save()
+        save()
     }
 
     func deleteAll() {
@@ -234,6 +242,6 @@ actor DataActor: ModelActor {
         } catch {
             debugPrint(error.localizedDescription)
         }
-        try? modelContext.save()
+        save()
     }
 }

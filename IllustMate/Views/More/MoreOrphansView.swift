@@ -116,8 +116,7 @@ struct MoreOrphansView: View {
 
     func importIllustration(_ name: String, data: Data) {
         Task {
-            let illustration = Illustration(name: name, data: data)
-            await actor.createIllustration(illustration)
+            await actor.createIllustration(name, data: data)
         }
     }
 }
