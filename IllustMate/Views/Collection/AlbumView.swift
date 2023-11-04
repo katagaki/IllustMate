@@ -241,7 +241,7 @@ struct AlbumView: View {
             } else {
                 albumStyleState = albumStyle
                 albumSortState = albumSort
-                Task {
+                Task.detached(priority: .userInitiated) {
                     await refreshData()
                 }
             }
@@ -260,7 +260,7 @@ struct AlbumView: View {
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
-                Task {
+                Task.detached(priority: .userInitiated) {
                     await refreshData()
                 }
             }
