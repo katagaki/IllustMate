@@ -209,9 +209,10 @@ actor DataActor: ModelActor {
     }
 
     func setAsAlbumCover(for illustrationID: ModelID) {
-        if let illustration = self[illustrationID, as: Illustration.self] {
+        if let illustration = self[illustrationID, as: Illustration.self],
+           let containingAlbum = illustration.containingAlbum {
             let image = UIImage(contentsOfFile: illustration.illustrationPath())
-            if let data = image?.jpegData(compressionQuality: 1.0), let containingAlbum = illustration.containingAlbum {
+            if let data = image?.jpegData(compressionQuality: 1.0) {
                 containingAlbum.coverPhoto = Album.makeCover(data)
                 save()
             }
