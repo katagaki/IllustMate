@@ -40,9 +40,16 @@ struct MoreFileManagementView: View {
                 Button("More.FileManagement.ShowOrphanedFiles") {
                     showOrphans()
                 }
+            }
+            Section {
                 Button("More.FileManagement.FindDuplicates") {
                     Task {
                         await findDuplicates()
+                    }
+                }
+                Button("More.FileManagement.FindReorphans") {
+                    Task {
+                        await findReorphans()
                     }
                 }
             }
@@ -227,6 +234,40 @@ struct MoreFileManagementView: View {
             }
             if albumsWithDuplicates != "" {
                 progressAlertManager.title = "More.FileManagement.Duplicates.Found.\(albumsWithDuplicates)"
+                try? await Task.sleep(nanoseconds: 3000000000)
+                await MainActor.run {
+                    progressAlertManager.hide()
+                }
+            } else {
+                progressAlertManager.hide()
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    func findReorphans() async {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let illustrations = try await actor.illustrations()
+            var albumsWithReorphans = ""
+            progressAlertManager.prepare("More.FileManagement.Reorphans.Scanning", total: illustrations.count)
+            progressAlertManager.show()
+            for illustration in illustrations {
+                if !FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
+                    albumsWithReorphans += "\n\(illustration.containingAlbum?.name ?? "")"
+                }
+                await MainActor.run {
+                    progressAlertManager.incrementProgress()
+                }
+            }
+            if albumsWithReorphans != "" {
+                progressAlertManager.title = "More.FileManagement.Reorphans.Found.\(albumsWithReorphans)"
+                try? await Task.sleep(nanoseconds: 3000000000)
+                await MainActor.run {
+                    progressAlertManager.hide()
+                }
             } else {
                 progressAlertManager.hide()
             }

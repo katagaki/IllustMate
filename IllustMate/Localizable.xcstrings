@@ -1121,6 +1121,16 @@
         }
       }
     },
+    "More.FileManagement.FindReorphans" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Pictures with Missing Files"
+          }
+        }
+      }
+    },
     "More.FileManagement.Orphans.Moving" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1202,6 +1212,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのサムネイルをダウンロード"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Reorphans.Found.%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures were found in the following album(s) without a file:\n%@"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Reorphans.Scanning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for missing files..."
           }
         }
       }
