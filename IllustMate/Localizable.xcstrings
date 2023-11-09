@@ -1104,6 +1104,23 @@
         }
       }
     },
+    "More.FileManagement.FindDuplicates" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Duplicates"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複画像を確認"
+          }
+        }
+      }
+    },
     "More.FileManagement.Orphans.Moving" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1185,22 +1202,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのサムネイルをダウンロード"
-          }
-        }
-      }
-    },
-    "More.FileManagement.RemoveDuplicates" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check for Duplicates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重複画像を確認"
           }
         }
       }

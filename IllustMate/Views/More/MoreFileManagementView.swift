@@ -40,9 +40,9 @@ struct MoreFileManagementView: View {
                 Button("More.FileManagement.ShowOrphanedFiles") {
                     showOrphans()
                 }
-                Button("More.FileManagement.RemoveDuplicates") {
+                Button("More.FileManagement.FindDuplicates") {
                     Task {
-                        await removeDuplicates()
+                        await findDuplicates()
                     }
                 }
             }
@@ -209,7 +209,7 @@ struct MoreFileManagementView: View {
         }
     }
 
-    func removeDuplicates() async {
+    func findDuplicates() async {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try await actor.illustrations()
@@ -220,6 +220,9 @@ struct MoreFileManagementView: View {
                 let illustrationsFound = illustrations.filter({ $0.id == illustration.id })
                 if illustrationsFound.count > 1 {
                     albumsWithDuplicates += "\n\(illustration.containingAlbum?.name ?? "")"
+                }
+                await MainActor.run {
+                    progressAlertManager.incrementProgress()
                 }
             }
             if albumsWithDuplicates != "" {
