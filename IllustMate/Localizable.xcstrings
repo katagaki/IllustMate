@@ -1040,6 +1040,38 @@
         }
       }
     },
+    "More.FileManagement.Duplicates.Found.%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate pictures were found in the following album(s):\n%@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以下のアルバムに重複した画像が検出されました：\n%@"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Duplicates.Scanning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for duplicates..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複画像を確認中…"
+          }
+        }
+      }
+    },
     "More.FileManagement.Export" : {
       "localizations" : {
         "en" : {
@@ -1153,6 +1185,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのサムネイルをダウンロード"
+          }
+        }
+      }
+    },
+    "More.FileManagement.RemoveDuplicates" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Duplicates"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複画像を確認"
           }
         }
       }

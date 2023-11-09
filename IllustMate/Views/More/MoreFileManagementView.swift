@@ -40,6 +40,11 @@ struct MoreFileManagementView: View {
                 Button("More.FileManagement.ShowOrphanedFiles") {
                     showOrphans()
                 }
+                Button("More.FileManagement.RemoveDuplicates") {
+                    Task {
+                        await removeDuplicates()
+                    }
+                }
             }
             Section {
                 Button("More.FileManagement.RedownloadIllustrations") {
@@ -202,6 +207,30 @@ struct MoreFileManagementView: View {
             }
             navigationManager.push(ViewPath.moreOrphans(orphans: orphans), for: .more)
         }
+    }
+
+    func removeDuplicates() async {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let illustrations = try await actor.illustrations()
+            var albumsWithDuplicates = ""
+            progressAlertManager.prepare("More.FileManagement.Duplicates.Scanning", total: illustrations.count)
+            progressAlertManager.show()
+            for illustration in illustrations {
+                let illustrationsFound = illustrations.filter({ $0.id == illustration.id })
+                if illustrationsFound.count > 1 {
+                    albumsWithDuplicates += "\n\(illustration.containingAlbum?.name ?? "")"
+                }
+            }
+            if albumsWithDuplicates != "" {
+                progressAlertManager.title = "More.FileManagement.Duplicates.Found.\(albumsWithDuplicates)"
+            } else {
+                progressAlertManager.hide()
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func redownloadIllustrations() async {
