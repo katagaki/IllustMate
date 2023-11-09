@@ -13,10 +13,24 @@ struct MoreFileManagementView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
+    let queue: OperationQueue
     @State var showOrphanedFilesViewFlag: Bool = false
+
+    init() {
+        queue = OperationQueue()
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = 8
+    }
 
     var body: some View {
         List {
+            Section {
+                Button("More.FileManagement.Export") {
+                    Task {
+                        await exportData()
+                    }
+                }
+            }
             Section {
                 Button("More.FileManagement.ScanAndMoveOrphans") {
                     Task {
@@ -40,6 +54,86 @@ struct MoreFileManagementView: View {
         }
         .navigationTitle("ViewTitle.FileManagement")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    func exportData() async {
+        UIApplication.shared.isIdleTimerDisabled = true
+        do {
+            let albums = try await actor.albums(sortedBy: .nameAscending)
+            let illustrationsWithNoParentAlbum = try await actor.illustrations(in: nil, order: .reverse)
+            let illustrationCount = await actor.illustrationCount()
+            progressAlertManager.prepare("More.FileManagement.Exporting", total: illustrationCount)
+            progressAlertManager.show()
+            if !directoryExistsAtPath(exportsFolder) {
+                try? FileManager.default.createDirectory(at: exportsFolder, withIntermediateDirectories: false)
+            } else {
+                try? FileManager.default.removeItem(at: exportsFolder)
+                try? FileManager.default.createDirectory(at: exportsFolder, withIntermediateDirectories: false)
+            }
+            for illustration in illustrationsWithNoParentAlbum {
+                await exportIllustration(illustration: illustration, to: exportsFolder)
+            }
+            for album in albums {
+                await exportAlbum(album: album, to: exportsFolder)
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    func exportAlbum(album: Album, to exportFolderURL: URL) async {
+        let albumFolderURL = exportFolderURL.appending(path: album.name)
+        if !directoryExistsAtPath(albumFolderURL) {
+            try? FileManager.default.createDirectory(at: albumFolderURL, withIntermediateDirectories: false)
+        }
+        do {
+            let childIllustrations = try await actor.illustrations(in: album, order: .reverse)
+            for childIllustration in childIllustrations {
+                await exportIllustration(illustration: childIllustration, to: albumFolderURL)
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+        do {
+            let childAlbums = try await actor.albums(in: album, sortedBy: .nameAscending)
+            for childAlbum in childAlbums {
+                await exportAlbum(album: childAlbum, to: albumFolderURL)
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+    }
+
+    func exportIllustration(illustration: Illustration, to exportFolderURL: URL) async {
+        let intent = NSFileAccessIntent.readingIntent(with: URL(filePath: illustration.illustrationPath()))
+        let coordinator = NSFileCoordinator()
+        coordinator.coordinate(with: [intent], queue: queue) { error in
+            if let error {
+                debugPrint(error.localizedDescription)
+            } else {
+                var filename: URL = exportFolderURL.appending(component: illustration.name)
+                if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                    if image.pngData() != nil {
+                        filename = filename.appendingPathExtension("png")
+                    } else if image.jpegData(compressionQuality: 0.1) != nil {
+                        filename = filename.appendingPathExtension("jpg")
+                    } else if image.heicData() != nil {
+                        filename = filename.appendingPathExtension("heic")
+                    }
+                    try? FileManager.default.copyItem(atPath: illustration.illustrationPath(),
+                                                      toPath: filename.path(percentEncoded: false))
+                }
+                Task {
+                    await MainActor.run {
+                        progressAlertManager.incrementProgress()
+                        if progressAlertManager.percentage == 100 {
+                            progressAlertManager.hide()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     func scanAndMoveOrphans() async {

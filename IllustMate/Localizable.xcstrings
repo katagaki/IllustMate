@@ -1040,6 +1040,38 @@
         }
       }
     },
+    "More.FileManagement.Export" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export As Files & Folders"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルおよびフォルダーとして書き出す"
+          }
+        }
+      }
+    },
+    "More.FileManagement.Exporting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporting..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書き出し中…"
+          }
+        }
+      }
+    },
     "More.FileManagement.Orphans.Moving" : {
       "extractionState" : "manual",
       "localizations" : {

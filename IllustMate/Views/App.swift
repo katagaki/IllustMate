@@ -74,16 +74,4 @@ struct IllustMateApp: App {
         .defaultSize(CGSize(width: 880.0, height: 680.0))
 #endif
     }
-
-    func createIfNotExists(_ url: URL?) {
-        if let url, !directoryExistsAtPath(url) {
-            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
-        }
-    }
-
-    func directoryExistsAtPath(_ url: URL) -> Bool {
-        var isDirectory: ObjCBool = true
-        let exists = FileManager.default.fileExists(atPath: url.path(percentEncoded: false), isDirectory: &isDirectory)
-        return exists && isDirectory.boolValue
-    }
 }

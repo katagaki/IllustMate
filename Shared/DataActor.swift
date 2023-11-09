@@ -96,6 +96,12 @@ actor DataActor: ModelActor {
         return albumCount ?? 0
     }
 
+    func illustrationCount() -> Int {
+        let fetchDescriptor = FetchDescriptor<Illustration>()
+        let illustrationCount = try? modelContext.fetchCount(fetchDescriptor)
+        return illustrationCount ?? 0
+    }
+
     func illustrationCount(inAlbumWithID albumID: ModelID) -> Int {
         let fetchDescriptor = FetchDescriptor<Illustration>(
             predicate: #Predicate { $0.containingAlbum?.persistentModelID == albumID })
