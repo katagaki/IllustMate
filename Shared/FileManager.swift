@@ -12,7 +12,8 @@ let documentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?
                    FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 let illustrationsFolder = documentsURL.appendingPathComponent("Illustrations")
 let orphansFolder = documentsURL.appendingPathComponent("Orphans")
-let exportsFolder = documentsURL.appendingPathComponent("Export")
+let exportsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+                        .first!.appendingPathComponent("Export")
 
 func createIfNotExists(_ url: URL?) {
     if let url, !directoryExistsAtPath(url) {
