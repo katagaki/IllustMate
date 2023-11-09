@@ -79,7 +79,6 @@ struct MoreFileManagementView: View {
         } catch {
             debugPrint(error.localizedDescription)
         }
-        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func exportAlbum(album: Album, to exportFolderURL: URL) async {
@@ -129,6 +128,7 @@ struct MoreFileManagementView: View {
                         progressAlertManager.incrementProgress()
                         if progressAlertManager.percentage == 100 {
                             progressAlertManager.hide()
+                            UIApplication.shared.isIdleTimerDisabled = false
                         }
                     }
                 }
