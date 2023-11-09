@@ -59,7 +59,7 @@ struct MoreFileManagementView: View {
     func exportData() async {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
-            let albums = try await actor.albums(sortedBy: .nameAscending)
+            let albums = try await actor.albums(in: nil, sortedBy: .nameAscending)
             let illustrationsWithNoParentAlbum = try await actor.illustrations(in: nil, order: .reverse)
             let illustrationCount = await actor.illustrationCount()
             progressAlertManager.prepare("More.FileManagement.Exporting", total: illustrationCount)
