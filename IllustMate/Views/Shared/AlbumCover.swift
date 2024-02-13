@@ -92,7 +92,7 @@ struct AlbumCover: View {
                         .frame(width: metrics.size.width * 0.95, height: metrics.size.height * 0.485)
                     }
                     .offset(y: metrics.size.height * 0.47 / 2)
-                    .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: -metrics.size.height * 0.04)
+                    .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: -metrics.size.height * 0.04)
                 }
             }
             .toggledTransition(.opacity.animation(.snappy.speed(2)))
