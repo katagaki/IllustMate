@@ -1116,7 +1116,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ファイルおよびフォルダーとして書き出す"
+            "value" : "ファイルとフォルダーとして書き出す"
           }
         }
       }
