@@ -13,8 +13,6 @@ enum ViewPath: Hashable {
     case illustrations
     case album(album: Album)
     case more
-    case moreDataManagement
-    case moreFileManagement
     case moreAppIcon
     case moreDebug
     case moreOrphans(orphans: [String])

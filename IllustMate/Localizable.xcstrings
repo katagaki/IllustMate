@@ -373,123 +373,6 @@
         }
       }
     },
-    "Experiments.Section.Animations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Animations"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アニメーション"
-          }
-        }
-      }
-    },
-    "Experiments.Section.Cloud" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud"
-          }
-        }
-      }
-    },
-    "Experiments.Section.DangerZone" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Danger Zone"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "危険区域"
-          }
-        }
-      }
-    },
-    "Experiments.Section.Data" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ"
-          }
-        }
-      }
-    },
-    "Experiments.Section.Filesystem" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル"
-          }
-        }
-      }
-    },
-    "Experiments.ShowAdvancedFileOptions" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Advanced File Options"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高度ファイルオプションを表示"
-          }
-        }
-      }
-    },
-    "Experiments.ShowAdvancedThumbnailOptions" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Advanced Thumbnail Options"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高度サムネイルオプションを表示"
-          }
-        }
-      }
-    },
     "Experiments.ShowCloudStatusEverywhere" : {
       "localizations" : {
         "en" : {
@@ -502,22 +385,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クラウド同期状況を常に表示"
-          }
-        }
-      }
-    },
-    "Experiments.ShowNamingOptions" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Naming Options"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像名オプションを表示"
           }
         }
       }
@@ -892,121 +759,6 @@
         }
       }
     },
-    "More.DataManagement" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ管理"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RebuildThumbnails" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recreate All Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのサムネイルを再生成"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RebuildThumbnails.Rebuilding" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recreating thumbnails..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルを再生成中…"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RestoreImageNames" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restore Picture Names"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像名を復元"
-          }
-        }
-      }
-    },
-    "More.DataManagement.RestoreImageNames.Renaming" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restoring picture names..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像名を復元中…"
-          }
-        }
-      }
-    },
-    "More.DataManagement.UnorphanThumbnails" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove Orphaned Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したサムネイルを削除"
-          }
-        }
-      }
-    },
-    "More.DataManagement.UnorphanThumbnails.Unorphaning" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Removing orphaned thumbnails..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したサムネイルを削除中…"
-          }
-        }
-      }
-    },
     "More.Debug" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1056,56 +808,8 @@
         }
       }
     },
-    "More.FileManagement" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル管理"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Duplicates.Found.%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duplicate pictures were found in the following album(s):\n%@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "以下のアルバムに重複した画像が検出されました：\n%@"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Duplicates.Scanning" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for duplicates..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重複画像を確認中…"
-          }
-        }
-      }
-    },
     "More.FileManagement.Export" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1122,6 +826,7 @@
       }
     },
     "More.FileManagement.Exporting" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1133,205 +838,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "書き出し中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.FindDuplicates" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check for Duplicates"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重複画像を確認"
-          }
-        }
-      }
-    },
-    "More.FileManagement.FindReorphans" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check for Pictures with Missing Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルの一貫性を確認"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Orphans.Moving" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moving orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを移動中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Orphans.Scanning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.RedownloadIllustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download All Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての画像をダウンロード"
-          }
-        }
-      }
-    },
-    "More.FileManagement.RedownloadIllustrations.Redownloading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sending picture download requests..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像のダウンロード要求を送信中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.RedownloadThumbnails" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download All Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのサムネイルをダウンロード"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Reorphans.Found.%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pictures were found in the following album(s) without a file:\n%@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下記のアルバム内にファイルの存在しない画像を検出しました：\n%@"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Reorphans.Scanning" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for missing files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルの一貫性を確認中…"
-          }
-        }
-      }
-    },
-    "More.FileManagement.ScanAndMoveOrphans" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan and Move Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを移動"
-          }
-        }
-      }
-    },
-    "More.FileManagement.ShowOrphanedFiles" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを表示"
-          }
-        }
-      }
-    },
-    "More.General" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "General"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一般"
           }
         }
       }
@@ -1467,6 +973,40 @@
         }
       }
     },
+    "More.Troubleshooting.CheckConsistency" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check File Consistency"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルの一貫性を確認"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.DataManagement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ管理"
+          }
+        }
+      }
+    },
     "More.Troubleshooting.DeleteAll" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1480,6 +1020,312 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのデータを消去"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Duplicates.Found.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate pictures were found in the following album(s):\n%@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以下のアルバムに重複した画像が検出されました：\n%@"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Duplicates.Scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for duplicates..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複画像を確認中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.FileManagement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル管理"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Orphans.Moving" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを移動中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Orphans.Scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for orphaned files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを確認中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Portability" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Portability"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ移行"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RebuildThumbnails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recreate All Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのサムネイルを再生成"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RebuildThumbnails.Rebuilding" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recreating thumbnails..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルを再生成中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RedownloadIllustrations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download All Pictures"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての画像をダウンロード"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RedownloadIllustrations.Redownloading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending picture download requests..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像のダウンロード要求を送信中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RedownloadThumbnails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download All Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのサムネイルをダウンロード"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Reorphans.Found.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pictures were found in the following album(s) without a file:\n%@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下記のアルバム内にファイルの存在しない画像を検出しました：\n%@"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.Reorphans.Scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanning for missing files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルの一貫性を確認中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RestoreImageNames" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Picture Names"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像名を復元"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.RestoreImageNames.Renaming" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring picture names..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像名を復元中…"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.ShowOrphanedFiles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Orphaned Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したファイルを表示"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.UnorphanThumbnails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Orphaned Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したサムネイルを削除"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.UnorphanThumbnails.Unorphaning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removing orphaned thumbnails..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "孤立したサムネイルを削除中…"
           }
         }
       }
@@ -2306,23 +2152,6 @@
         }
       }
     },
-    "ViewTitle.DataManagement" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ管理"
-          }
-        }
-      }
-    },
     "ViewTitle.Debug" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2336,23 +2165,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ラボ"
-          }
-        }
-      }
-    },
-    "ViewTitle.FileManagement" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル管理"
           }
         }
       }

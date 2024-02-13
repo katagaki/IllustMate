@@ -11,10 +11,7 @@ import SwiftUI
 struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
-    @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
-    @AppStorage(wrappedValue: false, "DebugNamingTools") var showNamingOptions: Bool
-    @AppStorage(wrappedValue: false, "DebugAdvancedFiles") var showAdvancedFileOptions: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
     @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
@@ -43,36 +40,10 @@ struct MoreExperimentsView: View {
             }
             Section {
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.Cloud")
-                    .font(.body)
-            }
-            Section {
-                Toggle("Experiments.ShowAdvancedThumbnailOptions", isOn: $showAdvancedThumbnailOptions)
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
-                Toggle("Experiments.ShowNamingOptions", isOn: $showNamingOptions)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.Data")
-                    .font(.body)
-            }
-            Section {
-                Toggle("Experiments.ShowAdvancedFileOptions", isOn: $showAdvancedFileOptions)
                 Toggle("Experiments.DeleteIllustrationWithoutFile", isOn: $deleteWithoutFile)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.Filesystem")
-                    .font(.body)
-            }
-            Section {
                 Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.Animations")
-                    .font(.body)
-            }
-            Section {
                 Toggle("Experiments.ButterItUp", isOn: $butterItUp)
-            } header: {
-                ListSectionHeader(text: "Experiments.Section.DangerZone")
-                    .font(.body)
             }
         }
         .navigationTitle("ViewTitle.Debug")

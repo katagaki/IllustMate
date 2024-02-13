@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		E43DFB222AD685E0002A6317 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E43DFB212AD685E0002A6317 /* Assets.xcassets */; };
-		E43DFB252AD69D95002A6317 /* MoreFileManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */; };
 		E43DFB2A2AD7804A002A6317 /* Drop.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB282AD77D74002A6317 /* Drop.swift */; };
 		E43DFB2C2AD78220002A6317 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB2B2AD78220002A6317 /* SwiftData.swift */; };
 		E43DFB2D2AD78224002A6317 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43DFB2B2AD78220002A6317 /* SwiftData.swift */; };
@@ -101,7 +100,6 @@
 		E4E892392AD3CA34005C9DBD /* ProgressAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */; };
 		E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */; };
 		E4E8923D2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */; };
-		E4E8923F2AD3DF6F005C9DBD /* MoreDataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E8923E2AD3DF6F005C9DBD /* MoreDataManagementView.swift */; };
 		E4E892432AD45DD6005C9DBD /* OptionalImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E892422AD45DD6005C9DBD /* OptionalImage.swift */; };
 /* End PBXBuildFile section */
 
@@ -131,7 +129,6 @@
 
 /* Begin PBXFileReference section */
 		E43DFB212AD685E0002A6317 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreFileManagementView.swift; sourceTree = "<group>"; };
 		E43DFB282AD77D74002A6317 /* Drop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drop.swift; sourceTree = "<group>"; };
 		E43DFB2B2AD78220002A6317 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E43DFB2E2AD82923002A6317 /* ConcurrencyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrencyManager.swift; sourceTree = "<group>"; };
@@ -205,7 +202,6 @@
 		E4E892382AD3CA34005C9DBD /* ProgressAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressAlertManager.swift; sourceTree = "<group>"; };
 		E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreOrphansView.swift; sourceTree = "<group>"; };
 		E4E8923C2AD3CFD5005C9DBD /* MoreTroubleshootingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTroubleshootingView.swift; sourceTree = "<group>"; };
-		E4E8923E2AD3DF6F005C9DBD /* MoreDataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDataManagementView.swift; sourceTree = "<group>"; };
 		E4E892422AD45DD6005C9DBD /* OptionalImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -447,8 +443,6 @@
 			isa = PBXGroup;
 			children = (
 				E4614D232ACB048000D751FB /* MoreView.swift */,
-				E4E8923E2AD3DF6F005C9DBD /* MoreDataManagementView.swift */,
-				E43DFB232AD69D31002A6317 /* MoreFileManagementView.swift */,
 				E4E8923A2AD3CEE6005C9DBD /* MoreOrphansView.swift */,
 				E4C834C52ADFB2C30056D47A /* MoreAppIconView.swift */,
 				E4E892312AD2F3C3005C9DBD /* MoreExperimentsView.swift */,
@@ -599,7 +593,6 @@
 				E4614D242ACB048000D751FB /* MoreView.swift in Sources */,
 				E4E892352AD31058005C9DBD /* IllustrationMoveMenu.swift in Sources */,
 				E4C834BA2ADEE42B0056D47A /* DataActor.swift in Sources */,
-				E4E8923F2AD3DF6F005C9DBD /* MoreDataManagementView.swift in Sources */,
 				E47162DE2AEC1D540065E9B1 /* View.swift in Sources */,
 				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
@@ -626,7 +619,6 @@
 				E43DFB302AD82A20002A6317 /* ConcurrencyManager.swift in Sources */,
 				E4E892322AD2F3C3005C9DBD /* MoreExperimentsView.swift in Sources */,
 				E45A8BCC2AD0332000E3035E /* SectionHeader.swift in Sources */,
-				E43DFB252AD69D95002A6317 /* MoreFileManagementView.swift in Sources */,
 				E49E363F2AE0FEB6005001B2 /* Animations.swift in Sources */,
 				E4614D482ACB46D700D751FB /* ProgressAlert.swift in Sources */,
 				E4614D1E2ACAF8C100D751FB /* NewAlbumView.swift in Sources */,
