@@ -62,6 +62,7 @@ struct IllustrationViewer: View {
                 .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                 .zIndex(1)
                 .toggledMatchedGeometryEffect(id: illustration.id, in: namespace)
+                .id(illustration.id)
                 .offset(displayOffset)
                 .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
             Spacer(minLength: 20)

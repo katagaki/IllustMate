@@ -35,30 +35,30 @@ class ViewerManager {
         } else {
             let intent = NSFileAccessIntent.readingIntent(with: URL(filePath: illustration.illustrationPath()))
             let coordinator = NSFileCoordinator()
-            coordinator.coordinate(with: [intent], queue: queue) { error in
+            coordinator.coordinate(with: [intent], queue: queue) { [self] error in
                 if let error {
                     debugPrint(error.localizedDescription)
                 } else {
-                    var displayedImage: UIImage?
+                    var loadedImage: UIImage?
                     if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                        displayedImage = image
+                        loadedImage = image
                     }
-                    self.imageCache[illustration.id] = displayedImage
-                    // doWithAnimationAsynchronously {
-                    self.displayedIllustrationID = illustration.id
-                    self.displayedImage = displayedImage
-                    self.displayedIllustration = illustration
-                    // }
+                    imageCache[illustration.id] = loadedImage
+                    doWithAnimationAsynchronously { [self] in
+                        displayedIllustrationID = illustration.id
+                        displayedImage = loadedImage
+                        displayedIllustration = illustration
+                    }
                 }
             }
         }
     }
 
     func removeDisplay() {
-        // doWithAnimationAsynchronously { [self] in
-        displayedImage = nil
-        displayedIllustration = nil
-        displayedIllustrationID = ""
-        // }
+        doWithAnimationAsynchronously { [self] in
+            displayedImage = nil
+            displayedIllustration = nil
+            displayedIllustrationID = ""
+        }
     }
 }
