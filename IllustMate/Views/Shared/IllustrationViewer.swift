@@ -77,16 +77,14 @@ struct IllustrationViewer: View {
                         .foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 0)
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        UIPasteboard.general.image = displayedImage
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .buttonBorderShape(.capsule)
                     ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
                               preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
-                        Label("Shared.Share", systemImage: "square.and.arrow.up")
+                        Image(systemName: "square.and.arrow.up")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28.0, height: 28.0)
                     }
-                              .buttonStyle(.borderedProminent)
+                              .buttonStyle(.borderless)
                               .buttonBorderShape(.capsule)
                 }
                 .opacity(opacityDuringGesture())
