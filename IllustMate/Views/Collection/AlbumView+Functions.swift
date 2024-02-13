@@ -70,7 +70,9 @@ extension AlbumView {
             if let transferable = drop.illustration {
                 await moveIllustrationToAlbum(transferable.id, to: album)
             } else if let transferable = drop.album {
-                await moveAlbumToAlbum(transferable.id, to: album)
+                if transferable.id != album.id {
+                    await moveAlbumToAlbum(transferable.id, to: album)
+                }
             } else if let transferable = drop.importedPhoto {
                 await importPhotoToAlbum(transferable, to: album)
             }
