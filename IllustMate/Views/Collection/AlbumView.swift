@@ -38,6 +38,8 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
@@ -56,7 +58,7 @@ struct AlbumView: View {
                             .tag(SortType.sizeDescending)
                     }
                     Picker("Albums.Style",
-                           selection: (isFB13295421Fixed ? $albumStyleState.animation(.snappy.speed(2)) :
+                           selection: (butterItUp ? $albumStyleState.animation(.snappy.speed(2)) :
                                         $albumStyleState)) {
                         Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                             .tag(ViewStyle.grid)

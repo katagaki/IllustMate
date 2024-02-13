@@ -26,6 +26,7 @@ struct IllustrationsGrid<Content: View>: View {
     @State var thumbnails: [String: Data] = [:]
 
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #if targetEnvironment(macCatalyst)
@@ -44,7 +45,7 @@ struct IllustrationsGrid<Content: View>: View {
                 } label: {
                     Group {
                         if UIDevice.current.userInterfaceIdiom == .phone {
-                            if isFB13295421Fixed {
+                            if butterItUp {
                                 IllustrationLabel(namespace: namespace, illustration: illustration,
                                                   isHiddenAndOverridesState: isViewing(illustration))
                             } else {

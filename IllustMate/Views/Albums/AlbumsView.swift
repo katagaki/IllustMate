@@ -20,6 +20,8 @@ struct AlbumsView: View {
 
     @State var viewerManager = ViewerManager()
 
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
+
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationManager.albumsTabPath) {
@@ -71,7 +73,7 @@ struct AlbumsView: View {
             do {
                 let albums = try await actor.albums(sortedBy: .nameAscending)
                 await MainActor.run {
-                    if isFB13295421Fixed {
+                    if butterItUp {
                         doWithAnimation {
                             self.albums = albums
                         }

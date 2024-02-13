@@ -12,9 +12,11 @@ struct IllustrationViewerModifier: ViewModifier {
     var namespace: Namespace.ID
     @Binding var viewerManager: ViewerManager
 
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
+
     func body(content: Content) -> some View {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            if isFB13295421Fixed {
+            if butterItUp {
                 content
                     .overlay {
                         if let image = viewerManager.displayedImage,

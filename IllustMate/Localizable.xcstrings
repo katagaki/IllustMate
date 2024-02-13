@@ -341,6 +341,22 @@
         }
       }
     },
+    "Experiments.ButterItUp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Butter Up UI (Will Cause Freezes!)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UIをスムーズにする（実験）"
+          }
+        }
+      }
+    },
     "Experiments.DeleteIllustrationWithoutFile" : {
       "localizations" : {
         "en" : {
@@ -387,6 +403,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud"
+          }
+        }
+      }
+    },
+    "Experiments.Section.DangerZone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danger Zone"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "危険区域"
           }
         }
       }
@@ -1128,6 +1161,12 @@
             "state" : "translated",
             "value" : "Check for Pictures with Missing Files"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルの一貫性を確認"
+          }
         }
       }
     },
@@ -1223,6 +1262,12 @@
             "state" : "translated",
             "value" : "Pictures were found in the following album(s) without a file:\n%@"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下記のアルバム内にファイルの存在しない画像を検出しました：\n%@"
+          }
         }
       }
     },
@@ -1232,6 +1277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scanning for missing files..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルの一貫性を確認中…"
           }
         }
       }

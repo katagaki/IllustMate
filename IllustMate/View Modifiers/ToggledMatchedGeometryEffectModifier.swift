@@ -12,8 +12,10 @@ struct ToggledMatchedGeometryEffectModifier: ViewModifier {
     var id: String
     var namespace: Namespace.ID
 
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
+
     func body(content: Content) -> some View {
-        if isFB13295421Fixed {
+        if butterItUp {
             content
                 .matchedGeometryEffect(id: id, in: namespace)
         } else {

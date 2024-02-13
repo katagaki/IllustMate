@@ -11,12 +11,13 @@ import SwiftUI
 struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
-    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugThumbnailTools") var showAdvancedThumbnailOptions: Bool
+    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugNamingTools") var showNamingOptions: Bool
     @AppStorage(wrappedValue: false, "DebugAdvancedFiles") var showAdvancedFileOptions: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
 
     var body: some View {
         List {
@@ -47,8 +48,8 @@ struct MoreExperimentsView: View {
                     .font(.body)
             }
             Section {
-                Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowAdvancedThumbnailOptions", isOn: $showAdvancedThumbnailOptions)
+                Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.ShowNamingOptions", isOn: $showNamingOptions)
             } header: {
                 ListSectionHeader(text: "Experiments.Section.Data")
@@ -65,6 +66,12 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
             } header: {
                 ListSectionHeader(text: "Experiments.Section.Animations")
+                    .font(.body)
+            }
+            Section {
+                Toggle("Experiments.ButterItUp", isOn: $butterItUp)
+            } header: {
+                ListSectionHeader(text: "Experiments.Section.DangerZone")
                     .font(.body)
             }
         }

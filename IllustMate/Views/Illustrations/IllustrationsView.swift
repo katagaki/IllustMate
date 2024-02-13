@@ -18,6 +18,8 @@ struct IllustrationsView: View {
     @State var illustrations: [Illustration] = []
     @State var viewerManager = ViewerManager()
 
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
+
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationManager.illustrationsTabPath) {
@@ -70,7 +72,7 @@ struct IllustrationsView: View {
             do {
                 let illustrations = try await actor.illustrations()
                 await MainActor.run {
-                    if isFB13295421Fixed {
+                    if butterItUp {
                         doWithAnimation {
                             self.illustrations = illustrations
                         }

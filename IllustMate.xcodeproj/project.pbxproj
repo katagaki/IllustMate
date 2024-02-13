@@ -72,8 +72,6 @@
 		E486C9AE2AEA52F500FD334E /* DataActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834B92ADEE42B0056D47A /* DataActor.swift */; };
 		E49E363F2AE0FEB6005001B2 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E363E2AE0FEB6005001B2 /* Animations.swift */; };
 		E49E36402AE0FEB6005001B2 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49E363E2AE0FEB6005001B2 /* Animations.swift */; };
-		E4A335752AEC04AE00A1F68E /* Radar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A335742AEC04AE00A1F68E /* Radar.swift */; };
-		E4A335762AEC04AE00A1F68E /* Radar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A335742AEC04AE00A1F68E /* Radar.swift */; };
 		E4C834B02ADED6970056D47A /* ButtonStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */; };
 		E4C834B12ADED71C0056D47A /* ButtonStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */; };
 		E4C834B32ADED7460056D47A /* AlbumDropModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */; };
@@ -184,7 +182,6 @@
 		E46712E42ADC374E006CB15D /* AlbumsScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsScrollView.swift; sourceTree = "<group>"; };
 		E47162DD2AEC1D540065E9B1 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		E49E363E2AE0FEB6005001B2 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
-		E4A335742AEC04AE00A1F68E /* Radar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Radar.swift; sourceTree = "<group>"; };
 		E4C834AF2ADED6970056D47A /* ButtonStyleModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyleModifier.swift; sourceTree = "<group>"; };
 		E4C834B22ADED7460056D47A /* AlbumDropModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDropModifier.swift; sourceTree = "<group>"; };
 		E4C834B52ADED88D0056D47A /* IllustrationViewerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationViewerModifier.swift; sourceTree = "<group>"; };
@@ -295,7 +292,6 @@
 				E4E73BE12AD56B4C00372D05 /* Defaults.swift */,
 				E4C834B92ADEE42B0056D47A /* DataActor.swift */,
 				E43DFB2B2AD78220002A6317 /* SwiftData.swift */,
-				E4A335742AEC04AE00A1F68E /* Radar.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -608,7 +604,6 @@
 				E4E8923B2AD3CEE6005C9DBD /* MoreOrphansView.swift in Sources */,
 				E45A8BFC2AD1958B00E3035E /* AlbumNavigationStack.swift in Sources */,
 				E45A8BD22AD03C5E00E3035E /* AlbumListRow.swift in Sources */,
-				E4A335752AEC04AE00A1F68E /* Radar.swift in Sources */,
 				E4E8922A2AD2843A005C9DBD /* AlbumsSection.swift in Sources */,
 				E45A8BD82AD04E1C00E3035E /* IllustrationViewer.swift in Sources */,
 				E4C834C42ADFB2B20056D47A /* AppIcon.swift in Sources */,
@@ -683,7 +678,6 @@
 				E43DFB2C2AD78220002A6317 /* SwiftData.swift in Sources */,
 				E486C9AD2AEA526400FD334E /* SortType.swift in Sources */,
 				E4CD39A82AD52F0800D03298 /* Thumbnail.swift in Sources */,
-				E4A335762AEC04AE00A1F68E /* Radar.swift in Sources */,
 				E46712DD2ADC25DF006CB15D /* Drop.swift in Sources */,
 				E453B5892AE83E3400D45278 /* ToggledMatchedGeometryEffectModifier.swift in Sources */,
 				E46712DA2ADC2595006CB15D /* AlbumGridLabel.swift in Sources */,

@@ -11,8 +11,10 @@ struct ToggledTransitionModifier: ViewModifier {
 
     var transition: AnyTransition
 
+    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
+
     func body(content: Content) -> some View {
-        if isFB13295421Fixed {
+        if butterItUp {
             content
                 .transition(transition)
         } else {

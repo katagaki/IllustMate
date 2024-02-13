@@ -122,7 +122,7 @@ extension AlbumView {
         let albums = await fetchAlbums()
         let illustrations = await fetchIllustrations()
         await MainActor.run {
-            if isFB13295421Fixed {
+            if butterItUp {
                 doWithAnimation {
                     self.albums = albums
                     self.illustrations = illustrations
@@ -148,7 +148,7 @@ extension AlbumView {
         Task.detached(priority: .userInitiated) {
             let albums = await fetchAlbums()
             await MainActor.run {
-                if isFB13295421Fixed {
+                if butterItUp {
                     doWithAnimation {
                         self.albums = albums
                     }
@@ -174,7 +174,7 @@ extension AlbumView {
         Task.detached(priority: .userInitiated) {
             let illustrations = await fetchIllustrations()
             await MainActor.run {
-                if isFB13295421Fixed {
+                if butterItUp {
                     doWithAnimation {
                         self.illustrations = illustrations
                     }
