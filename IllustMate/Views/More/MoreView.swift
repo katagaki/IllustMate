@@ -71,6 +71,9 @@ struct MoreView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
+                        .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
+                            return -36.0
+                        })
                     }
                     .padding()
                     HStack(alignment: .center, spacing: 8.0) {
