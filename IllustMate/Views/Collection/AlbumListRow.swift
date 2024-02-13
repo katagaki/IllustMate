@@ -25,7 +25,7 @@ struct AlbumListRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
             AlbumCover(length: 48.0,
-                       data: album.coverPhoto,
+                       album: album,
                        primaryImage: representativePhotos[0],
                        secondaryImage: representativePhotos[1],
                        tertiaryImage: representativePhotos[2])

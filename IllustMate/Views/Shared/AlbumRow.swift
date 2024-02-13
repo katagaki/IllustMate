@@ -14,7 +14,7 @@ struct AlbumRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            AlbumCover(length: 48.0, data: album.coverPhoto)
+            AlbumCover(length: 48.0, album: album)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
                     .font(.body)

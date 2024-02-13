@@ -12,18 +12,18 @@ struct AlbumCover: View {
     var length: CGFloat?
     var cornerRadius: Double
     var shadowSize: Double
-    var data: Data?
+    var album: Album
 
     @State var primaryImage: Image
     @State var secondaryImage: Image
     @State var tertiaryImage: Image
 
     init(length: CGFloat? = nil, cornerRadius: Double = 6.0, shadowSize: Double = 2.0,
-         data: Data? = nil, primaryImage: Image? = nil, secondaryImage: Image? = nil, tertiaryImage: Image? = nil) {
+         album: Album, primaryImage: Image? = nil, secondaryImage: Image? = nil, tertiaryImage: Image? = nil) {
         self.length = length
         self.cornerRadius = cornerRadius
         self.shadowSize = shadowSize
-        self.data = data
+        self.album = album
         if let primaryImage {
             self.primaryImage = primaryImage
         } else {
@@ -48,8 +48,7 @@ struct AlbumCover: View {
                     RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous)
                         .fill(LinearGradient(gradient: Gradient(colors: [.orange, .yellow]),
                                              startPoint: .topLeading,
-                                             endPoint: .bottomTrailing
-                                            ))
+                                             endPoint: .bottomTrailing))
                         .frame(width: metrics.size.width, height: metrics.size.height)
                         .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: metrics.size.height * 0.06)
                     ZStack {
@@ -74,8 +73,7 @@ struct AlbumCover: View {
                                            style: .continuous)
                     .fill(LinearGradient(gradient: Gradient(colors: [.yellow, .orange]),
                                          startPoint: .topLeading,
-                                         endPoint: .bottomTrailing
-                                        ))
+                                         endPoint: .bottomTrailing))
                     .frame(width: metrics.size.width, height: metrics.size.height * 0.53)
                     .overlay {
                         UnevenRoundedRectangle(topLeadingRadius: 0.0,
@@ -85,11 +83,36 @@ struct AlbumCover: View {
                                                style: .continuous)
                         .stroke(LinearGradient(gradient: Gradient(colors: [.black.opacity(0.5), .black.opacity(0.2)]),
                                                startPoint: .topLeading,
-                                               endPoint: .bottomTrailing
-                                              ),
+                                               endPoint: .bottomTrailing),
                                 style: .init(lineWidth: CGFloat(0.8), lineCap: .round, lineJoin: .round,
                                              dash: [CGFloat(metrics.size.width * 0.04)]))
                         .frame(width: metrics.size.width * 0.95, height: metrics.size.height * 0.485)
+                        .overlay {
+                            if metrics.size.width >= 100 {
+                                HStack(alignment: .center, spacing: 8.0) {
+                                    HStack(alignment: .center, spacing: 4.0) {
+                                        Group {
+                                            Image(systemName: "photo.fill")
+                                            Text(String(album.illustrationCount()))
+                                                .lineLimit(1)
+                                        }
+                                        .font(.caption)
+                                    }
+                                    HStack(alignment: .center, spacing: 4.0) {
+                                        Group {
+                                            Image(systemName: "rectangle.stack.fill")
+                                            Text(String(album.albumCount()))
+                                                .lineLimit(1)
+                                        }
+                                        .font(.caption)
+                                    }
+                                }
+                                .foregroundStyle(LinearGradient(gradient: Gradient(colors: [.black, .brown]),
+                                                                startPoint: .topLeading,
+                                                                endPoint: .bottomTrailing))
+                                .opacity(0.8)
+                            }
+                        }
                     }
                     .offset(y: metrics.size.height * 0.47 / 2)
                     .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: -metrics.size.height * 0.04)
@@ -100,7 +123,7 @@ struct AlbumCover: View {
         .scaledToFit()
         .frame(width: length, height: length)
         .onAppear {
-            if let data, let coverImage = UIImage(data: data) {
+            if let data = album.coverPhoto, let coverImage = UIImage(data: data) {
                 primaryImage = Image(uiImage: coverImage)
             }
         }
