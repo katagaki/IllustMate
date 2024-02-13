@@ -71,11 +71,11 @@ struct MoreView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
-                            return -36.0
-                        })
                     }
                     .padding()
+                    .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
+                        return 0.0
+                    })
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Albums")
                         Spacer(minLength: 0)
