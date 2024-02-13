@@ -14,10 +14,21 @@ struct AlbumListRow: View {
     var namespace: Namespace.ID
 
     var album: Album
+    var representativePhotos: [Image]
+
+    init(namespace: Namespace.ID, album: Album) {
+        self.namespace = namespace
+        self.album = album
+        self.representativePhotos = album.representativePhotos()
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            AlbumCover(length: 48.0, data: album.coverPhoto)
+            AlbumCover(length: 48.0,
+                       data: album.coverPhoto,
+                       primaryImage: representativePhotos[0],
+                       secondaryImage: representativePhotos[1],
+                       tertiaryImage: representativePhotos[2])
                 .toggledMatchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)

@@ -9,6 +9,7 @@ import CoreTransferable
 import CryptoKit
 import Foundation
 import SwiftData
+import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
@@ -66,6 +67,44 @@ final class Album {
             return sourceImage.jpegThumbnail(of: 160.0)
         }
         return nil
+    }
+
+    func representativePhotos() -> [Image] {
+        var imagesToReturn: [Image] = []
+        let genericImage: Image = Image(uiImage: UIImage(named: "Album.Generic")!)
+        if let illustrations = childIllustrations {
+            let sortedIllustrations = illustrations.sorted { lhs, rhs in
+                lhs.dateAdded < rhs.dateAdded
+            }
+            let primaryImage: Illustration? = sortedIllustrations.count >= 1 ? sortedIllustrations[0] : nil
+            let secondaryImage: Illustration? = sortedIllustrations.count >= 2 ? sortedIllustrations[1] : nil
+            let tertiaryImage: Illustration? = sortedIllustrations.count >= 3 ? sortedIllustrations[2] : nil
+            if let coverPhoto = coverPhoto, let coverImage = UIImage(data: coverPhoto) {
+                imagesToReturn.append(Image(uiImage: coverImage))
+                if let primaryImage, let thumbnail = primaryImage.cachedThumbnail?.image() {
+                    imagesToReturn.append(Image(uiImage: thumbnail))
+                }
+                if let secondaryImage, let thumbnail = secondaryImage.cachedThumbnail?.image() {
+                    imagesToReturn.append(Image(uiImage: thumbnail))
+                }
+            } else {
+                if let primaryImage, let thumbnail = primaryImage.cachedThumbnail?.image() {
+                    imagesToReturn.append(Image(uiImage: thumbnail))
+                }
+                if let secondaryImage, let thumbnail = secondaryImage.cachedThumbnail?.image() {
+                    imagesToReturn.append(Image(uiImage: thumbnail))
+                }
+                if let tertiaryImage, let thumbnail = tertiaryImage.cachedThumbnail?.image() {
+                    imagesToReturn.append(Image(uiImage: thumbnail))
+                }
+            }
+        }
+        if imagesToReturn.count < 3 {
+            for _ in imagesToReturn.count...3 {
+                imagesToReturn.append(genericImage)
+            }
+        }
+        return imagesToReturn
     }
 }
 
