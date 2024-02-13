@@ -47,6 +47,7 @@ struct AlbumFolderCover: View {
                         .scaledToFit()
                         .frame(width: metrics.size.width * 0.66,
                                height: metrics.size.height * 0.66)
+                        .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.05))
                         .offset(x: -metrics.size.width * 0.13, y: -metrics.size.height * 0.09)
                         .rotationEffect(.degrees(-10))
                     image2
@@ -54,6 +55,7 @@ struct AlbumFolderCover: View {
                         .scaledToFit()
                         .frame(width: metrics.size.width * 0.66,
                                height: metrics.size.height * 0.66)
+                        .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.05))
                         .offset(x: 0.0, y: -metrics.size.height * 0.06)
                         .rotationEffect(.degrees(0))
                         .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
@@ -62,6 +64,7 @@ struct AlbumFolderCover: View {
                         .scaledToFit()
                         .frame(width: metrics.size.width * 0.66,
                                height: metrics.size.height * 0.66)
+                        .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.05))
                         .offset(x: metrics.size.width * 0.13, y: -metrics.size.height * 0.07)
                         .rotationEffect(.degrees(10))
                         .shadow(color: .black.opacity(0.2), radius: 4.0, x: 2.0, y: 2.0)
