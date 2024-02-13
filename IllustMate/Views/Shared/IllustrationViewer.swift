@@ -81,7 +81,7 @@ struct IllustrationViewer: View {
                     ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
                               preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.body)
+                            .font(.system(size: 24.0))
                     }
                               .buttonStyle(.borderless)
                               .buttonBorderShape(.capsule)

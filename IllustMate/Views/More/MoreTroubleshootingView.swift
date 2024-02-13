@@ -132,7 +132,8 @@ struct MoreTroubleshootingView: View {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try await actor.illustrations()
-            progressAlertManager.prepare("More.Troubleshooting.RebuildThumbnails.Rebuilding", total: illustrations.count)
+            progressAlertManager.prepare("More.Troubleshooting.RebuildThumbnails.Rebuilding",
+                                         total: illustrations.count)
             await actor.deleteAllThumbnails()
             progressAlertManager.show()
             let coordinator = NSFileCoordinator()

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Album Name" : {
+
+    },
     "Albums.Detail.%lld,%lld" : {
       "extractionState" : "manual",
       "localizations" : {
