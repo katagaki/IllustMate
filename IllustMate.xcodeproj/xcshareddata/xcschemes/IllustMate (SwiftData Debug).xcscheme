@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4614CE22ACA86C900D751FB"
-               BuildableName = "PicMate.app"
-               BlueprintName = "PicMate"
+               BuildableName = "IllustMate.app"
+               BlueprintName = "IllustMate"
                ReferencedContainer = "container:IllustMate.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -44,8 +44,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4614CE22ACA86C900D751FB"
-            BuildableName = "PicMate.app"
-            BlueprintName = "PicMate"
+            BuildableName = "IllustMate.app"
+            BlueprintName = "IllustMate"
             ReferencedContainer = "container:IllustMate.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -61,8 +61,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4614CE22ACA86C900D751FB"
-            BuildableName = "PicMate.app"
-            BlueprintName = "PicMate"
+            BuildableName = "IllustMate.app"
+            BlueprintName = "IllustMate"
             ReferencedContainer = "container:IllustMate.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
