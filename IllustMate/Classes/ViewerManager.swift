@@ -33,22 +33,20 @@ class ViewerManager {
                 displayedIllustration = illustration
             }
         } else {
-            let intent = NSFileAccessIntent.readingIntent(with: URL(filePath: illustration.illustrationPath()))
-            let coordinator = NSFileCoordinator()
-            coordinator.coordinate(with: [intent], queue: queue) { [self] error in
-                if let error {
-                    debugPrint(error.localizedDescription)
-                } else {
+            let illustrationURL: URL = URL(filePath: illustration.illustrationPath())
+            NSFileCoordinator().coordinate(readingItemAt: illustrationURL, error: .none) { url in
+                Task {
                     var loadedImage: UIImage?
-                    if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                    if let image = await UIImage(contentsOfFile: url.path(percentEncoded: false))?
+                        .byPreparingForDisplay() {
                         loadedImage = image
                     }
-                    imageCache[illustration.id] = loadedImage
                     doWithAnimationAsynchronously { [self] in
                         displayedIllustrationID = illustration.id
                         displayedImage = loadedImage
                         displayedIllustration = illustration
                     }
+                    self.imageCache[illustration.id] = loadedImage
                 }
             }
         }

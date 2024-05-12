@@ -43,7 +43,6 @@ struct IllustrationLabel: View {
         .contentShape(.rect)
         .task {
             // TODO: Use file coordinator in async task
-            // try? FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: illustration.illustrationPath()))
             Task.detached {
                 if let image = illustration.thumbnail() {
                     thumbnail = Image(uiImage: image)
