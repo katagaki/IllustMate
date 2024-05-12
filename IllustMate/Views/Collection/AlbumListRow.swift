@@ -14,7 +14,7 @@ struct AlbumListRow: View {
     var namespace: Namespace.ID
 
     var album: Album
-    var representativePhotos: [Image]
+    var representativePhotos: [Image?]
 
     init(namespace: Namespace.ID, album: Album) {
         self.namespace = namespace

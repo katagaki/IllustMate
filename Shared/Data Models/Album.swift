@@ -69,9 +69,8 @@ final class Album {
         return nil
     }
 
-    func representativePhotos() -> [Image] {
-        var imagesToReturn: [Image] = []
-        let genericImage: Image = Image(uiImage: UIImage(named: "Album.Generic")!)
+    func representativePhotos() -> [Image?] {
+        var imagesToReturn: [Image?] = []
         if let illustrations = childIllustrations {
             let sortedIllustrations = illustrations.sorted { lhs, rhs in
                 lhs.dateAdded < rhs.dateAdded
@@ -81,29 +80,21 @@ final class Album {
             let tertiaryImage: Illustration? = sortedIllustrations.count >= 3 ? sortedIllustrations[2] : nil
             if let coverPhoto = coverPhoto, let coverImage = UIImage(data: coverPhoto) {
                 imagesToReturn.append(Image(uiImage: coverImage))
-                if let primaryImage, let thumbnail = primaryImage.cachedThumbnail?.image() {
-                    imagesToReturn.append(Image(uiImage: thumbnail))
-                }
-                if let secondaryImage, let thumbnail = secondaryImage.cachedThumbnail?.image() {
-                    imagesToReturn.append(Image(uiImage: thumbnail))
-                }
-            } else {
-                if let primaryImage, let thumbnail = primaryImage.cachedThumbnail?.image() {
-                    imagesToReturn.append(Image(uiImage: thumbnail))
-                }
-                if let secondaryImage, let thumbnail = secondaryImage.cachedThumbnail?.image() {
-                    imagesToReturn.append(Image(uiImage: thumbnail))
-                }
-                if let tertiaryImage, let thumbnail = tertiaryImage.cachedThumbnail?.image() {
-                    imagesToReturn.append(Image(uiImage: thumbnail))
-                }
+            }
+            if let primaryImage, let thumbnail = primaryImage.cachedThumbnail?.image() {
+                imagesToReturn.append(Image(uiImage: thumbnail))
+            }
+            if let secondaryImage, let thumbnail = secondaryImage.cachedThumbnail?.image() {
+                imagesToReturn.append(Image(uiImage: thumbnail))
+            }
+            if let tertiaryImage, let thumbnail = tertiaryImage.cachedThumbnail?.image() {
+                imagesToReturn.append(Image(uiImage: thumbnail))
             }
         }
-        if imagesToReturn.count < 3 {
-            for _ in imagesToReturn.count...3 {
-                imagesToReturn.append(genericImage)
-            }
+        for _ in 0..<3 {
+            imagesToReturn.append(nil)
         }
+        imagesToReturn = Array(imagesToReturn[0..<3])
         return imagesToReturn
     }
 }
