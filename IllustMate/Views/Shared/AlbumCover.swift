@@ -86,13 +86,20 @@ struct AlbumCover: View {
                                            startPoint: .top,
                                            endPoint: .bottom)
                             .mask {
-                                if metrics.size.width >= 100 {
-                                    HStack(alignment: .center, spacing: 8.0) {
+                                if metrics.size.width >= 70 {
+                                    HStack(alignment: .center, spacing: 6.0) {
                                         HStack(alignment: .center, spacing: 4.0) {
                                             Group {
                                                 Image(systemName: "photo.fill")
-                                                Text(String(album.illustrationCount()))
-                                                    .lineLimit(1)
+                                                if album.illustrationCount() <= 999 {
+                                                    Text(String(album.illustrationCount()))
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.6)
+                                                } else {
+                                                    Text(verbatim: "XD")
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.6)
+                                                }
                                             }
                                             .font(.caption)
                                         }
@@ -101,10 +108,14 @@ struct AlbumCover: View {
                                                 Image(systemName: "rectangle.stack.fill")
                                                 Text(String(album.albumCount()))
                                                     .lineLimit(1)
+                                                    .minimumScaleFactor(0.6)
                                             }
                                             .font(.caption)
                                         }
                                     }
+                                    .scaleEffect(x: min(100.0, metrics.size.width) / 100.0,
+                                                 y: min(100.0, metrics.size.width) / 100.0,
+                                                 anchor: .center)
                                 }
                             }
                         }
