@@ -44,10 +44,12 @@ struct IllustrationLabel: View {
         .task {
             // TODO: Use file coordinator in async task
             // try? FileManager.default.startDownloadingUbiquitousItem(at: URL(filePath: illustration.illustrationPath()))
-            if let image = illustration.thumbnail() {
-                thumbnail = Image(uiImage: image)
+            Task.detached {
+                if let image = illustration.thumbnail() {
+                    thumbnail = Image(uiImage: image)
+                }
+                isThumbnailReadyToPresent = true
             }
-            isThumbnailReadyToPresent = true
         }
     }
 }
