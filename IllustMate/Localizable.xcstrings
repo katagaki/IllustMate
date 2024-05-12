@@ -341,22 +341,6 @@
         }
       }
     },
-    "Experiments.ButterItUp" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Butter Up UI (Will Cause Freezes!)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "UIをスムーズにする（実験）"
-          }
-        }
-      }
-    },
     "Experiments.DeleteIllustrationWithoutFile" : {
       "localizations" : {
         "en" : {

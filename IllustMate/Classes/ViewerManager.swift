@@ -12,8 +12,8 @@ import SwiftUI
 class ViewerManager {
 
     var displayedIllustrationID: String = ""
-    var displayedIllustration: Illustration?
-    var displayedImage: UIImage?
+    @ObservationIgnored var displayedIllustration: Illustration?
+    @ObservationIgnored var displayedImage: UIImage?
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
@@ -28,25 +28,25 @@ class ViewerManager {
     func setDisplay(_ illustration: Illustration) {
         if let image = imageCache[illustration.id] {
             doWithAnimationAsynchronously { [self] in
-                displayedIllustrationID = illustration.id
                 displayedImage = image
                 displayedIllustration = illustration
+                displayedIllustrationID = illustration.id
             }
         } else {
             let illustrationURL: URL = URL(filePath: illustration.illustrationPath())
             NSFileCoordinator().coordinate(readingItemAt: illustrationURL, error: .none) { url in
-                Task {
+                Task(priority: .userInitiated) {
                     var loadedImage: UIImage?
                     if let image = await UIImage(contentsOfFile: url.path(percentEncoded: false))?
                         .byPreparingForDisplay() {
                         loadedImage = image
                     }
-                    doWithAnimationAsynchronously { [self] in
-                        displayedIllustrationID = illustration.id
+                    await doWithAnimation { [self] in
+                        imageCache[illustration.id] = loadedImage
                         displayedImage = loadedImage
                         displayedIllustration = illustration
+                        displayedIllustrationID = illustration.id
                     }
-                    self.imageCache[illustration.id] = loadedImage
                 }
             }
         }

@@ -11,15 +11,9 @@ struct ToggledTransitionModifier: ViewModifier {
 
     var transition: AnyTransition
 
-    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
-
     func body(content: Content) -> some View {
-        if butterItUp {
-            content
-                .transition(transition)
-        } else {
-            content
-        }
+        content
+            .transition(transition)
     }
 }
 

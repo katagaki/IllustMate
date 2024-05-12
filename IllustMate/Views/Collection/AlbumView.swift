@@ -38,8 +38,6 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
-    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
-
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
@@ -57,9 +55,7 @@ struct AlbumView: View {
                         Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
                             .tag(SortType.sizeDescending)
                     }
-                    Picker("Albums.Style",
-                           selection: (butterItUp ? $albumStyleState.animation(.snappy.speed(2)) :
-                                        $albumStyleState)) {
+                    Picker("Albums.Style", selection: ($albumStyleState.animation(.snappy.speed(2)))) {
                         Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                             .tag(ViewStyle.grid)
                         Label("Albums.Style.List", systemImage: "list.bullet")

@@ -12,13 +12,11 @@ struct IllustrationViewerModifier: ViewModifier {
     var namespace: Namespace.ID
     @Binding var viewerManager: ViewerManager
 
-    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
-
     func body(content: Content) -> some View {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            if butterItUp {
-                content
-                    .overlay {
+            content
+                .overlay {
+                    if viewerManager.displayedIllustrationID != "" {
                         if let image = viewerManager.displayedImage,
                            let illustration = viewerManager.displayedIllustration {
                             IllustrationViewer(namespace: namespace,
@@ -27,18 +25,7 @@ struct IllustrationViewerModifier: ViewModifier {
                             }
                         }
                     }
-            } else {
-                content
-                    .fullScreenCover(item: $viewerManager.displayedIllustration) { illustration in
-                        if let image = viewerManager.displayedImage {
-                            IllustrationViewer(namespace: namespace,
-                                               illustration: illustration, displayedImage: image) {
-                                viewerManager.removeDisplay()
-                            }
-                            .presentationBackground(.clear)
-                        }
-                    }
-            }
+                }
         } else {
             content
         }

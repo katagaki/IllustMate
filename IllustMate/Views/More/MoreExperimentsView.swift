@@ -14,7 +14,6 @@ struct MoreExperimentsView: View {
     @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
     @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
-    @AppStorage(wrappedValue: false, "DebugButterItUp") var butterItUp: Bool
 
     var body: some View {
         List {
@@ -43,7 +42,6 @@ struct MoreExperimentsView: View {
                 Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
                 Toggle("Experiments.DeleteIllustrationWithoutFile", isOn: $deleteWithoutFile)
                 Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
-                Toggle("Experiments.ButterItUp", isOn: $butterItUp)
             }
         }
         .navigationTitle("ViewTitle.Debug")
