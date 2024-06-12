@@ -12,26 +12,33 @@ import SwiftData
 struct CollectionView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
-
-    @Namespace var illustrationTransitionNamespace
-
-    @State var viewerManager = ViewerManager()
+    @Environment(ViewerManager.self) var viewer
 
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationManager.collectionTabPath) {
-                AlbumView(namespace: illustrationTransitionNamespace,
-                          viewerManager: $viewerManager)
-                .navigationDestination(for: ViewPath.self, destination: { viewPath in
-                    switch viewPath {
-                    case .album(let album):
-                        AlbumView(namespace: illustrationTransitionNamespace,
-                                  currentAlbum: album, viewerManager: $viewerManager)
-                    default: Color.clear
-                    }
-                })
+                AlbumView()
+                    .navigationDestination(for: ViewPath.self, destination: { viewPath in
+                      switch viewPath {
+                      case .album(let album):
+                          AlbumView(currentAlbum: album)
+                      case .illustrationViewer(let namespace):
+                          if let displayedIllustration = viewer.displayedIllustration,
+                             let displayedImage = viewer.displayedImage {
+                              if #available(iOS 18, *) {
+                                  IllustrationViewer(illustration: displayedIllustration,
+                                                     displayedImage: displayedImage)
+                                  .navigationTransition(.zoom(sourceID: viewer.displayedIllustrationID,
+                                                              in: namespace))
+                              } else {
+                                  IllustrationViewer(illustration: displayedIllustration,
+                                                     displayedImage: displayedImage)
+                              }
+                          }
+                      default: Color.clear
+                      }
+                    })
             }
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
     }
 }

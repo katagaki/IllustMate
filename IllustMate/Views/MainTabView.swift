@@ -11,6 +11,7 @@ struct MainTabView: View {
 
     @EnvironmentObject var tabManager: TabManager
     @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(ViewerManager.self) var viewer
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     var body: some View {
@@ -20,16 +21,16 @@ struct MainTabView: View {
                     Label("TabTitle.Collection", image: "Tab.Collection")
                 }
                 .tag(TabType.collection)
-            AlbumsView()
-                .tabItem {
-                    Label("TabTitle.Albums", systemImage: "rectangle.stack.fill")
-                }
-                .tag(TabType.albums)
-            IllustrationsView()
-                .tabItem {
-                    Label("TabTitle.Illustrations", systemImage: "photo.on.rectangle.angled")
-                }
-                .tag(TabType.illustrations)
+//            AlbumsView()
+//                .tabItem {
+//                    Label("TabTitle.Albums", systemImage: "rectangle.stack.fill")
+//                }
+//                .tag(TabType.albums)
+//            IllustrationsView()
+//                .tabItem {
+//                    Label("TabTitle.Illustrations", systemImage: "photo.on.rectangle.angled")
+//                }
+//                .tag(TabType.illustrations)
             MoreView()
                 .tabItem {
                     Label("TabTitle.More", systemImage: "ellipsis")

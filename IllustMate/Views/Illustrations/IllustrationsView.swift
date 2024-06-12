@@ -12,8 +12,9 @@ struct IllustrationsView: View {
 
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(ViewerManager.self) var viewer
 
-    @Namespace var illustrationTransitionNamespace
+    @Namespace var namespace
 
     @State var illustrations: [Illustration] = []
     @State var viewerManager = ViewerManager()
@@ -22,13 +23,13 @@ struct IllustrationsView: View {
         ZStack {
             NavigationStack(path: $navigationManager.illustrationsTabPath) {
                 ScrollView(.vertical) {
-                    IllustrationsGrid(namespace: illustrationTransitionNamespace,
+                    IllustrationsGrid(namespace: namespace,
                                       illustrations: illustrations,
                                       isSelecting: .constant(false),
                                       enableSelection: false) { illustration in
-                        illustration.id == viewerManager.displayedIllustrationID
-                    } onSelect: { illustration in
-                        viewerManager.setDisplay(illustration)
+                        viewer.setDisplay(illustration) {
+                            navigationManager.push(.illustrationViewer(namespace: namespace), for: .illustrations)
+                        }
                     } selectedCount: {
                         return 0
                     } moveMenu: { _ in }
@@ -54,7 +55,6 @@ struct IllustrationsView: View {
                 .navigationTitle("ViewTitle.Illustrations")
             }
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
         .onAppear {
             refreshIllustrations()
         }

@@ -124,7 +124,7 @@ struct AlbumCover: View {
                     .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: -metrics.size.height * 0.04)
                 }
             }
-            .toggledTransition(.opacity.animation(.snappy.speed(2)))
+            .transition(.opacity.animation(.snappy.speed(2)))
         }
         .scaledToFit()
         .frame(width: length, height: length)

@@ -12,7 +12,6 @@ struct IllustrationLabel: View {
     var namespace: Namespace.ID
 
     var illustration: Illustration
-    var isHiddenAndOverridesState: Bool
 
     @State var isThumbnailReadyToPresent: Bool = false
     @State var thumbnail: Image?
@@ -20,7 +19,7 @@ struct IllustrationLabel: View {
     var body: some View {
         ZStack(alignment: .center) {
             Color.clear
-            if isThumbnailReadyToPresent && !isHiddenAndOverridesState {
+            if isThumbnailReadyToPresent {
                 Group {
                     if let thumbnail {
                         thumbnail
@@ -34,8 +33,7 @@ struct IllustrationLabel: View {
                             .symbolRenderingMode(.multicolor)
                     }
                 }
-                .toggledMatchedGeometryEffect(id: illustration.id, in: namespace)
-                .toggledTransition(.opacity.animation(.snappy.speed(2)))
+                .transition(.opacity.animation(.snappy.speed(2)))
             }
         }
         .background(.primary.opacity(0.05))

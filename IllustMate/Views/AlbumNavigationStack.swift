@@ -19,20 +19,9 @@ struct AlbumNavigationStack: View {
     var body: some View {
         ZStack {
             NavigationStack(path: $viewPath) {
-                AlbumView(namespace: illustrationTransitionNamespace,
-                          currentAlbum: album,
-                          viewerManager: $viewerManager)
-                .navigationDestination(for: ViewPath.self, destination: { viewPath in
-                    switch viewPath {
-                    case .album(let album): AlbumView(namespace: illustrationTransitionNamespace,
-                                                      currentAlbum: album,
-                                                      viewerManager: $viewerManager)
-                    default: Color.clear
-                    }
-                })
+                AlbumView(currentAlbum: album)
             }
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
         .id(album.id)
     }
 }

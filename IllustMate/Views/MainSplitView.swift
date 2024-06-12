@@ -11,15 +11,14 @@ import SwiftUI
 struct MainSplitView: View {
 
     @Environment(ProgressAlertManager.self) var progressAlertManager
+    @Environment(ViewerManager.self) var viewer
 
-    @Namespace var splitViewNamespace
+    @Namespace var namespace
 
     @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
                                   sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
 
     @State var selectedView: ViewPath? = .collection
-
-    @State var viewerManager = ViewerManager()
 
     var body: some View {
         NavigationSplitView {
@@ -86,22 +85,20 @@ struct MainSplitView: View {
         } content: {
             Group {
                 switch selectedView {
-                case .collection: CollectionView(viewerManager: viewerManager)
-                case .albums: AlbumsView(viewerManager: viewerManager)
-                case .illustrations: IllustrationsView(viewerManager: viewerManager)
+                case .collection: CollectionView()
+                case .albums: AlbumsView()
+                case .illustrations: IllustrationsView()
                 case .more: MoreView()
-                case .album(let album): AlbumNavigationStack(album: album, viewerManager: viewerManager)
+                case .album(let album): AlbumNavigationStack(album: album)
                 default: Color.clear
                 }
             }
             .navigationSplitViewColumnWidth(375.0)
         } detail: {
-            if let image = viewerManager.displayedImage,
-               let illustration = viewerManager.displayedIllustration {
-                IllustrationViewer(namespace: splitViewNamespace, illustration: illustration, displayedImage: image) {
-                    viewerManager.removeDisplay()
-                }
-                .id(illustration.id)
+            if let image = viewer.displayedImage,
+               let illustration = viewer.displayedIllustration {
+                IllustrationViewer(illustration: illustration, displayedImage: image)
+                    .id(illustration.id)
             } else {
                 ContentUnavailableView("Shared.SelectAnIllustration", systemImage: "photo.on.rectangle.angled")
             }

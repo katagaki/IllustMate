@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import UIKit
+import SwiftUICore
 
 enum ViewPath: Hashable {
     case collection
     case albums
     case illustrations
+    case illustrationViewer(namespace: Namespace.ID)
     case album(album: Album)
     case more
     case moreAppIcon

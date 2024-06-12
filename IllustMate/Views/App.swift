@@ -14,6 +14,7 @@ struct IllustMateApp: App {
 
     @StateObject var tabManager = TabManager()
     @StateObject var navigationManager = NavigationManager()
+    @State var viewer = ViewerManager()
     @State var progressAlertManager = ProgressAlertManager()
     @State var concurrency = ConcurrencyManager()
     @ObservedObject var syncMonitor = SyncMonitor.shared
@@ -62,6 +63,7 @@ struct IllustMateApp: App {
             }
             .environmentObject(tabManager)
             .environmentObject(navigationManager)
+            .environment(viewer)
             .environment(progressAlertManager)
             .environment(concurrency)
             .task {

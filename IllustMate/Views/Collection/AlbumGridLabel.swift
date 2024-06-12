@@ -28,9 +28,9 @@ struct AlbumGridLabel: View {
                        primaryImage: representativePhotos[0],
                        secondaryImage: representativePhotos[1],
                        tertiaryImage: representativePhotos[2])
-            .toggledMatchedGeometryEffect(id: "\(album.id).Image", in: namespace)
+            .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             Text(album.name)
-                .toggledMatchedGeometryEffect(id: "\(album.id).Title", in: namespace)
+                .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
         }

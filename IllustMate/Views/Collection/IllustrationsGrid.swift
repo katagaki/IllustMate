@@ -16,7 +16,6 @@ struct IllustrationsGrid<Content: View>: View {
     var illustrations: [Illustration]
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
-    var isViewing: (Illustration) -> Bool
     var isSelected: ((Illustration) -> Bool)?
     var onSelect: (Illustration) -> Void
     var selectedCount: () -> Int
@@ -44,11 +43,9 @@ struct IllustrationsGrid<Content: View>: View {
                 } label: {
                     Group {
                         if UIDevice.current.userInterfaceIdiom == .phone {
-                            IllustrationLabel(namespace: namespace, illustration: illustration,
-                                              isHiddenAndOverridesState: isViewing(illustration))
+                            IllustrationLabel(namespace: namespace, illustration: illustration)
                         } else {
-                            IllustrationLabel(namespace: namespace, illustration: illustration,
-                                              isHiddenAndOverridesState: false)
+                            IllustrationLabel(namespace: namespace, illustration: illustration)
                         }
                     }
                     .overlay {
@@ -65,6 +62,7 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                     }
                 }
+                .automaticMatchedTransitionSource(id: illustration.id, in: namespace)
                 .contextMenu {
                     if !isSelecting {
                         if enableSelection {

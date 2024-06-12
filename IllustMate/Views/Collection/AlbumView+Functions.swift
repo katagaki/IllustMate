@@ -116,7 +116,9 @@ extension AlbumView {
                 selectedIllustrations.append(illustration)
             }
         } else {
-            viewerManager.setDisplay(illustration)
+            viewer.setDisplay(illustration) {
+                navigationManager.push(.illustrationViewer(namespace: namespace), for: .collection)
+            }
         }
     }
 

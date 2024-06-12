@@ -29,10 +29,10 @@ struct AlbumListRow: View {
                        primaryImage: representativePhotos[0],
                        secondaryImage: representativePhotos[1],
                        tertiaryImage: representativePhotos[2])
-                .toggledMatchedGeometryEffect(id: "\(album.id).Image", in: namespace)
+                .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
-                    .toggledMatchedGeometryEffect(id: "\(album.id).Title", in: namespace)
+                    .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text("Albums.Detail.\(album.illustrationCount()),\(album.albumCount())")

@@ -12,8 +12,9 @@ struct AlbumsView: View {
 
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(ViewerManager.self) var viewer
 
-    @Namespace var illustrationTransitionNamespace
+    @Namespace var namespace
 
     @State var albums: [Album] = []
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
@@ -26,14 +27,6 @@ struct AlbumsView: View {
                 ScrollView(.vertical) {
                     AlbumsSection(albums: albums, style: $style) { _ in }
                 }
-                .navigationDestination(for: ViewPath.self, destination: { viewPath in
-                    switch viewPath {
-                    case .album(let album): AlbumView(namespace: illustrationTransitionNamespace,
-                                                      currentAlbum: album,
-                                                      viewerManager: $viewerManager)
-                    default: Color.clear
-                    }
-                })
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         HStack(alignment: .center, spacing: 8.0) {
@@ -55,7 +48,6 @@ struct AlbumsView: View {
                 .navigationTitle("ViewTitle.Albums")
             }
         }
-        .illustrationViewerOverlay(namespace: illustrationTransitionNamespace, manager: $viewerManager)
         .onAppear {
             refreshAlbums()
         }

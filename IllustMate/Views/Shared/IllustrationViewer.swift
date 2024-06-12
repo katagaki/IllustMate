@@ -9,7 +9,7 @@ import SwiftUI
 
 struct IllustrationViewer: View {
 
-    var namespace: Namespace.ID
+    @Environment(\.dismiss) var dismiss
 
     var illustration: Illustration
     var displayedImage: UIImage
@@ -18,42 +18,8 @@ struct IllustrationViewer: View {
     @State var magnification: CGFloat = 1.0
     @State var magnificationAnchor: UnitPoint = .center
 
-    var closeAction: () -> Void
-
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
-            HStack(alignment: .center, spacing: 8.0) {
-#if !targetEnvironment(macCatalyst)
-                Button {
-                    closeAction()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28.0, height: 28.0)
-                        .foregroundStyle(.primary)
-                        .symbolRenderingMode(.hierarchical)
-                }
-                .buttonStyle(.plain)
-#endif
-                VStack(alignment: .center, spacing: 2.0) {
-                    Text(illustration.name)
-                        .bold()
-                        .lineLimit(1)
-                    if let containingAlbum = illustration.containingAlbum {
-                        Text(containingAlbum.name)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-#if !targetEnvironment(macCatalyst)
-                Spacer()
-                    .frame(width: 28.0)
-#endif
-            }
-            .opacity(opacityDuringGesture())
             Spacer(minLength: 20)
             Image(uiImage: displayedImage)
                 .resizable()
@@ -61,8 +27,6 @@ struct IllustrationViewer: View {
                 .clipShape(.rect(cornerRadius: 8.0))
                 .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                 .zIndex(1)
-                .toggledMatchedGeometryEffect(id: illustration.id, in: namespace)
-                .id(illustration.id)
                 .offset(displayOffset)
                 .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
             Spacer(minLength: 20)
@@ -89,6 +53,24 @@ struct IllustrationViewer: View {
                 .opacity(opacityDuringGesture())
             }
         }
+        .navigationTitle(illustration.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack(alignment: .center, spacing: 2.0) {
+                    Text(illustration.name)
+                        .font(.headline)
+                        .bold()
+                        .lineLimit(1)
+                    if let containingAlbum = illustration.containingAlbum {
+                        Text(containingAlbum.name)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+        }
         .padding(20.0)
         .frame(maxHeight: .infinity)
 #if !targetEnvironment(macCatalyst)
@@ -100,7 +82,7 @@ struct IllustrationViewer: View {
                 }
                 .onEnded { gesture in
                     if hypotenuse(gesture.translation) > 100.0 {
-                        closeAction()
+                        dismiss()
                     } else {
                         doWithAnimation {
                             magnification = 1.0

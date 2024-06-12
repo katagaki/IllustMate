@@ -25,13 +25,12 @@ class ViewerManager {
         queue.maxConcurrentOperationCount = 2
     }
 
-    func setDisplay(_ illustration: Illustration) {
+    func setDisplay(_ illustration: Illustration, completion: @escaping () -> Void) {
         if let image = imageCache[illustration.id] {
-            doWithAnimationAsynchronously { [self] in
-                displayedImage = image
-                displayedIllustration = illustration
-                displayedIllustrationID = illustration.id
-            }
+            displayedImage = image
+            displayedIllustration = illustration
+            displayedIllustrationID = illustration.id
+            completion()
         } else {
             let illustrationURL: URL = URL(filePath: illustration.illustrationPath())
             NSFileCoordinator().coordinate(readingItemAt: illustrationURL, error: .none) { url in
@@ -41,22 +40,19 @@ class ViewerManager {
                         .byPreparingForDisplay() {
                         loadedImage = image
                     }
-                    await doWithAnimation { [self] in
-                        imageCache[illustration.id] = loadedImage
-                        displayedImage = loadedImage
-                        displayedIllustration = illustration
-                        displayedIllustrationID = illustration.id
-                    }
+                    imageCache[illustration.id] = loadedImage
+                    displayedImage = loadedImage
+                    displayedIllustration = illustration
+                    displayedIllustrationID = illustration.id
+                    completion()
                 }
             }
         }
     }
 
     func removeDisplay() {
-        doWithAnimationAsynchronously { [self] in
-            displayedImage = nil
-            displayedIllustration = nil
-            displayedIllustrationID = ""
-        }
+        displayedImage = nil
+        displayedIllustration = nil
+        displayedIllustrationID = ""
     }
 }

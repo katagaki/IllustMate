@@ -13,8 +13,10 @@ struct AlbumView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
+    @EnvironmentObject var navigationManager: NavigationManager
+    @Environment(ViewerManager.self) var viewer
 
-    var namespace: Namespace.ID
+    @Namespace var namespace
 
     var currentAlbum: Album?
     @State var albums: [Album]?
@@ -34,7 +36,6 @@ struct AlbumView: View {
     @State var isSelectingIllustrations: Bool = false
     @State var selectedIllustrations: [Illustration] = []
     @State var isImportingPhotos: Bool = false
-    @Binding var viewerManager: ViewerManager
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
     @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
@@ -117,8 +118,6 @@ struct AlbumView: View {
                         Divider()
                         IllustrationsGrid(namespace: namespace, illustrations: illustrations,
                                           isSelecting: $isSelectingIllustrations) { illustration in
-                            illustration.id == viewerManager.displayedIllustrationID
-                        } isSelected: { illustration in
                             selectedIllustrations.contains(illustration)
                         } onSelect: { illustration in
                             selectOrDeselectIllustration(illustration)
