@@ -37,7 +37,6 @@ struct AlbumView: View {
     @State var selectedIllustrations: [Illustration] = []
     @State var isImportingPhotos: Bool = false
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
-    @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
 
     var body: some View {
         ScrollView(.vertical) {

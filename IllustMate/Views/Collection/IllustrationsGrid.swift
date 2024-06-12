@@ -24,8 +24,6 @@ struct IllustrationsGrid<Content: View>: View {
 
     @State var thumbnails: [String: Data] = [:]
 
-    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
-
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #if targetEnvironment(macCatalyst)
     let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
@@ -95,12 +93,6 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                         Divider()
                         moveMenu(illustration)
-                        if allowPerImageThumbnailRegeneration {
-                            Divider()
-                            Button("Shared.RegenerateThumbnail", systemImage: "arrow.clockwise") {
-                                illustration.generateThumbnail()
-                            }
-                        }
                         if let onDelete {
                             Divider()
                             Button("Shared.Delete", systemImage: "trash", role: .destructive) {

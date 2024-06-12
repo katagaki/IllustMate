@@ -226,11 +226,8 @@ actor DataActor: ModelActor {
     }
 
     func deleteIllustration(withID illustrationID: ModelID) {
-        @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
         if let illustration = self[illustrationID, as: Illustration.self] {
-            if !deleteWithoutFile {
-                illustration.prepareForDeletion()
-            }
+            illustration.prepareForDeletion()
             if let cachedThumbnail = illustration.cachedThumbnail {
                 modelContext.delete(cachedThumbnail)
             }

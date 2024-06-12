@@ -325,38 +325,6 @@
         }
       }
     },
-    "Experiments.AllowPerImageThumbnailRegeneration" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allow Per Image Thumbnail Regeneration"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像メニューに「サムネイルを再生成」を表示"
-          }
-        }
-      }
-    },
-    "Experiments.DeleteIllustrationWithoutFile" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keep File When Deleting Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像を削除する際にファイルを削除しない"
-          }
-        }
-      }
-    },
     "Experiments.ShowCloudStatusEverywhere" : {
       "localizations" : {
         "en" : {
@@ -369,22 +337,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クラウド同期状況を常に表示"
-          }
-        }
-      }
-    },
-    "Experiments.SlowDownAnimations" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Slow Down Animations"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アニメーションの速度を下げる"
           }
         }
       }
@@ -1686,22 +1638,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再読み込み"
-          }
-        }
-      }
-    },
-    "Shared.RegenerateThumbnail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Regenerate Thumbnail"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルを再生成"
           }
         }
       }

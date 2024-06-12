@@ -12,6 +12,7 @@ import SwiftUI
 
 struct MoreView: View {
 
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @ObservedObject var syncMonitor = SyncMonitor.shared
@@ -124,6 +125,14 @@ struct MoreView: View {
                 } header: {
                     ListSectionHeader(text: "More.Advanced")
                         .font(.body)
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    CloseButton {
+                        dismiss()
+                    }
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in

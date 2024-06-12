@@ -25,7 +25,7 @@ struct IllustMateApp: App {
         WindowGroup {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    MainTabView()
+                    CollectionView()
                 } else {
                     MainSplitView()
                 }

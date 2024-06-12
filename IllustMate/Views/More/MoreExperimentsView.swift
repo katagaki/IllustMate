@@ -11,9 +11,6 @@ import SwiftUI
 struct MoreExperimentsView: View {
 
     @AppStorage(wrappedValue: false, "DebugCloudEverywhere") var showCloudStatusEverywhere: Bool
-    @AppStorage(wrappedValue: false, "DebugThumbnailRegen") var allowPerImageThumbnailRegeneration: Bool
-    @AppStorage(wrappedValue: false, "DebugDeleteWithoutFile") var deleteWithoutFile: Bool
-    @AppStorage(wrappedValue: false, "DebugSlowAnims") var slowDownAnimations: Bool
 
     var body: some View {
         List {
@@ -39,9 +36,6 @@ struct MoreExperimentsView: View {
             }
             Section {
                 Toggle("Experiments.ShowCloudStatusEverywhere", isOn: $showCloudStatusEverywhere)
-                Toggle("Experiments.AllowPerImageThumbnailRegeneration", isOn: $allowPerImageThumbnailRegeneration)
-                Toggle("Experiments.DeleteIllustrationWithoutFile", isOn: $deleteWithoutFile)
-                Toggle("Experiments.SlowDownAnimations", isOn: $slowDownAnimations)
             }
         }
         .navigationTitle("ViewTitle.Debug")
