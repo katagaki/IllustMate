@@ -593,23 +593,6 @@
         }
       }
     },
-    "More.Customization.AppIcon.Default.Dark" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default (Dark)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デフォルト（ダーク）"
-          }
-        }
-      }
-    },
     "More.Customization.AppIcon.Leather" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -644,23 +627,6 @@
         }
       }
     },
-    "More.Customization.AppIcon.Pastel.Dark" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pastel (Dark)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パステル（ダーク）"
-          }
-        }
-      }
-    },
     "More.Customization.AppIcon.Plastic" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -674,23 +640,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プラスチック"
-          }
-        }
-      }
-    },
-    "More.Customization.AppIcon.Plastic.Dark" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plastic (Dark)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プラスチック（ダーク）"
           }
         }
       }
