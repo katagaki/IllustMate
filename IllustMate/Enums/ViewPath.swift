@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import SwiftUICore
+import SwiftUI
 
 enum ViewPath: Hashable {
     case collection
