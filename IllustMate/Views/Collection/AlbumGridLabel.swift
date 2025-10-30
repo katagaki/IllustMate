@@ -11,10 +11,10 @@ struct AlbumGridLabel: View {
 
     var namespace: Namespace.ID
 
-    var album: Album
+    var album: PhotoAlbum
     var representativePhotos: [Image?]
-
-    init(namespace: Namespace.ID, album: Album) {
+    
+    init(namespace: Namespace.ID, album: PhotoAlbum) {
         self.namespace = namespace
         self.album = album
         self.representativePhotos = album.representativePhotos()

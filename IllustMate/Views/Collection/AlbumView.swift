@@ -18,23 +18,23 @@ struct AlbumView: View {
 
     @Namespace var namespace
 
-    var currentAlbum: Album?
-    @State var albums: [Album]?
+    var currentAlbum: PhotoAlbum?
+    @State var albums: [PhotoAlbum]?
     @State var isConfirmingDeleteAlbum: Bool = false
-    @State var albumPendingDeletion: Album?
+    @State var albumPendingDeletion: PhotoAlbum?
     @State var isAddingAlbum: Bool = false
-    @State var albumToRename: Album?
+    @State var albumToRename: PhotoAlbum?
     @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
     @State var albumSortState: SortType = .nameAscending
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var albumStyle: ViewStyle
     @State var albumStyleState: ViewStyle = .grid
 
-    @State var illustrations: [Illustration]?
+    @State var illustrations: [PhotoIllustration]?
     @State var isConfirmingDeleteIllustration: Bool = false
     @State var isConfirmingDeleteSelectedIllustrations: Bool = false
-    @State var illustrationPendingDeletion: Illustration?
+    @State var illustrationPendingDeletion: PhotoIllustration?
     @State var isSelectingIllustrations: Bool = false
-    @State var selectedIllustrations: [Illustration] = []
+    @State var selectedIllustrations: [PhotoIllustration] = []
     @State var isImportingPhotos: Bool = false
     @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
 

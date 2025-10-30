@@ -12,7 +12,7 @@ import SwiftUI
 class ViewerManager {
 
     var displayedIllustrationID: String = ""
-    @ObservationIgnored var displayedIllustration: Illustration?
+    @ObservationIgnored var displayedIllustration: PhotoIllustration?
     @ObservationIgnored var displayedImage: UIImage?
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
@@ -25,27 +25,23 @@ class ViewerManager {
         queue.maxConcurrentOperationCount = 2
     }
 
-    func setDisplay(_ illustration: Illustration, completion: @escaping () -> Void) {
+    func setDisplay(_ illustration: PhotoIllustration, completion: @escaping () -> Void) {
         if let image = imageCache[illustration.id] {
             displayedImage = image
             displayedIllustration = illustration
             displayedIllustrationID = illustration.id
             completion()
         } else {
-            let illustrationURL: URL = URL(filePath: illustration.illustrationPath())
-            NSFileCoordinator().coordinate(readingItemAt: illustrationURL, error: .none) { url in
-                Task(priority: .userInitiated) {
-                    var loadedImage: UIImage?
-                    if let image = await UIImage(contentsOfFile: url.path(percentEncoded: false))?
-                        .byPreparingForDisplay() {
-                        loadedImage = image
-                    }
-                    imageCache[illustration.id] = loadedImage
-                    displayedImage = loadedImage
-                    displayedIllustration = illustration
-                    displayedIllustrationID = illustration.id
-                    completion()
+            Task(priority: .userInitiated) {
+                var loadedImage: UIImage?
+                if let image = await illustration.loadImage() {
+                    loadedImage = image
                 }
+                imageCache[illustration.id] = loadedImage
+                displayedImage = loadedImage
+                displayedIllustration = illustration
+                displayedIllustrationID = illustration.id
+                completion()
             }
         }
     }

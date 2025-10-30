@@ -13,14 +13,14 @@ struct IllustrationsGrid<Content: View>: View {
 
     var namespace: Namespace.ID
 
-    var illustrations: [Illustration]
+    var illustrations: [PhotoIllustration]
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
-    var isSelected: ((Illustration) -> Bool)?
-    var onSelect: (Illustration) -> Void
+    var isSelected: ((PhotoIllustration) -> Bool)?
+    var onSelect: (PhotoIllustration) -> Void
     var selectedCount: () -> Int
-    var onDelete: ((Illustration) -> Void)?
-    @ViewBuilder var moveMenu: (Illustration) -> Content
+    var onDelete: ((PhotoIllustration) -> Void)?
+    @ViewBuilder var moveMenu: (PhotoIllustration) -> Content
 
     @State var thumbnails: [String: Data] = [:]
 
@@ -35,7 +35,7 @@ struct IllustrationsGrid<Content: View>: View {
         LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
                   phoneColumnConfiguration : padOrMacColumnConfiguration,
                   spacing: 2.0) {
-            ForEach(illustrations, id: \.persistentModelID) { illustration in
+            ForEach(illustrations, id: \.id) { illustration in
                 Button {
                     onSelect(illustration)
                 } label: {

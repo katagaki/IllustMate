@@ -12,41 +12,28 @@ struct IllustrationMoveMenu: View {
 
     @Environment(\.modelContext) var modelContext
 
-    var illustrations: [Illustration]
-    var containingAlbum: Album?
+    var illustrations: [PhotoIllustration]
+    var containingAlbum: PhotoAlbum?
     var onMoved: () -> Void
 
     var body: some View {
-        if containingAlbum != nil {
+        if let containingAlbum {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await actor.removeParentAlbum(forIllustrationsWithIDs: illustrations.map({ $0.persistentModelID }))
+                    try? await photosActor.removeParentAlbum(
+                        forIllustrationsWithIDs: illustrations.map({ $0.id }),
+                        fromAlbum: containingAlbum
+                    )
                     onMoved()
                 }
-            }
-        }
-        if let containingAlbum, let parentAlbum = containingAlbum.parentAlbum {
-            Button {
-                Task {
-                    let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
-                    await actor.addIllustrations(withIDs: illustrationPersistentModelIDs,
-                                                 toAlbumWithID: parentAlbum.persistentModelID)
-                    onMoved()
-                }
-            } label: {
-                Label(
-                    title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
-                    icon: { Image(uiImage: parentAlbum.cover()) }
-                )
             }
         }
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
             ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
                 Button {
                     Task {
-                        let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
-                        await actor.addIllustrations(withIDs: illustrationPersistentModelIDs,
-                                                     toAlbumWithID: album.persistentModelID)
+                        let illustrationIDs = illustrations.map { $0.id }
+                        try? await photosActor.addIllustrations(withIDs: illustrationIDs, toAlbum: album)
                         onMoved()
                     }
                 } label: {
@@ -58,19 +45,12 @@ struct IllustrationMoveMenu: View {
             }
         }
     }
-
-    func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
+    
+    func albumsThatIllustrationsCanBeMovedTo() -> [PhotoAlbum] {
         if let containingAlbum {
-            return containingAlbum.albums()
+            return containingAlbum.childAlbums()
         } else {
-            do {
-                return try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum == nil },
-                    sortBy: [SortDescriptor(\.name)]))
-            } catch {
-                debugPrint(error.localizedDescription)
-                return []
-            }
+            return []
         }
     }
 }

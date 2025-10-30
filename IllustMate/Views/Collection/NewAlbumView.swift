@@ -11,7 +11,7 @@ import SwiftUI
 struct NewAlbumView: View {
 
     @Environment(\.dismiss) var dismiss
-    @State var albumToAddTo: Album?
+    @State var albumToAddTo: PhotoAlbum?
     @State var newAlbumName: String = ""
     @FocusState var focusedField: FocusedField?
 
@@ -27,12 +27,13 @@ struct NewAlbumView: View {
             .safeAreaInset(edge: .bottom) {
                 Button {
                     Task {
-                        let newAlbum = await actor.createAlbum(newAlbumName)
-                        if let albumToAddTo {
-                            await actor.addAlbum(withID: newAlbum.persistentModelID,
-                                                 toAlbumWithID: albumToAddTo.persistentModelID)
+                        do {
+                            _ = try await photosActor.createAlbum(newAlbumName)
+                            // Note: Adding to parent folder not supported by PhotoKit
+                            dismiss()
+                        } catch {
+                            debugPrint("Error creating album: \(error)")
                         }
-                        dismiss()
                     }
                 } label: {
                     Text("Shared.Create")

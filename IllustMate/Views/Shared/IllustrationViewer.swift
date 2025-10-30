@@ -11,7 +11,7 @@ struct IllustrationViewer: View {
 
     @Environment(\.dismiss) var dismiss
 
-    var illustration: Illustration
+    var illustration: PhotoIllustration
     var displayedImage: UIImage
 
     @State var displayOffset: CGSize = .zero

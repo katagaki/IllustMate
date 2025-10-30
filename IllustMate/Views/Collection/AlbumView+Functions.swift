@@ -11,7 +11,7 @@ import SwiftUI
 
 extension AlbumView {
 
-    func deleteAlbum(_ album: Album) {
+    func deleteAlbum(_ album: PhotoAlbum) {
         isConfirmingDeleteAlbum = true
         albumPendingDeletion = album
     }
@@ -19,13 +19,13 @@ extension AlbumView {
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
             Task {
-                await actor.deleteAlbum(withID: albumPendingDeletion.persistentModelID)
+                try? await photosActor.deleteAlbum(withID: albumPendingDeletion.id)
                 await refreshData()
             }
         }
     }
 
-    func deleteIllustration(_ illustration: Illustration?) {
+    func deleteIllustration(_ illustration: PhotoIllustration?) {
         if let illustration {
             isConfirmingDeleteIllustration = true
             illustrationPendingDeletion = illustration
@@ -39,15 +39,13 @@ extension AlbumView {
     }
 
     func confirmDeleteIllustration() {
-        // TODO: Use actor to delete multiple illustrations instead of for loop here
         Task { [isSelectingIllustrations, selectedIllustrations] in
             if isSelectingIllustrations {
-                for illustration in selectedIllustrations {
-                    await actor.deleteIllustration(withID: illustration.persistentModelID)
-                }
+                let ids = selectedIllustrations.map { $0.id }
+                try? await photosActor.deleteIllustrations(withIDs: ids)
             } else {
                 if let illustrationPendingDeletion = illustrationPendingDeletion {
-                    await actor.deleteIllustration(withID: illustrationPendingDeletion.persistentModelID)
+                    try? await photosActor.deleteIllustration(withID: illustrationPendingDeletion.id)
                 }
             }
             self.selectedIllustrations.removeAll()
@@ -65,7 +63,7 @@ extension AlbumView {
         }
     }
 
-    func moveDropToAlbum(_ drop: Drop, to album: Album) {
+    func moveDropToAlbum(_ drop: Drop, to album: PhotoAlbum) {
         Task {
             if let transferable = drop.illustration {
                 await moveIllustrationToAlbum(transferable.id, to: album)
@@ -80,24 +78,19 @@ extension AlbumView {
         }
     }
 
-    func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
-        if let illustration = await actor.illustration(for: illustrationID) {
-            await actor.addIllustration(withID: illustration.persistentModelID,
-                                        toAlbumWithID: album.persistentModelID)
-        }
+    func moveIllustrationToAlbum(_ illustrationID: String, to album: PhotoAlbum) async {
+        try? await photosActor.addIllustration(withID: illustrationID, toAlbum: album)
     }
 
-    func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
-        if let destinationAlbum = await actor.album(for: albumID) {
-            await actor.addAlbum(withID: destinationAlbum.persistentModelID,
-                                 toAlbumWithID: album.persistentModelID)
-        }
+    func moveAlbumToAlbum(_ albumID: String, to album: PhotoAlbum) async {
+        // Moving albums between folders is not supported by PhotoKit
+        // This would require more complex operations
     }
 
-    func importPhotoToAlbum(_ photo: Image, to album: Album) async {
+    func importPhotoToAlbum(_ photo: Image, to album: PhotoAlbum) async {
         let uiImage = await photo.render()
         if let data = uiImage?.data() {
-            await actor.createIllustration(Illustration.newFilename(), data: data)
+            try? await photosActor.createIllustration("Photo", data: data, inAlbum: album)
         }
     }
 
@@ -108,7 +101,7 @@ extension AlbumView {
         }
     }
 
-    func selectOrDeselectIllustration(_ illustration: Illustration) {
+    func selectOrDeselectIllustration(_ illustration: PhotoIllustration) {
         if isSelectingIllustrations {
             if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
                 selectedIllustrations.removeAll(where: { $0.id == illustration.id })
@@ -133,14 +126,9 @@ extension AlbumView {
         }
     }
 
-    func fetchAlbums() async -> [Album] {
-        do {
-            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
-            return albums
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
+    func fetchAlbums() async -> [PhotoAlbum] {
+        let albums = await photosActor.albums(in: currentAlbum, sortedBy: albumSort)
+        return albums
     }
 
     func refreshAlbumsAndSet() {
@@ -154,15 +142,10 @@ extension AlbumView {
         }
     }
 
-    func fetchIllustrations() async -> [Illustration] {
-        do {
-            let illustrations = try await actor
-                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
-            return illustrations
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
+    func fetchIllustrations() async -> [PhotoIllustration] {
+        let illustrations = await photosActor
+            .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+        return illustrations
     }
 
     func refreshIllustrationsAndSet() {

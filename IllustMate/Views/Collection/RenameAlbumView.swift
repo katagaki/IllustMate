@@ -11,7 +11,7 @@ import SwiftUI
 struct RenameAlbumView: View {
 
     @Environment(\.dismiss) var dismiss
-    @State var album: Album
+    @State var album: PhotoAlbum
     @State var newAlbumName: String = ""
     @FocusState var focusedField: FocusedField?
 
@@ -27,7 +27,12 @@ struct RenameAlbumView: View {
             .safeAreaInset(edge: .bottom) {
                 Button {
                     Task {
-                        await actor.renameAlbum(withID: album.persistentModelID, to: newAlbumName)
+                        do {
+                            try await photosActor.renameAlbum(withID: album.id, to: newAlbumName)
+                        } catch {
+                            // Renaming not supported by PhotoKit
+                            debugPrint("Renaming albums not supported: \(error)")
+                        }
                         await MainActor.run {
                             dismiss()
                         }

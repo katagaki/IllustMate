@@ -13,13 +13,13 @@ struct AlbumsSection<Content: View>: View {
 
     @Namespace var albumTransitionNamespace
 
-    var albums: [Album]
+    var albums: [PhotoAlbum]
     @Binding var style: ViewStyle
     var enablesContextMenu: Bool = true
-    var onRename: ((Album) -> Void)?
-    var onDelete: ((Album) -> Void)?
-    var onDrop: ((Drop, Album) -> Void)?
-    @ViewBuilder var moveMenu: (Album) -> Content
+    var onRename: ((PhotoAlbum) -> Void)?
+    var onDelete: ((PhotoAlbum) -> Void)?
+    var onDrop: ((Drop, PhotoAlbum) -> Void)?
+    @ViewBuilder var moveMenu: (PhotoAlbum) -> Content
 
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
 #if targetEnvironment(macCatalyst)
@@ -35,7 +35,7 @@ struct AlbumsSection<Content: View>: View {
                 LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
                           phoneColumnConfiguration : padOrMacColumnConfiguration,
                           spacing: 20.0) {
-                    ForEach(albums, id: \.persistentModelID) { album in
+                    ForEach(albums, id: \.id) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             if enablesContextMenu {
                                 AlbumGridLabel(namespace: albumTransitionNamespace, album: album)
@@ -56,7 +56,7 @@ struct AlbumsSection<Content: View>: View {
                           .padding(20.0)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {
-                    ForEach(albums, id: \.persistentModelID) { album in
+                    ForEach(albums, id: \.id) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             AlbumListRow(namespace: albumTransitionNamespace, album: album)
                                 .draggable(AlbumTransferable(id: album.id))
