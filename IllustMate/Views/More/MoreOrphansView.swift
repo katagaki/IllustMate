@@ -116,7 +116,7 @@ struct MoreOrphansView: View {
 
     func importIllustration(_ name: String, data: Data) {
         Task {
-            await actor.createIllustration(name, data: data)
+            try? await photosActor.createIllustration(name, data: data, inAlbum: nil)
         }
     }
 }

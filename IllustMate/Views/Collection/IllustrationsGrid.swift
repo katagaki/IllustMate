@@ -84,14 +84,15 @@ struct IllustrationsGrid<Content: View>: View {
                             }
                         }
                         Divider()
-                        if illustration.containingAlbum != nil {
-                            Button("Shared.SetAsCover", systemImage: "photo") {
-                                Task {
-                                    await actor.setAsAlbumCover(for: illustration.persistentModelID)
-                                }
-                            }
-                        }
-                        Divider()
+                        // Setting custom album covers not supported by PhotoKit
+                        // if illustration.containingAlbum != nil {
+                        //     Button("Shared.SetAsCover", systemImage: "photo") {
+                        //         Task {
+                        //             await actor.setAsAlbumCover(for: illustration.persistentModelID)
+                        //         }
+                        //     }
+                        // }
+                        // Divider()
                         moveMenu(illustration)
                         if let onDelete {
                             Divider()

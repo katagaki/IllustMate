@@ -31,6 +31,13 @@ struct MoreTroubleshootingView: View {
     var body: some View {
         List {
             Section {
+                Text("Troubleshooting features temporarily disabled during migration to Photos library integration.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            /*
+            // Temporarily disabled - needs migration to Photos library
+            Section {
                 Button("More.FileManagement.Export") {
                     Task {
                         await exportData()
@@ -85,6 +92,7 @@ struct MoreTroubleshootingView: View {
                     isDeleteConfirming = true
                 }
             }
+            */
         }
         .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
             Button("Shared.Yes", role: .destructive) {
