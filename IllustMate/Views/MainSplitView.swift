@@ -14,9 +14,8 @@ struct MainSplitView: View {
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
-
-    @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
-                                  sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
+    
+    @State var albums: [PhotoAlbum] = []
 
     @State var selectedView: ViewPath? = .collection
 
@@ -107,6 +106,11 @@ struct MainSplitView: View {
             if progressAlertManager.isDisplayed {
                 ProgressAlert()
                     .ignoresSafeArea()
+            }
+        }
+        .onAppear {
+            Task {
+                albums = await photosActor.albums(sortedBy: .nameAscending)
             }
         }
     }

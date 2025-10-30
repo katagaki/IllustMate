@@ -16,7 +16,7 @@ struct AlbumsView: View {
 
     @Namespace var namespace
 
-    @State var albums: [Album] = []
+    @State var albums: [PhotoAlbum] = []
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
 
     @State var viewerManager = ViewerManager()
@@ -60,15 +60,11 @@ struct AlbumsView: View {
 
     func refreshAlbums() {
         Task.detached(priority: .userInitiated) {
-            do {
-                let albums = try await actor.albums(sortedBy: .nameAscending)
-                await MainActor.run {
-                    doWithAnimation {
-                        self.albums = albums
-                    }
+            let albums = await photosActor.albums(sortedBy: .nameAscending)
+            await MainActor.run {
+                doWithAnimation {
+                    self.albums = albums
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
             }
         }
     }

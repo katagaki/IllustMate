@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AlbumNavigationStack: View {
 
-    var album: Album
+    var album: PhotoAlbum
     @State var viewPath: [ViewPath] = []
 
     @Namespace var illustrationTransitionNamespace

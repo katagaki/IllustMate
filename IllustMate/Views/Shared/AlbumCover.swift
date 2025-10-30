@@ -12,14 +12,14 @@ struct AlbumCover: View {
     var length: CGFloat?
     var cornerRadius: Double
     var shadowSize: Double
-    var album: Album
+    var album: PhotoAlbum
 
     var primaryImage: Image?
     var secondaryImage: Image?
     var tertiaryImage: Image?
 
     init(length: CGFloat? = nil, cornerRadius: Double = 6.0, shadowSize: Double = 2.0,
-         album: Album, primaryImage: Image? = nil, secondaryImage: Image? = nil, tertiaryImage: Image? = nil) {
+         album: PhotoAlbum, primaryImage: Image? = nil, secondaryImage: Image? = nil, tertiaryImage: Image? = nil) {
         self.length = length
         self.cornerRadius = cornerRadius
         self.shadowSize = shadowSize

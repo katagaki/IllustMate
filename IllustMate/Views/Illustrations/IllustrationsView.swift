@@ -16,7 +16,7 @@ struct IllustrationsView: View {
 
     @Namespace var namespace
 
-    @State var illustrations: [Illustration] = []
+    @State var illustrations: [PhotoIllustration] = []
     @State var viewerManager = ViewerManager()
 
     var body: some View {
@@ -67,15 +67,11 @@ struct IllustrationsView: View {
 
     func refreshIllustrations() {
         Task.detached(priority: .userInitiated) {
-            do {
-                let illustrations = try await actor.illustrations()
-                await MainActor.run {
-                    doWithAnimation {
-                        self.illustrations = illustrations
-                    }
+            let illustrations = await photosActor.illustrations(in: nil, order: .reverse)
+            await MainActor.run {
+                doWithAnimation {
+                    self.illustrations = illustrations
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
             }
         }
     }

@@ -6,6 +6,7 @@
 //
 
 import CloudKitSyncMonitor
+import Photos
 import SwiftUI
 import SwiftData
 
@@ -69,6 +70,11 @@ struct IllustMateApp: App {
             .task {
                 createIfNotExists(illustrationsFolder)
                 createIfNotExists(orphansFolder)
+                
+                // Request Photos library authorization
+                Task {
+                    _ = await photosActor.requestAuthorization()
+                }
             }
         }
         .modelContainer(sharedModelContainer)
