@@ -16,7 +16,7 @@ struct MoreTroubleshootingView: View {
     @Environment(ConcurrencyManager.self) var concurrency
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
-    @Query var thumbnails: [Thumbnail]
+    @State var thumbnails: [Thumbnail] = []
 
     @State var isDeleteConfirming: Bool = false
 
@@ -101,6 +101,17 @@ struct MoreTroubleshootingView: View {
         }
         .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await loadThumbnails()
+        }
+    }
+
+    func loadThumbnails() async {
+        do {
+            thumbnails = try await actor.thumbnails()
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
     }
 
     func exportData() async {

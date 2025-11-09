@@ -17,9 +17,9 @@ struct MoreView: View {
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @ObservedObject var syncMonitor = SyncMonitor.shared
 
-    @Query var illustrations: [Illustration]
-    @Query var albums: [Album]
-    @Query var thumbnails: [Thumbnail]
+    @State var illustrationCount: Int = 0
+    @State var albumCount: Int = 0
+    @State var thumbnailCount: Int = 0
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -80,19 +80,19 @@ struct MoreView: View {
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Albums")
                         Spacer(minLength: 0)
-                        Text("\(albums.count)")
+                        Text("\(albumCount)")
                             .foregroundStyle(.secondary)
                     }
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Illustrations")
                         Spacer(minLength: 0)
-                        Text("\(illustrations.count)")
+                        Text("\(illustrationCount)")
                             .foregroundStyle(.secondary)
                     }
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Thumbnails")
                         Spacer(minLength: 0)
-                        Text("\(thumbnails.count)")
+                        Text("\(thumbnailCount)")
                             .foregroundStyle(.secondary)
                     }
                 } header: {
@@ -168,5 +168,14 @@ SOFTWARE.
                 }
             }
         }
+        .task {
+            await loadCounts()
+        }
+    }
+
+    func loadCounts() async {
+        illustrationCount = await actor.illustrationCount()
+        albumCount = await actor.albumCount()
+        thumbnailCount = await actor.thumbnailCount()
     }
 }

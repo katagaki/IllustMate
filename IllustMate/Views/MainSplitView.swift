@@ -15,8 +15,7 @@ struct MainSplitView: View {
 
     @Namespace var namespace
 
-    @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
-                                  sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
+    @State var albums: [Album] = []
 
     @State var selectedView: ViewPath? = .collection
 
@@ -108,6 +107,17 @@ struct MainSplitView: View {
                 ProgressAlert()
                     .ignoresSafeArea()
             }
+        }
+        .task {
+            await loadAlbums()
+        }
+    }
+
+    func loadAlbums() async {
+        do {
+            albums = try await actor.albumsWithNilParent()
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 }

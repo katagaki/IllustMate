@@ -10,11 +10,11 @@ import SwiftUI
 
 struct IllustrationMoveMenu: View {
 
-    @Environment(\.modelContext) var modelContext
-
     var illustrations: [Illustration]
     var containingAlbum: Album?
     var onMoved: () -> Void
+
+    @State private var albumsToMoveTo: [Album] = []
 
     var body: some View {
         if containingAlbum != nil {
@@ -41,7 +41,7 @@ struct IllustrationMoveMenu: View {
             }
         }
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
-            ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
+            ForEach(albumsToMoveTo) { album in
                 Button {
                     Task {
                         let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
@@ -57,19 +57,20 @@ struct IllustrationMoveMenu: View {
                 }
             }
         }
+        .task {
+            await loadAlbumsToMoveTo()
+        }
     }
 
-    func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
+    func loadAlbumsToMoveTo() async {
         if let containingAlbum {
-            return containingAlbum.albums()
+            albumsToMoveTo = containingAlbum.albums()
         } else {
             do {
-                return try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum == nil },
-                    sortBy: [SortDescriptor(\.name)]))
+                albumsToMoveTo = try await actor.albumsWithNilParent()
             } catch {
                 debugPrint(error.localizedDescription)
-                return []
+                albumsToMoveTo = []
             }
         }
     }

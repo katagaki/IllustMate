@@ -54,6 +54,14 @@ actor DataActor: ModelActor {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
+    func albumsWithNilParent() throws -> [Album] {
+        var fetchDescriptor = FetchDescriptor<Album>(
+            predicate: #Predicate { $0.parentAlbum == nil },
+            sortBy: [SortDescriptor(\.name)])
+        fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
+        return try modelContext.fetch(fetchDescriptor)
+    }
+
     func createAlbum(_ albumName: String) -> Album {
         let newAlbum = Album(name: albumName.trimmingCharacters(in: .whitespaces))
         modelContext.insert(newAlbum)
@@ -100,6 +108,18 @@ actor DataActor: ModelActor {
         let fetchDescriptor = FetchDescriptor<Illustration>()
         let illustrationCount = try? modelContext.fetchCount(fetchDescriptor)
         return illustrationCount ?? 0
+    }
+
+    func albumCount() -> Int {
+        let fetchDescriptor = FetchDescriptor<Album>()
+        let albumCount = try? modelContext.fetchCount(fetchDescriptor)
+        return albumCount ?? 0
+    }
+
+    func thumbnailCount() -> Int {
+        let fetchDescriptor = FetchDescriptor<Thumbnail>()
+        let thumbnailCount = try? modelContext.fetchCount(fetchDescriptor)
+        return thumbnailCount ?? 0
     }
 
     func illustrationCount(inAlbumWithID albumID: ModelID) -> Int {
