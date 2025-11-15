@@ -11,7 +11,6 @@ import SwiftUI
 
 struct AlbumView: View {
 
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager

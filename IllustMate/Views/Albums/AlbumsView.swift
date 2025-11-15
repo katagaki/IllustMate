@@ -10,7 +10,6 @@ import SwiftUI
 
 struct AlbumsView: View {
 
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ViewerManager.self) var viewer
@@ -62,11 +61,10 @@ struct AlbumsView: View {
     func refreshAlbums() {
         Task.detached(priority: .userInitiated) {
             do {
-                let albumIDs = try await actor.albumIDs(sortedBy: .nameAscending)
+                let albums = try await actor.albums(sortedBy: .nameAscending)
                 await MainActor.run {
-                    let fetchedAlbums = albumIDs.compactMap { modelContext[$0, as: Album.self] }
                     doWithAnimation {
-                        self.albums = fetchedAlbums
+                        self.albums = albums
                     }
                 }
             } catch {

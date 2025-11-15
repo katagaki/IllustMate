@@ -10,7 +10,6 @@ import SwiftUI
 
 struct IllustrationsView: View {
 
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ViewerManager.self) var viewer
@@ -69,11 +68,10 @@ struct IllustrationsView: View {
     func refreshIllustrations() {
         Task.detached(priority: .userInitiated) {
             do {
-                let illustrationIDs = try await actor.illustrationIDs()
+                let illustrations = try await actor.illustrations()
                 await MainActor.run {
-                    let fetchedIllustrations = illustrationIDs.compactMap { modelContext[$0, as: Illustration.self] }
                     doWithAnimation {
-                        self.illustrations = fetchedIllustrations
+                        self.illustrations = illustrations
                     }
                 }
             } catch {

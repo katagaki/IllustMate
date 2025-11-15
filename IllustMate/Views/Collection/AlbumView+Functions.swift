@@ -81,15 +81,15 @@ extension AlbumView {
     }
 
     func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
-        if let illustrationPID = await actor.illustrationID(for: illustrationID) {
-            await actor.addIllustration(withID: illustrationPID,
+        if let illustration = await actor.illustration(for: illustrationID) {
+            await actor.addIllustration(withID: illustration.persistentModelID,
                                         toAlbumWithID: album.persistentModelID)
         }
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
-        if let destinationAlbumPID = await actor.albumID(for: albumID) {
-            await actor.addAlbum(withID: destinationAlbumPID,
+        if let destinationAlbum = await actor.album(for: albumID) {
+            await actor.addAlbum(withID: destinationAlbum.persistentModelID,
                                  toAlbumWithID: album.persistentModelID)
         }
     }
@@ -135,10 +135,8 @@ extension AlbumView {
 
     func fetchAlbums() async -> [Album] {
         do {
-            let albumIDs = try await actor.albumIDs(in: currentAlbum, sortedBy: albumSort)
-            return await MainActor.run {
-                albumIDs.compactMap { modelContext[$0, as: Album.self] }
-            }
+            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
+            return albums
         } catch {
             debugPrint(error.localizedDescription)
             return []
@@ -158,11 +156,9 @@ extension AlbumView {
 
     func fetchIllustrations() async -> [Illustration] {
         do {
-            let illustrationIDs = try await actor
-                .illustrationIDs(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
-            return await MainActor.run {
-                illustrationIDs.compactMap { modelContext[$0, as: Illustration.self] }
-            }
+            let illustrations = try await actor
+                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+            return illustrations
         } catch {
             debugPrint(error.localizedDescription)
             return []
