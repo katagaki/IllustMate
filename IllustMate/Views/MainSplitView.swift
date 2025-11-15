@@ -10,6 +10,7 @@ import SwiftUI
 
 struct MainSplitView: View {
 
+    @Environment(\.modelContext) private var modelContext
     @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(ViewerManager.self) var viewer
 
@@ -115,7 +116,13 @@ struct MainSplitView: View {
 
     func loadAlbums() async {
         do {
-            albums = try await actor.albumsWithNilParent()
+            let albumIDs = try await actor.albumIDsWithNilParent()
+            await MainActor.run {
+                let fetchedAlbums = albumIDs.compactMap { modelContext[$0, as: Album.self] }
+                doWithAnimation {
+                    self.albums = fetchedAlbums
+                }
+            }
         } catch {
             debugPrint(error.localizedDescription)
         }

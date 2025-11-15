@@ -12,6 +12,7 @@ import SwiftUI
 // swiftlint:disable type_body_length
 struct MoreTroubleshootingView: View {
 
+    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ConcurrencyManager.self) var concurrency
     @Environment(ProgressAlertManager.self) var progressAlertManager
@@ -108,7 +109,10 @@ struct MoreTroubleshootingView: View {
 
     func loadThumbnails() async {
         do {
-            thumbnails = try await actor.thumbnails()
+            let thumbnailIDs = try await actor.thumbnailIDs()
+            await MainActor.run {
+                thumbnails = thumbnailIDs.compactMap { modelContext[$0, as: Thumbnail.self] }
+            }
         } catch {
             debugPrint(error.localizedDescription)
         }

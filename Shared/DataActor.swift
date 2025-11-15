@@ -62,6 +62,14 @@ actor DataActor: ModelActor {
         return try modelContext.fetch(fetchDescriptor)
     }
 
+    func albumIDsWithNilParent() throws -> [PersistentIdentifier] {
+        let fetchDescriptor = FetchDescriptor<Album>(
+            predicate: #Predicate { $0.parentAlbum == nil },
+            sortBy: [SortDescriptor(\.name)])
+        let albums = try modelContext.fetch(fetchDescriptor)
+        return albums.map { $0.persistentModelID }
+    }
+
     func createAlbum(_ albumName: String) -> Album {
         let newAlbum = Album(name: albumName.trimmingCharacters(in: .whitespaces))
         modelContext.insert(newAlbum)
@@ -259,6 +267,12 @@ actor DataActor: ModelActor {
     func thumbnails() throws -> [Thumbnail] {
         let fetchDescriptor = FetchDescriptor<Thumbnail>()
         return try modelContext.fetch(fetchDescriptor)
+    }
+
+    func thumbnailIDs() throws -> [PersistentIdentifier] {
+        let fetchDescriptor = FetchDescriptor<Thumbnail>()
+        let thumbnails = try modelContext.fetch(fetchDescriptor)
+        return thumbnails.map { $0.persistentModelID }
     }
 
     func deleteAllThumbnails() {

@@ -10,6 +10,8 @@ import SwiftUI
 
 struct IllustrationMoveMenu: View {
 
+    @Environment(\.modelContext) private var modelContext
+    
     var illustrations: [Illustration]
     var containingAlbum: Album?
     var onMoved: () -> Void
@@ -67,7 +69,10 @@ struct IllustrationMoveMenu: View {
             albumsToMoveTo = containingAlbum.albums()
         } else {
             do {
-                albumsToMoveTo = try await actor.albumsWithNilParent()
+                let albumIDs = try await actor.albumIDsWithNilParent()
+                await MainActor.run {
+                    albumsToMoveTo = albumIDs.compactMap { modelContext[$0, as: Album.self] }
+                }
             } catch {
                 debugPrint(error.localizedDescription)
                 albumsToMoveTo = []
