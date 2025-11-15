@@ -81,15 +81,15 @@ extension AlbumView {
     }
 
     func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
-        if let illustration = await actor.illustration(for: illustrationID) {
-            await actor.addIllustration(withID: illustration.persistentModelID,
+        if let illustrationPID = await actor.illustrationID(for: illustrationID) {
+            await actor.addIllustration(withID: illustrationPID,
                                         toAlbumWithID: album.persistentModelID)
         }
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
-        if let destinationAlbum = await actor.album(for: albumID) {
-            await actor.addAlbum(withID: destinationAlbum.persistentModelID,
+        if let destinationAlbumPID = await actor.albumID(for: albumID) {
+            await actor.addAlbum(withID: destinationAlbumPID,
                                  toAlbumWithID: album.persistentModelID)
         }
     }
@@ -135,8 +135,10 @@ extension AlbumView {
 
     func fetchAlbums() async -> [Album] {
         do {
-            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
-            return albums
+            let albumIDs = try await actor.albumIDs(in: currentAlbum, sortedBy: albumSort)
+            return await MainActor.run {
+                albumIDs.compactMap { modelContext[$0, as: Album.self] }
+            }
         } catch {
             debugPrint(error.localizedDescription)
             return []
@@ -156,9 +158,11 @@ extension AlbumView {
 
     func fetchIllustrations() async -> [Illustration] {
         do {
-            let illustrations = try await actor
-                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
-            return illustrations
+            let illustrationIDs = try await actor
+                .illustrationIDs(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+            return await MainActor.run {
+                illustrationIDs.compactMap { modelContext[$0, as: Illustration.self] }
+            }
         } catch {
             debugPrint(error.localizedDescription)
             return []

@@ -70,6 +70,20 @@ actor DataActor: ModelActor {
         return albums.map { $0.persistentModelID }
     }
 
+    func albumIDs(sortedBy sortType: SortType) throws -> [PersistentIdentifier] {
+        let albums = try albums(sortedBy: sortType)
+        return albums.map { $0.persistentModelID }
+    }
+
+    func albumIDs(in album: Album?, sortedBy sortType: SortType) throws -> [PersistentIdentifier] {
+        let albums = try albums(in: album, sortedBy: sortType)
+        return albums.map { $0.persistentModelID }
+    }
+
+    func albumID(for id: String) -> PersistentIdentifier? {
+        return album(for: id)?.persistentModelID
+    }
+
     func createAlbum(_ albumName: String) -> Album {
         let newAlbum = Album(name: albumName.trimmingCharacters(in: .whitespaces))
         modelContext.insert(newAlbum)
@@ -176,6 +190,11 @@ actor DataActor: ModelActor {
         return try modelContext.fetch(fetchDescriptor)
     }
 
+    func illustrationIDs() throws -> [PersistentIdentifier] {
+        let illustrations = try illustrations()
+        return illustrations.map { $0.persistentModelID }
+    }
+
     func illustrations(in album: Album?, order: SortOrder) throws -> [Illustration] {
         let albumID = album?.id
         var fetchDescriptor = FetchDescriptor<Illustration>(
@@ -184,6 +203,16 @@ actor DataActor: ModelActor {
         fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
         fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
         return try modelContext.fetch(fetchDescriptor)
+    }
+
+    func illustrationIDs(in album: Album?, order: SortOrder) throws -> [PersistentIdentifier] {
+        let illustrations = try illustrations(in: album, order: order)
+        return illustrations.map { $0.persistentModelID }
+    }
+
+    func illustrationID(for id: String) -> PersistentIdentifier? {
+        return illustration(for: id)?.persistentModelID
+    }
     }
 
     func illustration(for id: String) -> Illustration? {
