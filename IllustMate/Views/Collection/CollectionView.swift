@@ -7,7 +7,6 @@
 
 import Komponents
 import SwiftUI
-import SwiftData
 
 struct CollectionView: View {
 

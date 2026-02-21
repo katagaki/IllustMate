@@ -6,7 +6,6 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftUI
 
 struct AlbumView: View {

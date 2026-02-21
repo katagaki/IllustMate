@@ -1,71 +1,159 @@
 //
 //  DataActor.swift
-//  PicMate
+//  IllustMate
 //
 //  Created by シン・ジャスティン on 2023/10/17.
 //
 
 import Foundation
-import SwiftData
+import SQLite
 import SwiftUI
 
-actor DataActor: ModelActor {
+actor DataActor {
 
-    let modelContainer: ModelContainer
-    let modelExecutor: any ModelExecutor
+    private let db: Connection
 
-    typealias ModelID = PersistentIdentifier
+    // Tables
+    private let albumsTable = Table("albums")
+    private let illustrationsTable = Table("illustrations")
 
-    init(modelContainer: ModelContainer) {
-        self.modelContainer = modelContainer
-        let context = ModelContext(modelContainer)
-        self.modelExecutor = DefaultSerialModelExecutor(modelContext: context)
+    // Album columns
+    private let albumId = Expression<String>("id")
+    private let albumName = Expression<String>("name")
+    private let albumCoverPhoto = Expression<Data?>("cover_photo")
+    private let albumParentId = Expression<String?>("parent_album_id")
+    private let albumDateCreated = Expression<Double>("date_created")
+
+    // Illustration columns
+    private let illustrationId = Expression<String>("id")
+    private let illustrationName = Expression<String>("name")
+    private let illustrationAlbumId = Expression<String?>("containing_album_id")
+    private let illustrationDateAdded = Expression<Double>("date_added")
+    private let illustrationData = Expression<Data>("data")
+    private let illustrationThumbnailData = Expression<Data?>("thumbnail_data")
+
+    init(db: Connection) {
+        self.db = db
+        setupDatabase()
+    }
+
+    private func setupDatabase() {
+        do {
+            try db.run(albumsTable.create(ifNotExists: true) { t in
+                t.column(albumId, primaryKey: true)
+                t.column(albumName)
+                t.column(albumCoverPhoto)
+                t.column(albumParentId)
+                t.column(albumDateCreated)
+            })
+            try db.run(illustrationsTable.create(ifNotExists: true) { t in
+                t.column(illustrationId, primaryKey: true)
+                t.column(illustrationName)
+                t.column(illustrationAlbumId)
+                t.column(illustrationDateAdded)
+                t.column(illustrationData)
+                t.column(illustrationThumbnailData)
+            })
+        } catch {
+            debugPrint("Database setup error: \(error)")
+        }
     }
 
     func save() {
-        modelContext.processPendingChanges()
-        try? modelContext.save()
+        // SQLite.swift commits automatically; no-op kept for compatibility
     }
 
-    // MARK: Albums
+    // MARK: - Row to Model Helpers
+
+    private func albumFrom(row: Row, loadChildren: Bool = false) -> Album {
+        let id = (try? row.get(albumId)) ?? ""
+        let name = (try? row.get(albumName)) ?? ""
+        let cover = try? row.get(albumCoverPhoto)
+        let parentId = try? row.get(albumParentId)
+        let dateCreated = Date(timeIntervalSince1970: (try? row.get(albumDateCreated)) ?? 0)
+        let album = Album(id: id, name: name, coverPhoto: cover ?? nil,
+                          parentAlbumID: parentId ?? nil, dateCreated: dateCreated)
+        if loadChildren {
+            album.childAlbums = fetchChildAlbums(forAlbumID: id)
+            album.childIllustrations = fetchChildIllustrations(forAlbumID: id)
+        }
+        return album
+    }
+
+    private func illustrationFrom(row: Row) -> Illustration {
+        let id = (try? row.get(illustrationId)) ?? ""
+        let name = (try? row.get(illustrationName)) ?? ""
+        let albumId = try? row.get(illustrationAlbumId)
+        let dateAdded = Date(timeIntervalSince1970: (try? row.get(illustrationDateAdded)) ?? 0)
+        let thumbData = try? row.get(illustrationThumbnailData)
+        let illustration = Illustration(id: id, name: name,
+                                        containingAlbumID: albumId ?? nil,
+                                        dateAdded: dateAdded)
+        illustration.thumbnailData = thumbData ?? nil
+        return illustration
+    }
+
+    private func fetchChildAlbums(forAlbumID id: String) -> [Album] {
+        let query = albumsTable.filter(albumParentId == id)
+        return (try? db.prepare(query).map { albumFrom(row: $0, loadChildren: false) }) ?? []
+    }
+
+    private func fetchChildIllustrations(forAlbumID id: String) -> [Illustration] {
+        let query = illustrationsTable
+            .filter(illustrationAlbumId == id)
+            .select(illustrationId, illustrationName, illustrationAlbumId,
+                    illustrationDateAdded, illustrationThumbnailData)
+        return (try? db.prepare(query).map { illustrationFrom(row: $0) }) ?? []
+    }
+
+    // MARK: - Albums
 
     func albums(sortedBy sortType: SortType) throws -> [Album] {
-        var fetchDescriptor = FetchDescriptor<Album>()
-        fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
-        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.childIllustrations]
-        let albums = try modelContext.fetch(fetchDescriptor)
+        let rows = try db.prepare(albumsTable)
+        let albums = rows.map { albumFrom(row: $0, loadChildren: true) }
         return sortAlbum(albums, sortedBy: sortType)
     }
 
     func albums(in album: Album?, sortedBy sortType: SortType) throws -> [Album] {
-        let albumID = album?.id
-        var fetchDescriptor = FetchDescriptor<Album>(
-            predicate: #Predicate { $0.parentAlbum?.id == albumID })
-        fetchDescriptor.propertiesToFetch = [\.name, \.coverPhoto]
-        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.childIllustrations]
-        let albums = try modelContext.fetch(fetchDescriptor)
+        let query: QueryType
+        if let albumID = album?.id {
+            query = albumsTable.filter(albumParentId == albumID)
+        } else {
+            query = albumsTable.filter(albumParentId == nil)
+        }
+        let rows = try db.prepare(query)
+        let albums = rows.map { albumFrom(row: $0, loadChildren: true) }
         return sortAlbum(albums, sortedBy: sortType)
     }
 
     func album(for id: String) -> Album? {
-        let fetchDescriptor = FetchDescriptor<Album>(
-            predicate: #Predicate<Album> { $0.id == id }
-        )
-        return try? modelContext.fetch(fetchDescriptor).first
+        let query = albumsTable.filter(albumId == id)
+        return try? db.pluck(query).map { albumFrom(row: $0, loadChildren: true) }
     }
 
-    func createAlbum(_ albumName: String) -> Album {
-        let newAlbum = Album(name: albumName.trimmingCharacters(in: .whitespaces))
-        modelContext.insert(newAlbum)
-        save()
-        return newAlbum
+    func createAlbum(_ name: String) -> Album {
+        let id = UUID().uuidString
+        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        let now = Date.now
+        let album = Album(id: id, name: trimmedName, dateCreated: now)
+        try? db.run(albumsTable.insert(
+            albumId <- id,
+            albumName <- trimmedName,
+            albumCoverPhoto <- nil,
+            albumParentId <- nil,
+            albumDateCreated <- now.timeIntervalSince1970
+        ))
+        return album
     }
 
-    func renameAlbum(withID albumID: ModelID, to newName: String) {
-        if let album = self[albumID, as: Album.self] {
-            album.name = newName.trimmingCharacters(in: .whitespaces)
-        }
-        save()
+    func renameAlbum(withID id: String, to newName: String) {
+        let query = albumsTable.filter(albumId == id)
+        try? db.run(query.update(albumName <- newName.trimmingCharacters(in: .whitespaces)))
+    }
+
+    func updateAlbumCover(forAlbumWithID albumID: String, coverData: Data?) {
+        let query = albumsTable.filter(albumId == albumID)
+        try? db.run(query.update(albumCoverPhoto <- coverData))
     }
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
@@ -74,204 +162,210 @@ actor DataActor: ModelActor {
         case .nameDescending: albums.sorted(by: { $0.name > $1.name })
         case .sizeAscending:
             albums.sorted(by: {
-                objectCount(inAlbumWithID: $0.persistentModelID) <
-                    objectCount(inAlbumWithID: $1.persistentModelID)
+                objectCount(forAlbumWithID: $0.id) < objectCount(forAlbumWithID: $1.id)
             })
         case .sizeDescending:
             albums.sorted(by: {
-                objectCount(inAlbumWithID: $0.persistentModelID) >
-                objectCount(inAlbumWithID: $1.persistentModelID)
+                objectCount(forAlbumWithID: $0.id) > objectCount(forAlbumWithID: $1.id)
             })
         }
     }
 
-    func objectCount(inAlbumWithID albumID: ModelID) -> Int {
-        return albumCount(inAlbumWithID: albumID) + illustrationCount(inAlbumWithID: albumID)
+    func objectCount(forAlbumWithID id: String) -> Int {
+        return albumCount(forAlbumWithID: id) + illustrationCount(forAlbumWithID: id)
     }
 
-    func albumCount(inAlbumWithID albumID: ModelID) -> Int {
-        let fetchDescriptor = FetchDescriptor<Album>(
-            predicate: #Predicate { $0.parentAlbum?.persistentModelID == albumID })
-        let albumCount = try? modelContext.fetchCount(fetchDescriptor)
-        return albumCount ?? 0
+    func albumCount(forAlbumWithID id: String) -> Int {
+        let query = albumsTable.filter(albumParentId == id)
+        return (try? db.scalar(query.count)) ?? 0
     }
 
     func illustrationCount() -> Int {
-        let fetchDescriptor = FetchDescriptor<Illustration>()
-        let illustrationCount = try? modelContext.fetchCount(fetchDescriptor)
-        return illustrationCount ?? 0
+        return (try? db.scalar(illustrationsTable.count)) ?? 0
     }
 
-    func illustrationCount(inAlbumWithID albumID: ModelID) -> Int {
-        let fetchDescriptor = FetchDescriptor<Illustration>(
-            predicate: #Predicate { $0.containingAlbum?.persistentModelID == albumID })
-        let illustrationCount = try? modelContext.fetchCount(fetchDescriptor)
-        return illustrationCount ?? 0
+    func illustrationCount(forAlbumWithID id: String) -> Int {
+        let query = illustrationsTable.filter(illustrationAlbumId == id)
+        return (try? db.scalar(query.count)) ?? 0
     }
 
-    func addAlbum(withID albumID: ModelID,
-                  toAlbumWithID destinationAlbumID: ModelID) {
-        if let album = self[albumID, as: Album.self],
-            let destinationAlbum = self[destinationAlbumID, as: Album.self] {
-            destinationAlbum.childAlbums?.append(album)
+    func albumCount() -> Int {
+        return (try? db.scalar(albumsTable.count)) ?? 0
+    }
+
+    func addAlbum(withID albumID: String, toAlbumWithID destinationAlbumID: String) {
+        let query = albumsTable.filter(albumId == albumID)
+        try? db.run(query.update(albumParentId <- destinationAlbumID))
+    }
+
+    func removeParentAlbum(forAlbumWithidentifier albumID: String) {
+        let query = albumsTable.filter(albumId == albumID)
+        try? db.run(query.update(albumParentId <- nil))
+    }
+
+    func deleteAlbum(withID albumID: String) {
+        let parentID = parentAlbumID(forAlbumWithID: albumID)
+
+        // Move direct illustrations to parent album, or orphan them
+        let illustQuery = illustrationsTable.filter(illustrationAlbumId == albumID)
+        if let parentID = parentID {
+            try? db.run(illustQuery.update(illustrationAlbumId <- parentID))
+        } else {
+            try? db.run(illustQuery.update(illustrationAlbumId <- nil))
         }
-        save()
+
+        // Recursively delete child albums
+        deleteAlbumCascade(withID: albumID)
     }
 
-    func removeParentAlbum(forAlbumWithidentifier albumID: ModelID) {
-        if let album = self[albumID, as: Album.self] {
-            album.parentAlbum?.childAlbums?.removeAll(where: { $0.id == album.id })
-            save()
-        }
-    }
+    private func deleteAlbumCascade(withID albumID: String) {
+        // Orphan all illustrations in this album
+        let illustQuery = illustrationsTable.filter(illustrationAlbumId == albumID)
+        try? db.run(illustQuery.update(illustrationAlbumId <- nil))
 
-    func deleteAlbum(withID albumID: ModelID) {
-        if let album = self[albumID, as: Album.self] {
-            if let parentAlbum = album.parentAlbum {
-                for illustration in album.illustrations() {
-                    addIllustration(withID: illustration.persistentModelID,
-                                    toAlbumWithID: parentAlbum.persistentModelID)
+        // Recurse into child albums
+        let childQuery = albumsTable.filter(albumParentId == albumID)
+        if let rows = try? db.prepare(childQuery) {
+            for row in rows {
+                if let childID = try? row.get(albumId) {
+                    deleteAlbumCascade(withID: childID)
                 }
             }
-            modelContext.delete(album)
-            save()
         }
+
+        // Delete the album
+        let album = albumsTable.filter(albumId == albumID)
+        try? db.run(album.delete())
     }
 
-    // MARK: Illustrations
+    private func parentAlbumID(forAlbumWithID albumID: String) -> String? {
+        let query = albumsTable.filter(albumId == albumID).select(albumParentId)
+        return try? db.pluck(query).flatMap { try? $0.get(albumParentId) }
+    }
+
+    // MARK: - Illustrations
 
     func illustrations() throws -> [Illustration] {
-        var fetchDescriptor = FetchDescriptor<Illustration>(
-            sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
-        fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
-        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
-        return try modelContext.fetch(fetchDescriptor)
+        let query = illustrationsTable
+            .select(illustrationId, illustrationName, illustrationAlbumId,
+                    illustrationDateAdded, illustrationThumbnailData)
+            .order(illustrationDateAdded.desc)
+        return try db.prepare(query).map { illustrationFrom(row: $0) }
     }
 
     func illustrations(in album: Album?, order: SortOrder) throws -> [Illustration] {
-        let albumID = album?.id
-        var fetchDescriptor = FetchDescriptor<Illustration>(
-            predicate: #Predicate { $0.containingAlbum?.id == albumID },
-            sortBy: [SortDescriptor(\.dateAdded, order: order)])
-        fetchDescriptor.propertiesToFetch = [\.name, \.dateAdded]
-        fetchDescriptor.relationshipKeyPathsForPrefetching = [\.cachedThumbnail]
-        return try modelContext.fetch(fetchDescriptor)
+        let baseQuery: Table
+        if let albumID = album?.id {
+            baseQuery = illustrationsTable.filter(illustrationAlbumId == albumID)
+        } else {
+            baseQuery = illustrationsTable.filter(illustrationAlbumId == nil)
+        }
+        let orderedQuery = (order == .reverse ? baseQuery.order(illustrationDateAdded.desc) :
+                                                baseQuery.order(illustrationDateAdded.asc))
+            .select(illustrationId, illustrationName, illustrationAlbumId,
+                    illustrationDateAdded, illustrationThumbnailData)
+        return try db.prepare(orderedQuery).map { illustrationFrom(row: $0) }
     }
 
     func illustration(for id: String) -> Illustration? {
-        let fetchDescriptor = FetchDescriptor<Illustration>(
-            predicate: #Predicate<Illustration> { $0.id == id }
-        )
-        return try? modelContext.fetch(fetchDescriptor).first
+        let query = illustrationsTable
+            .filter(illustrationId == id)
+            .select(illustrationId, illustrationName, illustrationAlbumId,
+                    illustrationDateAdded, illustrationThumbnailData)
+        return try? db.pluck(query).map { illustrationFrom(row: $0) }
     }
 
-    func createIllustration(_ name: String, data: Data, inAlbumWithID albumID: ModelID? = nil) {
-        let illustration = Illustration(name: name, data: data)
-        modelContext.insert(illustration)
-        illustration.generateThumbnail()
-        if let albumID, let album = self[albumID, as: Album.self] {
-            album.childIllustrations?.append(illustration)
-        }
-        save()
+    func imageData(forIllustrationWithID id: String) -> Data? {
+        let query = illustrationsTable
+            .filter(illustrationId == id)
+            .select(illustrationData)
+        return try? db.pluck(query).flatMap { try? $0.get(illustrationData) }
     }
 
-    func addIllustrations(withIDs illustrationIDs: [ModelID], toAlbumWithID albumID: ModelID) {
-        if let album = self[albumID, as: Album.self] {
-            var illustrations: [Illustration] = []
-            for illustrationID in illustrationIDs {
-                if let illustration = self[illustrationID, as: Illustration.self] {
-                    illustrations.append(illustration)
-                }
-            }
-            album.childIllustrations?.append(contentsOf: illustrations)
-        }
-        save()
+    func createIllustration(_ name: String, data: Data, inAlbumWithID albumID: String? = nil) {
+        let id = UUID().uuidString
+        let now = Date.now
+        let thumbnailData = Illustration.makeThumbnail(data)
+        try? db.run(illustrationsTable.insert(
+            illustrationId <- id,
+            illustrationName <- name,
+            illustrationAlbumId <- albumID,
+            illustrationDateAdded <- now.timeIntervalSince1970,
+            illustrationData <- data,
+            illustrationThumbnailData <- thumbnailData
+        ))
     }
 
-    func addIllustration(withID illustrationID: ModelID, toAlbumWithID albumID: ModelID) {
-        if let illustration = self[illustrationID, as: Illustration.self],
-            let album = self[albumID, as: Album.self] {
-            album.childIllustrations?.append(illustration)
-        }
-        save()
-    }
-
-    func removeParentAlbum(forIllustrationWithID illustrationID: ModelID) {
-        if let illustration = self[illustrationID, as: Illustration.self] {
-            illustration.containingAlbum?.childIllustrations?
-                .removeAll(where: { $0.id == illustration.id })
-            save()
-        }
-    }
-
-    func removeParentAlbum(forIllustrationsWithIDs illustrationIDs: [ModelID]) {
+    func addIllustrations(withIDs illustrationIDs: [String], toAlbumWithID albumID: String) {
         for illustrationID in illustrationIDs {
-            if let illustration = self[illustrationID, as: Illustration.self] {
-                illustration.containingAlbum?.childIllustrations?
-                    .removeAll(where: { $0.id == illustration.id })
-            }
-        }
-        save()
-    }
-
-    func setAsAlbumCover(for illustrationID: ModelID) {
-        if let illustration = self[illustrationID, as: Illustration.self],
-           let containingAlbum = illustration.containingAlbum {
-            let image = UIImage(contentsOfFile: illustration.illustrationPath())
-            if let data = image?.jpegData(compressionQuality: 1.0) {
-                containingAlbum.coverPhoto = Album.makeCover(data)
-                save()
-            }
+            let query = illustrationsTable.filter(illustrationId == illustrationID)
+            try? db.run(query.update(illustrationAlbumId <- albumID))
         }
     }
 
-    func deleteIllustration(withID illustrationID: ModelID) {
-        if let illustration = self[illustrationID, as: Illustration.self] {
-            illustration.prepareForDeletion()
-            if let cachedThumbnail = illustration.cachedThumbnail {
-                modelContext.delete(cachedThumbnail)
-            }
-            modelContext.delete(illustration)
-        }
-        save()
+    func addIllustration(withID illustrationID: String, toAlbumWithID albumID: String) {
+        let query = illustrationsTable.filter(illustrationId == illustrationID)
+        try? db.run(query.update(illustrationAlbumId <- albumID))
     }
 
-    func thumbnails() throws -> [Thumbnail] {
-        let fetchDescriptor = FetchDescriptor<Thumbnail>()
-        return try modelContext.fetch(fetchDescriptor)
+    func removeParentAlbum(forIllustrationWithID illustrationID: String) {
+        let query = illustrationsTable.filter(illustrationId == illustrationID)
+        try? db.run(query.update(illustrationAlbumId <- nil))
+    }
+
+    func removeParentAlbum(forIllustrationsWithIDs illustrationIDs: [String]) {
+        for illustrationID in illustrationIDs {
+            let query = illustrationsTable.filter(illustrationId == illustrationID)
+            try? db.run(query.update(illustrationAlbumId <- nil))
+        }
+    }
+
+    func setAsAlbumCover(for illustrationID: String) {
+        if let data = imageData(forIllustrationWithID: illustrationID),
+           let albumID = containingAlbumID(forIllustrationWithID: illustrationID) {
+            let coverData = Album.makeCover(data)
+            let query = albumsTable.filter(albumId == albumID)
+            try? db.run(query.update(albumCoverPhoto <- coverData))
+        }
+    }
+
+    func renameIllustration(withID illustrationID: String, to newName: String) {
+        let query = illustrationsTable.filter(illustrationId == illustrationID)
+        try? db.run(query.update(illustrationName <- newName))
+    }
+
+    func updateThumbnail(forIllustrationWithID illustrationID: String, thumbnailData: Data?) {
+        let query = illustrationsTable.filter(illustrationId == illustrationID)
+        try? db.run(query.update(illustrationThumbnailData <- thumbnailData))
+    }
+
+    private func containingAlbumID(forIllustrationWithID illustrationID: String) -> String? {
+        let query = illustrationsTable
+            .filter(illustrationId == illustrationID)
+            .select(illustrationAlbumId)
+        return try? db.pluck(query).flatMap { try? $0.get(illustrationAlbumId) }
+    }
+
+    func deleteIllustration(withID illustrationID: String) {
+        let query = illustrationsTable.filter(illustrationId == illustrationID)
+        try? db.run(query.delete())
+    }
+
+    // MARK: - Thumbnails (stored within illustrations table)
+
+    func thumbnailCount() -> Int {
+        let query = illustrationsTable.filter(illustrationThumbnailData != nil)
+        return (try? db.scalar(query.count)) ?? 0
     }
 
     func deleteAllThumbnails() {
-        for thumbnail in ((try? thumbnails()) ?? []) {
-            modelContext.delete(thumbnail)
-        }
-        save()
+        try? db.run(illustrationsTable.update(illustrationThumbnailData <- nil))
     }
 
-    func deleteThumbnail(withID thumbnailID: ModelID) {
-        if let thumbnail = self[thumbnailID, as: Thumbnail.self] {
-            modelContext.delete(thumbnail)
-        }
-        save()
-    }
+    // MARK: - Delete All
 
     func deleteAll() {
-        try? modelContext.delete(model: Illustration.self, includeSubclasses: true)
-        try? modelContext.delete(model: Album.self, includeSubclasses: true)
-        try? modelContext.delete(model: Thumbnail.self, includeSubclasses: true)
-        do {
-            for illustration in try modelContext.fetch(FetchDescriptor<Illustration>()) {
-                modelContext.delete(illustration)
-            }
-            for album in try modelContext.fetch(FetchDescriptor<Album>()) {
-                modelContext.delete(album)
-            }
-            for thumbnail in try modelContext.fetch(FetchDescriptor<Thumbnail>()) {
-                modelContext.delete(thumbnail)
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-        save()
+        try? db.run(illustrationsTable.delete())
+        try? db.run(albumsTable.delete())
     }
 }

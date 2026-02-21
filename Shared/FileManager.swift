@@ -1,19 +1,15 @@
 //
 //  FileManager.swift
-//  PicMate
+//  IllustMate
 //
 //  Created by シン・ジャスティン on 2023/10/04.
 //
 
 import Foundation
 
-let isCloudSyncEnabled = FileManager.default.url(forUbiquityContainerIdentifier: nil) != nil
-let documentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents") ??
-                   FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-let illustrationsFolder = documentsURL.appendingPathComponent("Illustrations")
+let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 let orphansFolder = documentsURL.appendingPathComponent("Orphans")
-let exportsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-                        .first!.appendingPathComponent("Export")
+let exportsFolder = documentsURL.appendingPathComponent("Export")
 
 func createIfNotExists(_ url: URL?) {
     if let url, !directoryExistsAtPath(url) {

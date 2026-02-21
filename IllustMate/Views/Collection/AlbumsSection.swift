@@ -35,7 +35,7 @@ struct AlbumsSection<Content: View>: View {
                 LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
                           phoneColumnConfiguration : padOrMacColumnConfiguration,
                           spacing: 20.0) {
-                    ForEach(albums, id: \.persistentModelID) { album in
+                    ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             if enablesContextMenu {
                                 AlbumGridLabel(namespace: albumTransitionNamespace, album: album)
@@ -56,7 +56,7 @@ struct AlbumsSection<Content: View>: View {
                           .padding(20.0)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {
-                    ForEach(albums, id: \.persistentModelID) { album in
+                    ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             AlbumListRow(namespace: albumTransitionNamespace, album: album)
                                 .draggable(AlbumTransferable(id: album.id))
@@ -86,8 +86,8 @@ struct AlbumsSection<Content: View>: View {
             moveMenu(album)
             Divider()
             Button("Shared.ResetCover", systemImage: "photo") {
-                doWithAnimationAsynchronously {
-                    album.coverPhoto = nil
+                Task {
+                    await actor.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
                 }
             }
             if onRename != nil || onDelete != nil {

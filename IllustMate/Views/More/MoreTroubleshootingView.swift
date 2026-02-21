@@ -6,8 +6,8 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftUI
+import UIKit
 
 // swiftlint:disable type_body_length
 struct MoreTroubleshootingView: View {
@@ -16,17 +16,7 @@ struct MoreTroubleshootingView: View {
     @Environment(ConcurrencyManager.self) var concurrency
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
-    @Query var thumbnails: [Thumbnail]
-
     @State var isDeleteConfirming: Bool = false
-
-    let queue: OperationQueue
-
-    init() {
-        queue = OperationQueue()
-        queue.qualityOfService = .userInitiated
-        queue.maxConcurrentOperationCount = 8
-    }
 
     var body: some View {
         List {
@@ -46,11 +36,6 @@ struct MoreTroubleshootingView: View {
                         await rebuildThumbnails()
                     }
                 }
-                Button("More.Troubleshooting.UnorphanThumbnails") {
-                    Task {
-                        await removeOrphanedThumbnails()
-                    }
-                }
                 Button("More.Troubleshooting.RestoreImageNames") {
                     Task {
                         await rebuildImageNames()
@@ -61,16 +46,9 @@ struct MoreTroubleshootingView: View {
                     .font(.body)
             }
             Section {
-                Button("More.Troubleshooting.RedownloadIllustrations") {
-                    Task {
-                        await redownloadIllustrations()
-                    }
-                }
                 Button("More.Troubleshooting.CheckConsistency") {
                     Task {
-                        await scanAndMoveOrphans()
                         await findDuplicates()
-                        await findReorphans()
                     }
                 }
                 Button("More.Troubleshooting.ShowOrphanedFiles") {
@@ -90,7 +68,6 @@ struct MoreTroubleshootingView: View {
             Button("Shared.Yes", role: .destructive) {
                 Task {
                     await deleteData()
-                    deleteContents(of: illustrationsFolder)
                     deleteContents(of: orphansFolder)
                     navigationManager.popAll()
                 }
@@ -136,53 +113,18 @@ struct MoreTroubleshootingView: View {
                                          total: illustrations.count)
             await actor.deleteAllThumbnails()
             progressAlertManager.show()
-            let coordinator = NSFileCoordinator()
             for illustration in illustrations {
-                let url = URL(filePath: illustration.illustrationPath())
-                let intent = NSFileAccessIntent.readingIntent(with: url)
-                coordinator.coordinate(with: [intent], queue: concurrency.queue) { error in
-                    if let error {
-                        debugPrint(error.localizedDescription)
-                        Task {
-                            await MainActor.run {
-                                progressAlertManager.incrementProgress()
-                            }
-                        }
-                    } else {
-                        Task {
-                            illustration.generateThumbnail()
-                            await MainActor.run {
-                                progressAlertManager.incrementProgress()
-                                if progressAlertManager.percentage >= 100 {
-                                    Task {
-                                        await actor.save()
-                                    }
-                                    UIApplication.shared.isIdleTimerDisabled = false
-                                    progressAlertManager.hide()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-    }
-
-    func removeOrphanedThumbnails() async {
-        UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let thumbnails = try await actor.thumbnails()
-            progressAlertManager.prepare("More.Troubleshooting.UnorphanThumbnails.Unorphaning", total: thumbnails.count)
-            progressAlertManager.show()
-            for thumbnail in thumbnails {
-                if thumbnail.illustration == nil {
-                    await actor.deleteThumbnail(withID: thumbnail.persistentModelID)
+                if let data = await actor.imageData(forIllustrationWithID: illustration.id) {
+                    let thumbnailData = Illustration.makeThumbnail(data)
+                    await actor.updateThumbnail(forIllustrationWithID: illustration.id,
+                                                thumbnailData: thumbnailData)
                 }
                 await MainActor.run {
                     progressAlertManager.incrementProgress()
+                    if progressAlertManager.percentage >= 100 {
+                        UIApplication.shared.isIdleTimerDisabled = false
+                        progressAlertManager.hide()
+                    }
                 }
             }
             UIApplication.shared.isIdleTimerDisabled = false
@@ -197,13 +139,15 @@ struct MoreTroubleshootingView: View {
         UIApplication.shared.isIdleTimerDisabled = true
         do {
             let illustrations = try await actor.illustrations()
-            progressAlertManager.prepare("More.Troubleshooting.RestoreImageNames.Renaming", total: thumbnails.count)
+            progressAlertManager.prepare("More.Troubleshooting.RestoreImageNames.Renaming",
+                                         total: illustrations.count)
             progressAlertManager.show()
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyyMMddHHmmssSSSS"
             for illustration in illustrations {
                 if illustration.name.starts(with: "PIC_") || illustration.name.starts(with: "ILLUST_") {
-                    illustration.name = "PIC_" + dateFormatter.string(from: illustration.dateAdded)
+                    let newName = "PIC_" + dateFormatter.string(from: illustration.dateAdded)
+                    await actor.renameIllustration(withID: illustration.id, to: newName)
                 }
                 await MainActor.run {
                     progressAlertManager.incrementProgress()
@@ -241,82 +185,31 @@ struct MoreTroubleshootingView: View {
     }
 
     func exportIllustration(illustration: Illustration, to exportFolderURL: URL) async {
-        let intent = NSFileAccessIntent.readingIntent(with: URL(filePath: illustration.illustrationPath()))
-        let coordinator = NSFileCoordinator()
-        coordinator.coordinate(with: [intent], queue: queue) { error in
-            if let error {
-                debugPrint(error.localizedDescription)
+        if let data = await actor.imageData(forIllustrationWithID: illustration.id),
+           let image = UIImage(data: data) {
+            var filename: URL = exportFolderURL.appending(component: illustration.name)
+            let fileData: Data?
+            if let pngData = image.pngData() {
+                filename = filename.appendingPathExtension("png")
+                fileData = pngData
+            } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
+                filename = filename.appendingPathExtension("jpg")
+                fileData = jpgData
+            } else if let heicData = image.heicData() {
+                filename = filename.appendingPathExtension("heic")
+                fileData = heicData
             } else {
-                var filename: URL = exportFolderURL.appending(component: illustration.name)
-                if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                    if image.pngData() != nil {
-                        filename = filename.appendingPathExtension("png")
-                    } else if image.jpegData(compressionQuality: 0.1) != nil {
-                        filename = filename.appendingPathExtension("jpg")
-                    } else if image.heicData() != nil {
-                        filename = filename.appendingPathExtension("heic")
-                    }
-                    try? FileManager.default.copyItem(atPath: illustration.illustrationPath(),
-                                                      toPath: filename.path(percentEncoded: false))
-                }
-                Task {
-                    await MainActor.run {
-                        progressAlertManager.incrementProgress()
-                        if progressAlertManager.percentage == 100 {
-                            progressAlertManager.hide()
-                            UIApplication.shared.isIdleTimerDisabled = false
-                        }
-                    }
-                }
+                fileData = data
+            }
+            try? fileData?.write(to: filename)
+        }
+        await MainActor.run {
+            progressAlertManager.incrementProgress()
+            if progressAlertManager.percentage >= 100 {
+                progressAlertManager.hide()
+                UIApplication.shared.isIdleTimerDisabled = false
             }
         }
-    }
-
-    func scanAndMoveOrphans() async {
-        UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let illustrations = try await actor.illustrations()
-            let filesToCheck = try FileManager.default.contentsOfDirectory(at: illustrationsFolder,
-                                                                           includingPropertiesForKeys: nil)
-            progressAlertManager.prepare("More.Troubleshooting.Orphans.Scanning", total: filesToCheck.count)
-            progressAlertManager.show()
-            let orphans: [String] = await withTaskGroup(of: String?.self, returning: [String].self) { group in
-                var orphans: [String] = []
-                for file in filesToCheck {
-                    group.addTask {
-                        if !illustrations.contains(where: { file.lastPathComponent.contains($0.id) }) {
-                            await MainActor.run {
-                                progressAlertManager.incrementProgress()
-                            }
-                            return file.lastPathComponent
-                        }
-                        await MainActor.run {
-                            progressAlertManager.incrementProgress()
-                        }
-                        return nil
-                    }
-                }
-                for await result in group {
-                    if let result {
-                        orphans.append(result)
-                    }
-                }
-                return orphans
-            }
-            progressAlertManager.prepare("More.Troubleshooting.Orphans.Moving", total: orphans.count)
-            for orphan in orphans {
-                try? FileManager.default.moveItem(
-                    at: illustrationsFolder.appendingPathComponent(orphan),
-                    to: orphansFolder.appendingPathComponent(orphan))
-                await MainActor.run {
-                    progressAlertManager.incrementProgress()
-                }
-            }
-            progressAlertManager.hide()
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func showOrphans() {
@@ -350,7 +243,7 @@ struct MoreTroubleshootingView: View {
             for illustration in illustrations {
                 let illustrationsFound = illustrations.filter({ $0.id == illustration.id })
                 if illustrationsFound.count > 1 {
-                    albumsWithDuplicates += "\n\(illustration.containingAlbum?.name ?? "")"
+                    albumsWithDuplicates += "\n\(illustration.containingAlbumID ?? "")"
                 }
                 await MainActor.run {
                     progressAlertManager.incrementProgress()
@@ -369,64 +262,6 @@ struct MoreTroubleshootingView: View {
             debugPrint(error.localizedDescription)
         }
         UIApplication.shared.isIdleTimerDisabled = false
-    }
-
-    func findReorphans() async {
-        UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let illustrations = try await actor.illustrations()
-            var albumsWithReorphans = ""
-            progressAlertManager.prepare("More.Troubleshooting.Reorphans.Scanning", total: illustrations.count)
-            progressAlertManager.show()
-            for illustration in illustrations {
-                if !FileManager.default.fileExists(atPath: illustration.illustrationPath()) {
-                    albumsWithReorphans += "\n\(illustration.containingAlbum?.name ?? "")"
-                }
-                await MainActor.run {
-                    progressAlertManager.incrementProgress()
-                }
-            }
-            if albumsWithReorphans != "" {
-                progressAlertManager.title = "More.Troubleshooting.Reorphans.Found.\(albumsWithReorphans)"
-                try? await Task.sleep(nanoseconds: 3000000000)
-                await MainActor.run {
-                    progressAlertManager.hide()
-                }
-            } else {
-                progressAlertManager.hide()
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-        UIApplication.shared.isIdleTimerDisabled = false
-    }
-
-    func redownloadIllustrations() async {
-        UIApplication.shared.isIdleTimerDisabled = true
-        do {
-            let illustrations = try await actor.illustrations()
-            progressAlertManager.prepare("More.Troubleshooting.RedownloadIllustrations.Redownloading",
-                                         total: illustrations.count)
-            progressAlertManager.show()
-            for illustration in illustrations {
-                do {
-                    try FileManager.default.startDownloadingUbiquitousItem(
-                        at: URL(filePath: illustration.illustrationPath()))
-                } catch {
-                    debugPrint(error.localizedDescription)
-                }
-                await MainActor.run {
-                    progressAlertManager.incrementProgress()
-                }
-            }
-            UIApplication.shared.isIdleTimerDisabled = false
-            progressAlertManager.hide {
-                // TODO: Show an alert that the downloads may take some time to complete
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
     }
 
     func deleteData() async {

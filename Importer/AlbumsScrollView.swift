@@ -18,8 +18,6 @@ struct AlbumsScrollView: View {
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
     @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
 
-    let actor = DataActor(modelContainer: sharedModelContainer)
-
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {

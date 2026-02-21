@@ -1,24 +1,7 @@
 //
 //  Thumbnail.swift
-//  PicMate
+//  IllustMate
 //
-//  Created by シン・ジャスティン on 2023/10/10.
+//  Thumbnails are now stored directly in the illustrations table.
+//  This file is intentionally left without a model class.
 //
-
-import Foundation
-import SwiftData
-import UIKit
-
-@Model
-final class Thumbnail {
-    @Relationship(deleteRule: .nullify, inverse: \Illustration.cachedThumbnail) var illustration: Illustration?
-    @Attribute(.externalStorage) var data: Data = Data()
-
-    init(data: Data) {
-        self.data = data
-    }
-
-    func image() -> UIImage? {
-        return UIImage(data: data)
-    }
-}

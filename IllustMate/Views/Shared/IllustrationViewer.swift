@@ -17,6 +17,7 @@ struct IllustrationViewer: View {
     @State var displayOffset: CGSize = .zero
     @State var magnification: CGFloat = 1.0
     @State var magnificationAnchor: UnitPoint = .center
+    @State var containingAlbumName: String? = nil
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
@@ -62,8 +63,8 @@ struct IllustrationViewer: View {
                         .font(.headline)
                         .bold()
                         .lineLimit(1)
-                    if let containingAlbum = illustration.containingAlbum {
-                        Text(containingAlbum.name)
+                    if let containingAlbumName {
+                        Text(containingAlbumName)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -73,6 +74,11 @@ struct IllustrationViewer: View {
         }
         .padding(20.0)
         .frame(maxHeight: .infinity)
+        .task {
+            if let albumID = illustration.containingAlbumID {
+                containingAlbumName = await actor.album(for: albumID)?.name
+            }
+        }
 #if !targetEnvironment(macCatalyst)
         .overlayBackground(opacity: opacityDuringGesture())
         .gesture(

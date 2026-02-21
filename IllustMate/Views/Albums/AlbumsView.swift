@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/18.
 //
 
-import SwiftData
 import SwiftUI
 
 struct AlbumsView: View {

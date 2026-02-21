@@ -1,22 +1,24 @@
 //
-//  SwiftData.swift
-//  Importer
+//  Database.swift
+//  IllustMate
 //
 //  Created by シン・ジャスティン on 2023/10/12.
 //
 
-import SwiftData
+import Foundation
+import SQLite
 
-var sharedModelContainer: ModelContainer = {
-    let schema = Schema([Album.self, Illustration.self])
-    let modelConfiguration = ModelConfiguration(schema: schema,
-                                                isStoredInMemoryOnly: false,
-                                                cloudKitDatabase: .automatic)
+let sharedDatabase: Connection = {
+    let dbURL = FileManager.default
+        .urls(for: .documentDirectory, in: .userDomainMask)
+        .first!
+        .appendingPathComponent("IllustMate.sqlite")
     do {
-        return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        let connection = try Connection(dbURL.path)
+        return connection
     } catch {
-        fatalError("Could not create ModelContainer: \(error)")
+        fatalError("Could not open SQLite database: \(error)")
     }
 }()
 
-let actor = DataActor(modelContainer: sharedModelContainer)
+let actor = DataActor(db: sharedDatabase)

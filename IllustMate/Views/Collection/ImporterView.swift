@@ -7,7 +7,6 @@
 
 import Komponents
 import PhotosUI
-import SwiftData
 import SwiftUI
 
 struct ImporterView: View {
@@ -116,7 +115,7 @@ struct ImporterView: View {
             for selectedPhotoItem in selectedPhotoItems {
                 if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                     await actor.createIllustration(Illustration.newFilename(), data: data,
-                                                   inAlbumWithID: selectedAlbum?.persistentModelID)
+                                                   inAlbumWithID: selectedAlbum?.id)
                 }
                 await MainActor.run {
                     importCurrentCount += 1

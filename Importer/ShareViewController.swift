@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
-import SwiftData
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers

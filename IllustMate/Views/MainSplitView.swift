@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/07.
 //
 
-import SwiftData
 import SwiftUI
 
 struct MainSplitView: View {
@@ -15,9 +14,7 @@ struct MainSplitView: View {
 
     @Namespace var namespace
 
-    @Query(FetchDescriptor<Album>(predicate: #Predicate { $0.parentAlbum == nil },
-                                  sortBy: [SortDescriptor<Album>(\.name)])) var albums: [Album]
-
+    @State var albums: [Album] = []
     @State var selectedView: ViewPath? = .collection
 
     var body: some View {
@@ -58,7 +55,7 @@ struct MainSplitView: View {
                     }
                 }
                 Section {
-                    ForEach(albums, id: \.id) { album in
+                    ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             Label {
                                 Text(album.name)
@@ -107,6 +104,13 @@ struct MainSplitView: View {
             if progressAlertManager.isDisplayed {
                 ProgressAlert()
                     .ignoresSafeArea()
+            }
+        }
+        .task {
+            do {
+                albums = try await actor.albums(in: nil, sortedBy: .nameAscending)
+            } catch {
+                debugPrint(error.localizedDescription)
             }
         }
     }

@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/08.
 //
 
-import SwiftData
 import SwiftUI
 
 struct IllustrationsView: View {
