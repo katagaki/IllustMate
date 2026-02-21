@@ -114,9 +114,6 @@ struct IllustrationsGrid<Content: View>: View {
 #endif
             }
         }
-        .background(colorScheme == .light ?
-                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                        Color.init(uiColor: .systemBackground))
     }
 }
 

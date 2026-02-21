@@ -75,9 +75,6 @@ struct AlbumsSection<Content: View>: View {
                 }
             }
         }
-        .background(colorScheme == .light ?
-                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                        Color.init(uiColor: .systemBackground))
     }
 
     @ViewBuilder

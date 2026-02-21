@@ -62,8 +62,6 @@ struct AlbumView: View {
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !albums.isEmpty {
-                    Divider()
-                        .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
                     AlbumsSection(albums: albums, style: $albumStyleState) { album in
                         albumToRename = album
                     } onDelete: { album in
@@ -75,12 +73,7 @@ struct AlbumView: View {
                             refreshAlbumsAndSet()
                         }
                     }
-                    if colorScheme == .light || albumStyleState == .list {
-                        Divider()
-                    }
                 } else {
-                    Divider()
-                        .padding([.leading], 20.0)
                     Text("Albums.NoAlbums")
                         .foregroundStyle(.secondary)
                         .padding(20.0)
@@ -100,7 +93,6 @@ struct AlbumView: View {
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !illustrations.isEmpty {
-                    Divider()
                     IllustrationsGrid(namespace: namespace, illustrations: illustrations,
                                       isSelecting: $isSelectingIllustrations) { illustration in
                         selectedIllustrations.contains(illustration)
@@ -117,10 +109,7 @@ struct AlbumView: View {
                             refreshDataAfterIllustrationMoved()
                         }
                     }
-                    Divider()
                 } else {
-                    Divider()
-                        .padding([.leading], 20.0)
                     Text("Albums.NoIllustrations")
                         .foregroundStyle(.secondary)
                         .padding(20.0)
@@ -142,7 +131,6 @@ struct AlbumView: View {
                 }
             }
         }
-        .background(Color.init(uiColor: .systemGroupedBackground))
 #if targetEnvironment(macCatalyst)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
