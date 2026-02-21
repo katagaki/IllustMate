@@ -12,7 +12,7 @@ import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
-final class Album: Identifiable, Hashable {
+final class Album: Identifiable, Hashable, @unchecked Sendable {
     var id: String
     var name: String
     var coverPhoto: Data?

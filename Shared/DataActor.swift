@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SQLite
+@preconcurrency import SQLite
 import SwiftUI
 
 actor DataActor {
@@ -14,30 +14,36 @@ actor DataActor {
     private let database: Connection
 
     // Tables
-    private let albumsTable = Table("albums")
-    private let illustrationsTable = Table("illustrations")
+    private nonisolated let albumsTable = Table("albums")
+    private nonisolated let illustrationsTable = Table("illustrations")
 
     // Album columns
-    private let albumId = Expression<String>("id")
-    private let albumName = Expression<String>("name")
-    private let albumCoverPhoto = Expression<Data?>("cover_photo")
-    private let albumParentId = Expression<String?>("parent_album_id")
-    private let albumDateCreated = Expression<Double>("date_created")
+    private nonisolated let albumId = Expression<String>("id")
+    private nonisolated let albumName = Expression<String>("name")
+    private nonisolated let albumCoverPhoto = Expression<Data?>("cover_photo")
+    private nonisolated let albumParentId = Expression<String?>("parent_album_id")
+    private nonisolated let albumDateCreated = Expression<Double>("date_created")
 
     // Illustration columns
-    private let illustrationId = Expression<String>("id")
-    private let illustrationName = Expression<String>("name")
-    private let illustrationAlbumId = Expression<String?>("containing_album_id")
-    private let illustrationDateAdded = Expression<Double>("date_added")
-    private let illustrationData = Expression<Data>("data")
-    private let illustrationThumbnailData = Expression<Data?>("thumbnail_data")
+    private nonisolated let illustrationId = Expression<String>("id")
+    private nonisolated let illustrationName = Expression<String>("name")
+    private nonisolated let illustrationAlbumId = Expression<String?>("containing_album_id")
+    private nonisolated let illustrationDateAdded = Expression<Double>("date_added")
+    private nonisolated let illustrationData = Expression<Data>("data")
+    private nonisolated let illustrationThumbnailData = Expression<Data?>("thumbnail_data")
 
-    init(_ database: Connection) {
+    init() {
+        let dbURL = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)
+            .first!
+            .appendingPathComponent("IllustMate.sqlite")
+        let database: Connection
+        do {
+            database = try Connection(dbURL.path)
+        } catch {
+            fatalError("Could not open SQLite database: \(error)")
+        }
         self.database = database
-        setupDatabase()
-    }
-
-    private func setupDatabase() {
         do {
             try database.run(albumsTable.create(ifNotExists: true) { table in
                 table.column(albumId, primaryKey: true)

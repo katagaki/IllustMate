@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import UniformTypeIdentifiers
 
-final class Illustration: Identifiable, Hashable {
+final class Illustration: Identifiable, Hashable, @unchecked Sendable {
     var id: String
     var name: String
     var containingAlbumID: String?

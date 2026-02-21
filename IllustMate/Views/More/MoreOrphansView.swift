@@ -90,7 +90,10 @@ struct MoreOrphansView: View {
                     debugPrint(error.localizedDescription)
                 } else {
                     if let image = UIImage(contentsOfFile: url.path(percentEncoded: false)) {
-                        orphanThumbnails[orphan] = image.jpegThumbnail(of: 120.0)
+                        let thumbnailData = image.jpegThumbnail(of: 120.0)
+                        DispatchQueue.main.async {
+                            self.orphanThumbnails[orphan] = thumbnailData
+                        }
                     }
                 }
             }
@@ -108,7 +111,7 @@ struct MoreOrphansView: View {
                 importIllustration(UUID().uuidString, data: heicData)
             }
             try? FileManager.default.removeItem(at: orphansFolder.appendingPathComponent(fileName))
-            doWithAnimationAsynchronously {
+            doWithAnimation {
                 orphans.removeAll(where: { $0 == fileName })
             }
         }

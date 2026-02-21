@@ -41,12 +41,11 @@ struct IllustrationLabel: View {
         .contentShape(.rect)
         .task {
             // TODO: Use file coordinator in async task
-            Task.detached {
-                if let image = illustration.thumbnail() {
-                    thumbnail = Image(uiImage: image)
-                }
-                isThumbnailReadyToPresent = true
+            let image = illustration.thumbnail()
+            if let image {
+                thumbnail = Image(uiImage: image)
             }
+            isThumbnailReadyToPresent = true
         }
     }
 }

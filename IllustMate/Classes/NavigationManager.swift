@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 class NavigationManager: ObservableObject {
 
     @Published var collectionTabPath: [ViewPath] = []

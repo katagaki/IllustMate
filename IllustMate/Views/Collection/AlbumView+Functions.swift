@@ -109,7 +109,8 @@ extension AlbumView {
                 selectedIllustrations.append(illustration)
             }
         } else {
-            viewer.setDisplay(illustration) {
+            let illustrationCopy = illustration
+            viewer.setDisplay(illustrationCopy) { [navigationManager] in
                 navigationManager.push(.illustrationViewer(namespace: namespace), for: .collection)
             }
         }

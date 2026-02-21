@@ -62,8 +62,9 @@ class ShareViewController: UIViewController {
 
     func loadItem(_ attachment: NSItemProvider, type: UTType) async -> Any? {
         return await withCheckedContinuation { continuation in
-            attachment.loadItem(forTypeIdentifier: type.identifier, options: nil) { file, _ in
-                continuation.resume(returning: (file))
+            attachment.loadItem(forTypeIdentifier: type.identifier, options: nil) { @Sendable file, _ in
+                nonisolated(unsafe) let result = file as Any?
+                continuation.resume(returning: result)
             }
         }
     }

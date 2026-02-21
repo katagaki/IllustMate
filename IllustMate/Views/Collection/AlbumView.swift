@@ -23,9 +23,11 @@ struct AlbumView: View {
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
-    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
+    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumSort: SortType
     @State var albumSortState: SortType = .nameAscending
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var albumStyle: ViewStyle
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyle: ViewStyle
     @State var albumStyleState: ViewStyle = .grid
 
     @State var illustrations: [Illustration]?

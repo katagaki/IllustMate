@@ -94,7 +94,7 @@ struct ShareView: View {
                             withAnimation(.snappy.speed(2)) {
                                 isImporting = true
                             } completion: {
-                                OperationQueue().addOperation {
+                                Task {
                                     importItems()
                                 }
                             }

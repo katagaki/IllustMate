@@ -15,8 +15,10 @@ struct AlbumsScrollView: View {
     @State var albums: [Album] = []
     @State var isAlbumsLoaded: Bool = false
 
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
-    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var style: ViewStyle
+    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumSort: SortType
 
     var body: some View {
         ScrollView(.vertical) {

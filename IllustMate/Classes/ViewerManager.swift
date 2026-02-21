@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-@Observable
+@MainActor @Observable
 class ViewerManager {
 
     var displayedIllustrationID: String = ""
@@ -17,7 +17,7 @@ class ViewerManager {
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
-    func setDisplay(_ illustration: Illustration, completion: @escaping () -> Void) {
+    func setDisplay(_ illustration: Illustration, completion: @escaping @MainActor @Sendable () -> Void) {
         if let image = imageCache[illustration.id] {
             displayedImage = image
             displayedIllustration = illustration

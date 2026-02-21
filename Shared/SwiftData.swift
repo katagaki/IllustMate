@@ -6,19 +6,5 @@
 //
 
 import Foundation
-import SQLite
 
-let sharedDatabase: Connection = {
-    let dbURL = FileManager.default
-        .urls(for: .documentDirectory, in: .userDomainMask)
-        .first!
-        .appendingPathComponent("IllustMate.sqlite")
-    do {
-        let connection = try Connection(dbURL.path)
-        return connection
-    } catch {
-        fatalError("Could not open SQLite database: \(error)")
-    }
-}()
-
-let actor = DataActor(sharedDatabase)
+let actor = DataActor()
