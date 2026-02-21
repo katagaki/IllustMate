@@ -8,11 +8,26 @@
 import Komponents
 import SwiftUI
 
-struct SectionHeader<Content: View>: View {
+struct SectionHeader<Buttons: View, Content: View>: View {
 
     var title: LocalizedStringKey
     var count: Int
-    @ViewBuilder var trailingViews: Content
+    @ViewBuilder var buttons: () -> Buttons
+    @ViewBuilder var trailingViews: () -> Content
+
+    init(title: LocalizedStringKey, count: Int, @ViewBuilder trailingViews: @escaping () -> Content) where Buttons == EmptyView {
+        self.title = title
+        self.count = count
+        self.buttons = { EmptyView() }
+        self.trailingViews = trailingViews
+    }
+
+    init(title: LocalizedStringKey, count: Int, @ViewBuilder buttons: @escaping () -> Buttons, @ViewBuilder trailingViews: @escaping () -> Content) {
+        self.title = title
+        self.count = count
+        self.buttons = buttons
+        self.trailingViews = trailingViews
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
@@ -31,17 +46,20 @@ struct SectionHeader<Content: View>: View {
                 }
             }
             Spacer(minLength: 0)
+            buttons()
 #if targetEnvironment(macCatalyst)
             Menu("Shared.More") {
-                trailingViews
+                trailingViews()
             }
 #else
             Menu {
-                trailingViews
+                trailingViews()
             } label: {
-                Image(systemName: "ellipsis.circle")
-                    .font(.title2)
+                Image(systemName: "ellipsis")
+                    .frame(width: 18.0, height: 18.0, alignment: .center)
             }
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
 #endif
         }
     }

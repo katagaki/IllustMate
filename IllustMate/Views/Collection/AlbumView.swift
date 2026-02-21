@@ -43,9 +43,6 @@ struct AlbumView: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
                 SectionHeader(title: "Albums.Albums", count: albums.count) {
-                    Button("Shared.Create", systemImage: "plus") {
-                        isAddingAlbum = true
-                    }
                     Picker("Shared.Sort", selection: $albumSortState) {
                         Label("Shared.Sort.Name.Ascending", image: "Sort.Name.Ascending")
                             .tag(SortType.nameAscending)
@@ -91,10 +88,6 @@ struct AlbumView: View {
                 Spacer()
                     .frame(height: 20.0)
                 SectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
-                    Button("Shared.Select", systemImage: "checkmark.circle") {
-                        startOrStopSelectingIllustrations()
-                    }
-                    .disabled(isSelectingIllustrations || illustrations.isEmpty)
                     Picker("Shared.Sort", selection: $isIllustrationSortReversed) {
                         Label("Shared.Sort.DateAdded.Ascending", image: "Sort.Count.Ascending")
                             .tag(true)
@@ -134,6 +127,20 @@ struct AlbumView: View {
                 }
             }
             .padding([.top], 20.0)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Select", systemImage: "checkmark.circle") {
+                    startOrStopSelectingIllustrations()
+                }
+                .disabled(isSelectingIllustrations || illustrations.isEmpty)
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Create", systemImage: "plus") {
+                    isAddingAlbum = true
+                }
+            }
         }
         .background(Color.init(uiColor: .systemGroupedBackground))
 #if targetEnvironment(macCatalyst)

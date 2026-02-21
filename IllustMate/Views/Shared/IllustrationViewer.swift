@@ -57,10 +57,18 @@ struct IllustrationViewer: View {
                         .foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 0)
+                    Button {
+                        UIPasteboard.general.image = displayedImage
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                            .font(.title3)
+                    }
+                    .buttonStyle(.borderless)
+                    .buttonBorderShape(.capsule)
                     ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
                               preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 24.0))
+                            .font(.title3)
                     }
                               .buttonStyle(.borderless)
                               .buttonBorderShape(.capsule)

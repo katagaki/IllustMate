@@ -70,14 +70,8 @@ struct MoreView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .close) {
-                            dismiss()
-                        }
-                    } else {
-                        CloseButton {
-                            dismiss()
-                        }
+                    Button(role: .close) {
+                        dismiss()
                     }
                 }
             }

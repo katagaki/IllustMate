@@ -19,17 +19,11 @@ struct CollectionView: View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
             AlbumView()
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .topBarLeading) {
                         Button {
                             isMoreViewPresenting = true
                         } label: {
-                            if #available(iOS 26.0, *) {
-                                Image(systemName: "ellipsis")
-                            } else {
-                                Image(systemName: "ellipsis.circle.fill")
-                                    .symbolRenderingMode(.hierarchical)
-                                    .font(.title2)
-                            }
+                            Image(systemName: "gearshape")
                         }
                     }
                 }

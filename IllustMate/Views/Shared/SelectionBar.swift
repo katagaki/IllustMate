@@ -50,9 +50,15 @@ struct SelectionBar<Content: View>: View {
             .padding(8.0)
 #else
             HStack(alignment: .center, spacing: 16.0) {
-                CloseButton {
+                Button {
                     onStopSelecting()
+                } label: {
+                    Image(systemName: "xmark")
+                        .frame(width: 24.0, height: 24.0, alignment: .center)
                 }
+                .frame(width: 24.0, height: 24.0, alignment: .center)
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.circle)
                 Text("Shared.Selected.\(selectedIllustrations.count)")
                 Spacer()
                 Menu {
@@ -74,19 +80,19 @@ struct SelectionBar<Content: View>: View {
                     menuItems
                         .disabled(selectedIllustrations.count == 0)
                 } label: {
-                    Image(systemName: "ellipsis.circle.fill")
-                        .symbolRenderingMode(.hierarchical)
-                        .font(.title2)
+                    Image(systemName: "ellipsis")
+                        .frame(width: 24.0, height: 24.0, alignment: .center)
                 }
+                .frame(width: 24.0, height: 24.0, alignment: .center)
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.circle)
             }
-            .padding(16.0)
+            .padding(20.0)
 #endif
         }
         .frame(maxWidth: .infinity)
-        .background(.regularMaterial)
-        .clipShape(.rect(cornerRadius: 16.0))
-        .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: 4.0)
-        .padding([.leading, .trailing, .bottom], 8.0)
+        .glassEffect(.regular.interactive(), in: .capsule)
+        .padding([.horizontal, .bottom])
         .transition(.move(edge: .bottom).combined(with: .opacity).animation(.snappy.speed(2)))
     }
 }
