@@ -762,6 +762,7 @@
       }
     },
     "More.Sync.State.Error" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -778,6 +779,7 @@
       }
     },
     "More.Sync.State.InProgress" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -794,6 +796,7 @@
       }
     },
     "More.Sync.State.NoNetwork" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -810,6 +813,7 @@
       }
     },
     "More.Sync.State.NotSyncing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -826,6 +830,7 @@
       }
     },
     "More.Sync.State.Synced" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

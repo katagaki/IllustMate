@@ -13,8 +13,8 @@ struct AlbumMoveMenu: View {
     var onMoved: () -> Void
 
     @State var availableAlbums: [Album] = []
-    @State var parentAlbum: Album? = nil
-    @State var grandparentAlbum: Album? = nil
+    @State var parentAlbum: Album?
+    @State var grandparentAlbum: Album?
 
     var body: some View {
         if album.parentAlbumID != nil {

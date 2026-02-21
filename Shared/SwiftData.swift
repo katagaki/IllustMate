@@ -21,4 +21,4 @@ let sharedDatabase: Connection = {
     }
 }()
 
-let actor = DataActor(db: sharedDatabase)
+let actor = DataActor(sharedDatabase)

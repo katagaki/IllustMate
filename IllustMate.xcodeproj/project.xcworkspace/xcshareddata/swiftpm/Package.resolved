@@ -1,5 +1,5 @@
 {
-  "originHash" : "6c0412f35a6d340c895ffc777766ee0a67c24826e8cca3f9eef0adb5a861a9b5",
+  "originHash" : "db8a8b5144b15db2cc445c45a4880a4f3c71b9d94988acb933686ef6965f32a5",
   "pins" : [
     {
       "identity" : "cloudkitsyncmonitor",
@@ -24,7 +24,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stephencelis/SQLite.swift",
       "state" : {
-        "revision" : "6d9abf66f8a8ef9e1b6f4a14d21557b8af44a31e",
+        "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
         "version" : "0.15.3"
       }
     }

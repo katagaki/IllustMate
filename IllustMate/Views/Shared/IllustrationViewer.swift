@@ -17,7 +17,7 @@ struct IllustrationViewer: View {
     @State var displayOffset: CGSize = .zero
     @State var magnification: CGFloat = 1.0
     @State var magnificationAnchor: UnitPoint = .center
-    @State var containingAlbumName: String? = nil
+    @State var containingAlbumName: String?
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {

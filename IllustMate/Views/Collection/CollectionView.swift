@@ -23,9 +23,13 @@ struct CollectionView: View {
                         Button {
                             isMoreViewPresenting = true
                         } label: {
-                            Image(systemName: "ellipsis.circle.fill")
-                                .symbolRenderingMode(.hierarchical)
-                                .font(.title2)
+                            if #available(iOS 26.0, *) {
+                                Image(systemName: "ellipsis")
+                            } else {
+                                Image(systemName: "ellipsis.circle.fill")
+                                    .symbolRenderingMode(.hierarchical)
+                                    .font(.title2)
+                            }
                         }
                     }
                 }

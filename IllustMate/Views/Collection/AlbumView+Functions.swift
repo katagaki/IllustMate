@@ -87,7 +87,7 @@ extension AlbumView {
     }
 
     func importPhotoToAlbum(_ photo: Image, to album: Album) async {
-        let uiImage = await photo.render()
+        let uiImage = photo.render()
         if let data = uiImage?.data() {
             await actor.createIllustration(Illustration.newFilename(), data: data,
                                            inAlbumWithID: album.id)

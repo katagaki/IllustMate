@@ -14,7 +14,7 @@ struct IllustrationMoveMenu: View {
     var onMoved: () -> Void
 
     @State var availableAlbums: [Album] = []
-    @State var parentAlbum: Album? = nil
+    @State var parentAlbum: Album?
 
     var body: some View {
         if containingAlbum != nil {
