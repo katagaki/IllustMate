@@ -33,10 +33,20 @@ actor DataActor {
     private nonisolated let illustrationThumbnailData = Expression<Data?>("thumbnail_data")
 
     init() {
-        let dbURL = FileManager.default
+        let containerURL = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate")!
+        let dbURL = containerURL.appendingPathComponent("IllustMate.sqlite")
+
+        // Migrate from old location if needed
+        let oldDbURL = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first!
             .appendingPathComponent("IllustMate.sqlite")
+        if !FileManager.default.fileExists(atPath: dbURL.path) &&
+            FileManager.default.fileExists(atPath: oldDbURL.path) {
+            try? FileManager.default.copyItem(at: oldDbURL, to: dbURL)
+        }
+
         let database: Connection
         do {
             database = try Connection(dbURL.path)

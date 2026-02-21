@@ -12,7 +12,6 @@
 		E4614D062ACA86ED00D751FB /* Importer.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4614CFC2ACA86EC00D751FB /* Importer.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4614D192ACAB6AD00D751FB /* Komponents */; };
 		E46712E12ADC2B6E006CB15D /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E46712E02ADC2B6E006CB15D /* Komponents */; };
-		E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,7 +91,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */,
-				E47765782ACBF21900BA6287 /* CloudKitSyncMonitor in Frameworks */,
 				A1B2C3062ACABCDE00D751FB /* SQLite in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -161,7 +159,6 @@
 			name = IllustMate;
 			packageProductDependencies = (
 				E4614D192ACAB6AD00D751FB /* Komponents */,
-				E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */,
 				A1B2C3042ACABCDE00D751FB /* SQLite */,
 			);
 			productName = IllustMate;
@@ -223,7 +220,6 @@
 			mainGroup = E4614CDA2ACA86C900D751FB;
 			packageReferences = (
 				E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */,
-				E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */,
 				A1B2C3032ACABCDE00D751FB /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
 			productRefGroup = E4614CE42ACA86C900D751FB /* Products */;
@@ -620,14 +616,6 @@
 				kind = branch;
 			};
 		};
-		E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ggruen/CloudKitSyncMonitor";
-			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 1.2.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -650,11 +638,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E4614D182ACAB6AD00D751FB /* XCRemoteSwiftPackageReference "Komponents" */;
 			productName = Komponents;
-		};
-		E47765772ACBF21900BA6287 /* CloudKitSyncMonitor */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E47765762ACBF21900BA6287 /* XCRemoteSwiftPackageReference "CloudKitSyncMonitor" */;
-			productName = CloudKitSyncMonitor;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

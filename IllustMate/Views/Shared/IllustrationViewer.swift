@@ -10,9 +10,9 @@ import SwiftUI
 struct IllustrationViewer: View {
 
     @Environment(\.dismiss) var dismiss
+    @Environment(ViewerManager.self) var viewer
 
     var illustration: Illustration
-    var displayedImage: UIImage
 
     @State var displayOffset: CGSize = .zero
     @State var magnification: CGFloat = 1.0
@@ -22,16 +22,30 @@ struct IllustrationViewer: View {
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             Spacer(minLength: 20)
-            Image(uiImage: displayedImage)
-                .resizable()
-                .scaledToFit()
-                .clipShape(.rect(cornerRadius: 8.0))
-                .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                .zIndex(1)
-                .offset(displayOffset)
-                .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
+            ZStack {
+                // Show thumbnail as placeholder
+                if let thumbnail = viewer.displayedThumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                        .opacity(viewer.isFullImageLoaded ? 0 : 1)
+                }
+                // Crossfade to full image when loaded
+                if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
+                    Image(uiImage: fullImage)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                        .transition(.opacity)
+                }
+            }
+            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+            .zIndex(1)
+            .offset(displayOffset)
+            .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
             Spacer(minLength: 20)
-            if let cgImage = displayedImage.cgImage {
+            if let displayedImage = viewer.displayedImage, let cgImage = displayedImage.cgImage {
                 HStack(alignment: .center, spacing: 16.0) {
                     HStack(alignment: .center, spacing: 2.0) {
                         Group {

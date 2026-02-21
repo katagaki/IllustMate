@@ -92,9 +92,8 @@ struct MainSplitView: View {
             }
             .navigationSplitViewColumnWidth(375.0)
         } detail: {
-            if let image = viewer.displayedImage,
-               let illustration = viewer.displayedIllustration {
-                IllustrationViewer(illustration: illustration, displayedImage: image)
+            if let illustration = viewer.displayedIllustration {
+                IllustrationViewer(illustration: illustration)
                     .id(illustration.id)
             } else {
                 ContentUnavailableView("Shared.SelectAnIllustration", systemImage: "photo.on.rectangle.angled")

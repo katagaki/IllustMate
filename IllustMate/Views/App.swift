@@ -30,9 +30,6 @@ struct IllustMateApp: App {
             .environment(viewer)
             .environment(progressAlertManager)
             .environment(concurrency)
-            .task {
-                createIfNotExists(orphansFolder)
-            }
         }
 #if targetEnvironment(macCatalyst)
         .defaultSize(CGSize(width: 880.0, height: 680.0))

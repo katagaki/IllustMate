@@ -294,6 +294,7 @@
       }
     },
     "Alert.ReimportOrphan.Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -310,6 +311,7 @@
       }
     },
     "Alert.ReimportOrphan.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -723,6 +725,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "書き出し中…"
+          }
+        }
+      }
+    },
+    "More.Stats" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "集計"
           }
         }
       }
@@ -2009,6 +2028,7 @@
       }
     },
     "ViewTitle.Orphans" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

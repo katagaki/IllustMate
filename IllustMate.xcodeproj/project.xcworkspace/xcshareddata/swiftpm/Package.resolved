@@ -1,22 +1,13 @@
 {
-  "originHash" : "db8a8b5144b15db2cc445c45a4880a4f3c71b9d94988acb933686ef6965f32a5",
+  "originHash" : "9a6a3ace0d01a5bc36d6da4329a5aead278c03348e61fa7b78335dd3398be466",
   "pins" : [
-    {
-      "identity" : "cloudkitsyncmonitor",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ggruen/CloudKitSyncMonitor",
-      "state" : {
-        "revision" : "8f8de8e71928df27bf023cc6ed808a8b6270a0d3",
-        "version" : "1.2.1"
-      }
-    },
     {
       "identity" : "komponents",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/katagaki/Komponents",
       "state" : {
         "branch" : "main",
-        "revision" : "cb0a6a60bc091627c11e6eca511279414fd1d45e"
+        "revision" : "93f484d6f2cef9c179387fcca2b2048413f9f0a6"
       }
     },
     {
@@ -24,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stephencelis/SQLite.swift",
       "state" : {
-        "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
-        "version" : "0.15.3"
+        "revision" : "0c08856385fe24f7b76d8c51842d78a196e8e817",
+        "version" : "0.15.5"
       }
     }
   ],
