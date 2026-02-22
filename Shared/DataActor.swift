@@ -329,6 +329,27 @@ extension DataActor {
         return try database.prepare(orderedQuery).map { illustrationFrom(row: $0) }
     }
 
+    func illustrationSkeletons(in album: Album?, order: SortOrder) throws -> [Illustration] {
+        let baseQuery: SQLite.Table
+        if let albumID = album?.id {
+            baseQuery = illustrationsTable.filter(illustrationAlbumId == albumID)
+        } else {
+            baseQuery = illustrationsTable.filter(illustrationAlbumId == nil)
+        }
+        let orderedQuery = (order == .reverse ? baseQuery.order(illustrationDateAdded.desc) :
+                                                baseQuery.order(illustrationDateAdded.asc))
+            .select(illustrationId, illustrationName, illustrationAlbumId,
+                    illustrationDateAdded)
+        return try database.prepare(orderedQuery).map { illustrationFrom(row: $0) }
+    }
+
+    func thumbnailData(forIllustrationWithID id: String) -> Data? {
+        let query = illustrationsTable
+            .filter(illustrationId == id)
+            .select(illustrationThumbnailData)
+        return try? database.pluck(query).flatMap { try? $0.get(illustrationThumbnailData) }
+    }
+
     func illustration(for id: String) -> Illustration? {
         let query = illustrationsTable
             .filter(illustrationId == id)

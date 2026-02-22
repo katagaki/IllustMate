@@ -130,6 +130,48 @@ struct AlbumCover: View {
         .frame(width: length, height: length)
     }
 
+    struct AsyncAlbumCover: View {
+
+        var album: Album
+        var length: CGFloat?
+        var cornerRadius: Double = 6.0
+        var shadowSize: Double = 2.0
+
+        @State private var primaryImage: Image?
+        @State private var secondaryImage: Image?
+        @State private var tertiaryImage: Image?
+
+        var body: some View {
+            AlbumCover(length: length,
+                       cornerRadius: cornerRadius,
+                       shadowSize: shadowSize,
+                       album: album,
+                       primaryImage: primaryImage,
+                       secondaryImage: secondaryImage,
+                       tertiaryImage: tertiaryImage)
+            .task(id: album.id) {
+                await loadRepresentativePhotos()
+            }
+        }
+
+        private func loadRepresentativePhotos() async {
+            var images: [Image?] = []
+            if let coverPhoto = album.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
+                images.append(Image(uiImage: uiImage))
+            }
+            let thumbnails = await actor.representativeThumbnails(forAlbumWithID: album.id)
+            for thumbData in thumbnails {
+                if let uiImage = UIImage(data: thumbData) {
+                    images.append(Image(uiImage: uiImage))
+                }
+            }
+            while images.count < 3 { images.append(nil) }
+            primaryImage = images[0]
+            secondaryImage = images[1]
+            tertiaryImage = images[2]
+        }
+    }
+
     struct AlbumCoverChildImage: View {
 
         var image: Image

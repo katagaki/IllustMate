@@ -161,7 +161,7 @@ extension AlbumView {
     func fetchIllustrations() async -> [Illustration] {
         do {
             let illustrations = try await actor
-                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+                .illustrationSkeletons(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
             return illustrations
         } catch {
             debugPrint(error.localizedDescription)
