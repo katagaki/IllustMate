@@ -26,7 +26,87 @@ struct IllustrationViewer: View {
     }
 
     var body: some View {
-        ZStack {
+        VStack(alignment: .center, spacing: 0.0) {
+            // Image with size overlay - fills available space
+            ZStack(alignment: .bottomLeading) {
+                ZStack {
+                    // Show thumbnail as placeholder
+                    if let thumbnail = viewer.displayedThumbnail {
+                        Image(uiImage: thumbnail)
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(.rect(cornerRadius: 8.0))
+                            .opacity(viewer.isFullImageLoaded ? 0 : 1)
+                    }
+                    // Crossfade to full image when loaded
+                    if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
+                        Image(uiImage: fullImage)
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(.rect(cornerRadius: 8.0))
+                            .transition(.opacity)
+                    }
+                }
+
+                // Image size overlay (bottom-left of image)
+                if showImageSize, let displayedImage = viewer.displayedImage {
+                    HStack(alignment: .center, spacing: 2.0) {
+                        Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                        Text(verbatim: "×")
+                        Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
+                    }
+                    .font(.caption)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.bar, in: .capsule)
+                    .padding(8)
+                    .transition(.opacity)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.vertical, 20)
+            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+            .zIndex(1)
+            .offset(displayOffset)
+            .scaleEffect(CGSize(width: magnification, height: magnification),
+                         anchor: magnificationAnchor)
+            .onTapGesture {
+                withAnimation(.snappy.speed(2)) {
+                    showImageSize.toggle()
+                }
+            }
+
+            // Fixed bottom toolbar with Copy/Share
+            HStack(alignment: .center, spacing: 16.0) {
+                Button {
+                    if let image = currentImage {
+                        UIPasteboard.general.image = image
+                    }
+                } label: {
+                    Label("Shared.Copy", systemImage: "doc.on.doc")
+                        .font(.body)
+                }
+                .buttonStyle(.borderless)
+
+                if let image = currentImage, let cgImage = image.cgImage {
+                    ShareLink(item: Image(cgImage, scale: image.scale, label: Text("")),
+                              preview: SharePreview(illustration.name,
+                                                    image: Image(uiImage: image))) {
+                        Label("Shared.Share", systemImage: "square.and.arrow.up")
+                            .font(.body)
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+            .tint(.primary)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .glassEffect(.regular.interactive(), in: .capsule)
+            .opacity(opacityDuringGesture())
+        }
+        .padding(20.0)
+        .frame(maxHeight: .infinity)
+        .background {
             // Blurred image background
             if let backgroundImage = currentImage {
                 Image(uiImage: backgroundImage)
@@ -40,86 +120,6 @@ struct IllustrationViewer: View {
                     .ignoresSafeArea()
                     .opacity(opacityDuringGesture())
             }
-
-            VStack(alignment: .center, spacing: 0.0) {
-                // Image with size overlay - fills available space
-                ZStack(alignment: .bottomLeading) {
-                    ZStack {
-                        // Show thumbnail as placeholder
-                        if let thumbnail = viewer.displayedThumbnail {
-                            Image(uiImage: thumbnail)
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(.rect(cornerRadius: 8.0))
-                                .opacity(viewer.isFullImageLoaded ? 0 : 1)
-                        }
-                        // Crossfade to full image when loaded
-                        if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
-                            Image(uiImage: fullImage)
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(.rect(cornerRadius: 8.0))
-                                .transition(.opacity)
-                        }
-                    }
-
-                    // Image size overlay (bottom-left of image)
-                    if showImageSize, let displayedImage = viewer.displayedImage {
-                        HStack(alignment: .center, spacing: 2.0) {
-                            Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
-                            Text(verbatim: "×")
-                            Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
-                        }
-                        .font(.caption)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(.bar, in: .capsule)
-                        .padding(8)
-                        .transition(.opacity)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.vertical, 20)
-                .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-                .zIndex(1)
-                .offset(displayOffset)
-                .scaleEffect(CGSize(width: magnification, height: magnification),
-                             anchor: magnificationAnchor)
-                .onTapGesture {
-                    withAnimation(.snappy.speed(2)) {
-                        showImageSize.toggle()
-                    }
-                }
-
-                // Fixed bottom toolbar with Copy/Share
-                HStack(alignment: .center, spacing: 16.0) {
-                    Button {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                        }
-                    } label: {
-                        Label("Shared.Copy", systemImage: "doc.on.doc")
-                            .font(.body)
-                    }
-                    .buttonStyle(.borderless)
-
-                    if let image = currentImage, let cgImage = image.cgImage {
-                        ShareLink(item: Image(cgImage, scale: image.scale, label: Text("")),
-                                  preview: SharePreview(illustration.name,
-                                                        image: Image(uiImage: image))) {
-                            Label("Shared.Share", systemImage: "square.and.arrow.up")
-                                .font(.body)
-                        }
-                        .buttonStyle(.borderless)
-                    }
-                }
-                .tint(.primary)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .glassEffect(.regular.interactive(), in: .capsule)
-                .opacity(opacityDuringGesture())
-            }
-            .padding(20.0)
         }
         .navigationTitle(illustration.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -139,7 +139,6 @@ struct IllustrationViewer: View {
                 }
             }
         }
-        .frame(maxHeight: .infinity)
         .task {
             if let albumID = illustration.containingAlbumID {
                 containingAlbumName = await actor.album(for: albumID)?.name
