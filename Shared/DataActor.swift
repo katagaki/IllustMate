@@ -70,6 +70,8 @@ actor DataActor {
                 table.column(illustrationData)
                 table.column(illustrationThumbnailData)
             })
+            try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
+            try database.run(illustrationsTable.createIndex(illustrationAlbumId, ifNotExists: true))
         } catch {
             debugPrint("Database setup error: \(error)")
         }
@@ -142,6 +144,44 @@ actor DataActor {
         return sortAlbum(albums, sortedBy: sortType)
     }
 
+    func albumsWithCounts(sortedBy sortType: SortType) throws -> [Album] {
+        let rows = try database.prepare(albumsTable)
+        let albums = rows.map { row -> Album in
+            let album = albumFrom(row: row, loadChildren: false)
+            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
+            album.childIllustrationCount = illustrationCount(forAlbumWithID: album.id)
+            return album
+        }
+        return sortAlbum(albums, sortedBy: sortType)
+    }
+
+    func albumsWithCounts(in album: Album?, sortedBy sortType: SortType) throws -> [Album] {
+        let query: QueryType
+        if let albumID = album?.id {
+            query = albumsTable.filter(albumParentId == albumID)
+        } else {
+            query = albumsTable.filter(albumParentId == nil)
+        }
+        let rows = try database.prepare(query)
+        let albums = rows.map { row -> Album in
+            let album = albumFrom(row: row, loadChildren: false)
+            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
+            album.childIllustrationCount = illustrationCount(forAlbumWithID: album.id)
+            return album
+        }
+        return sortAlbum(albums, sortedBy: sortType)
+    }
+
+    func representativeThumbnails(forAlbumWithID albumID: String, limit: Int = 3) -> [Data] {
+        let query = illustrationsTable
+            .filter(illustrationAlbumId == albumID)
+            .select(illustrationThumbnailData)
+            .order(illustrationDateAdded.asc)
+            .limit(limit)
+        guard let rows = try? database.prepare(query) else { return [] }
+        return rows.compactMap { try? $0.get(illustrationThumbnailData) }
+    }
+
     func album(for id: String) -> Album? {
         let query = albumsTable.filter(albumId == id)
         return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: true) }
@@ -178,11 +218,13 @@ actor DataActor {
         case .nameDescending: return albums.sorted(by: { $0.name > $1.name })
         case .sizeAscending:
             return albums.sorted(by: {
-                objectCount(forAlbumWithID: $0.id) < objectCount(forAlbumWithID: $1.id)
+                $0.albumCount() + $0.illustrationCount() <
+                $1.albumCount() + $1.illustrationCount()
             })
         case .sizeDescending:
             return albums.sorted(by: {
-                objectCount(forAlbumWithID: $0.id) > objectCount(forAlbumWithID: $1.id)
+                $0.albumCount() + $0.illustrationCount() >
+                $1.albumCount() + $1.illustrationCount()
             })
         }
     }

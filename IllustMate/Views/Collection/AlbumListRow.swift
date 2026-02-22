@@ -14,21 +14,18 @@ struct AlbumListRow: View {
     var namespace: Namespace.ID
 
     var album: Album
-    var representativePhotos: [Image?]
 
-    init(namespace: Namespace.ID, album: Album) {
-        self.namespace = namespace
-        self.album = album
-        self.representativePhotos = album.representativePhotos()
-    }
+    @State private var primaryImage: Image?
+    @State private var secondaryImage: Image?
+    @State private var tertiaryImage: Image?
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
             AlbumCover(length: 48.0,
                        album: album,
-                       primaryImage: representativePhotos[0],
-                       secondaryImage: representativePhotos[1],
-                       tertiaryImage: representativePhotos[2])
+                       primaryImage: primaryImage,
+                       secondaryImage: secondaryImage,
+                       tertiaryImage: tertiaryImage)
                 .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)
@@ -51,5 +48,25 @@ struct AlbumListRow: View {
         .contentShape(.rect)
         .padding([.leading, .trailing], 20.0)
         .padding([.top, .bottom], 8.0)
+        .task(id: album.id) {
+            await loadRepresentativePhotos()
+        }
+    }
+
+    private func loadRepresentativePhotos() async {
+        var images: [Image?] = []
+        if let coverPhoto = album.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
+            images.append(Image(uiImage: uiImage))
+        }
+        let thumbnails = await actor.representativeThumbnails(forAlbumWithID: album.id)
+        for thumbData in thumbnails {
+            if let uiImage = UIImage(data: thumbData) {
+                images.append(Image(uiImage: uiImage))
+            }
+        }
+        while images.count < 3 { images.append(nil) }
+        primaryImage = images[0]
+        secondaryImage = images[1]
+        tertiaryImage = images[2]
     }
 }
