@@ -117,19 +117,29 @@ extension AlbumView {
     }
 
     func refreshData() async {
-        let albums = await fetchAlbums()
-        let illustrations = await fetchIllustrations()
-        await MainActor.run {
-            doWithAnimation {
-                self.albums = albums
-                self.illustrations = illustrations
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                let albums = await self.fetchAlbums()
+                await MainActor.run {
+                    doWithAnimation {
+                        self.albums = albums
+                    }
+                }
+            }
+            group.addTask {
+                let illustrations = await self.fetchIllustrations()
+                await MainActor.run {
+                    doWithAnimation {
+                        self.illustrations = illustrations
+                    }
+                }
             }
         }
     }
 
     func fetchAlbums() async -> [Album] {
         do {
-            let albums = try await actor.albums(in: currentAlbum, sortedBy: albumSort)
+            let albums = try await actor.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
             return albums
         } catch {
             debugPrint(error.localizedDescription)
@@ -151,7 +161,7 @@ extension AlbumView {
     func fetchIllustrations() async -> [Illustration] {
         do {
             let illustrations = try await actor
-                .illustrations(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
+                .illustrationSkeletons(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
             return illustrations
         } catch {
             debugPrint(error.localizedDescription)

@@ -68,12 +68,12 @@ struct AlbumMoveMenu: View {
                 grandparentAlbum = await actor.album(for: grandparentID)
             }
             if let parent {
-                availableAlbums = (try? await actor.albums(in: parent, sortedBy: .nameAscending))?.filter {
+                availableAlbums = (try? await actor.albumsWithCounts(in: parent, sortedBy: .nameAscending))?.filter {
                     $0.id != album.id
                 } ?? []
             }
         } else {
-            availableAlbums = (try? await actor.albums(in: nil, sortedBy: .nameAscending)) ?? []
+            availableAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
         }
     }
 }

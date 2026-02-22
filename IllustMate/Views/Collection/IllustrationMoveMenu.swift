@@ -67,9 +67,9 @@ struct IllustrationMoveMenu: View {
 
     func loadAlbums() async {
         if let containingAlbum {
-            availableAlbums = (try? await actor.albums(in: containingAlbum, sortedBy: .nameAscending)) ?? []
+            availableAlbums = (try? await actor.albumsWithCounts(in: containingAlbum, sortedBy: .nameAscending)) ?? []
         } else {
-            availableAlbums = (try? await actor.albums(in: nil, sortedBy: .nameAscending)) ?? []
+            availableAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
         }
     }
 }

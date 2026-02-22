@@ -6,7 +6,6 @@
 //
 
 import CoreTransferable
-import CryptoKit
 import Foundation
 import SwiftUI
 import UIKit
@@ -22,6 +21,10 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     // Transient relationships (populated after fetch)
     var childAlbums: [Album]?
     var childIllustrations: [Illustration]?
+
+    // Lightweight counts (populated without loading children)
+    var childAlbumCount: Int?
+    var childIllustrationCount: Int?
 
     init(id: String = UUID().uuidString, name: String, coverPhoto: Data? = nil,
          parentAlbumID: String? = nil, dateCreated: Date = Date.now) {
@@ -41,7 +44,8 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     }
 
     func identifiableString() -> String {
-        return "\(id)-\(coverHash())-\(albumCount())-\(illustrationCount())"
+        let coverSize = coverPhoto?.count ?? 0
+        return "\(id)-\(coverSize)-\(albumCount())-\(illustrationCount())"
     }
 
     func albums() -> [Album] {
@@ -53,11 +57,11 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     }
 
     func albumCount() -> Int {
-        return childAlbums?.count ?? 0
+        return childAlbumCount ?? childAlbums?.count ?? 0
     }
 
     func illustrationCount() -> Int {
-        return childIllustrations?.count ?? 0
+        return childIllustrationCount ?? childIllustrations?.count ?? 0
     }
 
     func cover() -> UIImage {
@@ -65,14 +69,6 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
             return uiImage.scalePreservingAspectRatio(targetSize: CGSize(width: 60.0, height: 60.0))
         }
         return UIImage(named: "Album.Generic")!
-    }
-
-    func coverHash() -> String {
-        if let coverPhoto {
-            return SHA256.hash(data: coverPhoto).compactMap { String(format: "%02x", $0) }.joined()
-        } else {
-            return ""
-        }
     }
 
     static func makeCover(_ data: Data?) -> Data? {

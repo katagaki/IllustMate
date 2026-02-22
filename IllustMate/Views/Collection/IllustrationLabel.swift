@@ -42,10 +42,11 @@ struct IllustrationLabel: View {
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 3.0))
-        .task {
-            let image = illustration.thumbnail()
-            if let image {
-                thumbnail = Image(uiImage: image)
+        .task(id: illustration.id) {
+            if let thumbData = await actor.thumbnailData(forIllustrationWithID: illustration.id),
+               let uiImage = UIImage(data: thumbData) {
+                illustration.thumbnailData = thumbData
+                thumbnail = Image(uiImage: uiImage)
             }
             isThumbnailReadyToPresent = true
         }
