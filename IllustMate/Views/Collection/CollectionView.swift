@@ -7,7 +7,6 @@
 
 import Komponents
 import SwiftUI
-import SwiftData
 
 struct CollectionView: View {
 
@@ -20,13 +19,11 @@ struct CollectionView: View {
         NavigationStack(path: $navigationManager.collectionTabPath) {
             AlbumView()
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItem(placement: .topBarLeading) {
                         Button {
                             isMoreViewPresenting = true
                         } label: {
-                            Image(systemName: "ellipsis.circle.fill")
-                                .symbolRenderingMode(.hierarchical)
-                                .font(.title2)
+                            Image(systemName: "gearshape")
                         }
                     }
                 }
@@ -38,16 +35,13 @@ struct CollectionView: View {
                   case .album(let album):
                       AlbumView(currentAlbum: album)
                   case .illustrationViewer(let namespace):
-                      if let displayedIllustration = viewer.displayedIllustration,
-                         let displayedImage = viewer.displayedImage {
+                      if let displayedIllustration = viewer.displayedIllustration {
                           if #available(iOS 18, *) {
-                              IllustrationViewer(illustration: displayedIllustration,
-                                                 displayedImage: displayedImage)
+                              IllustrationViewer(illustration: displayedIllustration)
                               .navigationTransition(.zoom(sourceID: viewer.displayedIllustrationID,
                                                           in: namespace))
                           } else {
-                              IllustrationViewer(illustration: displayedIllustration,
-                                                 displayedImage: displayedImage)
+                              IllustrationViewer(illustration: displayedIllustration)
                           }
                       }
                   default: Color.clear

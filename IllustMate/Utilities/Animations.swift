@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-func doWithAnimationAsynchronously(task: @escaping () -> Void, completion: (() -> Void)? = nil) {
-    Task {
-        await doWithAnimation {
+@MainActor
+func doWithAnimationAsynchronously(task: @escaping @Sendable () -> Void,
+                                   completion: (@Sendable () -> Void)? = nil) {
+    Task { @MainActor in
+        doWithAnimation {
             task()
         } completion: {
             if let completion {

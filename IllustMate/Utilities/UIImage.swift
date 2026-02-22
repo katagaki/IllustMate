@@ -22,21 +22,16 @@ extension UIImage {
     }
 
     func jpegThumbnail(of length: Double) -> Data? {
-        let shortSideLength = min(self.size.width, self.size.height)
-        let xOffset = (self.size.width - shortSideLength) / 2.0
-        let yOffset = (self.size.height - shortSideLength) / 2.0
-        let cropRect = CGRect(x: xOffset, y: yOffset, width: shortSideLength, height: shortSideLength)
-        let format = self.imageRendererFormat
+        let scaleFactor = length / max(self.size.width, self.size.height)
+        let targetSize = CGSize(width: self.size.width * scaleFactor,
+                                height: self.size.height * scaleFactor)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 3.0
         format.opaque = false
-        let croppedImage = UIGraphicsImageRenderer(size: cropRect.size, format: format).image { _ in
-            self.draw(in: CGRect(origin: CGPoint(x: -xOffset, y: -yOffset),
-                                        size: self.size))
-        }.cgImage!
-        if let scaledImage = UIImage(cgImage: croppedImage)
-            .scaleImage(toSize: CGSize(width: length, height: length)) {
-            return scaledImage.jpegData(compressionQuality: 0.7)
+        let scaledImage = UIGraphicsImageRenderer(size: targetSize, format: format).image { _ in
+            self.draw(in: CGRect(origin: .zero, size: targetSize))
         }
-        return nil
+        return scaledImage.jpegData(compressionQuality: 0.7)
     }
 
     // Adapted from: https://www.advancedswift.com/resize-uiimage-no-stretching-swift/

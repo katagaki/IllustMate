@@ -294,6 +294,7 @@
       }
     },
     "Alert.ReimportOrphan.Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -310,6 +311,7 @@
       }
     },
     "Alert.ReimportOrphan.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -375,6 +377,125 @@
         }
       }
     },
+    "Import.Albums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
+          }
+        }
+      }
+    },
+    "Import.Albums.Folders" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダ"
+          }
+        }
+      }
+    },
+    "Import.Albums.MyAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイアルバム"
+          }
+        }
+      }
+    },
+    "Import.Albums.SmartAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スマートアルバム"
+          }
+        }
+      }
+    },
+    "Import.Albums.Untitled" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untitled Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称未設定"
+          }
+        }
+      }
+    },
+    "Import.BrowseAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを選択"
+          }
+        }
+      }
+    },
+    "Import.BulkInstructions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Or, import an album from your Photos library."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "または、「写真」ライブラリからアルバムを一括でインポートします。"
+          }
+        }
+      }
+    },
     "Import.Completed.Text.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -416,6 +537,40 @@
         }
       }
     },
+    "Import.DeselectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択解除"
+          }
+        }
+      }
+    },
+    "Import.Folder.Empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This folder is empty."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このフォルダは空です。"
+          }
+        }
+      }
+    },
     "Import.Importing" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -446,6 +601,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「写真」アプリからインポートしたい写真を選択し、「インポートを開始」をタップしてください。"
+          }
+        }
+      }
+    },
+    "Import.OpenSettings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を開く"
+          }
+        }
+      }
+    },
+    "Import.PhotosAccessDenied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos library access has been denied. Please grant access in Settings to browse your albums."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリへのアクセスが拒否されています。アルバムを閲覧するには、設定でアクセスを許可してください。"
+          }
+        }
+      }
+    },
+    "Import.SelectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択"
           }
         }
       }
@@ -727,6 +933,23 @@
         }
       }
     },
+    "More.Stats" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "集計"
+          }
+        }
+      }
+    },
     "More.Sync" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -757,86 +980,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリ内のデータは自動的にiCloudに同期されます。\nこの設定を変更することには、「設定」アプリ＞「Apple ID」＞「iCloud」＞「すべてを表示」を開き、「ピックメイト」をオフにしてください。"
-          }
-        }
-      }
-    },
-    "More.Sync.State.Error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error Occurred During Syncing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "エラーが発生しました"
-          }
-        }
-      }
-    },
-    "More.Sync.State.InProgress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Syncing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "同期中"
-          }
-        }
-      }
-    },
-    "More.Sync.State.NoNetwork" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could Not Connect to the Internet"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インターネットに接続できません"
-          }
-        }
-      }
-    },
-    "More.Sync.State.NotSyncing" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not Syncing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "同期していません"
-          }
-        }
-      }
-    },
-    "More.Sync.State.Synced" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synced"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "同期済み"
           }
         }
       }
@@ -1280,23 +1423,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アルバム"
-          }
-        }
-      }
-    },
-    "Shared.Cancel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "キャンセル"
           }
         }
       }
@@ -2089,6 +2215,7 @@
       }
     },
     "ViewTitle.Orphans" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

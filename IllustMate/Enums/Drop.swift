@@ -7,7 +7,6 @@
 
 import CoreTransferable
 import Foundation
-import SwiftData
 import SwiftUI
 
 enum Drop: Transferable {

@@ -35,6 +35,18 @@
         }
       }
     },
+    "NSPhotoLibraryUsageDescription" : {
+      "comment" : "Privacy - Photo Library Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "IllustMate needs access to your Photos library to browse and import images from your albums."
+          }
+        }
+      }
+    },
     "NSUbiquitousContainerName" : {
       "extractionState" : "manual",
       "localizations" : {

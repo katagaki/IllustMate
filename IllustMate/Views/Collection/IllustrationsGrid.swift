@@ -22,8 +22,6 @@ struct IllustrationsGrid<Content: View>: View {
     var onDelete: ((Illustration) -> Void)?
     @ViewBuilder var moveMenu: (Illustration) -> Content
 
-    @State var thumbnails: [String: Data] = [:]
-
     let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
 #if targetEnvironment(macCatalyst)
     let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
@@ -35,7 +33,7 @@ struct IllustrationsGrid<Content: View>: View {
         LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
                   phoneColumnConfiguration : padOrMacColumnConfiguration,
                   spacing: 2.0) {
-            ForEach(illustrations, id: \.persistentModelID) { illustration in
+            ForEach(illustrations) { illustration in
                 Button {
                     onSelect(illustration)
                 } label: {
@@ -73,21 +71,22 @@ struct IllustrationsGrid<Content: View>: View {
                             Divider()
                         }
                         Button("Shared.Copy", systemImage: "doc.on.doc") {
-                            if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                                UIPasteboard.general.image = image
+                            Task {
+                                if let data = await actor.imageData(forIllustrationWithID: illustration.id),
+                                   let image = UIImage(data: data) {
+                                    UIPasteboard.general.image = image
+                                }
                             }
                         }
-                        if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
-                            ShareLink(item: Image(uiImage: image),
-                                      preview: SharePreview(illustration.name, image: Image(uiImage: image))) {
-                                Label("Shared.Share", systemImage: "square.and.arrow.up")
-                            }
+                        ShareLink(item: IllustrationShareable(illustrationID: illustration.id),
+                                  preview: SharePreview(illustration.name)) {
+                            Label("Shared.Share", systemImage: "square.and.arrow.up")
                         }
                         Divider()
-                        if illustration.containingAlbum != nil {
+                        if illustration.containingAlbumID != nil {
                             Button("Shared.SetAsCover", systemImage: "photo") {
                                 Task {
-                                    await actor.setAsAlbumCover(for: illustration.persistentModelID)
+                                    await actor.setAsAlbumCover(for: illustration.id)
                                 }
                             }
                         }
@@ -101,7 +100,8 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                     }
                 } preview: {
-                    if let image = UIImage(contentsOfFile: illustration.illustrationPath()) {
+                    if let thumbnailData = illustration.thumbnailData,
+                       let image = UIImage(data: thumbnailData) {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
@@ -114,8 +114,15 @@ struct IllustrationsGrid<Content: View>: View {
 #endif
             }
         }
-        .background(colorScheme == .light ?
-                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                        Color.init(uiColor: .systemBackground))
+    }
+}
+
+struct IllustrationShareable: Transferable {
+    let illustrationID: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(exportedContentType: .image) { shareable in
+            await actor.imageData(forIllustrationWithID: shareable.illustrationID) ?? Data()
+        }
     }
 }

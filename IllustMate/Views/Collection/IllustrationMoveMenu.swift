@@ -5,32 +5,31 @@
 //  Created by シン・ジャスティン on 2023/10/09.
 //
 
-import SwiftData
 import SwiftUI
 
 struct IllustrationMoveMenu: View {
-
-    @Environment(\.modelContext) var modelContext
 
     var illustrations: [Illustration]
     var containingAlbum: Album?
     var onMoved: () -> Void
 
+    @State var availableAlbums: [Album] = []
+    @State var parentAlbum: Album?
+
     var body: some View {
         if containingAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await actor.removeParentAlbum(forIllustrationsWithIDs: illustrations.map({ $0.persistentModelID }))
+                    await actor.removeParentAlbum(forIllustrationsWithIDs: illustrations.map({ $0.id }))
                     onMoved()
                 }
             }
         }
-        if let containingAlbum, let parentAlbum = containingAlbum.parentAlbum {
+        if let containingAlbum, let parentAlbum {
             Button {
                 Task {
-                    let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
-                    await actor.addIllustrations(withIDs: illustrationPersistentModelIDs,
-                                                 toAlbumWithID: parentAlbum.persistentModelID)
+                    await actor.addIllustrations(withIDs: illustrations.map { $0.id },
+                                                 toAlbumWithID: parentAlbum.id)
                     onMoved()
                 }
             } label: {
@@ -39,14 +38,18 @@ struct IllustrationMoveMenu: View {
                     icon: { Image(uiImage: parentAlbum.cover()) }
                 )
             }
+            .task(id: containingAlbum.id) {
+                if let parentAlbumID = containingAlbum.parentAlbumID {
+                    self.parentAlbum = await actor.album(for: parentAlbumID)
+                }
+            }
         }
         Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
-            ForEach(albumsThatIllustrationsCanBeMovedTo()) { album in
+            ForEach(availableAlbums) { album in
                 Button {
                     Task {
-                        let illustrationPersistentModelIDs = illustrations.map { $0.persistentModelID }
-                        await actor.addIllustrations(withIDs: illustrationPersistentModelIDs,
-                                                     toAlbumWithID: album.persistentModelID)
+                        await actor.addIllustrations(withIDs: illustrations.map { $0.id },
+                                                     toAlbumWithID: album.id)
                         onMoved()
                     }
                 } label: {
@@ -57,20 +60,16 @@ struct IllustrationMoveMenu: View {
                 }
             }
         }
+        .task {
+            await loadAlbums()
+        }
     }
 
-    func albumsThatIllustrationsCanBeMovedTo() -> [Album] {
+    func loadAlbums() async {
         if let containingAlbum {
-            return containingAlbum.albums()
+            availableAlbums = (try? await actor.albums(in: containingAlbum, sortedBy: .nameAscending)) ?? []
         } else {
-            do {
-                return try modelContext.fetch(FetchDescriptor<Album>(
-                    predicate: #Predicate { $0.parentAlbum == nil },
-                    sortBy: [SortDescriptor(\.name)]))
-            } catch {
-                debugPrint(error.localizedDescription)
-                return []
-            }
+            availableAlbums = (try? await actor.albums(in: nil, sortedBy: .nameAscending)) ?? []
         }
     }
 }

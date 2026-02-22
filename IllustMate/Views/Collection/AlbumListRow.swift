@@ -51,8 +51,5 @@ struct AlbumListRow: View {
         .contentShape(.rect)
         .padding([.leading, .trailing], 20.0)
         .padding([.top, .bottom], 8.0)
-        .background(colorScheme == .light ?
-                    Color.init(uiColor: .secondarySystemGroupedBackground) :
-                        Color.init(uiColor: .systemBackground))
     }
 }

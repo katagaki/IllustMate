@@ -1,52 +1,48 @@
 //
 //  Illustration.swift
-//  PicMate
+//  IllustMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
 import CoreTransferable
 import Foundation
-import SwiftData
 import UIKit
 import UniformTypeIdentifiers
 
-@Model
-final class Illustration {
-    var id = UUID().uuidString
-    var name: String = ""
-    @Relationship(deleteRule: .nullify, inverse: \Album.childIllustrations) var containingAlbum: Album?
-    @Relationship(deleteRule: .cascade) var cachedThumbnail: Thumbnail?
-    var dateAdded: Date = Date.now
+final class Illustration: Identifiable, Hashable, @unchecked Sendable {
+    var id: String
+    var name: String
+    var containingAlbumID: String?
+    var dateAdded: Date
 
-    init(name: String, data: Data) {
+    // Transient - loaded from database
+    var thumbnailData: Data?
+
+    // Transient - reference to containing album (may be nil)
+    var containingAlbum: Album?
+
+    init(id: String = UUID().uuidString, name: String, containingAlbumID: String? = nil,
+         dateAdded: Date = Date.now) {
+        self.id = id
         self.name = name
-        self.dateAdded = .now
-        FileManager.default.createFile(atPath: illustrationPath(), contents: data)
+        self.containingAlbumID = containingAlbumID
+        self.dateAdded = dateAdded
     }
 
-    func illustrationPath() -> String {
-        return illustrationsFolder.appendingPathComponent(id).path(percentEncoded: false)
+    static func == (lhs: Illustration, rhs: Illustration) -> Bool {
+        lhs.id == rhs.id
     }
 
-    func illustrationPathWhenUbiquitousFileNotDownloaded() -> String {
-        return illustrationsFolder.appendingPathComponent(".\(id).icloud").path(percentEncoded: false)
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
     func thumbnail() -> UIImage? {
-        return cachedThumbnail?.image()
-    }
-
-    func generateThumbnail() {
-        if let data = try? Data(contentsOf: URL(filePath: illustrationPath())),
-           let thumbnailData = Illustration.makeThumbnail(data) {
-            let thumbnail = Thumbnail(data: thumbnailData)
-            cachedThumbnail = thumbnail
+        if let thumbnailData {
+            return UIImage(data: thumbnailData)
         }
-    }
-
-    func prepareForDeletion() {
-        try? FileManager.default.removeItem(atPath: illustrationPath())
+        return nil
     }
 
     static func newFilename() -> String {

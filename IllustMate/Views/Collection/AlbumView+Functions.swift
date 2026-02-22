@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftData
 import SwiftUI
 
 extension AlbumView {
@@ -19,7 +18,7 @@ extension AlbumView {
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
             Task {
-                await actor.deleteAlbum(withID: albumPendingDeletion.persistentModelID)
+                await actor.deleteAlbum(withID: albumPendingDeletion.id)
                 await refreshData()
             }
         }
@@ -39,15 +38,14 @@ extension AlbumView {
     }
 
     func confirmDeleteIllustration() {
-        // TODO: Use actor to delete multiple illustrations instead of for loop here
         Task { [isSelectingIllustrations, selectedIllustrations] in
             if isSelectingIllustrations {
                 for illustration in selectedIllustrations {
-                    await actor.deleteIllustration(withID: illustration.persistentModelID)
+                    await actor.deleteIllustration(withID: illustration.id)
                 }
             } else {
                 if let illustrationPendingDeletion = illustrationPendingDeletion {
-                    await actor.deleteIllustration(withID: illustrationPendingDeletion.persistentModelID)
+                    await actor.deleteIllustration(withID: illustrationPendingDeletion.id)
                 }
             }
             self.selectedIllustrations.removeAll()
@@ -81,23 +79,18 @@ extension AlbumView {
     }
 
     func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
-        if let illustration = await actor.illustration(for: illustrationID) {
-            await actor.addIllustration(withID: illustration.persistentModelID,
-                                        toAlbumWithID: album.persistentModelID)
-        }
+        await actor.addIllustration(withID: illustrationID, toAlbumWithID: album.id)
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
-        if let destinationAlbum = await actor.album(for: albumID) {
-            await actor.addAlbum(withID: destinationAlbum.persistentModelID,
-                                 toAlbumWithID: album.persistentModelID)
-        }
+        await actor.addAlbum(withID: albumID, toAlbumWithID: album.id)
     }
 
     func importPhotoToAlbum(_ photo: Image, to album: Album) async {
-        let uiImage = await photo.render()
+        let uiImage = photo.render()
         if let data = uiImage?.data() {
-            await actor.createIllustration(Illustration.newFilename(), data: data)
+            await actor.createIllustration(Illustration.newFilename(), data: data,
+                                           inAlbumWithID: album.id)
         }
     }
 
@@ -116,7 +109,8 @@ extension AlbumView {
                 selectedIllustrations.append(illustration)
             }
         } else {
-            viewer.setDisplay(illustration) {
+            let illustrationCopy = illustration
+            viewer.setDisplay(illustrationCopy) { [navigationManager] in
                 navigationManager.push(.illustrationViewer(namespace: namespace), for: .collection)
             }
         }

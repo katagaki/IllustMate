@@ -29,8 +29,8 @@ struct NewAlbumView: View {
                     Task {
                         let newAlbum = await actor.createAlbum(newAlbumName)
                         if let albumToAddTo {
-                            await actor.addAlbum(withID: newAlbum.persistentModelID,
-                                                 toAlbumWithID: albumToAddTo.persistentModelID)
+                            await actor.addAlbum(withID: newAlbum.id,
+                                                 toAlbumWithID: albumToAddTo.id)
                         }
                         dismiss()
                     }
@@ -48,7 +48,7 @@ struct NewAlbumView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Cancel", role: .cancel) {
+                    Button(role: .cancel) {
                         newAlbumName = ""
                         dismiss()
                     }

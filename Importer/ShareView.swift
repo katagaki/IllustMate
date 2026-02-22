@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/15.
 //
 
-import SwiftData
 import SwiftUI
 
 struct ShareView: View {
@@ -18,8 +17,6 @@ struct ShareView: View {
     @State var isImporting: Bool = false
     @State var isCompleted: Bool = false
     @State var failedItemCount: Int
-
-    let actor = DataActor(modelContainer: sharedModelContainer)
 
     init(items: [Any?], failedItemCount: Int) {
         self.items = items
@@ -97,7 +94,7 @@ struct ShareView: View {
                             withAnimation(.snappy.speed(2)) {
                                 isImporting = true
                             } completion: {
-                                OperationQueue().addOperation {
+                                Task {
                                     importItems()
                                 }
                             }
@@ -163,7 +160,7 @@ struct ShareView: View {
     }
 
     func importItems() {
-        let albumID = albumInViewPath()?.persistentModelID
+        let albumID = albumInViewPath()?.id
         Task {
             for item in items {
                 await importItem(item, to: albumID, named: Illustration.newFilename())
@@ -188,7 +185,7 @@ struct ShareView: View {
         }
     }
 
-    func importItem(_ file: Any?, to albumID: PersistentIdentifier?, named name: String) async {
+    func importItem(_ file: Any?, to albumID: String?, named name: String) async {
         if let url = file as? URL, let imageData = try? Data(contentsOf: url),
             let image = UIImage(data: imageData) {
             await importItem(image, to: albumID, named: url.lastPathComponent)
@@ -205,7 +202,7 @@ struct ShareView: View {
         }
     }
 
-    func importIllustration(_ name: String, data: Data, to albumID: PersistentIdentifier?) async {
+    func importIllustration(_ name: String, data: Data, to albumID: String?) async {
         await actor.createIllustration(name, data: data, inAlbumWithID: albumID)
     }
 }

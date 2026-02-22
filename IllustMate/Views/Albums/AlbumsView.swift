@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/18.
 //
 
-import SwiftData
 import SwiftUI
 
 struct AlbumsView: View {
@@ -17,7 +16,8 @@ struct AlbumsView: View {
     @Namespace var namespace
 
     @State var albums: [Album] = []
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var style: ViewStyle
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var style: ViewStyle
 
     @State var viewerManager = ViewerManager()
 

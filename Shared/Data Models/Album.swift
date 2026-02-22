@@ -1,6 +1,6 @@
 //
-//  Item.swift
-//  PicMate
+//  Album.swift
+//  IllustMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -8,23 +8,36 @@
 import CoreTransferable
 import CryptoKit
 import Foundation
-import SwiftData
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
-@Model
-final class Album {
-    var id = UUID().uuidString
-    var name: String = ""
+final class Album: Identifiable, Hashable, @unchecked Sendable {
+    var id: String
+    var name: String
     var coverPhoto: Data?
-    @Relationship(deleteRule: .cascade) var childAlbums: [Album]? = []
-    var childIllustrations: [Illustration]? = []
-    @Relationship(deleteRule: .nullify, inverse: \Album.childAlbums) var parentAlbum: Album?
-    var dateCreated: Date = Date.now
+    var parentAlbumID: String?
+    var dateCreated: Date
 
-    init(name: String) {
+    // Transient relationships (populated after fetch)
+    var childAlbums: [Album]?
+    var childIllustrations: [Illustration]?
+
+    init(id: String = UUID().uuidString, name: String, coverPhoto: Data? = nil,
+         parentAlbumID: String? = nil, dateCreated: Date = Date.now) {
+        self.id = id
         self.name = name
+        self.coverPhoto = coverPhoto
+        self.parentAlbumID = parentAlbumID
+        self.dateCreated = dateCreated
+    }
+
+    static func == (lhs: Album, rhs: Album) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
     func identifiableString() -> String {
@@ -81,13 +94,16 @@ final class Album {
             if let coverPhoto = coverPhoto, let coverImage = UIImage(data: coverPhoto) {
                 imagesToReturn.append(Image(uiImage: coverImage))
             }
-            if let primaryImage, let thumbnail = primaryImage.cachedThumbnail?.image() {
+            if let primaryImage, let thumbnailData = primaryImage.thumbnailData,
+               let thumbnail = UIImage(data: thumbnailData) {
                 imagesToReturn.append(Image(uiImage: thumbnail))
             }
-            if let secondaryImage, let thumbnail = secondaryImage.cachedThumbnail?.image() {
+            if let secondaryImage, let thumbnailData = secondaryImage.thumbnailData,
+               let thumbnail = UIImage(data: thumbnailData) {
                 imagesToReturn.append(Image(uiImage: thumbnail))
             }
-            if let tertiaryImage, let thumbnail = tertiaryImage.cachedThumbnail?.image() {
+            if let tertiaryImage, let thumbnailData = tertiaryImage.thumbnailData,
+               let thumbnail = UIImage(data: thumbnailData) {
                 imagesToReturn.append(Image(uiImage: thumbnail))
             }
         }

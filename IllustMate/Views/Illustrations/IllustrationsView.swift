@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/08.
 //
 
-import SwiftData
 import SwiftUI
 
 struct IllustrationsView: View {
@@ -27,7 +26,7 @@ struct IllustrationsView: View {
                                       illustrations: illustrations,
                                       isSelecting: .constant(false),
                                       enableSelection: false) { illustration in
-                        viewer.setDisplay(illustration) {
+                        viewer.setDisplay(illustration) { [navigationManager] in
                             navigationManager.push(.illustrationViewer(namespace: namespace), for: .illustrations)
                         }
                     } selectedCount: {

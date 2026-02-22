@@ -5,9 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
-import CloudKitSyncMonitor
 import Komponents
-import SwiftData
 import SwiftUI
 
 struct MoreView: View {
@@ -15,94 +13,36 @@ struct MoreView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(ProgressAlertManager.self) var progressAlertManager
-    @ObservedObject var syncMonitor = SyncMonitor.shared
 
-    @Query var illustrations: [Illustration]
-    @Query var albums: [Album]
-    @Query var thumbnails: [Thumbnail]
+    @State var albumCount: Int = 0
+    @State var illustrationCount: Int = 0
+    @State var thumbnailCount: Int = 0
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    VStack(alignment: .center, spacing: 16.0) {
-                        Group {
-                            if syncMonitor.syncStateSummary.isBroken {
-                                Image(systemName: "xmark.icloud.fill")
-                                    .resizable()
-                                    .foregroundStyle(.red)
-                            } else if syncMonitor.syncStateSummary.inProgress {
-                                Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
-                                    .resizable()
-                                    .foregroundStyle(.primary)
-                            } else {
-                                switch syncMonitor.syncStateSummary {
-                                case .notStarted, .succeeded:
-                                    Image(systemName: "checkmark.icloud.fill")
-                                        .resizable()
-                                        .foregroundStyle(.green)
-                                case .noNetwork:
-                                    Image(systemName: "bolt.horizontal.icloud.fill")
-                                        .resizable()
-                                        .foregroundStyle(.orange)
-                                default:
-                                    Image(systemName: "exclamationmark.icloud.fill")
-                                        .resizable()
-                                        .foregroundStyle(.primary)
-                                }
-                            }
-                        }
-                        .symbolRenderingMode(.multicolor)
-                        .scaledToFit()
-                        .frame(width: 64.0, height: 64.0)
-                        Group {
-                            if syncMonitor.syncStateSummary.isBroken {
-                                Text("More.Sync.State.Error")
-                            } else if syncMonitor.syncStateSummary.inProgress {
-                                Text("More.Sync.State.InProgress")
-                            } else {
-                                switch syncMonitor.syncStateSummary {
-                                case .notStarted, .succeeded:
-                                    Text("More.Sync.State.Synced")
-                                case .noNetwork:
-                                    Text("More.Sync.State.NoNetwork")
-                                default:
-                                    Text("More.Sync.State.NotSyncing")
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .padding()
-                    .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
-                        return 0.0
-                    })
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Albums")
                         Spacer(minLength: 0)
-                        Text("\(albums.count)")
+                        Text("\(albumCount)")
                             .foregroundStyle(.secondary)
                     }
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Illustrations")
                         Spacer(minLength: 0)
-                        Text("\(illustrations.count)")
+                        Text("\(illustrationCount)")
                             .foregroundStyle(.secondary)
                     }
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Thumbnails")
                         Spacer(minLength: 0)
-                        Text("\(thumbnails.count)")
+                        Text("\(thumbnailCount)")
                             .foregroundStyle(.secondary)
                     }
                 } header: {
-                    ListSectionHeader(text: "More.Sync")
+                    ListSectionHeader(text: "More.Stats")
                         .font(.body)
-                } footer: {
-                    if isCloudSyncEnabled {
-                        Text("More.Sync.Description")
-                            .font(.body)
-                    }
                 }
 #if !targetEnvironment(macCatalyst)
                 Section {
@@ -116,9 +56,9 @@ struct MoreView: View {
                 }
 #endif
                 Section {
-                    NavigationLink(value: ViewPath.moreDebug) {
-                        ListRow(image: "ListIcon.Debug", title: "More.Debug")
-                    }
+//                    NavigationLink(value: ViewPath.moreDebug) {
+//                        ListRow(image: "ListIcon.Debug", title: "More.Debug")
+//                    }
                     NavigationLink(value: ViewPath.moreTroubleshooting) {
                         ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
                     }
@@ -130,7 +70,7 @@ struct MoreView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    CloseButton {
+                    Button(role: .close) {
                         dismiss()
                     }
                 }
@@ -139,12 +79,11 @@ struct MoreView: View {
                 switch viewPath {
                 case .moreAppIcon: MoreAppIconView()
                 case .moreDebug: MoreExperimentsView()
-                case .moreOrphans(let orphans): MoreOrphansView(orphans: orphans)
                 case .moreTroubleshooting: MoreTroubleshootingView()
                 case .moreAttributions: LicensesView(licenses: [
-                    License(libraryName: "CloudKitSyncMonitor", text:
+                    License(libraryName: "SQLite.swift", text:
 """
-Copyright (c) 2020 Grant Grueninger
+Copyright (c) 2014-2015 Stephen Celis (<stephen@stephencelis.com>)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -163,10 +102,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-""")])
+""")
+                ])
                 default: Color.clear
                 }
             }
+        }
+        .task {
+            await loadCounts()
+        }
+    }
+
+    func loadCounts() async {
+        let albums = await actor.albumCount()
+        let illustrations = await actor.illustrationCount()
+        let thumbnails = await actor.thumbnailCount()
+        await MainActor.run {
+            albumCount = albums
+            illustrationCount = illustrations
+            thumbnailCount = thumbnails
         }
     }
 }

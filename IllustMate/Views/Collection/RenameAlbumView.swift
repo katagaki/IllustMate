@@ -27,7 +27,7 @@ struct RenameAlbumView: View {
             .safeAreaInset(edge: .bottom) {
                 Button {
                     Task {
-                        await actor.renameAlbum(withID: album.persistentModelID, to: newAlbumName)
+                        await actor.renameAlbum(withID: album.id, to: newAlbumName)
                         await MainActor.run {
                             dismiss()
                         }
@@ -46,7 +46,7 @@ struct RenameAlbumView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Cancel", role: .cancel) {
+                    Button(role: .cancel) {
                         newAlbumName = ""
                         dismiss()
                     }

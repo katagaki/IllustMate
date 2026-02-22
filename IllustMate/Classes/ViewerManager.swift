@@ -8,43 +8,53 @@
 import Foundation
 import SwiftUI
 
-@Observable
+@MainActor @Observable
 class ViewerManager {
 
     var displayedIllustrationID: String = ""
     @ObservationIgnored var displayedIllustration: Illustration?
+    @ObservationIgnored var displayedThumbnail: UIImage?
     @ObservationIgnored var displayedImage: UIImage?
+    var isFullImageLoaded: Bool = false
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
-    let queue: OperationQueue
-
-    init() {
-        queue = OperationQueue()
-        queue.qualityOfService = .userInitiated
-        queue.maxConcurrentOperationCount = 2
-    }
-
-    func setDisplay(_ illustration: Illustration, completion: @escaping () -> Void) {
-        if let image = imageCache[illustration.id] {
-            displayedImage = image
-            displayedIllustration = illustration
-            displayedIllustrationID = illustration.id
-            completion()
+    func setDisplay(_ illustration: Illustration, completion: @escaping @MainActor @Sendable () -> Void) {
+        // Show thumbnail immediately to open viewer without delay
+        let thumbnail: UIImage?
+        if let thumbnailData = illustration.thumbnailData {
+            thumbnail = UIImage(data: thumbnailData)
         } else {
-            let illustrationURL: URL = URL(filePath: illustration.illustrationPath())
-            NSFileCoordinator().coordinate(readingItemAt: illustrationURL, error: .none) { url in
-                Task(priority: .userInitiated) {
-                    var loadedImage: UIImage?
-                    if let image = await UIImage(contentsOfFile: url.path(percentEncoded: false))?
-                        .byPreparingForDisplay() {
-                        loadedImage = image
-                    }
-                    imageCache[illustration.id] = loadedImage
-                    displayedImage = loadedImage
-                    displayedIllustration = illustration
-                    displayedIllustrationID = illustration.id
-                    completion()
+            thumbnail = nil
+        }
+
+        displayedThumbnail = thumbnail
+        displayedIllustration = illustration
+        displayedIllustrationID = illustration.id
+        isFullImageLoaded = false
+
+        if let cachedImage = imageCache[illustration.id] {
+            displayedImage = cachedImage
+            isFullImageLoaded = true
+        } else {
+            displayedImage = nil
+        }
+
+        // Navigate immediately — viewer opens with thumbnail
+        completion()
+
+        // Load full image in background if not cached
+        if !isFullImageLoaded {
+            Task(priority: .userInitiated) {
+                var loadedImage: UIImage?
+                if let data = await actor.imageData(forIllustrationWithID: illustration.id),
+                   let image = await UIImage(data: data)?.byPreparingForDisplay() {
+                    loadedImage = image
+                }
+                self.imageCache[illustration.id] = loadedImage
+                self.displayedImage = loadedImage
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    self.isFullImageLoaded = true
                 }
             }
         }
@@ -52,7 +62,9 @@ class ViewerManager {
 
     func removeDisplay() {
         displayedImage = nil
+        displayedThumbnail = nil
         displayedIllustration = nil
         displayedIllustrationID = ""
+        isFullImageLoaded = false
     }
 }

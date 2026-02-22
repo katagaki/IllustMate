@@ -6,7 +6,6 @@
 //
 
 import Komponents
-import SwiftData
 import SwiftUI
 
 struct AlbumView: View {
@@ -19,17 +18,19 @@ struct AlbumView: View {
     @Namespace var namespace
 
     var currentAlbum: Album?
-    @State var albums: [Album]?
+    @State var albums: [Album] = []
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
     @State var albumToRename: Album?
-    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort", store: defaults) var albumSort: SortType
+    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumSort: SortType
     @State var albumSortState: SortType = .nameAscending
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle", store: defaults) var albumStyle: ViewStyle
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyle: ViewStyle
     @State var albumStyleState: ViewStyle = .grid
 
-    @State var illustrations: [Illustration]?
+    @State var illustrations: [Illustration] = []
     @State var isConfirmingDeleteIllustration: Bool = false
     @State var isConfirmingDeleteSelectedIllustrations: Bool = false
     @State var illustrationPendingDeletion: Illustration?
@@ -41,10 +42,7 @@ struct AlbumView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                SectionHeader(title: "Albums.Albums", count: albums?.count ?? 0) {
-                    Button("Shared.Create", systemImage: "plus") {
-                        isAddingAlbum = true
-                    }
+                SectionHeader(title: "Albums.Albums", count: albums.count) {
                     Picker("Shared.Sort", selection: $albumSortState) {
                         Label("Shared.Sort.Name.Ascending", image: "Sort.Name.Ascending")
                             .tag(SortType.nameAscending)
@@ -63,44 +61,26 @@ struct AlbumView: View {
                     }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                if let albums {
-                    if !albums.isEmpty {
-                        Divider()
-                            .padding([.leading], colorScheme == .light ? 0.0 : 20.0)
-                        AlbumsSection(albums: albums, style: $albumStyleState) { album in
-                            albumToRename = album
-                        } onDelete: { album in
-                            deleteAlbum(album)
-                        } onDrop: { transferable, album in
-                            moveDropToAlbum(transferable, to: album)
-                        } moveMenu: { album in
-                            AlbumMoveMenu(album: album) {
-                                refreshAlbumsAndSet()
-                            }
+                if !albums.isEmpty {
+                    AlbumsSection(albums: albums, style: $albumStyleState) { album in
+                        albumToRename = album
+                    } onDelete: { album in
+                        deleteAlbum(album)
+                    } onDrop: { transferable, album in
+                        moveDropToAlbum(transferable, to: album)
+                    } moveMenu: { album in
+                        AlbumMoveMenu(album: album) {
+                            refreshAlbumsAndSet()
                         }
-                        if colorScheme == .light || albumStyleState == .list {
-                            Divider()
-                        }
-                    } else {
-                        Divider()
-                            .padding([.leading], 20.0)
-                        Text("Albums.NoAlbums")
-                            .foregroundStyle(.secondary)
-                            .padding(20.0)
                     }
                 } else {
-                    Divider()
-                        .padding([.leading], 20.0)
-                    ProgressView()
+                    Text("Albums.NoAlbums")
+                        .foregroundStyle(.secondary)
                         .padding(20.0)
                 }
                 Spacer()
                     .frame(height: 20.0)
-                SectionHeader(title: "Albums.Illustrations", count: illustrations?.count ?? 0) {
-                    Button("Shared.Select", systemImage: "checkmark.circle") {
-                        startOrStopSelectingIllustrations()
-                    }
-                    .disabled(isSelectingIllustrations || illustrations == nil || (illustrations?.isEmpty ?? true))
+                SectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
                     Picker("Shared.Sort", selection: $isIllustrationSortReversed) {
                         Label("Shared.Sort.DateAdded.Ascending", image: "Sort.Count.Ascending")
                             .tag(true)
@@ -112,43 +92,45 @@ struct AlbumView: View {
                     }
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                if let illustrations {
-                    if !illustrations.isEmpty {
-                        Divider()
-                        IllustrationsGrid(namespace: namespace, illustrations: illustrations,
-                                          isSelecting: $isSelectingIllustrations) { illustration in
-                            selectedIllustrations.contains(illustration)
-                        } onSelect: { illustration in
-                            selectOrDeselectIllustration(illustration)
-                        } selectedCount: {
-                            selectedIllustrations.count
-                        } onDelete: { illustration in
-                            deleteIllustration(illustration)
-                        } moveMenu: { illustration in
-                            IllustrationMoveMenu(illustrations: isSelectingIllustrations ?
-                                                 selectedIllustrations : [illustration],
-                                                 containingAlbum: currentAlbum) {
-                                refreshDataAfterIllustrationMoved()
-                            }
+                if !illustrations.isEmpty {
+                    IllustrationsGrid(namespace: namespace, illustrations: illustrations,
+                                      isSelecting: $isSelectingIllustrations) { illustration in
+                        selectedIllustrations.contains(illustration)
+                    } onSelect: { illustration in
+                        selectOrDeselectIllustration(illustration)
+                    } selectedCount: {
+                        selectedIllustrations.count
+                    } onDelete: { illustration in
+                        deleteIllustration(illustration)
+                    } moveMenu: { illustration in
+                        IllustrationMoveMenu(illustrations: isSelectingIllustrations ?
+                                             selectedIllustrations : [illustration],
+                                             containingAlbum: currentAlbum) {
+                            refreshDataAfterIllustrationMoved()
                         }
-                        Divider()
-                    } else {
-                        Divider()
-                            .padding([.leading], 20.0)
-                        Text("Albums.NoIllustrations")
-                            .foregroundStyle(.secondary)
-                            .padding(20.0)
                     }
                 } else {
-                    Divider()
-                        .padding([.leading], 20.0)
-                    ProgressView()
+                    Text("Albums.NoIllustrations")
+                        .foregroundStyle(.secondary)
                         .padding(20.0)
                 }
             }
             .padding([.top], 20.0)
         }
-        .background(Color.init(uiColor: .systemGroupedBackground))
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Select", systemImage: "checkmark.circle") {
+                    startOrStopSelectingIllustrations()
+                }
+                .disabled(isSelectingIllustrations || illustrations.isEmpty)
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Create", systemImage: "plus") {
+                    isAddingAlbum = true
+                }
+            }
+        }
 #if targetEnvironment(macCatalyst)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -162,8 +144,8 @@ struct AlbumView: View {
 #else
         .refreshable {
             doWithAnimation {
-                albums?.removeAll()
-                illustrations?.removeAll()
+                albums.removeAll()
+                illustrations.removeAll()
             } completion: {
                 Task {
                     await refreshData()
@@ -172,7 +154,7 @@ struct AlbumView: View {
         }
 #endif
         .safeAreaInset(edge: .bottom) {
-            if isSelectingIllustrations, let illustrations {
+            if isSelectingIllustrations, !illustrations.isEmpty {
                 SelectionBar(illustrations: illustrations, selectedIllustrations: $selectedIllustrations) {
                     startOrStopSelectingIllustrations()
                 } menuItems: {
@@ -230,16 +212,10 @@ struct AlbumView: View {
             }
         }
         .onAppear {
-            if albums != nil && illustrations != nil {
-                Task {
-                    await refreshData()
-                }
-            } else {
-                albumStyleState = albumStyle
-                albumSortState = albumSort
-                Task.detached(priority: .userInitiated) {
-                    await refreshData()
-                }
+            albumStyleState = albumStyle
+            albumSortState = albumSort
+            Task.detached(priority: .userInitiated) {
+                await refreshData()
             }
         }
         .onChange(of: albumStyleState) { _, newValue in
