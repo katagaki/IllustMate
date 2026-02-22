@@ -48,7 +48,7 @@ struct NewAlbumView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Cancel", role: .cancel) {
+                    Button(role: .cancel) {
                         newAlbumName = ""
                         dismiss()
                     }
