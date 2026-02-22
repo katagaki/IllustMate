@@ -87,8 +87,8 @@ actor DataActor {
         let cover = try? row.get(albumCoverPhoto)
         let parentId = try? row.get(albumParentId)
         let dateCreated = Date(timeIntervalSince1970: (try? row.get(albumDateCreated)) ?? 0)
-        let album = Album(id: id, name: name, coverPhoto: cover ?? nil,
-                          parentAlbumID: parentId ?? nil, dateCreated: dateCreated)
+        let album = Album(id: id, name: name, coverPhoto: cover,
+                          parentAlbumID: parentId, dateCreated: dateCreated)
         if loadChildren {
             album.childAlbums = fetchChildAlbums(forAlbumID: id)
             album.childIllustrations = fetchChildIllustrations(forAlbumID: id)
@@ -103,9 +103,9 @@ actor DataActor {
         let dateAdded = Date(timeIntervalSince1970: (try? row.get(illustrationDateAdded)) ?? 0)
         let thumbData = try? row.get(illustrationThumbnailData)
         let illustration = Illustration(id: id, name: name,
-                                        containingAlbumID: albumId ?? nil,
+                                        containingAlbumID: albumId,
                                         dateAdded: dateAdded)
-        illustration.thumbnailData = thumbData ?? nil
+        illustration.thumbnailData = thumbData
         return illustration
     }
 
@@ -214,7 +214,7 @@ actor DataActor {
         _ = try? database.run(query.update(albumParentId <- destinationAlbumID))
     }
 
-    func removeParentAlbum(forAlbumWithidentifier albumID: String) {
+    func removeParentAlbum(forAlbumWithIdentifier albumID: String) {
         let query = albumsTable.filter(albumId == albumID)
         _ = try? database.run(query.update(albumParentId <- nil))
     }

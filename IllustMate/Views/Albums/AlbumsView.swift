@@ -19,8 +19,6 @@ struct AlbumsView: View {
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var style: ViewStyle
 
-    @State var viewerManager = ViewerManager()
-
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationManager.albumsTabPath) {

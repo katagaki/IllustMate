@@ -14,8 +14,6 @@ struct AlbumNavigationStack: View {
 
     @Namespace var illustrationTransitionNamespace
 
-    @State var viewerManager = ViewerManager()
-
     var body: some View {
         ZStack {
             NavigationStack(path: $viewPath) {

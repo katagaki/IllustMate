@@ -16,7 +16,6 @@ struct IllustrationsView: View {
     @Namespace var namespace
 
     @State var illustrations: [Illustration] = []
-    @State var viewerManager = ViewerManager()
 
     var body: some View {
         ZStack {

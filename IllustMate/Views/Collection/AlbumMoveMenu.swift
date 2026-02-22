@@ -20,7 +20,7 @@ struct AlbumMoveMenu: View {
         if album.parentAlbumID != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await actor.removeParentAlbum(forAlbumWithidentifier: album.id)
+                    await actor.removeParentAlbum(forAlbumWithIdentifier: album.id)
                     onMoved()
                 }
             }
