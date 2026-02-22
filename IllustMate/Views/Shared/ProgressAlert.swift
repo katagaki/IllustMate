@@ -21,9 +21,20 @@ struct ProgressAlert: View {
                     Text(progressAlertManager.title)
                         .multilineTextAlignment(.center)
                         .bold()
-                    ProgressView(value: min(Float(progressAlertManager.percentage), 100.0),
-                                 total: 100.0)
-                        .progressViewStyle(.linear)
+                    VStack(alignment: .center, spacing: 8.0) {
+                        ProgressView(value: min(Float(progressAlertManager.percentage), 100.0),
+                                     total: 100.0)
+                            .progressViewStyle(.linear)
+                        HStack {
+                            Text(verbatim: "\(progressAlertManager.currentProgress)/\(progressAlertManager.total)")
+                                .monospacedDigit()
+                            Spacer()
+                            Text(verbatim: "\(progressAlertManager.percentage)%")
+                                .monospacedDigit()
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
                 }
                 .padding()
             }
