@@ -5,11 +5,13 @@
 //  Created by シン・ジャスティン on 2023/10/06.
 //
 
+import Komponents
 import SwiftUI
 
 struct IllustrationViewer: View {
 
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @Environment(ViewerManager.self) var viewer
 
     var illustration: Illustration
@@ -18,62 +20,64 @@ struct IllustrationViewer: View {
     @State var magnification: CGFloat = 1.0
     @State var magnificationAnchor: UnitPoint = .center
     @State var containingAlbumName: String?
+    @State var showImageSize: Bool = false
 
     var body: some View {
-        VStack(alignment: .center, spacing: 0.0) {
-            Spacer(minLength: 20)
-            ZStack {
-                // Show thumbnail as placeholder
-                if let thumbnail = viewer.displayedThumbnail {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .scaledToFit()
-                        .clipShape(.rect(cornerRadius: 8.0))
-                        .opacity(viewer.isFullImageLoaded ? 0 : 1)
-                }
-                // Crossfade to full image when loaded
-                if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
-                    Image(uiImage: fullImage)
-                        .resizable()
-                        .scaledToFit()
-                        .clipShape(.rect(cornerRadius: 8.0))
-                        .transition(.opacity)
-                }
+        ZStack {
+            // Blurred thumbnail background
+            if let thumbnail = viewer.displayedThumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+                    .blur(radius: 40)
+                    .overlay {
+                        Color.black.opacity(colorScheme == .dark ? 0.4 : 0.0)
+                        Color.white.opacity(colorScheme == .light ? 0.2 : 0.0)
+                    }
+                    .ignoresSafeArea()
             }
-            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-            .zIndex(1)
-            .offset(displayOffset)
-            .scaleEffect(CGSize(width: magnification, height: magnification), anchor: magnificationAnchor)
-            Spacer(minLength: 20)
-            if let displayedImage = viewer.displayedImage, let cgImage = displayedImage.cgImage {
-                HStack(alignment: .center, spacing: 16.0) {
-                    HStack(alignment: .center, spacing: 2.0) {
-                        Group {
+            VStack(alignment: .center, spacing: 0.0) {
+                ZStack(alignment: .bottomLeading) {
+                    ZStack {
+                        // Show thumbnail as placeholder
+                        if let thumbnail = viewer.displayedThumbnail {
+                            Image(uiImage: thumbnail)
+                                .resizable()
+                                .scaledToFit()
+                                .opacity(viewer.isFullImageLoaded ? 0 : 1)
+                        }
+                        // Crossfade to full image when loaded
+                        if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
+                            Image(uiImage: fullImage)
+                                .resizable()
+                                .scaledToFit()
+                                .transition(.opacity)
+                        }
+                    }
+                    .onTapGesture {
+                        withAnimation(.snappy.speed(2)) {
+                            showImageSize.toggle()
+                        }
+                    }
+                    // Image size overlay
+                    if showImageSize, let displayedImage = viewer.displayedImage {
+                        HStack(alignment: .center, spacing: 2.0) {
                             Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
                             Text(verbatim: "×")
                             Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
                         }
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(.bar, in: .capsule)
+                        .padding(8)
+                        .transition(.opacity)
                     }
-                    Spacer(minLength: 0)
-                    Button {
-                        UIPasteboard.general.image = displayedImage
-                    } label: {
-                        Image(systemName: "doc.on.doc")
-                            .font(.title3)
-                    }
-                    .buttonStyle(.borderless)
-                    .buttonBorderShape(.capsule)
-                    ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
-                              preview: SharePreview(illustration.name, image: Image(uiImage: displayedImage))) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.title3)
-                    }
-                              .buttonStyle(.borderless)
-                              .buttonBorderShape(.capsule)
                 }
-                .opacity(opacityDuringGesture())
+                .frame(maxHeight: .infinity)
+                .offset(displayOffset)
+                .scaleEffect(CGSize(width: magnification, height: magnification),
+                             anchor: magnificationAnchor)
             }
         }
         .navigationTitle(illustration.name)
@@ -94,15 +98,34 @@ struct IllustrationViewer: View {
                 }
             }
         }
-        .padding(20.0)
-        .frame(maxHeight: .infinity)
+        .safeAreaInset(edge: .bottom) {
+            if let displayedImage = viewer.displayedImage, let cgImage = displayedImage.cgImage {
+                HStack(alignment: .center, spacing: 16.0) {
+                    Button {
+                        UIPasteboard.general.image = displayedImage
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                            .font(.title3)
+                    }
+                    ShareLink(item: Image(cgImage, scale: displayedImage.scale, label: Text("")),
+                              preview: SharePreview(illustration.name,
+                                                    image: Image(uiImage: displayedImage))) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.title3)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .padding(.bottom, 8)
+            }
+        }
         .task {
             if let albumID = illustration.containingAlbumID {
                 containingAlbumName = await actor.album(for: albumID)?.name
             }
         }
 #if !targetEnvironment(macCatalyst)
-        .overlayBackground(opacity: opacityDuringGesture())
         .gesture(
             DragGesture()
                 .onChanged { gesture in
@@ -141,10 +164,6 @@ struct IllustrationViewer: View {
                 }
         )
 #endif
-    }
-
-    func opacityDuringGesture() -> Double {
-        1.0 - hypotenuse(displayOffset) / 100.0
     }
 
     func hypotenuse(_ translation: CGSize) -> Double {
