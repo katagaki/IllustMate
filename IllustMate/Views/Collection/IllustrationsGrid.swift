@@ -37,13 +37,7 @@ struct IllustrationsGrid<Content: View>: View {
                 Button {
                     onSelect(illustration)
                 } label: {
-                    Group {
-                        if UIDevice.current.userInterfaceIdiom == .phone {
-                            IllustrationLabel(namespace: namespace, illustration: illustration)
-                        } else {
-                            IllustrationLabel(namespace: namespace, illustration: illustration)
-                        }
-                    }
+                    IllustrationLabel(namespace: namespace, illustration: illustration)
                     .overlay {
                         if let isSelected, isSelected(illustration) {
                             SelectionOverlay()

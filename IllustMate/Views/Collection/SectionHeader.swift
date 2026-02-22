@@ -15,14 +15,21 @@ struct SectionHeader<Buttons: View, Content: View>: View {
     @ViewBuilder var buttons: () -> Buttons
     @ViewBuilder var trailingViews: () -> Content
 
-    init(title: LocalizedStringKey, count: Int, @ViewBuilder trailingViews: @escaping () -> Content) where Buttons == EmptyView {
+    init(
+        title: LocalizedStringKey, count: Int,
+        @ViewBuilder trailingViews: @escaping () -> Content
+    ) where Buttons == EmptyView {
         self.title = title
         self.count = count
         self.buttons = { EmptyView() }
         self.trailingViews = trailingViews
     }
 
-    init(title: LocalizedStringKey, count: Int, @ViewBuilder buttons: @escaping () -> Buttons, @ViewBuilder trailingViews: @escaping () -> Content) {
+    init(
+        title: LocalizedStringKey, count: Int,
+        @ViewBuilder buttons: @escaping () -> Buttons,
+        @ViewBuilder trailingViews: @escaping () -> Content
+    ) {
         self.title = title
         self.count = count
         self.buttons = buttons

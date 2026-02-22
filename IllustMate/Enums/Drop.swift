@@ -21,23 +21,17 @@ enum Drop: Transferable {
     }
 
     var album: AlbumTransferable? {
-        switch self {
-        case .album(let album): return album
-        default: return nil
-        }
+        if case .album(let album) = self { return album }
+        return nil
     }
 
     var illustration: IllustrationTransferable? {
-        switch self {
-        case.illustration(let illustration): return illustration
-        default: return nil
-        }
+        if case .illustration(let illustration) = self { return illustration }
+        return nil
     }
 
     var importedPhoto: Image? {
-        switch self {
-        case.importedPhoto(let importedPhoto): return importedPhoto
-        default: return nil
-        }
+        if case .importedPhoto(let importedPhoto) = self { return importedPhoto }
+        return nil
     }
 }

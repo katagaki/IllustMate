@@ -174,14 +174,14 @@ actor DataActor {
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
         switch sortType {
-        case .nameAscending: albums.sorted(by: { $0.name < $1.name })
-        case .nameDescending: albums.sorted(by: { $0.name > $1.name })
+        case .nameAscending: return albums.sorted(by: { $0.name < $1.name })
+        case .nameDescending: return albums.sorted(by: { $0.name > $1.name })
         case .sizeAscending:
-            albums.sorted(by: {
+            return albums.sorted(by: {
                 objectCount(forAlbumWithID: $0.id) < objectCount(forAlbumWithID: $1.id)
             })
         case .sizeDescending:
-            albums.sorted(by: {
+            return albums.sorted(by: {
                 objectCount(forAlbumWithID: $0.id) > objectCount(forAlbumWithID: $1.id)
             })
         }
@@ -259,7 +259,11 @@ actor DataActor {
         return try? database.pluck(query).flatMap { try? $0.get(albumParentId) }
     }
 
-    // MARK: - Illustrations
+}
+
+// MARK: - Illustrations
+
+extension DataActor {
 
     func illustrations() throws -> [Illustration] {
         let query = illustrationsTable

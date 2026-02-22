@@ -64,10 +64,10 @@ struct ShareView: View {
                 NavigationStack(path: $viewPath) {
                     AlbumsScrollView(title: "Shared.Collection")
                         .navigationDestination(for: ViewPath.self, destination: { viewPath in
-                            switch viewPath {
-                            case .album(let album):
+                            if case .album(let album) = viewPath {
                                 AlbumsScrollView(title: LocalizedStringKey(album.name), parentAlbum: album)
-                            default: Color.clear
+                            } else {
+                                Color.clear
                             }
                         })
                 }
@@ -150,11 +150,9 @@ struct ShareView: View {
     }
 
     func albumInViewPath() -> Album? {
-        if let currentlyDisplayingViewPath = viewPath.last {
-            switch currentlyDisplayingViewPath {
-            case .album(let album): return album
-            default: break
-            }
+        if let currentlyDisplayingViewPath = viewPath.last,
+           case .album(let album) = currentlyDisplayingViewPath {
+            return album
         }
         return nil
     }
