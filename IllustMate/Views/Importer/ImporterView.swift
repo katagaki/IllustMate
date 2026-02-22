@@ -22,22 +22,37 @@ struct ImporterView: View {
     @State var importTotalCount: Int = 0
     @State var importCompletedCount: Int = 0
 
+    @State var navigationPath = NavigationPath()
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ScrollView(.vertical) {
                 VStack(alignment: .center, spacing: 16.0) {
                     if !isImportCompleted {
                         if !isImporting {
                             Text("Import.Instructions")
-                            PhotosPicker(selection: $selectedPhotoItems, matching: .images, photoLibrary: .shared()) {
-                                HStack(alignment: .center, spacing: 8.0) {
-                                    Image("ListIcon.Photos")
-                                        .resizable()
-                                        .frame(width: 30.0, height: 30.0)
-                                    Text("Import.SelectPhotos")
-                                        .bold()
-                                }
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            PhotosPicker(selection: $selectedPhotoItems,
+                                         matching: .images,
+                                         photoLibrary: .shared()) {
+                                Text("Import.SelectPhotos")
+                                    .bold()
+                                    .padding(4.0)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .buttonBorderShape(.capsule)
+                            .disabled(isImporting)
+
+                            Text("Import.BulkInstructions")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Button {
+                                navigationPath.append("albumPicker")
+                            } label: {
+                                Text("Import.BrowseAlbums")
+                                    .bold()
+                                    .padding(4.0)
+                                    .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.borderedProminent)
                             .buttonBorderShape(.capsule)
@@ -96,7 +111,7 @@ struct ImporterView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if !isImporting {
-                        Button("Shared.Cancel", role: .cancel) {
+                        Button(role: .cancel) {
                             dismiss()
                         }
                     }
@@ -104,8 +119,15 @@ struct ImporterView: View {
             }
             .navigationTitle("ViewTitle.Import")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: String.self) { destination in
+                if destination == "albumPicker" {
+                    PhotosAlbumPickerView(selectedAlbum: selectedAlbum) {
+                        dismiss()
+                    }
+                }
+            }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
         .interactiveDismissDisabled()
     }
 

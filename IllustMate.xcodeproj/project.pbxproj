@@ -55,6 +55,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Enums/Drop.swift,
+				Enums/PHCollectionItem.swift,
 				Enums/SortType.swift,
 				Enums/ViewPath.swift,
 				Enums/ViewStyle.swift,
