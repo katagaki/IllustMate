@@ -42,9 +42,7 @@ struct IllustrationViewer: View {
             }
 
             VStack(alignment: .center, spacing: 0.0) {
-                Spacer(minLength: 20)
-
-                // Image with size overlay
+                // Image with size overlay - fills available space
                 ZStack(alignment: .bottomLeading) {
                     ZStack {
                         // Show thumbnail as placeholder
@@ -80,6 +78,8 @@ struct IllustrationViewer: View {
                         .transition(.opacity)
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 20)
                 .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
                 .zIndex(1)
                 .offset(displayOffset)
@@ -91,8 +91,6 @@ struct IllustrationViewer: View {
                     }
                 }
 
-                Spacer(minLength: 20)
-
                 // Fixed bottom toolbar with Copy/Share
                 HStack(alignment: .center, spacing: 16.0) {
                     Button {
@@ -101,7 +99,7 @@ struct IllustrationViewer: View {
                         }
                     } label: {
                         Label("Shared.Copy", systemImage: "doc.on.doc")
-                            .font(.subheadline)
+                            .font(.body)
                     }
                     .buttonStyle(.borderless)
 
@@ -110,11 +108,12 @@ struct IllustrationViewer: View {
                                   preview: SharePreview(illustration.name,
                                                         image: Image(uiImage: image))) {
                             Label("Shared.Share", systemImage: "square.and.arrow.up")
-                                .font(.subheadline)
+                                .font(.body)
                         }
                         .buttonStyle(.borderless)
                     }
                 }
+                .tint(.primary)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
                 .glassEffect(.regular.interactive(), in: .capsule)
