@@ -11,7 +11,7 @@ import UIKit
 
 struct MoreTroubleshootingView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigation: NavigationManager
     @Environment(ConcurrencyManager.self) var concurrency
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
@@ -25,9 +25,15 @@ struct MoreTroubleshootingView: View {
                         await rebuildThumbnails()
                     }
                 }
+                Button("More.Troubleshooting.FreeUpSpace") {
+                    Task {
+                        await dataActor.vacuum()
+                    }
+                }
             } header: {
-                ListSectionHeader(text: "More.Troubleshooting.DataManagement")
-                    .font(.body)
+                Text("More.Troubleshooting.DataManagement")
+            } footer: {
+                Text("More.Troubleshooting.DataManagement.Description")
             }
             Section {
                 Button("More.Troubleshooting.DeleteAll", role: .destructive) {
@@ -38,8 +44,8 @@ struct MoreTroubleshootingView: View {
         .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
             Button("Shared.Yes", role: .destructive) {
                 Task {
-                    await deleteData()
-                    navigationManager.popAll()
+                    await dataActor.deleteAll()
+                    navigation.popAll()
                 }
             }
             Button("Shared.No", role: .cancel) {
@@ -57,19 +63,19 @@ struct MoreTroubleshootingView: View {
             UIApplication.shared.isIdleTimerDisabled = true
         }
         do {
-            let pics = try await actor.pics()
+            let pics = try await dataActor.pics()
             await MainActor.run {
                 progressAlertManager.prepare("More.Troubleshooting.RebuildThumbnails.Rebuilding",
                                              total: pics.count)
             }
-            await actor.deleteAllThumbnails()
+            await dataActor.deleteAllThumbnails()
             await MainActor.run {
                 progressAlertManager.show()
             }
             for pic in pics {
-                if let data = await actor.imageData(forPicWithID: pic.id) {
+                if let data = await dataActor.imageData(forPicWithID: pic.id) {
                     let thumbnailData = Pic.makeThumbnail(data)
-                    await actor.updateThumbnail(forPicWithID: pic.id,
+                    await dataActor.updateThumbnail(forPicWithID: pic.id,
                                                 thumbnailData: thumbnailData)
                 }
                 await MainActor.run {
@@ -86,9 +92,5 @@ struct MoreTroubleshootingView: View {
                 UIApplication.shared.isIdleTimerDisabled = false
             }
         }
-    }
-
-    func deleteData() async {
-        await actor.deleteAll()
     }
 }

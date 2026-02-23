@@ -11,7 +11,7 @@ import SwiftUI
 struct IllustMateApp: App {
 
     @StateObject var tabManager = TabManager()
-    @StateObject var navigationManager = NavigationManager()
+    @StateObject var navigation = NavigationManager()
     @State var viewer = ViewerManager()
     @State var progressAlertManager = ProgressAlertManager()
     @State var concurrency = ConcurrencyManager()
@@ -26,7 +26,7 @@ struct IllustMateApp: App {
                 }
             }
             .environmentObject(tabManager)
-            .environmentObject(navigationManager)
+            .environmentObject(navigation)
             .environment(viewer)
             .environment(progressAlertManager)
             .environment(concurrency)

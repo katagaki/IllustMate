@@ -18,7 +18,7 @@ struct AlbumMoveMenu: View {
         if album.parentAlbumID != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await actor.removeParentAlbum(forAlbumWithidentifier: album.id)
+                    await dataActor.removeParentAlbum(forAlbumWithidentifier: album.id)
                     onMoved()
                 }
             }
@@ -30,7 +30,7 @@ struct AlbumMoveMenu: View {
                     excludingAlbumID: album.id
                 ) { destinationAlbum in
                     Task {
-                        await actor.addAlbum(withID: album.id,
+                        await dataActor.addAlbum(withID: album.id,
                                              toAlbumWithID: destinationAlbum.id)
                         onMoved()
                     }
@@ -43,7 +43,7 @@ struct AlbumMoveMenu: View {
     }
 
     func loadAlbums() async {
-        rootAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+        rootAlbums = (try? await dataActor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
     }
 }
 
@@ -93,6 +93,6 @@ struct AlbumHierarchyMenuItem: View {
     }
 
     func loadChildAlbums() async {
-        childAlbums = (try? await actor.albumsWithCounts(in: targetAlbum, sortedBy: .nameAscending)) ?? []
+        childAlbums = (try? await dataActor.albumsWithCounts(in: targetAlbum, sortedBy: .nameAscending)) ?? []
     }
 }

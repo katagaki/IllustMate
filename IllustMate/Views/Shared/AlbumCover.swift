@@ -158,7 +158,7 @@ struct AlbumCover: View {
             if let coverPhoto = album.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
                 images.append(Image(uiImage: uiImage))
             }
-            let thumbnails = await actor.representativeThumbnails(forAlbumWithID: album.id)
+            let thumbnails = await dataActor.representativeThumbnails(forAlbumWithID: album.id)
             for thumbData in thumbnails {
                 if let uiImage = UIImage(data: thumbData) {
                     images.append(Image(uiImage: uiImage))

@@ -12,7 +12,7 @@ struct AlbumView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace

@@ -10,7 +10,7 @@ import SwiftUI
 struct PicsView: View {
 
     @Environment(\.scenePhase) var scenePhase
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
@@ -20,14 +20,14 @@ struct PicsView: View {
 
     var body: some View {
         ZStack {
-            NavigationStack(path: $navigationManager.picsTabPath) {
+            NavigationStack(path: $navigation.picsTabPath) {
                 ScrollView(.vertical) {
                     PicsGrid(namespace: namespace,
                                       pics: pics,
                                       isSelecting: .constant(false),
                                       enableSelection: false) { pic in
-                        viewer.setDisplay(pic) { [navigationManager] in
-                            navigationManager.push(.picViewer(namespace: namespace), for: .pics)
+                        viewer.setDisplay(pic) { [navigation] in
+                            navigation.push(.picViewer(namespace: namespace), for: .pics)
                         }
                     } selectedCount: {
                         return 0
@@ -69,7 +69,7 @@ struct PicsView: View {
     func refreshPics() {
         Task.detached(priority: .userInitiated) {
             do {
-                let pics = try await actor.pics()
+                let pics = try await dataActor.pics()
                 await MainActor.run {
                     doWithAnimation {
                         self.pics = pics

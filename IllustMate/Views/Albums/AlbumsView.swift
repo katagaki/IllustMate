@@ -10,7 +10,7 @@ import SwiftUI
 struct AlbumsView: View {
 
     @Environment(\.scenePhase) var scenePhase
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
@@ -23,7 +23,7 @@ struct AlbumsView: View {
 
     var body: some View {
         ZStack {
-            NavigationStack(path: $navigationManager.albumsTabPath) {
+            NavigationStack(path: $navigation.albumsTabPath) {
                 ScrollView(.vertical) {
                     AlbumsSection(albums: albums, style: $style) { _ in
                         // TODO: Move menu support in macOS Albums view
@@ -63,7 +63,7 @@ struct AlbumsView: View {
     func refreshAlbums() {
         Task.detached(priority: .userInitiated) {
             do {
-                let albums = try await actor.albumsWithCounts(sortedBy: .nameAscending)
+                let albums = try await dataActor.albumsWithCounts(sortedBy: .nameAscending)
                 await MainActor.run {
                     doWithAnimation {
                         self.albums = albums

@@ -148,7 +148,7 @@ struct ImporterView: View {
                             filename = resources.first?.originalFilename
                         }
                     }
-                    await actor.createPic(filename ?? Pic.newFilename(), data: data,
+                    await dataActor.createPic(filename ?? Pic.newFilename(), data: data,
                                                    inAlbumWithID: selectedAlbum?.id,
                                                    dateAdded: creationDate)
                 }

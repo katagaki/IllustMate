@@ -18,7 +18,7 @@ extension AlbumView {
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
             Task {
-                await actor.deleteAlbum(withID: albumPendingDeletion.id)
+                await dataActor.deleteAlbum(withID: albumPendingDeletion.id)
                 await refreshData()
             }
         }
@@ -41,11 +41,11 @@ extension AlbumView {
         Task { [isSelectingPics, selectedPics] in
             if isSelectingPics {
                 for pic in selectedPics {
-                    await actor.deletePic(withID: pic.id)
+                    await dataActor.deletePic(withID: pic.id)
                 }
             } else {
                 if let picPendingDeletion = picPendingDeletion {
-                    await actor.deletePic(withID: picPendingDeletion.id)
+                    await dataActor.deletePic(withID: picPendingDeletion.id)
                 }
             }
             self.selectedPics.removeAll()
@@ -79,17 +79,17 @@ extension AlbumView {
     }
 
     func movePicToAlbum(_ picID: String, to album: Album) async {
-        await actor.addPic(withID: picID, toAlbumWithID: album.id)
+        await dataActor.addPic(withID: picID, toAlbumWithID: album.id)
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
-        await actor.addAlbum(withID: albumID, toAlbumWithID: album.id)
+        await dataActor.addAlbum(withID: albumID, toAlbumWithID: album.id)
     }
 
     func importPhotoToAlbum(_ photo: Image, to album: Album) async {
         let uiImage = photo.render()
         if let data = uiImage?.data() {
-            await actor.createPic(Pic.newFilename(), data: data,
+            await dataActor.createPic(Pic.newFilename(), data: data,
                                            inAlbumWithID: album.id)
         }
     }
@@ -110,8 +110,8 @@ extension AlbumView {
             }
         } else {
             let picCopy = pic
-            viewer.setDisplay(picCopy) { [navigationManager] in
-                navigationManager.push(.picViewer(namespace: namespace), for: .collection)
+            viewer.setDisplay(picCopy) { [navigation] in
+                navigation.push(.picViewer(namespace: namespace), for: .collection)
             }
         }
     }
@@ -139,7 +139,7 @@ extension AlbumView {
 
     func fetchAlbums() async -> [Album] {
         do {
-            let albums = try await actor.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
+            let albums = try await dataActor.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
             return albums
         } catch {
             debugPrint(error.localizedDescription)
@@ -160,7 +160,7 @@ extension AlbumView {
 
     func fetchPics() async -> [Pic] {
         do {
-            let pics = try await actor
+            let pics = try await dataActor
                 .picSkeletons(in: currentAlbum, order: isPicSortReversed ? .forward : .reverse)
             return pics
         } catch {

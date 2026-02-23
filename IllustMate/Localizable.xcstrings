@@ -797,6 +797,22 @@
         }
       }
     },
+    "More.Troubleshooting.DataManagement.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate reuses existing space used by deleted pics to populate new data.\nYou can immediately free up this space by tapping ‘Free Up Space’."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピックメイトは、削除された画像のディスク領域を再利用し、新しい画像を保存します。\nディスク領域をすぐに増やしたい場合、「空き領域を増やす」をタッチしてください。"
+          }
+        }
+      }
+    },
     "More.Troubleshooting.DeleteAll" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -810,6 +826,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのデータを消去"
+          }
+        }
+      }
+    },
+    "More.Troubleshooting.FreeUpSpace" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free Up Space"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "空き領域を増やす"
           }
         }
       }

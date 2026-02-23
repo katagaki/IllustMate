@@ -7,4 +7,4 @@
 
 import Foundation
 
-let actor = DataActor()
+let dataActor = DataActor()

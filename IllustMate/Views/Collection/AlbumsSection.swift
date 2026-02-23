@@ -84,7 +84,7 @@ struct AlbumsSection<Content: View>: View {
             Divider()
             Button("Shared.ResetCover", systemImage: "photo") {
                 Task {
-                    await actor.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
+                    await dataActor.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
                 }
             }
             if onRename != nil || onDelete != nil {

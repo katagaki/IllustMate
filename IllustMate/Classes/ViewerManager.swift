@@ -47,7 +47,7 @@ class ViewerManager {
         if !isFullImageLoaded {
             Task(priority: .userInitiated) {
                 var loadedImage: UIImage?
-                if let data = await actor.imageData(forPicWithID: pic.id),
+                if let data = await dataActor.imageData(forPicWithID: pic.id),
                    let image = await UIImage(data: data)?.byPreparingForDisplay() {
                     loadedImage = image
                 }

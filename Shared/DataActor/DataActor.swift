@@ -64,10 +64,13 @@ actor DataActor {
             })
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
-            _ = try? database.vacuum()
         } catch {
             debugPrint("Database setup error: \(error)")
         }
+    }
+
+    func vacuum() {
+        _ = try? self.database.vacuum()
     }
 
     // MARK: - Row to Model Helpers

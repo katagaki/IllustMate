@@ -123,7 +123,7 @@ struct PicViewer: View {
         }
         .task {
             if let albumID = pic.containingAlbumID {
-                containingAlbumName = await actor.album(for: albumID)?.name
+                containingAlbumName = await dataActor.album(for: albumID)?.name
             }
         }
 #if !targetEnvironment(macCatalyst)

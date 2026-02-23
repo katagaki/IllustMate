@@ -34,9 +34,9 @@ struct NewAlbumView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(role: .confirm) {
                         Task {
-                            let newAlbum = await actor.createAlbum(newAlbumName)
+                            let newAlbum = await dataActor.createAlbum(newAlbumName)
                             if let albumToAddTo {
-                                await actor.addAlbum(withID: newAlbum.id,
+                                await dataActor.addAlbum(withID: newAlbum.id,
                                                      toAlbumWithID: albumToAddTo.id)
                             }
                             dismiss()

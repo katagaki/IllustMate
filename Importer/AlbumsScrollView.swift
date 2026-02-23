@@ -54,7 +54,7 @@ struct AlbumsScrollView: View {
         .onAppear {
             Task {
                 do {
-                    let albums = try await actor.albumsWithCounts(in: parentAlbum, sortedBy: albumSort)
+                    let albums = try await dataActor.albumsWithCounts(in: parentAlbum, sortedBy: albumSort)
                     await MainActor.run {
                         self.albums = albums
                         isAlbumsLoaded = true

@@ -11,14 +11,13 @@ import SwiftUI
 struct MoreView: View {
 
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var navigationManager: NavigationManager
-    @Environment(ProgressAlertManager.self) var progressAlertManager
+    @EnvironmentObject var navigation: NavigationManager
 
     @State var albumCount: Int = 0
     @State var picCount: Int = 0
 
     var body: some View {
-        NavigationStack(path: $navigationManager.moreTabPath) {
+        NavigationStack(path: $navigation.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
                 Section {
                     Button {
@@ -126,8 +125,8 @@ SOFTWARE.
     }
 
     func loadCounts() async {
-        let albums = await actor.albumCount()
-        let pics = await actor.picCount()
+        let albums = await dataActor.albumCount()
+        let pics = await dataActor.picCount()
         await MainActor.run {
             albumCount = albums
             picCount = pics

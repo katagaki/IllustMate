@@ -10,13 +10,13 @@ import SwiftUI
 
 struct CollectionView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
 
     @State var isMoreViewPresenting: Bool = false
 
     var body: some View {
-        NavigationStack(path: $navigationManager.collectionTabPath) {
+        NavigationStack(path: $navigation.collectionTabPath) {
             AlbumView()
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
