@@ -15,7 +15,7 @@ actor DataActor {
 
     // Tables
     let albumsTable = Table("albums")
-    let illustrationsTable = Table("illustrations")
+    let picsTable = Table("pics")
 
     // Album columns
     let albumId = Expression<String>("id")
@@ -24,13 +24,13 @@ actor DataActor {
     let albumParentId = Expression<String?>("parent_album_id")
     let albumDateCreated = Expression<Double>("date_created")
 
-    // Illustration columns
-    let illustrationId = Expression<String>("id")
-    let illustrationName = Expression<String>("name")
-    let illustrationAlbumId = Expression<String?>("containing_album_id")
-    let illustrationDateAdded = Expression<Double>("date_added")
-    let illustrationData = Expression<Data>("data")
-    let illustrationThumbnailData = Expression<Data?>("thumbnail_data")
+    // Pic columns
+    let picId = Expression<String>("id")
+    let picName = Expression<String>("name")
+    let picAlbumId = Expression<String?>("containing_album_id")
+    let picDateAdded = Expression<Double>("date_added")
+    let picData = Expression<Data>("data")
+    let picThumbnailData = Expression<Data?>("thumbnail_data")
 
     init() {
         let databaseFileName = "Collection.db"
@@ -54,16 +54,16 @@ actor DataActor {
                 table.column(albumParentId)
                 table.column(albumDateCreated)
             })
-            try database.run(illustrationsTable.create(ifNotExists: true) { table in
-                table.column(illustrationId, primaryKey: true)
-                table.column(illustrationName)
-                table.column(illustrationAlbumId)
-                table.column(illustrationDateAdded)
-                table.column(illustrationData)
-                table.column(illustrationThumbnailData)
+            try database.run(picsTable.create(ifNotExists: true) { table in
+                table.column(picId, primaryKey: true)
+                table.column(picName)
+                table.column(picAlbumId)
+                table.column(picDateAdded)
+                table.column(picData)
+                table.column(picThumbnailData)
             })
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
-            try database.run(illustrationsTable.createIndex(illustrationAlbumId, ifNotExists: true))
+            try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
             _ = try? database.vacuum()
         } catch {
             debugPrint("Database setup error: \(error)")
@@ -82,22 +82,22 @@ actor DataActor {
                           parentAlbumID: parentId ?? nil, dateCreated: dateCreated)
         if loadChildren {
             album.childAlbums = fetchChildAlbums(forAlbumID: id)
-            album.childIllustrations = fetchChildIllustrations(forAlbumID: id)
+            album.childPics = fetchChildPics(forAlbumID: id)
         }
         return album
     }
 
-    func illustrationFrom(row: Row) -> Illustration {
-        let id = (try? row.get(illustrationId)) ?? ""
-        let name = (try? row.get(illustrationName)) ?? ""
-        let albumId = try? row.get(illustrationAlbumId)
-        let dateAdded = Date(timeIntervalSince1970: (try? row.get(illustrationDateAdded)) ?? 0)
-        let thumbData = try? row.get(illustrationThumbnailData)
-        let illustration = Illustration(id: id, name: name,
+    func picFrom(row: Row) -> Pic {
+        let id = (try? row.get(picId)) ?? ""
+        let name = (try? row.get(picName)) ?? ""
+        let albumId = try? row.get(picAlbumId)
+        let dateAdded = Date(timeIntervalSince1970: (try? row.get(picDateAdded)) ?? 0)
+        let thumbData = try? row.get(picThumbnailData)
+        let pic = Pic(id: id, name: name,
                                         containingAlbumID: albumId ?? nil,
                                         dateAdded: dateAdded)
-        illustration.thumbnailData = thumbData ?? nil
-        return illustration
+        pic.thumbnailData = thumbData ?? nil
+        return pic
     }
 
     func fetchChildAlbums(forAlbumID id: String) -> [Album] {
@@ -105,11 +105,11 @@ actor DataActor {
         return (try? database.prepare(query).map { albumFrom(row: $0, loadChildren: false) }) ?? []
     }
 
-    func fetchChildIllustrations(forAlbumID id: String) -> [Illustration] {
-        let query = illustrationsTable
-            .filter(illustrationAlbumId == id)
-            .select(illustrationId, illustrationName, illustrationAlbumId,
-                    illustrationDateAdded, illustrationThumbnailData)
-        return (try? database.prepare(query).map { illustrationFrom(row: $0) }) ?? []
+    func fetchChildPics(forAlbumID id: String) -> [Pic] {
+        let query = picsTable
+            .filter(picAlbumId == id)
+            .select(picId, picName, picAlbumId,
+                    picDateAdded, picThumbnailData)
+        return (try? database.prepare(query).map { picFrom(row: $0) }) ?? []
     }
 }

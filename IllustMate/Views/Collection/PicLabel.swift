@@ -1,5 +1,5 @@
 //
-//  IllustrationLabel.swift
+//  PicLabel.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/06.
@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct IllustrationLabel: View {
+struct PicLabel: View {
 
     var namespace: Namespace.ID
 
-    var illustration: Illustration
+    var pic: Pic
 
     @State var isThumbnailReadyToPresent: Bool = false
     @State var thumbnail: Image?
@@ -42,10 +42,10 @@ struct IllustrationLabel: View {
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 3.0))
-        .task(id: illustration.id) {
-            if let thumbData = await actor.thumbnailData(forIllustrationWithID: illustration.id),
+        .task(id: pic.id) {
+            if let thumbData = await actor.thumbnailData(forPicWithID: pic.id),
                let uiImage = UIImage(data: thumbData) {
-                illustration.thumbnailData = thumbData
+                pic.thumbnailData = thumbData
                 thumbnail = Image(uiImage: uiImage)
             }
             isThumbnailReadyToPresent = true

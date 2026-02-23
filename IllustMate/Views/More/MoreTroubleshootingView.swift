@@ -57,19 +57,19 @@ struct MoreTroubleshootingView: View {
             UIApplication.shared.isIdleTimerDisabled = true
         }
         do {
-            let illustrations = try await actor.illustrations()
+            let pics = try await actor.pics()
             await MainActor.run {
                 progressAlertManager.prepare("More.Troubleshooting.RebuildThumbnails.Rebuilding",
-                                             total: illustrations.count)
+                                             total: pics.count)
             }
             await actor.deleteAllThumbnails()
             await MainActor.run {
                 progressAlertManager.show()
             }
-            for illustration in illustrations {
-                if let data = await actor.imageData(forIllustrationWithID: illustration.id) {
-                    let thumbnailData = Illustration.makeThumbnail(data)
-                    await actor.updateThumbnail(forIllustrationWithID: illustration.id,
+            for pic in pics {
+                if let data = await actor.imageData(forPicWithID: pic.id) {
+                    let thumbnailData = Pic.makeThumbnail(data)
+                    await actor.updateThumbnail(forPicWithID: pic.id,
                                                 thumbnailData: thumbnailData)
                 }
                 await MainActor.run {

@@ -11,29 +11,29 @@ import SwiftUI
 @MainActor @Observable
 class ViewerManager {
 
-    var displayedIllustrationID: String = ""
-    var displayedIllustration: Illustration?
+    var displayedPicID: String = ""
+    var displayedPic: Pic?
     var displayedThumbnail: UIImage?
     var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
-    func setDisplay(_ illustration: Illustration, completion: @escaping @MainActor @Sendable () -> Void) {
+    func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
         // Show thumbnail immediately to open viewer without delay
         let thumbnail: UIImage?
-        if let thumbnailData = illustration.thumbnailData {
+        if let thumbnailData = pic.thumbnailData {
             thumbnail = UIImage(data: thumbnailData)
         } else {
             thumbnail = nil
         }
 
         displayedThumbnail = thumbnail
-        displayedIllustration = illustration
-        displayedIllustrationID = illustration.id
+        displayedPic = pic
+        displayedPicID = pic.id
         isFullImageLoaded = false
 
-        if let cachedImage = imageCache[illustration.id] {
+        if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
             isFullImageLoaded = true
         } else {
@@ -47,11 +47,11 @@ class ViewerManager {
         if !isFullImageLoaded {
             Task(priority: .userInitiated) {
                 var loadedImage: UIImage?
-                if let data = await actor.imageData(forIllustrationWithID: illustration.id),
+                if let data = await actor.imageData(forPicWithID: pic.id),
                    let image = await UIImage(data: data)?.byPreparingForDisplay() {
                     loadedImage = image
                 }
-                self.imageCache[illustration.id] = loadedImage
+                self.imageCache[pic.id] = loadedImage
                 self.displayedImage = loadedImage
                 withAnimation(.easeInOut(duration: 0.25)) {
                     self.isFullImageLoaded = true

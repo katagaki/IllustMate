@@ -161,7 +161,7 @@ struct ShareView: View {
         let albumID = albumInViewPath()?.id
         Task {
             for item in items {
-                await importItem(item, to: albumID, named: Illustration.newFilename())
+                await importItem(item, to: albumID, named: Pic.newFilename())
                 await MainActor.run {
                     progress += 1.0
                 }
@@ -189,18 +189,18 @@ struct ShareView: View {
             await importItem(image, to: albumID, named: url.lastPathComponent)
         } else if let image = file as? UIImage {
             if let pngData = image.pngData() {
-                await importIllustration(name, data: pngData, to: albumID)
+                await importPic(name, data: pngData, to: albumID)
             } else if let jpgData = image.jpegData(compressionQuality: 1.0) {
-                await importIllustration(name, data: jpgData, to: albumID)
+                await importPic(name, data: jpgData, to: albumID)
             } else if let heicData = image.heicData() {
-                await importIllustration(name, data: heicData, to: albumID)
+                await importPic(name, data: heicData, to: albumID)
             }
         } else {
             failedItemCount += 1
         }
     }
 
-    func importIllustration(_ name: String, data: Data, to albumID: String?) async {
-        await actor.createIllustration(name, data: data, inAlbumWithID: albumID)
+    func importPic(_ name: String, data: Data, to albumID: String?) async {
+        await actor.createPic(name, data: data, inAlbumWithID: albumID)
     }
 }

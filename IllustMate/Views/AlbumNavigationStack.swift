@@ -12,7 +12,7 @@ struct AlbumNavigationStack: View {
     var album: Album
     @State var viewPath: [ViewPath] = []
 
-    @Namespace var illustrationTransitionNamespace
+    @Namespace var picTransitionNamespace
 
     @State var viewerManager = ViewerManager()
 

@@ -35,14 +35,14 @@ struct CollectionView: View {
                   switch viewPath {
                   case .album(let album):
                       AlbumView(currentAlbum: album)
-                  case .illustrationViewer(let namespace):
-                      if let displayedIllustration = viewer.displayedIllustration {
+                  case .picViewer(let namespace):
+                      if let displayedPic = viewer.displayedPic {
                           if #available(iOS 18, *) {
-                              IllustrationViewer(illustration: displayedIllustration)
-                              .navigationTransition(.zoom(sourceID: viewer.displayedIllustrationID,
+                              PicViewer(pic: displayedPic)
+                              .navigationTransition(.zoom(sourceID: viewer.displayedPicID,
                                                           in: namespace))
                           } else {
-                              IllustrationViewer(illustration: displayedIllustration)
+                              PicViewer(pic: displayedPic)
                           }
                       }
                   default: Color.clear

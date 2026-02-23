@@ -92,8 +92,8 @@ struct AlbumCover: View {
                                         HStack(alignment: .center, spacing: 4.0) {
                                             Group {
                                                 Image(systemName: "photo.fill")
-                                                if album.illustrationCount() <= 999 {
-                                                    Text(String(album.illustrationCount()))
+                                                if album.picCount() <= 999 {
+                                                    Text(String(album.picCount()))
                                                         .lineLimit(1)
                                                         .minimumScaleFactor(0.6)
                                                 } else {

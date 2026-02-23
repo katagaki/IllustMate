@@ -1,5 +1,5 @@
 //
-//  IllustrationViewer.swift
+//  PicViewer.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/06.
@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct IllustrationViewer: View {
+struct PicViewer: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(ViewerManager.self) var viewer
 
-    var illustration: Illustration
+    var pic: Pic
 
     @State var displayOffset: CGSize = .zero
     @State var magnification: CGFloat = 1.0
@@ -92,7 +92,7 @@ struct IllustrationViewer: View {
                     .ignoresSafeArea()
             }
         }
-        .navigationTitle(illustration.name)
+        .navigationTitle(pic.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if let containingAlbumName {
@@ -114,7 +114,7 @@ struct IllustrationViewer: View {
                         "Shared.Share",
                         item: Image(cgImage, scale: image.scale, label: Text("")),
                         preview: SharePreview(
-                            illustration.name,
+                            pic.name,
                             image: Image(uiImage: image)
                         )
                     )
@@ -122,7 +122,7 @@ struct IllustrationViewer: View {
             }
         }
         .task {
-            if let albumID = illustration.containingAlbumID {
+            if let albumID = pic.containingAlbumID {
                 containingAlbumName = await actor.album(for: albumID)?.name
             }
         }

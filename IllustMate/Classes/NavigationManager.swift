@@ -12,13 +12,13 @@ class NavigationManager: ObservableObject {
 
     @Published var collectionTabPath: [ViewPath] = []
     @Published var albumsTabPath: [ViewPath] = []
-    @Published var illustrationsTabPath: [ViewPath] = []
+    @Published var picsTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
 
     func popAll() {
         collectionTabPath.removeAll()
         albumsTabPath.removeAll()
-        illustrationsTabPath.removeAll()
+        picsTabPath.removeAll()
         moreTabPath.removeAll()
     }
 
@@ -28,8 +28,8 @@ class NavigationManager: ObservableObject {
             collectionTabPath.removeAll()
         case .albums:
             albumsTabPath.removeAll()
-        case .illustrations:
-            illustrationsTabPath.removeAll()
+        case .pics:
+            picsTabPath.removeAll()
         case .more:
             moreTabPath.removeAll()
         }
@@ -41,8 +41,8 @@ class NavigationManager: ObservableObject {
             collectionTabPath.append(viewPath)
         case .albums:
             albumsTabPath.append(viewPath)
-        case .illustrations:
-            illustrationsTabPath.append(viewPath)
+        case .pics:
+            picsTabPath.append(viewPath)
         case .more:
             moreTabPath.append(viewPath)
         }

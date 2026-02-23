@@ -1,5 +1,5 @@
 //
-//  IllustrationMoveMenu.swift
+//  PicMoveMenu.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/09.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct IllustrationMoveMenu: View {
+struct PicMoveMenu: View {
 
-    var illustrations: [Illustration]
+    var pics: [Pic]
     var containingAlbum: Album?
     var onMoved: () -> Void
 
@@ -19,7 +19,7 @@ struct IllustrationMoveMenu: View {
         if containingAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await actor.removeParentAlbum(forIllustrationsWithIDs: illustrations.map({ $0.id }))
+                    await actor.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
                     onMoved()
                 }
             }
@@ -31,7 +31,7 @@ struct IllustrationMoveMenu: View {
                     excludingAlbumID: containingAlbum?.id ?? ""
                 ) { destinationAlbum in
                     Task {
-                        await actor.addIllustrations(withIDs: illustrations.map { $0.id },
+                        await actor.addPics(withIDs: pics.map { $0.id },
                                                      toAlbumWithID: destinationAlbum.id)
                         onMoved()
                     }

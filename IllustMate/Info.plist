@@ -12,7 +12,7 @@
 				<string></string>
 			</array>
 			<key>UTTypeIdentifier</key>
-			<string>com.tsubuzaki.IllustMate.Illustration</string>
+			<string>com.tsubuzaki.IllustMate.Pic</string>
 			<key>UTTypeTagSpecification</key>
 			<dict/>
 		</dict>

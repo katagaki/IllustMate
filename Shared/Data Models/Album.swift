@@ -20,11 +20,11 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
 
     // Transient relationships (populated after fetch)
     var childAlbums: [Album]?
-    var childIllustrations: [Illustration]?
+    var childPics: [Pic]?
 
     // Lightweight counts (populated without loading children)
     var childAlbumCount: Int?
-    var childIllustrationCount: Int?
+    var childPicCount: Int?
 
     init(id: String = UUID().uuidString, name: String, coverPhoto: Data? = nil,
          parentAlbumID: String? = nil, dateCreated: Date = Date.now) {
@@ -45,23 +45,23 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
 
     func identifiableString() -> String {
         let coverSize = coverPhoto?.count ?? 0
-        return "\(id)-\(coverSize)-\(albumCount())-\(illustrationCount())"
+        return "\(id)-\(coverSize)-\(albumCount())-\(picCount())"
     }
 
     func albums() -> [Album] {
         return childAlbums?.sorted(by: { $0.name < $1.name }) ?? []
     }
 
-    func illustrations() -> [Illustration] {
-        return childIllustrations ?? []
+    func pics() -> [Pic] {
+        return childPics ?? []
     }
 
     func albumCount() -> Int {
         return childAlbumCount ?? childAlbums?.count ?? 0
     }
 
-    func illustrationCount() -> Int {
-        return childIllustrationCount ?? childIllustrations?.count ?? 0
+    func picCount() -> Int {
+        return childPicCount ?? childPics?.count ?? 0
     }
 
     func cover() -> UIImage {
@@ -80,13 +80,13 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
 
     func representativePhotos() -> [Image?] {
         var imagesToReturn: [Image?] = []
-        if let illustrations = childIllustrations {
-            let sortedIllustrations = illustrations.sorted { lhs, rhs in
+        if let pics = childPics {
+            let sortedPics = pics.sorted { lhs, rhs in
                 lhs.dateAdded < rhs.dateAdded
             }
-            let primaryImage: Illustration? = sortedIllustrations.count >= 1 ? sortedIllustrations[0] : nil
-            let secondaryImage: Illustration? = sortedIllustrations.count >= 2 ? sortedIllustrations[1] : nil
-            let tertiaryImage: Illustration? = sortedIllustrations.count >= 3 ? sortedIllustrations[2] : nil
+            let primaryImage: Pic? = sortedPics.count >= 1 ? sortedPics[0] : nil
+            let secondaryImage: Pic? = sortedPics.count >= 2 ? sortedPics[1] : nil
+            let tertiaryImage: Pic? = sortedPics.count >= 3 ? sortedPics[2] : nil
             if let coverPhoto = coverPhoto, let coverImage = UIImage(data: coverPhoto) {
                 imagesToReturn.append(Image(uiImage: coverImage))
             }

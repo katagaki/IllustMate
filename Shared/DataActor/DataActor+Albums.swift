@@ -32,7 +32,7 @@ extension DataActor {
         let albums = rows.map { row -> Album in
             let album = albumFrom(row: row, loadChildren: false)
             album.childAlbumCount = albumCount(forAlbumWithID: album.id)
-            album.childIllustrationCount = illustrationCount(forAlbumWithID: album.id)
+            album.childPicCount = picCount(forAlbumWithID: album.id)
             return album
         }
         return sortAlbum(albums, sortedBy: sortType)
@@ -49,20 +49,20 @@ extension DataActor {
         let albums = rows.map { row -> Album in
             let album = albumFrom(row: row, loadChildren: false)
             album.childAlbumCount = albumCount(forAlbumWithID: album.id)
-            album.childIllustrationCount = illustrationCount(forAlbumWithID: album.id)
+            album.childPicCount = picCount(forAlbumWithID: album.id)
             return album
         }
         return sortAlbum(albums, sortedBy: sortType)
     }
 
     func representativeThumbnails(forAlbumWithID albumID: String, limit: Int = 3) -> [Data] {
-        let query = illustrationsTable
-            .filter(illustrationAlbumId == albumID)
-            .select(illustrationThumbnailData)
-            .order(illustrationDateAdded.asc)
+        let query = picsTable
+            .filter(picAlbumId == albumID)
+            .select(picThumbnailData)
+            .order(picDateAdded.asc)
             .limit(limit)
         guard let rows = try? database.prepare(query) else { return [] }
-        return rows.compactMap { try? $0.get(illustrationThumbnailData) }
+        return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
     func album(for id: String) -> Album? {
@@ -101,19 +101,19 @@ extension DataActor {
         case .nameDescending: return albums.sorted(by: { $0.name > $1.name })
         case .sizeAscending:
             return albums.sorted(by: {
-                $0.albumCount() + $0.illustrationCount() <
-                    $1.albumCount() + $1.illustrationCount()
+                $0.albumCount() + $0.picCount() <
+                    $1.albumCount() + $1.picCount()
             })
         case .sizeDescending:
             return albums.sorted(by: {
-                $0.albumCount() + $0.illustrationCount() >
-                $1.albumCount() + $1.illustrationCount()
+                $0.albumCount() + $0.picCount() >
+                $1.albumCount() + $1.picCount()
             })
         }
     }
 
     func objectCount(forAlbumWithID id: String) -> Int {
-        return albumCount(forAlbumWithID: id) + illustrationCount(forAlbumWithID: id)
+        return albumCount(forAlbumWithID: id) + picCount(forAlbumWithID: id)
     }
 
     func albumCount(forAlbumWithID id: String) -> Int {
@@ -121,12 +121,12 @@ extension DataActor {
         return (try? database.scalar(query.count)) ?? 0
     }
 
-    func illustrationCount() -> Int {
-        return (try? database.scalar(illustrationsTable.count)) ?? 0
+    func picCount() -> Int {
+        return (try? database.scalar(picsTable.count)) ?? 0
     }
 
-    func illustrationCount(forAlbumWithID id: String) -> Int {
-        let query = illustrationsTable.filter(illustrationAlbumId == id)
+    func picCount(forAlbumWithID id: String) -> Int {
+        let query = picsTable.filter(picAlbumId == id)
         return (try? database.scalar(query.count)) ?? 0
     }
 
@@ -147,12 +147,12 @@ extension DataActor {
     func deleteAlbum(withID albumID: String) {
         let parentID = parentAlbumID(forAlbumWithID: albumID)
 
-        // Move direct illustrations to parent album, or orphan them
-        let illustQuery = illustrationsTable.filter(illustrationAlbumId == albumID)
+        // Move direct pics to parent album, or orphan them
+        let illustQuery = picsTable.filter(picAlbumId == albumID)
         if let parentID = parentID {
-            _ = try? database.run(illustQuery.update(illustrationAlbumId <- parentID))
+            _ = try? database.run(illustQuery.update(picAlbumId <- parentID))
         } else {
-            _ = try? database.run(illustQuery.update(illustrationAlbumId <- nil))
+            _ = try? database.run(illustQuery.update(picAlbumId <- nil))
         }
 
         // Recursively delete child albums
@@ -160,9 +160,9 @@ extension DataActor {
     }
 
     func deleteAlbumCascade(withID albumID: String) {
-        // Orphan all illustrations in this album
-        let illustQuery = illustrationsTable.filter(illustrationAlbumId == albumID)
-        _ = try? database.run(illustQuery.update(illustrationAlbumId <- nil))
+        // Orphan all pics in this album
+        let illustQuery = picsTable.filter(picAlbumId == albumID)
+        _ = try? database.run(illustQuery.update(picAlbumId <- nil))
 
         // Recurse into child albums
         let childQuery = albumsTable.filter(albumParentId == albumID)

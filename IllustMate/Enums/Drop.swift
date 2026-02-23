@@ -11,12 +11,12 @@ import SwiftUI
 
 enum Drop: Transferable {
     case album(AlbumTransferable)
-    case illustration(IllustrationTransferable)
+    case pic(PicTransferable)
     case importedPhoto(Image)
 
     static var transferRepresentation: some TransferRepresentation {
         ProxyRepresentation { Drop.album($0) }
-        ProxyRepresentation { Drop.illustration($0) }
+        ProxyRepresentation { Drop.pic($0) }
         ProxyRepresentation { Drop.importedPhoto($0) }
     }
 
@@ -25,8 +25,8 @@ enum Drop: Transferable {
         return nil
     }
 
-    var illustration: IllustrationTransferable? {
-        if case .illustration(let illustration) = self { return illustration }
+    var pic: PicTransferable? {
+        if case .pic(let pic) = self { return pic }
         return nil
     }
 

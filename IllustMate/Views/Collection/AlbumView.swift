@@ -30,14 +30,14 @@ struct AlbumView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyle: ViewStyle
     @State var albumStyleState: ViewStyle = .grid
 
-    @State var illustrations: [Illustration] = []
-    @State var isConfirmingDeleteIllustration: Bool = false
-    @State var isConfirmingDeleteSelectedIllustrations: Bool = false
-    @State var illustrationPendingDeletion: Illustration?
-    @State var isSelectingIllustrations: Bool = false
-    @State var selectedIllustrations: [Illustration] = []
+    @State var pics: [Pic] = []
+    @State var isConfirmingDeletePic: Bool = false
+    @State var isConfirmingDeleteSelectedPics: Bool = false
+    @State var picPendingDeletion: Pic?
+    @State var isSelectingPics: Bool = false
+    @State var selectedPics: [Pic] = []
     @State var isImportingPhotos: Bool = false
-    @AppStorage(wrappedValue: false, "IllustrationSortReversed") var isIllustrationSortReversed: Bool
+    @AppStorage(wrappedValue: false, "PicSortReversed") var isPicSortReversed: Bool
 
     var body: some View {
         ScrollView(.vertical) {
@@ -81,12 +81,12 @@ struct AlbumView: View {
                 }
                 Spacer()
                     .frame(height: 20.0)
-                SectionHeader(title: "Albums.Pictures", count: illustrations.count) {
+                SectionHeader(title: "Albums.Pictures", count: pics.count) {
                     Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
                         isImportingPhotos = true
                     }
                     Divider()
-                    Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isIllustrationSortReversed) {
+                    Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isPicSortReversed) {
                         Text("Shared.Sort.DateAdded.Ascending")
                             .tag(true)
                         Text("Shared.Sort.DateAdded.Descending")
@@ -95,21 +95,21 @@ struct AlbumView: View {
                     .pickerStyle(.menu)
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                if !illustrations.isEmpty {
-                    IllustrationsGrid(namespace: namespace, illustrations: illustrations,
-                                      isSelecting: $isSelectingIllustrations) { illustration in
-                        selectedIllustrations.contains(illustration)
-                    } onSelect: { illustration in
-                        selectOrDeselectIllustration(illustration)
+                if !pics.isEmpty {
+                    PicsGrid(namespace: namespace, pics: pics,
+                                      isSelecting: $isSelectingPics) { pic in
+                        selectedPics.contains(pic)
+                    } onSelect: { pic in
+                        selectOrDeselectPic(pic)
                     } selectedCount: {
-                        selectedIllustrations.count
-                    } onDelete: { illustration in
-                        deleteIllustration(illustration)
-                    } moveMenu: { illustration in
-                        IllustrationMoveMenu(illustrations: isSelectingIllustrations ?
-                                             selectedIllustrations : [illustration],
+                        selectedPics.count
+                    } onDelete: { pic in
+                        deletePic(pic)
+                    } moveMenu: { pic in
+                        PicMoveMenu(pics: isSelectingPics ?
+                                             selectedPics : [pic],
                                              containingAlbum: currentAlbum) {
-                            refreshDataAfterIllustrationMoved()
+                            refreshDataAfterPicMoved()
                         }
                     }
                 } else {
@@ -123,7 +123,7 @@ struct AlbumView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Shared.Select", systemImage: "checkmark.circle") {
-                    startOrStopSelectingIllustrations()
+                    startOrStopSelectingPics()
                 }
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
@@ -149,17 +149,17 @@ struct AlbumView: View {
         }
 #endif
         .safeAreaInset(edge: .bottom) {
-            if isSelectingIllustrations, !illustrations.isEmpty {
-                SelectionBar(illustrations: illustrations, selectedIllustrations: $selectedIllustrations) {
-                    startOrStopSelectingIllustrations()
+            if isSelectingPics, !pics.isEmpty {
+                SelectionBar(pics: pics, selectedPics: $selectedPics) {
+                    startOrStopSelectingPics()
                 } menuItems: {
                     Menu("Shared.Move", systemImage: "tray.full") {
-                        IllustrationMoveMenu(illustrations: selectedIllustrations, containingAlbum: currentAlbum) {
-                            refreshDataAfterIllustrationMoved()
+                        PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
+                            refreshDataAfterPicMoved()
                         }
                     }
                     Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                        deleteIllustrations()
+                        deletePics()
                     }
                 }
             }
@@ -175,7 +175,7 @@ struct AlbumView: View {
             RenameAlbumView(album: album)
         }
         .sheet(isPresented: $isImportingPhotos) {
-            refreshIllustrationsAndSet()
+            refreshPicsAndSet()
         } content: {
             ImporterView(selectedAlbum: currentAlbum)
         }
@@ -189,21 +189,21 @@ struct AlbumView: View {
             }
         }
         .confirmationDialog("Shared.DeleteConfirmation.Picture",
-                            isPresented: $isConfirmingDeleteIllustration, titleVisibility: .visible) {
+                            isPresented: $isConfirmingDeletePic, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
-                confirmDeleteIllustration()
+                confirmDeletePic()
             }
             Button("Shared.No", role: .cancel) {
-                illustrationPendingDeletion = nil
+                picPendingDeletion = nil
             }
         }
-        .confirmationDialog("Shared.DeleteConfirmation.Picture.\(selectedIllustrations.count)",
-                            isPresented: $isConfirmingDeleteSelectedIllustrations, titleVisibility: .visible) {
+        .confirmationDialog("Shared.DeleteConfirmation.Picture.\(selectedPics.count)",
+                            isPresented: $isConfirmingDeleteSelectedPics, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
-                confirmDeleteIllustration()
+                confirmDeletePic()
             }
             Button("Shared.No", role: .cancel) {
-                illustrationPendingDeletion = nil
+                picPendingDeletion = nil
             }
         }
         .onAppear {
@@ -222,8 +222,8 @@ struct AlbumView: View {
         .onChange(of: albumSort) { _, _ in
             refreshAlbumsAndSet()
         }
-        .onChange(of: isIllustrationSortReversed) { _, _ in
-            refreshIllustrationsAndSet()
+        .onChange(of: isPicSortReversed) { _, _ in
+            refreshPicsAndSet()
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {

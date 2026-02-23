@@ -1,5 +1,5 @@
 //
-//  IllustrationsView.swift
+//  PicsView.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/08.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct IllustrationsView: View {
+struct PicsView: View {
 
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigationManager: NavigationManager
@@ -15,34 +15,34 @@ struct IllustrationsView: View {
 
     @Namespace var namespace
 
-    @State var illustrations: [Illustration] = []
+    @State var pics: [Pic] = []
     @State var viewerManager = ViewerManager()
 
     var body: some View {
         ZStack {
-            NavigationStack(path: $navigationManager.illustrationsTabPath) {
+            NavigationStack(path: $navigationManager.picsTabPath) {
                 ScrollView(.vertical) {
-                    IllustrationsGrid(namespace: namespace,
-                                      illustrations: illustrations,
+                    PicsGrid(namespace: namespace,
+                                      pics: pics,
                                       isSelecting: .constant(false),
-                                      enableSelection: false) { illustration in
-                        viewer.setDisplay(illustration) { [navigationManager] in
-                            navigationManager.push(.illustrationViewer(namespace: namespace), for: .illustrations)
+                                      enableSelection: false) { pic in
+                        viewer.setDisplay(pic) { [navigationManager] in
+                            navigationManager.push(.picViewer(namespace: namespace), for: .pics)
                         }
                     } selectedCount: {
                         return 0
                     } moveMenu: { _ in
-                        // TODO: Move menu support in macOS Illustrations view
+                        // TODO: Move menu support in macOS Pics view
                     }
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         HStack(alignment: .center, spacing: 8.0) {
-                            Text("\(illustrations.count)")
+                            Text("\(pics.count)")
                                 .foregroundStyle(.secondary)
 #if targetEnvironment(macCatalyst)
                             Button("Shared.Refresh") {
-                                refreshIllustrations()
+                                refreshPics()
                             }
 #endif
                         }
@@ -50,29 +50,29 @@ struct IllustrationsView: View {
                 }
 #if !targetEnvironment(macCatalyst)
                 .refreshable {
-                    refreshIllustrations()
+                    refreshPics()
                 }
 #endif
                 .navigationTitle("ViewTitle.Pictures")
             }
         }
         .onAppear {
-            refreshIllustrations()
+            refreshPics()
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
-                refreshIllustrations()
+                refreshPics()
             }
         }
     }
 
-    func refreshIllustrations() {
+    func refreshPics() {
         Task.detached(priority: .userInitiated) {
             do {
-                let illustrations = try await actor.illustrations()
+                let pics = try await actor.pics()
                 await MainActor.run {
                     doWithAnimation {
-                        self.illustrations = illustrations
+                        self.pics = pics
                     }
                 }
             } catch {

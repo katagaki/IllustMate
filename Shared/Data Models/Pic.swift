@@ -1,5 +1,5 @@
 //
-//  Illustration.swift
+//  Pic.swift
 //  IllustMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import UniformTypeIdentifiers
 
-final class Illustration: Identifiable, Hashable, @unchecked Sendable {
+final class Pic: Identifiable, Hashable, @unchecked Sendable {
     var id: String
     var name: String
     var containingAlbumID: String?
@@ -30,7 +30,7 @@ final class Illustration: Identifiable, Hashable, @unchecked Sendable {
         self.dateAdded = dateAdded
     }
 
-    static func == (lhs: Illustration, rhs: Illustration) -> Bool {
+    static func == (lhs: Pic, rhs: Pic) -> Bool {
         lhs.id == rhs.id
     }
 
@@ -60,15 +60,15 @@ final class Illustration: Identifiable, Hashable, @unchecked Sendable {
     }
 }
 
-struct IllustrationTransferable: Codable, Transferable {
+struct PicTransferable: Codable, Transferable {
 
     var id: String
 
     static var transferRepresentation: some TransferRepresentation {
-        CodableRepresentation(for: IllustrationTransferable.self, contentType: .picture)
+        CodableRepresentation(for: PicTransferable.self, contentType: .picture)
     }
 }
 
 extension UTType {
-    static var picture: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Illustration") }
+    static var picture: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Pic") }
 }

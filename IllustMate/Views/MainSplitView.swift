@@ -43,7 +43,7 @@ struct MainSplitView: View {
 #endif
                         }
                     }
-                    NavigationLink(value: ViewPath.illustrations) {
+                    NavigationLink(value: ViewPath.pics) {
                         Label {
                             Text("ViewTitle.Pictures")
                         } icon: {
@@ -84,7 +84,7 @@ struct MainSplitView: View {
                 switch selectedView {
                 case .collection: CollectionView()
                 case .albums: AlbumsView()
-                case .illustrations: IllustrationsView()
+                case .pics: PicsView()
                 case .more: MoreView()
                 case .album(let album): AlbumNavigationStack(album: album)
                 default: Color.clear
@@ -92,9 +92,9 @@ struct MainSplitView: View {
             }
             .navigationSplitViewColumnWidth(375.0)
         } detail: {
-            if let illustration = viewer.displayedIllustration {
-                IllustrationViewer(illustration: illustration)
-                    .id(illustration.id)
+            if let pic = viewer.displayedPic {
+                PicViewer(pic: pic)
+                    .id(pic.id)
             } else {
                 ContentUnavailableView("Shared.SelectAPicture", systemImage: "photo.on.rectangle.angled")
             }

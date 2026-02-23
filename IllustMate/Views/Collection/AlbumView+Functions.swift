@@ -24,49 +24,49 @@ extension AlbumView {
         }
     }
 
-    func deleteIllustration(_ illustration: Illustration?) {
-        if let illustration {
-            isConfirmingDeleteIllustration = true
-            illustrationPendingDeletion = illustration
+    func deletePic(_ pic: Pic?) {
+        if let pic {
+            isConfirmingDeletePic = true
+            picPendingDeletion = pic
         } else {
-            isConfirmingDeleteSelectedIllustrations = true
+            isConfirmingDeleteSelectedPics = true
         }
     }
 
-    func deleteIllustrations() {
-        isConfirmingDeleteSelectedIllustrations = true
+    func deletePics() {
+        isConfirmingDeleteSelectedPics = true
     }
 
-    func confirmDeleteIllustration() {
-        Task { [isSelectingIllustrations, selectedIllustrations] in
-            if isSelectingIllustrations {
-                for illustration in selectedIllustrations {
-                    await actor.deleteIllustration(withID: illustration.id)
+    func confirmDeletePic() {
+        Task { [isSelectingPics, selectedPics] in
+            if isSelectingPics {
+                for pic in selectedPics {
+                    await actor.deletePic(withID: pic.id)
                 }
             } else {
-                if let illustrationPendingDeletion = illustrationPendingDeletion {
-                    await actor.deleteIllustration(withID: illustrationPendingDeletion.id)
+                if let picPendingDeletion = picPendingDeletion {
+                    await actor.deletePic(withID: picPendingDeletion.id)
                 }
             }
-            self.selectedIllustrations.removeAll()
-            refreshIllustrationsAndSet()
+            self.selectedPics.removeAll()
+            refreshPicsAndSet()
         }
     }
 
     @MainActor
-    func startOrStopSelectingIllustrations() {
+    func startOrStopSelectingPics() {
         doWithAnimation {
-            if isSelectingIllustrations {
-                selectedIllustrations.removeAll()
+            if isSelectingPics {
+                selectedPics.removeAll()
             }
-            isSelectingIllustrations.toggle()
+            isSelectingPics.toggle()
         }
     }
 
     func moveDropToAlbum(_ drop: Drop, to album: Album) {
         Task {
-            if let transferable = drop.illustration {
-                await moveIllustrationToAlbum(transferable.id, to: album)
+            if let transferable = drop.pic {
+                await movePicToAlbum(transferable.id, to: album)
             } else if let transferable = drop.album {
                 if transferable.id != album.id {
                     await moveAlbumToAlbum(transferable.id, to: album)
@@ -78,8 +78,8 @@ extension AlbumView {
         }
     }
 
-    func moveIllustrationToAlbum(_ illustrationID: String, to album: Album) async {
-        await actor.addIllustration(withID: illustrationID, toAlbumWithID: album.id)
+    func movePicToAlbum(_ picID: String, to album: Album) async {
+        await actor.addPic(withID: picID, toAlbumWithID: album.id)
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
@@ -89,29 +89,29 @@ extension AlbumView {
     func importPhotoToAlbum(_ photo: Image, to album: Album) async {
         let uiImage = photo.render()
         if let data = uiImage?.data() {
-            await actor.createIllustration(Illustration.newFilename(), data: data,
+            await actor.createPic(Pic.newFilename(), data: data,
                                            inAlbumWithID: album.id)
         }
     }
 
-    func refreshDataAfterIllustrationMoved() {
-        selectedIllustrations.removeAll()
+    func refreshDataAfterPicMoved() {
+        selectedPics.removeAll()
         Task {
             await refreshData()
         }
     }
 
-    func selectOrDeselectIllustration(_ illustration: Illustration) {
-        if isSelectingIllustrations {
-            if selectedIllustrations.contains(where: { $0.id == illustration.id }) {
-                selectedIllustrations.removeAll(where: { $0.id == illustration.id })
+    func selectOrDeselectPic(_ pic: Pic) {
+        if isSelectingPics {
+            if selectedPics.contains(where: { $0.id == pic.id }) {
+                selectedPics.removeAll(where: { $0.id == pic.id })
             } else {
-                selectedIllustrations.append(illustration)
+                selectedPics.append(pic)
             }
         } else {
-            let illustrationCopy = illustration
-            viewer.setDisplay(illustrationCopy) { [navigationManager] in
-                navigationManager.push(.illustrationViewer(namespace: namespace), for: .collection)
+            let picCopy = pic
+            viewer.setDisplay(picCopy) { [navigationManager] in
+                navigationManager.push(.picViewer(namespace: namespace), for: .collection)
             }
         }
     }
@@ -127,10 +127,10 @@ extension AlbumView {
                 }
             }
             group.addTask {
-                let illustrations = await self.fetchIllustrations()
+                let pics = await self.fetchPics()
                 await MainActor.run {
                     withAnimation {
-                        self.illustrations = illustrations
+                        self.pics = pics
                     }
                 }
             }
@@ -158,23 +158,23 @@ extension AlbumView {
         }
     }
 
-    func fetchIllustrations() async -> [Illustration] {
+    func fetchPics() async -> [Pic] {
         do {
-            let illustrations = try await actor
-                .illustrationSkeletons(in: currentAlbum, order: isIllustrationSortReversed ? .forward : .reverse)
-            return illustrations
+            let pics = try await actor
+                .picSkeletons(in: currentAlbum, order: isPicSortReversed ? .forward : .reverse)
+            return pics
         } catch {
             debugPrint(error.localizedDescription)
             return []
         }
     }
 
-    func refreshIllustrationsAndSet() {
+    func refreshPicsAndSet() {
         Task.detached(priority: .userInitiated) {
-            let illustrations = await fetchIllustrations()
+            let pics = await fetchPics()
             await MainActor.run {
                 withAnimation {
-                    self.illustrations = illustrations
+                    self.pics = pics
                 }
             }
         }

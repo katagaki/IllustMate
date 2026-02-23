@@ -15,7 +15,7 @@ struct MoreView: View {
     @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @State var albumCount: Int = 0
-    @State var illustrationCount: Int = 0
+    @State var picCount: Int = 0
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -46,7 +46,7 @@ struct MoreView: View {
                             Image(systemName: "photo.on.rectangle.angled")
                                 .font(.title2)
                                 .foregroundStyle(.secondary)
-                            Text("\(illustrationCount)")
+                            Text("\(picCount)")
                                 .font(.title2)
                                 .fontWeight(.bold)
                             Text("Shared.Pictures")
@@ -127,10 +127,10 @@ SOFTWARE.
 
     func loadCounts() async {
         let albums = await actor.albumCount()
-        let illustrations = await actor.illustrationCount()
+        let pics = await actor.picCount()
         await MainActor.run {
             albumCount = albums
-            illustrationCount = illustrations
+            picCount = pics
         }
     }
 }

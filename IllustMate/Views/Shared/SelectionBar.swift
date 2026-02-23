@@ -10,8 +10,8 @@ import SwiftUI
 
 struct SelectionBar<Content: View>: View {
 
-    var illustrations: [Illustration]
-    @Binding var selectedIllustrations: [Illustration]
+    var pics: [Pic]
+    @Binding var selectedPics: [Pic]
     var onStopSelecting: () -> Void
     @ViewBuilder var menuItems: Content
 
@@ -23,27 +23,27 @@ struct SelectionBar<Content: View>: View {
                     CloseButton {
                         onStopSelecting()
                     }
-                    Text("Shared.Selected.\(selectedIllustrations.count)")
+                    Text("Shared.Selected.\(selectedPics.count)")
                 }
                 Divider()
                 HStack(alignment: .center, spacing: 8.0) {
                     Spacer()
                     Button {
-                        if illustrations.count == selectedIllustrations.count {
-                            selectedIllustrations.removeAll()
+                        if pics.count == selectedPics.count {
+                            selectedPics.removeAll()
                         } else {
-                            selectedIllustrations.removeAll()
-                            selectedIllustrations.append(contentsOf: illustrations)
+                            selectedPics.removeAll()
+                            selectedPics.append(contentsOf: pics)
                         }
                     } label: {
-                        if illustrations.count == selectedIllustrations.count {
+                        if pics.count == selectedPics.count {
                             Label("Shared.DeselectAll", systemImage: "rectangle.stack")
                         } else {
                             Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
                         }
                     }
                     menuItems
-                        .disabled(selectedIllustrations.count == 0)
+                        .disabled(selectedPics.count == 0)
                     Spacer()
                 }
             }
@@ -59,18 +59,18 @@ struct SelectionBar<Content: View>: View {
                 .frame(width: 24.0, height: 24.0, alignment: .center)
                 .buttonStyle(.bordered)
                 .buttonBorderShape(.circle)
-                Text("Shared.Selected.\(selectedIllustrations.count)")
+                Text("Shared.Selected.\(selectedPics.count)")
                 Spacer()
                 Menu {
                     Button {
-                        if illustrations.count == selectedIllustrations.count {
-                            selectedIllustrations.removeAll()
+                        if pics.count == selectedPics.count {
+                            selectedPics.removeAll()
                         } else {
-                            selectedIllustrations.removeAll()
-                            selectedIllustrations.append(contentsOf: illustrations)
+                            selectedPics.removeAll()
+                            selectedPics.append(contentsOf: pics)
                         }
                     } label: {
-                        if illustrations.count == selectedIllustrations.count {
+                        if pics.count == selectedPics.count {
                             Label("Shared.DeselectAll", systemImage: "rectangle.stack")
                         } else {
                             Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
@@ -78,7 +78,7 @@ struct SelectionBar<Content: View>: View {
                     }
                     Divider()
                     menuItems
-                        .disabled(selectedIllustrations.count == 0)
+                        .disabled(selectedPics.count == 0)
                 } label: {
                     Image(systemName: "ellipsis")
                         .frame(width: 24.0, height: 24.0, alignment: .center)

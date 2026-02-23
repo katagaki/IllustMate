@@ -170,8 +170,8 @@ struct PhotosAssetGridView: View {
 
                 if let data {
                     let resources = PHAssetResource.assetResources(for: asset)
-                    let filename = resources.first?.originalFilename ?? Illustration.newFilename()
-                    await actor.createIllustration(
+                    let filename = resources.first?.originalFilename ?? Pic.newFilename()
+                    await actor.createPic(
                         filename, data: data,
                         inAlbumWithID: selectedAlbum?.id,
                         dateAdded: asset.creationDate
