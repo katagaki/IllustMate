@@ -25,7 +25,9 @@ struct AlbumsView: View {
         ZStack {
             NavigationStack(path: $navigationManager.albumsTabPath) {
                 ScrollView(.vertical) {
-                    AlbumsSection(albums: albums, style: $style) { _ in }
+                    AlbumsSection(albums: albums, style: $style) { _ in
+                        // TODO: Move menu support in macOS Albums view
+                    }
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {

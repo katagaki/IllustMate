@@ -39,7 +39,9 @@ struct AlbumsScrollView: View {
                             .padding([.top], 10.0)
                     } else {
                         AlbumsSection(albums: albums, style: $style,
-                                      enablesContextMenu: false) { _ in }
+                                      enablesContextMenu: false) { _ in
+                            // Move menu not supported when in importer extension
+                        }
                     }
                 } else {
                     ProgressView()

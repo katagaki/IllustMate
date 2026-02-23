@@ -42,7 +42,9 @@ struct MoreTroubleshootingView: View {
                     navigationManager.popAll()
                 }
             }
-            Button("Shared.No", role: .cancel) { }
+            Button("Shared.No", role: .cancel) {
+                isDeleteConfirming = false
+            }
         } message: {
             Text("Alert.DeleteAll.Text")
         }

@@ -31,7 +31,9 @@ struct IllustrationsView: View {
                         }
                     } selectedCount: {
                         return 0
-                    } moveMenu: { _ in }
+                    } moveMenu: { _ in
+                        // TODO: Move menu support in macOS Illustrations view
+                    }
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
