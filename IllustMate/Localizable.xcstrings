@@ -933,6 +933,22 @@
         }
       }
     },
+    "Shared.Create" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成"
+          }
+        }
+      }
+    },
     "Shared.Delete" : {
       "localizations" : {
         "en" : {

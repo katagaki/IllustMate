@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import Photos
 import PhotosUI
 import SwiftUI
 
@@ -137,8 +138,19 @@ struct ImporterView: View {
         Task {
             for selectedPhotoItem in selectedPhotoItems {
                 if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                    await actor.createIllustration(Illustration.newFilename(), data: data,
-                                                   inAlbumWithID: selectedAlbum?.id)
+                    var creationDate: Date? = nil
+                    var filename: String? = nil
+                    if let identifier = selectedPhotoItem.itemIdentifier {
+                        let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
+                        if let asset = result.firstObject {
+                            creationDate = asset.creationDate
+                            let resources = PHAssetResource.assetResources(for: asset)
+                            filename = resources.first?.originalFilename
+                        }
+                    }
+                    await actor.createIllustration(filename ?? Illustration.newFilename(), data: data,
+                                                   inAlbumWithID: selectedAlbum?.id,
+                                                   dateAdded: creationDate)
                 }
                 await MainActor.run {
                     importCurrentCount += 1

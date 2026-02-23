@@ -67,9 +67,9 @@ extension DataActor {
         return try? database.pluck(query).flatMap { try? $0.get(illustrationData) }
     }
 
-    func createIllustration(_ name: String, data: Data, inAlbumWithID albumID: String? = nil) {
+    func createIllustration(_ name: String, data: Data, inAlbumWithID albumID: String? = nil, dateAdded: Date? = nil) {
         let id = UUID().uuidString
-        let now = Date.now
+        let now = dateAdded ?? Date.now
         let thumbnailData = Illustration.makeThumbnail(data)
         _ = try? database.run(illustrationsTable.insert(
             illustrationId <- id,
