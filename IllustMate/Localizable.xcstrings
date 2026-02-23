@@ -88,13 +88,13 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Picture"
+                      "value" : "%arg Pic"
                     }
                   },
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Pictures"
+                      "value" : "%arg Pics"
                     }
                   }
                 }
@@ -183,7 +183,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This album does not contain any images."
+            "value" : "This album does not contain any pics."
           }
         },
         "ja" : {
@@ -200,7 +200,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Images"
+            "value" : "Pics"
           }
         },
         "ja" : {
@@ -971,7 +971,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete this image?\nImages in the album will be moved to its containing album."
+            "value" : "Are you sure you want to delete this pic?\nPics in the album will be moved to its containing album."
           }
         },
         "ja" : {
@@ -988,7 +988,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete this image?"
+            "value" : "Are you sure you want to delete this pic?"
           }
         },
         "ja" : {
@@ -1008,13 +1008,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Are you sure you want to delete the selected image?"
+                  "value" : "Are you sure you want to delete the selected pic?"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Are you sure you want to delete the selected %lld images?"
+                  "value" : "Are you sure you want to delete the selected %lld pics?"
                 }
               }
             }
@@ -1228,7 +1228,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Images"
+            "value" : "Pics"
           }
         },
         "ja" : {
@@ -1329,7 +1329,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select an image to preview."
+            "value" : "Select a pic to preview."
           }
         },
         "ja" : {
@@ -1493,7 +1493,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image Count (Ascending)"
+            "value" : "Pic Count (Ascending)"
           }
         },
         "ja" : {
@@ -1509,7 +1509,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image Count (Descending)"
+            "value" : "Pic Count (Descending)"
           }
         },
         "ja" : {
@@ -1677,7 +1677,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Images"
+            "value" : "Pics"
           }
         },
         "ja" : {

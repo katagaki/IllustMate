@@ -18,13 +18,13 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Picture"
+                      "value" : "%arg Pic"
                     }
                   },
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg Pictures"
+                      "value" : "%arg Pics"
                     }
                   }
                 }
@@ -205,7 +205,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use the in-app importer when importing large images."
+            "value" : "Use the in-app importer when importing large pics."
           }
         },
         "ja" : {
