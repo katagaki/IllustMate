@@ -145,14 +145,7 @@ struct AlbumView: View {
         }
 #else
         .refreshable {
-            doWithAnimation {
-                albums.removeAll()
-                illustrations.removeAll()
-            } completion: {
-                Task {
-                    await refreshData()
-                }
-            }
+            await refreshData()
         }
 #endif
         .safeAreaInset(edge: .bottom) {

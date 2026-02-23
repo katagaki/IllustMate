@@ -121,7 +121,7 @@ extension AlbumView {
             group.addTask {
                 let albums = await self.fetchAlbums()
                 await MainActor.run {
-                    doWithAnimation {
+                    withAnimation {
                         self.albums = albums
                     }
                 }
@@ -129,7 +129,7 @@ extension AlbumView {
             group.addTask {
                 let illustrations = await self.fetchIllustrations()
                 await MainActor.run {
-                    doWithAnimation {
+                    withAnimation {
                         self.illustrations = illustrations
                     }
                 }
@@ -151,7 +151,7 @@ extension AlbumView {
         Task.detached(priority: .userInitiated) {
             let albums = await fetchAlbums()
             await MainActor.run {
-                doWithAnimation {
+                withAnimation {
                     self.albums = albums
                 }
             }
@@ -173,7 +173,7 @@ extension AlbumView {
         Task.detached(priority: .userInitiated) {
             let illustrations = await fetchIllustrations()
             await MainActor.run {
-                doWithAnimation {
+                withAnimation {
                     self.illustrations = illustrations
                 }
             }

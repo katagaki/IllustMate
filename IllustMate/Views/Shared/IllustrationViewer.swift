@@ -75,34 +75,6 @@ struct IllustrationViewer: View {
                     showImageSize.toggle()
                 }
             }
-
-            // Fixed bottom toolbar with Copy/Share
-            HStack(alignment: .center, spacing: 16.0) {
-                Button {
-                    if let image = currentImage {
-                        UIPasteboard.general.image = image
-                    }
-                } label: {
-                    Label("Shared.Copy", systemImage: "doc.on.doc")
-                        .font(.body)
-                }
-                .buttonStyle(.borderless)
-
-                if let image = currentImage, let cgImage = image.cgImage {
-                    ShareLink(item: Image(cgImage, scale: image.scale, label: Text("")),
-                              preview: SharePreview(illustration.name,
-                                                    image: Image(uiImage: image))) {
-                        Label("Shared.Share", systemImage: "square.and.arrow.up")
-                            .font(.body)
-                    }
-                    .buttonStyle(.borderless)
-                }
-            }
-            .tint(.primary)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .glassEffect(.regular.interactive(), in: .capsule)
-            .opacity(opacityDuringGesture())
         }
         .padding(20.0)
         .frame(maxHeight: .infinity)
@@ -118,24 +90,34 @@ struct IllustrationViewer: View {
                             .opacity(0.3)
                     }
                     .ignoresSafeArea()
-                    .opacity(opacityDuringGesture())
             }
         }
         .navigationTitle(illustration.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(alignment: .center, spacing: 2.0) {
-                    Text(illustration.name)
-                        .font(.headline)
-                        .bold()
+            if let containingAlbumName {
+                ToolbarItem(placement: .subtitle) {
+                    Text(containingAlbumName)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
-                    if let containingAlbumName {
-                        Text(containingAlbumName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
+                }
+            }
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button("Shared.Copy", systemImage: "doc.on.doc") {
+                    if let image = currentImage {
+                        UIPasteboard.general.image = image
                     }
+                }
+                if let image = currentImage, let cgImage = image.cgImage {
+                    ShareLink(
+                        "Shared.Share",
+                        item: Image(cgImage, scale: image.scale, label: Text("")),
+                        preview: SharePreview(
+                            illustration.name,
+                            image: Image(uiImage: image)
+                        )
+                    )
                 }
             }
         }
@@ -165,15 +147,5 @@ struct IllustrationViewer: View {
                 }
         )
 #endif
-    }
-
-    func opacityDuringGesture() -> Double {
-        1.0 - hypotenuse(displayOffset) / 100.0
-    }
-
-    func hypotenuse(_ translation: CGSize) -> Double {
-        let width = translation.width
-        let height = translation.height
-        return sqrt((width * width) + (height * height))
     }
 }

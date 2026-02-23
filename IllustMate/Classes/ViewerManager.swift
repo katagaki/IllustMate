@@ -12,9 +12,9 @@ import SwiftUI
 class ViewerManager {
 
     var displayedIllustrationID: String = ""
-    @ObservationIgnored var displayedIllustration: Illustration?
-    @ObservationIgnored var displayedThumbnail: UIImage?
-    @ObservationIgnored var displayedImage: UIImage?
+    var displayedIllustration: Illustration?
+    var displayedThumbnail: UIImage?
+    var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]

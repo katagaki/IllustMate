@@ -70,5 +70,5 @@ struct IllustrationTransferable: Codable, Transferable {
 }
 
 extension UTType {
-    static var picture: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Picture") }
+    static var picture: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Illustration") }
 }

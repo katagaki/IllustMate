@@ -21,6 +21,7 @@ struct AlbumGridLabel: View {
             .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             Text(album.name)
                 .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
+                .font(.caption)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
         }
