@@ -32,7 +32,7 @@ struct PhotosFolderView: View {
                 }
             }
         }
-        .listStyle(.insetGrouped)
+        .listStyle(.plain)
         .navigationTitle(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: PHAssetCollectionWrapper.self) { wrapper in

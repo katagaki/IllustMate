@@ -8,17 +8,28 @@
 import SwiftUI
 
 struct SelectionOverlay: View {
+    let isSelected: Bool
+
+    init(_ isSelected: Bool) {
+        self.isSelected = isSelected
+    }
+
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            Rectangle()
-                .foregroundStyle(.black)
-                .opacity(0.5)
-            Image(systemName: "checkmark.circle.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24.0, height: 24.0)
-                .foregroundStyle(.white)
-                .padding(8.0)
+        ZStack {
+            if isSelected {
+                Circle()
+                    .fill(Color.accentColor)
+                    .frame(width: 24, height: 24)
+                Image(systemName: "checkmark")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+            } else {
+                Circle()
+                    .strokeBorder(Color.white, lineWidth: 2)
+                    .frame(width: 24, height: 24)
+                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+            }
         }
+        .padding(6)
     }
 }

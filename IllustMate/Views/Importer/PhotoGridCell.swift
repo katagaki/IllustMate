@@ -22,26 +22,7 @@ struct PhotoGridCell: View {
                     .frame(minWidth: 80, minHeight: 80)
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()
-
-                // Selection indicator
-                ZStack {
-                    if isSelected {
-                        Circle()
-                            .fill(Color.accentColor)
-                            .frame(width: 24, height: 24)
-                        Image(systemName: "checkmark")
-                            .font(.caption.bold())
-                            .foregroundStyle(.white)
-                    } else {
-                        Circle()
-                            .strokeBorder(Color.white, lineWidth: 2)
-                            .frame(width: 24, height: 24)
-                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-                    }
-                }
-                .padding(6)
-
-                // Dim unselected
+                SelectionOverlay(isSelected)
                 if !isSelected {
                     Color.black.opacity(0.15)
                 }

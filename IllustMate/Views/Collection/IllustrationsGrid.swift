@@ -39,8 +39,13 @@ struct IllustrationsGrid<Content: View>: View {
                 } label: {
                     IllustrationLabel(namespace: namespace, illustration: illustration)
                     .overlay {
-                        if let isSelected, isSelected(illustration) {
-                            SelectionOverlay()
+                        if isSelecting {
+                            if let isSelected {
+                                ZStack(alignment: .bottomTrailing) {
+                                    SelectionOverlay(isSelected(illustration))
+                                    Color.clear
+                                }
+                            }
                         }
                     }
                     .draggable(IllustrationTransferable(id: illustration.id)) {
