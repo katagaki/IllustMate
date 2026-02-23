@@ -23,7 +23,7 @@ struct MainSplitView: View {
                 Section {
                     NavigationLink(value: ViewPath.collection) {
                         Label {
-                            Text("TabTitle.Collection")
+                            Text("ViewTitle.Collection")
                         } icon: {
                             Image("Tab.Collection")
 #if targetEnvironment(macCatalyst)
@@ -34,7 +34,7 @@ struct MainSplitView: View {
                     }
                     NavigationLink(value: ViewPath.albums) {
                         Label {
-                            Text("TabTitle.Albums")
+                            Text("ViewTitle.Albums")
                         } icon: {
                             Image(systemName: "rectangle.stack.fill")
 #if targetEnvironment(macCatalyst)
@@ -45,13 +45,13 @@ struct MainSplitView: View {
                     }
                     NavigationLink(value: ViewPath.illustrations) {
                         Label {
-                            Text("TabTitle.Illustrations")
+                            Text("ViewTitle.Pictures")
                         } icon: {
                             Image(systemName: "photo.on.rectangle.angled")
                         }
                     }
                     NavigationLink(value: ViewPath.more) {
-                        Label("TabTitle.More", systemImage: "ellipsis")
+                        Label("ViewTitle.More", systemImage: "ellipsis")
                     }
                 }
                 Section {
@@ -96,7 +96,7 @@ struct MainSplitView: View {
                 IllustrationViewer(illustration: illustration)
                     .id(illustration.id)
             } else {
-                ContentUnavailableView("Shared.SelectAnIllustration", systemImage: "photo.on.rectangle.angled")
+                ContentUnavailableView("Shared.SelectAPicture", systemImage: "photo.on.rectangle.angled")
             }
         }
         .overlay {

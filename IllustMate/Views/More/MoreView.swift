@@ -49,7 +49,7 @@ struct MoreView: View {
                             Text("\(illustrationCount)")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                            Text("Shared.Illustrations")
+                            Text("Shared.Pictures")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
@@ -72,16 +72,6 @@ struct MoreView: View {
                 } header: {
                     Text("More.Stats")
                 }
-#if !targetEnvironment(macCatalyst)
-                Section {
-                    NavigationLink(value: ViewPath.moreAppIcon) {
-                        ListRow(image: "ListIcon.AppIcon",
-                                title: "More.Customization.AppIcon")
-                    }
-                } header: {
-                    Text("More.Customization")
-                }
-#endif
                 Section {
                     NavigationLink(value: ViewPath.moreTroubleshooting) {
                         ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
@@ -100,7 +90,6 @@ struct MoreView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .moreAppIcon: MoreAppIconView()
                 case .moreDebug: MoreExperimentsView()
                 case .moreTroubleshooting: MoreTroubleshootingView()
                 case .moreAttributions: LicensesView(licenses: [

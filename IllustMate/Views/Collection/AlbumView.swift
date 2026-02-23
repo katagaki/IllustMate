@@ -43,22 +43,23 @@ struct AlbumView: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
                 SectionHeader(title: "Albums.Albums", count: albums.count) {
-                    Picker("Shared.Sort", selection: $albumSortState) {
-                        Label("Shared.Sort.Name.Ascending", image: "Sort.Name.Ascending")
-                            .tag(SortType.nameAscending)
-                        Label("Shared.Sort.Name.Descending", image: "Sort.Name.Descending")
-                            .tag(SortType.nameDescending)
-                        Label("Shared.Sort.IllustrationCount.Ascending", image: "Sort.Count.Ascending")
-                            .tag(SortType.sizeAscending)
-                        Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
-                            .tag(SortType.sizeDescending)
-                    }
                     Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
                         Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                             .tag(ViewStyle.grid)
                         Label("Albums.Style.List", systemImage: "list.bullet")
                             .tag(ViewStyle.list)
                     }
+                    Picker("Shared.Sort", selection: $albumSortState) {
+                        Label("Shared.Sort.Name.Ascending", image: "Sort.Name.Ascending")
+                            .tag(SortType.nameAscending)
+                        Label("Shared.Sort.Name.Descending", image: "Sort.Name.Descending")
+                            .tag(SortType.nameDescending)
+                        Label("Shared.Sort.PictureCount.Ascending", image: "Sort.Count.Ascending")
+                            .tag(SortType.sizeAscending)
+                        Label("Shared.Sort.PictureCount.Descending", image: "Sort.Count.Descending")
+                            .tag(SortType.sizeDescending)
+                    }
+                    .pickerStyle(.menu)
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !albums.isEmpty {
@@ -80,16 +81,17 @@ struct AlbumView: View {
                 }
                 Spacer()
                     .frame(height: 20.0)
-                SectionHeader(title: "Albums.Illustrations", count: illustrations.count) {
+                SectionHeader(title: "Albums.Pictures", count: illustrations.count) {
+                    Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
+                        isImportingPhotos = true
+                    }
                     Picker("Shared.Sort", selection: $isIllustrationSortReversed) {
                         Label("Shared.Sort.DateAdded.Ascending", image: "Sort.Count.Ascending")
                             .tag(true)
                         Label("Shared.Sort.DateAdded.Descending", image: "Sort.Count.Descending")
                             .tag(false)
                     }
-                    Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
-                        isImportingPhotos = true
-                    }
+                    .pickerStyle(.menu)
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !illustrations.isEmpty {
@@ -110,7 +112,7 @@ struct AlbumView: View {
                         }
                     }
                 } else {
-                    Text("Albums.NoIllustrations")
+                    Text("Albums.NoPictures")
                         .foregroundStyle(.secondary)
                         .padding(20.0)
                 }

@@ -51,7 +51,7 @@ struct IllustrationsView: View {
                     refreshIllustrations()
                 }
 #endif
-                .navigationTitle("ViewTitle.Illustrations")
+                .navigationTitle("ViewTitle.Pictures")
             }
         }
         .onAppear {

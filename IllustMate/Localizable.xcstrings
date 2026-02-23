@@ -160,23 +160,6 @@
         }
       }
     },
-    "Albums.Illustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
-          }
-        }
-      }
-    },
     "Albums.NoAlbums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -194,19 +177,36 @@
         }
       }
     },
-    "Albums.NoIllustrations" : {
+    "Albums.NoPictures" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This album does not contain any pictures."
+            "value" : "This album does not contain any images."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像がありません"
+          }
+        }
+      }
+    },
+    "Albums.Pictures" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }
@@ -305,23 +305,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クラウド同期状況を常に表示"
-          }
-        }
-      }
-    },
-    "Illustration.Error.CouldNotOpen" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could Not Open Picture"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像が開けませんでした"
           }
         }
       }
@@ -714,108 +697,6 @@
         }
       }
     },
-    "More.Customization" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Customization"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カスタマイズ"
-          }
-        }
-      }
-    },
-    "More.Customization.AppIcon" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Icon"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アイコン"
-          }
-        }
-      }
-    },
-    "More.Customization.AppIcon.Default" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デフォルト"
-          }
-        }
-      }
-    },
-    "More.Customization.AppIcon.Leather" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Leather"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レザー"
-          }
-        }
-      }
-    },
-    "More.Customization.AppIcon.Pastel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pastel"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パステル"
-          }
-        }
-      }
-    },
-    "More.Customization.AppIcon.Plastic" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plastic"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プラスチック"
-          }
-        }
-      }
-    },
     "More.Debug" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -865,40 +746,6 @@
         }
       }
     },
-    "More.FileManagement.Export" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export As Files & Folders"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルとフォルダーとして書き出す"
-          }
-        }
-      }
-    },
-    "More.FileManagement.Exporting" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exporting..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "書き出し中…"
-          }
-        }
-      }
-    },
     "More.Stats" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -916,40 +763,6 @@
         }
       }
     },
-    "More.Sync" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud Sync"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud同期"
-          }
-        }
-      }
-    },
-    "More.Sync.Description" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your data is automatically synced to your iCloud account.\nTo turn off iCloud sync, go to Settings > Apple ID > iCloud > Show All, and turn off 'PicMate'."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリ内のデータは自動的にiCloudに同期されます。\nこの設定を変更することには、「設定」アプリ＞「Apple ID」＞「iCloud」＞「すべてを表示」を開き、「ピックメイト」をオフにしてください。"
-          }
-        }
-      }
-    },
     "More.Troubleshooting" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -963,23 +776,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "トラブルシューティング"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.CheckConsistency" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check File Consistency"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルの一貫性を確認"
           }
         }
       }
@@ -1018,108 +814,6 @@
         }
       }
     },
-    "More.Troubleshooting.Duplicates.Found.%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Duplicate pictures were found in the following album(s):\n%@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "以下のアルバムに重複した画像が検出されました：\n%@"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.Duplicates.Scanning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for duplicates..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重複画像を確認中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.FileManagement" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル管理"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.Orphans.Moving" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moving orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを移動中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.Orphans.Scanning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for orphaned files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを確認中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.Portability" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data Portability"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ移行"
-          }
-        }
-      }
-    },
     "More.Troubleshooting.RebuildThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1150,176 +844,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サムネイルを再生成中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.RedownloadIllustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download All Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての画像をダウンロード"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.RedownloadIllustrations.Redownloading" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sending picture download requests..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像のダウンロード要求を送信中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.RedownloadThumbnails" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download All Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのサムネイルをダウンロード"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.Reorphans.Found.%@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pictures were found in the following album(s) without a file:\n%@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下記のアルバム内にファイルの存在しない画像を検出しました：\n%@"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.Reorphans.Scanning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanning for missing files..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイルの一貫性を確認中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.RestoreImageNames" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restore Picture Names"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像名を復元"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.RestoreImageNames.Renaming" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restoring picture names..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像名を復元中…"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.ShowOrphanedFiles" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを表示"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.UnorphanThumbnails" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove Orphaned Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したサムネイルを削除"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.UnorphanThumbnails.Unorphaning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Removing orphaned thumbnails..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したサムネイルを削除中…"
           }
         }
       }
@@ -1448,7 +972,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete this album?\nPictures in the album will be moved to its containing album."
+            "value" : "Are you sure you want to delete this image?\nImages in the album will be moved to its containing album."
           }
         },
         "ja" : {
@@ -1465,7 +989,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete this picture?"
+            "value" : "Are you sure you want to delete this image?"
           }
         },
         "ja" : {
@@ -1485,13 +1009,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Are you sure you want to delete the selected picture?"
+                  "value" : "Are you sure you want to delete the selected image?"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Are you sure you want to delete the selected %lld pictures?"
+                  "value" : "Are you sure you want to delete the selected %lld images?"
                 }
               }
             }
@@ -1530,23 +1054,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての選択を解除"
-          }
-        }
-      }
-    },
-    "Shared.Illustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
           }
         }
       }
@@ -1682,6 +1189,23 @@
         }
       }
     },
+    "Shared.Pictures" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
+          }
+        }
+      }
+    },
     "Shared.Refresh" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1766,13 +1290,13 @@
         }
       }
     },
-    "Shared.SelectAnIllustration" : {
+    "Shared.SelectAPicture" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select a picture to preview."
+            "value" : "Select an image to preview."
           }
         },
         "ja" : {
@@ -1872,13 +1396,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort By Date Added (Ascending)"
+            "value" : "Date Added (Ascending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "追加日で並べ替える（昇順）"
+            "value" : "追加日（昇順）"
           }
         }
       }
@@ -1888,23 +1412,55 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort By Date Added (Descending)"
+            "value" : "Date Added (Descending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "追加日で並べ替える（降順）"
+            "value" : "追加日（降順）"
           }
         }
       }
     },
-    "Shared.Sort.IllustrationCount.Ascending" : {
+    "Shared.Sort.Name.Ascending" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort By Size (Ascending)"
+            "value" : "Name (Ascending)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前（昇順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.Name.Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name (Descending)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前（降順）"
+          }
+        }
+      }
+    },
+    "Shared.Sort.PictureCount.Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Count (Ascending)"
           }
         },
         "ja" : {
@@ -1915,50 +1471,18 @@
         }
       }
     },
-    "Shared.Sort.IllustrationCount.Descending" : {
+    "Shared.Sort.PictureCount.Descending" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sort By Size (Descending)"
+            "value" : "Image Count (Descending)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "アルバムおよび画像数で並べ替える（降順）"
-          }
-        }
-      }
-    },
-    "Shared.Sort.Name.Ascending" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sort By Name (Ascending)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名前で並べ替える（昇順）"
-          }
-        }
-      }
-    },
-    "Shared.Sort.Name.Descending" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sort By Name (Descending)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "名前で並べ替える（降順）"
           }
         }
       }
@@ -1975,73 +1499,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "はい"
-          }
-        }
-      }
-    },
-    "TabTitle.Albums" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Albums"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アルバム"
-          }
-        }
-      }
-    },
-    "TabTitle.Collection" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collection"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コレクション"
-          }
-        }
-      }
-    },
-    "TabTitle.Illustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
-          }
-        }
-      }
-    },
-    "TabTitle.More" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "More"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "その他"
           }
         }
       }
@@ -2130,23 +1587,6 @@
         }
       }
     },
-    "ViewTitle.Illustrations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pictures"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
-          }
-        }
-      }
-    },
     "ViewTitle.Import" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2164,7 +1604,25 @@
         }
       }
     },
+    "ViewTitle.More" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
+          }
+        }
+      }
+    },
     "ViewTitle.More.Customization.AppIcon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2176,6 +1634,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アイコン"
+          }
+        }
+      }
+    },
+    "ViewTitle.Pictures" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }

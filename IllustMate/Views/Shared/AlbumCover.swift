@@ -10,19 +10,20 @@ import SwiftUI
 struct AlbumCover: View {
 
     var length: CGFloat?
-    var cornerRadius: Double
-    var shadowSize: Double
     var album: Album
 
     var primaryImage: Image?
     var secondaryImage: Image?
     var tertiaryImage: Image?
 
-    init(length: CGFloat? = nil, cornerRadius: Double = 6.0, shadowSize: Double = 2.0,
-         album: Album, primaryImage: Image? = nil, secondaryImage: Image? = nil, tertiaryImage: Image? = nil) {
+    init(
+        length: CGFloat? = nil,
+        album: Album,
+        primaryImage: Image? = nil,
+        secondaryImage: Image? = nil,
+        tertiaryImage: Image? = nil
+    ) {
         self.length = length
-        self.cornerRadius = cornerRadius
-        self.shadowSize = shadowSize
         self.album = album
         self.primaryImage = primaryImage
         self.secondaryImage = secondaryImage
@@ -143,8 +144,6 @@ struct AlbumCover: View {
 
         var body: some View {
             AlbumCover(length: length,
-                       cornerRadius: cornerRadius,
-                       shadowSize: shadowSize,
                        album: album,
                        primaryImage: primaryImage,
                        secondaryImage: secondaryImage,

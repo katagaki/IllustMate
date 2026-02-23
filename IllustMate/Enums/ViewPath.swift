@@ -16,7 +16,6 @@ enum ViewPath: Hashable {
     case illustrationViewer(namespace: Namespace.ID)
     case album(album: Album)
     case more
-    case moreAppIcon
     case moreDebug
     case moreTroubleshooting
     case moreAttributions
