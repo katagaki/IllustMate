@@ -8,8 +8,6 @@
 import Photos
 import SwiftUI
 
-// MARK: - Photo Grid Cell
-
 struct PhotoGridCell: View {
     let asset: PHAsset
     let isSelected: Bool
@@ -23,9 +21,6 @@ struct PhotoGridCell: View {
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()
                 SelectionOverlay(isSelected)
-                if !isSelected {
-                    Color.black.opacity(0.15)
-                }
             }
             .clipShape(.rect(cornerRadius: 3.0))
         }
