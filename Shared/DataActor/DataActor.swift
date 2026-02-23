@@ -64,6 +64,7 @@ actor DataActor {
             })
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(illustrationsTable.createIndex(illustrationAlbumId, ifNotExists: true))
+            _ = try? database.vacuum()
         } catch {
             debugPrint("Database setup error: \(error)")
         }
