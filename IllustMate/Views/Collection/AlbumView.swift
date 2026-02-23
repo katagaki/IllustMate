@@ -85,6 +85,7 @@ struct AlbumView: View {
                     Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
                         isImportingPhotos = true
                     }
+                    Divider()
                     Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isIllustrationSortReversed) {
                         Text("Shared.Sort.DateAdded.Ascending")
                             .tag(true)
