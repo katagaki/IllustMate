@@ -33,23 +33,24 @@ actor DataActor {
     let illustrationThumbnailData = Expression<Data?>("thumbnail_data")
 
     init() {
+        let databaseFileName = "Collection.db"
         let containerURL = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate")!
-        let dbURL = containerURL.appendingPathComponent("IllustMate.sqlite")
+        let databaseURL = containerURL.appendingPathComponent(databaseFileName)
 
         // Migrate from old location if needed
         let oldDbURL = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first!
-            .appendingPathComponent("IllustMate.sqlite")
-        if !FileManager.default.fileExists(atPath: dbURL.path) &&
+            .appendingPathComponent(databaseFileName)
+        if !FileManager.default.fileExists(atPath: databaseURL.path) &&
             FileManager.default.fileExists(atPath: oldDbURL.path) {
-            try? FileManager.default.copyItem(at: oldDbURL, to: dbURL)
+            try? FileManager.default.copyItem(at: oldDbURL, to: databaseURL)
         }
 
         let database: Connection
         do {
-            database = try Connection(dbURL.path)
+            database = try Connection(databaseURL.path)
         } catch {
             fatalError("Could not open SQLite database: \(error)")
         }
