@@ -1700,6 +1700,22 @@
         }
       }
     },
+    "Shared.OpenFilesApp" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Files App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「ファイル」アプリを開く"
+          }
+        }
+      }
+    },
     "Shared.Refresh" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -22,6 +22,26 @@ struct MoreView: View {
         NavigationStack(path: $navigationManager.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
                 Section {
+                    Button {
+                        let documentsUrl = FileManager.default.urls(
+                            for: .documentDirectory, in: .userDomainMask
+                        ).first!
+#if targetEnvironment(macCatalyst)
+                        UIApplication.shared.open(documentsUrl)
+#else
+                        if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
+                            if UIApplication.shared.canOpenURL(sharedUrl) {
+                                UIApplication.shared.open(sharedUrl)
+                            }
+                        }
+#endif
+                    } label: {
+                        ListRow(image: "ListIcon.Files",
+                                title: "Shared.OpenFilesApp")
+                    }
+                    .tint(.primary)
+                }
+                Section {
                     HStack(alignment: .center, spacing: 8.0) {
                         Text("Shared.Albums")
                         Spacer(minLength: 0)
@@ -41,8 +61,7 @@ struct MoreView: View {
                             .foregroundStyle(.secondary)
                     }
                 } header: {
-                    ListSectionHeader(text: "More.Stats")
-                        .font(.body)
+                    Text("More.Stats")
                 }
 #if !targetEnvironment(macCatalyst)
                 Section {
@@ -51,20 +70,15 @@ struct MoreView: View {
                                 title: "More.Customization.AppIcon")
                     }
                 } header: {
-                    ListSectionHeader(text: "More.Customization")
-                        .font(.body)
+                    Text("More.Customization")
                 }
 #endif
                 Section {
-//                    NavigationLink(value: ViewPath.moreDebug) {
-//                        ListRow(image: "ListIcon.Debug", title: "More.Debug")
-//                    }
                     NavigationLink(value: ViewPath.moreTroubleshooting) {
                         ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
                     }
                 } header: {
-                    ListSectionHeader(text: "More.Advanced")
-                        .font(.body)
+                    Text("More.Advanced")
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
