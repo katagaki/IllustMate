@@ -49,14 +49,14 @@ struct AlbumView: View {
                         Label("Albums.Style.List", systemImage: "list.bullet")
                             .tag(ViewStyle.list)
                     }
-                    Picker("Shared.Sort", selection: $albumSortState) {
-                        Label("Shared.Sort.Name.Ascending", image: "Sort.Name.Ascending")
+                    Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
+                        Text("Shared.Sort.Name.Ascending")
                             .tag(SortType.nameAscending)
-                        Label("Shared.Sort.Name.Descending", image: "Sort.Name.Descending")
+                        Text("Shared.Sort.Name.Descending")
                             .tag(SortType.nameDescending)
-                        Label("Shared.Sort.PictureCount.Ascending", image: "Sort.Count.Ascending")
+                        Text("Shared.Sort.PictureCount.Ascending")
                             .tag(SortType.sizeAscending)
-                        Label("Shared.Sort.PictureCount.Descending", image: "Sort.Count.Descending")
+                        Text("Shared.Sort.PictureCount.Descending")
                             .tag(SortType.sizeDescending)
                     }
                     .pickerStyle(.menu)
@@ -85,10 +85,10 @@ struct AlbumView: View {
                     Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
                         isImportingPhotos = true
                     }
-                    Picker("Shared.Sort", selection: $isIllustrationSortReversed) {
-                        Label("Shared.Sort.DateAdded.Ascending", image: "Sort.Count.Ascending")
+                    Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isIllustrationSortReversed) {
+                        Text("Shared.Sort.DateAdded.Ascending")
                             .tag(true)
-                        Label("Shared.Sort.DateAdded.Descending", image: "Sort.Count.Descending")
+                        Text("Shared.Sort.DateAdded.Descending")
                             .tag(false)
                     }
                     .pickerStyle(.menu)

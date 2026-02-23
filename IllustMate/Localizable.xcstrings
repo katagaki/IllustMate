@@ -1466,7 +1466,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アルバムおよび画像数で並べ替える（昇順）"
+            "value" : "アルバムと画像数（昇順）"
           }
         }
       }
@@ -1482,7 +1482,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アルバムおよび画像数で並べ替える（降順）"
+            "value" : "アルバムと画像数（降順）"
           }
         }
       }
