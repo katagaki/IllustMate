@@ -146,24 +146,6 @@ struct IllustrationViewer: View {
         }
 #if !targetEnvironment(macCatalyst)
         .gesture(
-            DragGesture()
-                .onChanged { gesture in
-                    displayOffset = gesture.translation
-                }
-                .onEnded { gesture in
-                    if hypotenuse(gesture.translation) > 100.0 {
-                        dismiss()
-                    } else {
-                        doWithAnimation {
-                            magnification = 1.0
-                            displayOffset = .zero
-                        } completion: {
-                            magnificationAnchor = .center
-                        }
-                    }
-                }
-        )
-        .gesture(
             MagnifyGesture()
                 .onChanged { gesture in
                     if gesture.magnification > 1.0 {

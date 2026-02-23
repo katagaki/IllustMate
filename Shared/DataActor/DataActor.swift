@@ -34,19 +34,10 @@ actor DataActor {
 
     init() {
         let databaseFileName = "Collection.db"
-        let containerURL = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate")!
-        let databaseURL = containerURL.appendingPathComponent(databaseFileName)
-
-        // Migrate from old location if needed
-        let oldDbURL = FileManager.default
+        let databaseURL = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first!
             .appendingPathComponent(databaseFileName)
-        if !FileManager.default.fileExists(atPath: databaseURL.path) &&
-            FileManager.default.fileExists(atPath: oldDbURL.path) {
-            try? FileManager.default.copyItem(at: oldDbURL, to: databaseURL)
-        }
 
         let database: Connection
         do {
