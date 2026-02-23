@@ -29,8 +29,7 @@ struct MoreAppIconView: View {
                     UIApplication.shared.setAlternateIconName(icon.iconName)
                 } label: {
                     ListAppIconRow(image: icon.previewImageName,
-                                   text: NSLocalizedString(icon.name, comment: ""),
-                                   iconToSet: icon.iconName)
+                                   text: NSLocalizedString(icon.name, comment: ""))
                 }
                 .buttonStyle(.plain)
             }

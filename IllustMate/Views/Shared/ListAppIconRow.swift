@@ -10,7 +10,6 @@ import SwiftUI
 struct ListAppIconRow: View {
     var image: String
     var text: String
-    var iconToSet: String?
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {

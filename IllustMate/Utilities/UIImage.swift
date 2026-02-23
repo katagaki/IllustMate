@@ -45,13 +45,4 @@ extension UIImage {
         }
         return scaledImage
     }
-
-    func scaleImage(toSize newSize: CGSize) -> UIImage? {
-        let newRect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 3.0
-        return UIGraphicsImageRenderer(size: newRect.size, format: format).image { _ in
-            self.draw(in: CGRect(origin: .zero, size: newSize))
-        }
-    }
 }

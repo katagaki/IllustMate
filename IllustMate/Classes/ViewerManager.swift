@@ -59,12 +59,4 @@ class ViewerManager {
             }
         }
     }
-
-    func removeDisplay() {
-        displayedImage = nil
-        displayedThumbnail = nil
-        displayedIllustration = nil
-        displayedIllustrationID = ""
-        isFullImageLoaded = false
-    }
 }

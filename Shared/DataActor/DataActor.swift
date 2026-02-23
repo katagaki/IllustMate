@@ -77,10 +77,6 @@ actor DataActor {
         }
     }
 
-    func save() {
-        // SQLite.swift commits automatically; no-op kept for compatibility
-    }
-
     // MARK: - Row to Model Helpers
 
     func albumFrom(row: Row, loadChildren: Bool = false) -> Album {
