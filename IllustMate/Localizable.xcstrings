@@ -293,40 +293,6 @@
         }
       }
     },
-    "Alert.ReimportOrphan.Text" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to import this orphaned file?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルをインポートしてもよろしいですか？"
-          }
-        }
-      }
-    },
-    "Alert.ReimportOrphan.Title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import Orphaned File"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイルを再インポート"
-          }
-        }
-      }
-    },
     "Experiments.ShowCloudStatusEverywhere" : {
       "localizations" : {
         "en" : {
@@ -1997,22 +1963,6 @@
         }
       }
     },
-    "Shared.Thumbnails" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイル"
-          }
-        }
-      }
-    },
     "Shared.Yes" : {
       "localizations" : {
         "en" : {
@@ -2226,23 +2176,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アイコン"
-          }
-        }
-      }
-    },
-    "ViewTitle.Orphans" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Orphaned Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "孤立したファイル"
           }
         }
       }

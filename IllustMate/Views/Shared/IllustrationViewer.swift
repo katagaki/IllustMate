@@ -71,7 +71,7 @@ struct IllustrationViewer: View {
             .scaleEffect(CGSize(width: magnification, height: magnification),
                          anchor: magnificationAnchor)
             .onTapGesture {
-                withAnimation(.snappy.speed(2)) {
+                withAnimation(.smooth.speed(2)) {
                     showImageSize.toggle()
                 }
             }

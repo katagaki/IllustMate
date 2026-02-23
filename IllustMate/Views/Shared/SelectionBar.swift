@@ -84,7 +84,7 @@ struct SelectionBar<Content: View>: View {
                         .frame(width: 24.0, height: 24.0, alignment: .center)
                 }
                 .frame(width: 24.0, height: 24.0, alignment: .center)
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.bordered)
                 .buttonBorderShape(.circle)
             }
             .padding(20.0)
@@ -92,7 +92,8 @@ struct SelectionBar<Content: View>: View {
         }
         .frame(maxWidth: .infinity)
         .glassEffect(.regular.interactive(), in: .capsule)
+        .tint(.primary)
         .padding([.horizontal, .bottom])
-        .transition(.move(edge: .bottom).combined(with: .opacity).animation(.snappy.speed(2)))
+        .transition(.move(edge: .bottom).combined(with: .opacity).animation(.smooth.speed(2)))
     }
 }

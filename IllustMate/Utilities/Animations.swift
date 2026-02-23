@@ -23,7 +23,7 @@ func doWithAnimationAsynchronously(task: @escaping @Sendable () -> Void,
 
 @MainActor
 func doWithAnimation(task: @escaping () -> Void, completion: (() -> Void)? = nil) {
-    withAnimation(.snappy.speed(2)) {
+    withAnimation(.smooth.speed(2)) {
         task()
     } completion: {
         if let completion {

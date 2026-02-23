@@ -16,7 +16,6 @@ struct MoreView: View {
 
     @State var albumCount: Int = 0
     @State var illustrationCount: Int = 0
-    @State var thumbnailCount: Int = 0
 
     var body: some View {
         NavigationStack(path: $navigationManager.moreTabPath) {
@@ -42,23 +41,33 @@ struct MoreView: View {
                     .tint(.primary)
                 }
                 Section {
-                    HStack(alignment: .center, spacing: 8.0) {
-                        Text("Shared.Albums")
-                        Spacer(minLength: 0)
-                        Text("\(albumCount)")
-                            .foregroundStyle(.secondary)
-                    }
-                    HStack(alignment: .center, spacing: 8.0) {
-                        Text("Shared.Illustrations")
-                        Spacer(minLength: 0)
-                        Text("\(illustrationCount)")
-                            .foregroundStyle(.secondary)
-                    }
-                    HStack(alignment: .center, spacing: 8.0) {
-                        Text("Shared.Thumbnails")
-                        Spacer(minLength: 0)
-                        Text("\(thumbnailCount)")
-                            .foregroundStyle(.secondary)
+                    HStack(alignment: .top) {
+                        VStack(spacing: 8.0) {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .font(.title2)
+                                .foregroundStyle(.secondary)
+                            Text("\(illustrationCount)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text("Shared.Illustrations")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        VStack(spacing: 8.0) {
+                            Image(systemName: "rectangle.stack.fill")
+                                .font(.title2)
+                                .foregroundStyle(.secondary)
+                            Text("\(albumCount)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text("Shared.Albums")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                 } header: {
                     Text("More.Stats")
@@ -130,11 +139,9 @@ SOFTWARE.
     func loadCounts() async {
         let albums = await actor.albumCount()
         let illustrations = await actor.illustrationCount()
-        let thumbnails = await actor.thumbnailCount()
         await MainActor.run {
             albumCount = albums
             illustrationCount = illustrations
-            thumbnailCount = thumbnails
         }
     }
 }

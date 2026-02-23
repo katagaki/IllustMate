@@ -29,6 +29,7 @@ struct CollectionView: View {
                 }
                 .sheet(isPresented: $isMoreViewPresenting) {
                     MoreView()
+                        .presentationDetents([.medium, .large])
                 }
                 .navigationDestination(for: ViewPath.self, destination: { viewPath in
                   switch viewPath {

@@ -53,7 +53,7 @@ struct AlbumView: View {
                         Label("Shared.Sort.IllustrationCount.Descending", image: "Sort.Count.Descending")
                             .tag(SortType.sizeDescending)
                     }
-                    Picker("Albums.Style", selection: ($albumStyleState.animation(.snappy.speed(2)))) {
+                    Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
                         Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                             .tag(ViewStyle.grid)
                         Label("Albums.Style.List", systemImage: "list.bullet")
@@ -122,7 +122,6 @@ struct AlbumView: View {
                 Button("Shared.Select", systemImage: "checkmark.circle") {
                     startOrStopSelectingIllustrations()
                 }
-                .disabled(isSelectingIllustrations || illustrations.isEmpty)
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {

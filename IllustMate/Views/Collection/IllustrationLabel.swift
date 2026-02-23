@@ -36,7 +36,7 @@ struct IllustrationLabel: View {
                                 .symbolRenderingMode(.multicolor)
                         }
                     }
-                    .transition(.opacity.animation(.snappy.speed(2)))
+                    .transition(.opacity.animation(.smooth.speed(2)))
                 }
             }
             .clipped()

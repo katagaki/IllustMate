@@ -91,7 +91,7 @@ struct ShareView: View {
                             close()
                         } else {
                             total = Float(items.count)
-                            withAnimation(.snappy.speed(2)) {
+                            withAnimation(.smooth.speed(2)) {
                                 isImporting = true
                             } completion: {
                                 Task {
@@ -167,7 +167,7 @@ struct ShareView: View {
                 }
             }
             await MainActor.run {
-                withAnimation(.snappy.speed(2)) {
+                withAnimation(.smooth.speed(2)) {
                     isCompleted = true
                 } completion: {
                     if failedItemCount == 0 {
