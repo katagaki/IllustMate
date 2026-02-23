@@ -84,6 +84,7 @@ struct PhotosAssetGridView: View {
                             .padding(4.0)
                             .frame(maxWidth: .infinity)
                     }
+                    .tint(.green)
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
                     .disabled(selectedAssets.isEmpty)

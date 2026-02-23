@@ -46,6 +46,7 @@ struct PhotoGridCell: View {
                     Color.black.opacity(0.15)
                 }
             }
+            .clipShape(.rect(cornerRadius: 3.0))
         }
         .buttonStyle(.plain)
     }

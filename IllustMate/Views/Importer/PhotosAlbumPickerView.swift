@@ -62,7 +62,7 @@ struct PhotosAlbumPickerView: View {
                 }
             }
         }
-        .listStyle(.insetGrouped)
+        .listStyle(.plain)
         .onAppear {
             if !hasFetched {
                 fetchAlbums()
