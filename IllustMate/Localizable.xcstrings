@@ -933,23 +933,6 @@
         }
       }
     },
-    "Shared.Create" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "作成"
-          }
-        }
-      }
-    },
     "Shared.Delete" : {
       "localizations" : {
         "en" : {
@@ -1124,23 +1107,6 @@
         }
       }
     },
-    "Shared.MoveTo" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move To..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移動先…"
-          }
-        }
-      }
-    },
     "Shared.MoveOutOfAlbum" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1171,6 +1137,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@に戻す"
+          }
+        }
+      }
+    },
+    "Shared.MoveTo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move To..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動先…"
           }
         }
       }

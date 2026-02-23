@@ -24,34 +24,25 @@ struct NewAlbumView: View {
                         .focused($focusedField, equals: .newAlbumName)
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                Button {
-                    Task {
-                        let newAlbum = await actor.createAlbum(newAlbumName)
-                        if let albumToAddTo {
-                            await actor.addAlbum(withID: newAlbum.id,
-                                                 toAlbumWithID: albumToAddTo.id)
-                        }
-                        dismiss()
-                    }
-                } label: {
-                    Text("Shared.Create")
-                        .bold()
-                        .padding(4.0)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
-                .frame(maxWidth: .infinity)
-                .padding(20.0)
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(role: .cancel) {
                         newAlbumName = ""
                         dismiss()
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(role: .confirm) {
+                        Task {
+                            let newAlbum = await actor.createAlbum(newAlbumName)
+                            if let albumToAddTo {
+                                await actor.addAlbum(withID: newAlbum.id,
+                                                     toAlbumWithID: albumToAddTo.id)
+                            }
+                            dismiss()
+                        }
+                    }
+                    .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
                 }
             }
             .navigationTitle("ViewTitle.Albums.Create")
@@ -64,7 +55,7 @@ struct NewAlbumView: View {
             focusedField = .newAlbumName
         }
 #endif
-        .presentationDetents([.medium])
+        .presentationDetents([.height(200.0)])
         .interactiveDismissDisabled()
     }
 
