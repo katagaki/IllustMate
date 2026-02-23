@@ -1107,6 +1107,40 @@
         }
       }
     },
+    "Shared.MoveHere" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Here"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここに移動"
+          }
+        }
+      }
+    },
+    "Shared.MoveTo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move To..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動先…"
+          }
+        }
+      }
+    },
     "Shared.MoveOutOfAlbum" : {
       "extractionState" : "manual",
       "localizations" : {

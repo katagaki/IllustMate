@@ -12,9 +12,7 @@ struct AlbumMoveMenu: View {
     var album: Album
     var onMoved: () -> Void
 
-    @State var availableAlbums: [Album] = []
-    @State var parentAlbum: Album?
-    @State var grandparentAlbum: Album?
+    @State var rootAlbums: [Album] = []
 
     var body: some View {
         if album.parentAlbumID != nil {
@@ -25,33 +23,17 @@ struct AlbumMoveMenu: View {
                 }
             }
         }
-        if let grandparentAlbum {
-            Button {
-                Task {
-                    await actor.addAlbum(withID: album.id,
-                                         toAlbumWithID: grandparentAlbum.id)
-                    onMoved()
-                }
-            } label: {
-                Label(
-                    title: { Text("Shared.MoveOutTo.\(grandparentAlbum.name)") },
-                    icon: { Image(uiImage: grandparentAlbum.cover()) }
-                )
-            }
-        }
-        Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
-            ForEach(availableAlbums) { albumToMoveTo in
-                Button {
+        Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
+            ForEach(rootAlbums) { rootAlbum in
+                AlbumHierarchyMenuItem(
+                    targetAlbum: rootAlbum,
+                    excludingAlbumID: album.id
+                ) { destinationAlbum in
                     Task {
                         await actor.addAlbum(withID: album.id,
-                                             toAlbumWithID: albumToMoveTo.id)
+                                             toAlbumWithID: destinationAlbum.id)
                         onMoved()
                     }
-                } label: {
-                    Label(
-                        title: { Text(albumToMoveTo.name) },
-                        icon: { Image(uiImage: albumToMoveTo.cover()) }
-                    )
                 }
             }
         }
@@ -61,19 +43,56 @@ struct AlbumMoveMenu: View {
     }
 
     func loadAlbums() async {
-        if let parentAlbumID = album.parentAlbumID {
-            let parent = await actor.album(for: parentAlbumID)
-            parentAlbum = parent
-            if let grandparentID = parent?.parentAlbumID {
-                grandparentAlbum = await actor.album(for: grandparentID)
-            }
-            if let parent {
-                availableAlbums = (try? await actor.albumsWithCounts(in: parent, sortedBy: .nameAscending))?.filter {
-                    $0.id != album.id
-                } ?? []
+        rootAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+    }
+}
+
+struct AlbumHierarchyMenuItem: View {
+
+    var targetAlbum: Album
+    var excludingAlbumID: String
+    var onSelect: (Album) -> Void
+
+    @State var childAlbums: [Album]?
+
+    var isExcluded: Bool {
+        targetAlbum.id == excludingAlbumID
+    }
+
+    var body: some View {
+        if let children = childAlbums {
+            if !children.isEmpty {
+                Menu(targetAlbum.name) {
+                    if !isExcluded {
+                        Button("Shared.MoveHere", systemImage: "tray.and.arrow.down") {
+                            onSelect(targetAlbum)
+                        }
+                        Divider()
+                    }
+                    ForEach(children) { child in
+                        AlbumHierarchyMenuItem(
+                            targetAlbum: child,
+                            excludingAlbumID: excludingAlbumID,
+                            onSelect: onSelect
+                        )
+                    }
+                }
+            } else if !isExcluded {
+                Button(targetAlbum.name) {
+                    onSelect(targetAlbum)
+                }
             }
         } else {
-            availableAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+            Button(targetAlbum.name) {
+                if !isExcluded { onSelect(targetAlbum) }
+            }
+            .task {
+                await loadChildAlbums()
+            }
         }
+    }
+
+    func loadChildAlbums() async {
+        childAlbums = (try? await actor.albumsWithCounts(in: targetAlbum, sortedBy: .nameAscending)) ?? []
     }
 }

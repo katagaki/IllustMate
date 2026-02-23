@@ -99,12 +99,7 @@ struct IllustrationsGrid<Content: View>: View {
                         }
                     }
                 } preview: {
-                    if let thumbnailData = illustration.thumbnailData,
-                       let image = UIImage(data: thumbnailData) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                    }
+                    IllustrationPreview(illustrationID: illustration.id)
                 }
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
@@ -122,6 +117,32 @@ struct IllustrationShareable: Transferable {
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(exportedContentType: .image) { shareable in
             await actor.imageData(forIllustrationWithID: shareable.illustrationID) ?? Data()
+        }
+    }
+}
+
+struct IllustrationPreview: View {
+    let illustrationID: String
+
+    @State private var image: UIImage?
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                Rectangle()
+                    .fill(.primary.opacity(0.05))
+                    .frame(width: 200, height: 200)
+            }
+        }
+        .task {
+            if let thumbData = await actor.thumbnailData(forIllustrationWithID: illustrationID),
+               let uiImage = UIImage(data: thumbData) {
+                image = uiImage
+            }
         }
     }
 }

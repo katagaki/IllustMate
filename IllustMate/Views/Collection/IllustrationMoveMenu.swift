@@ -13,8 +13,7 @@ struct IllustrationMoveMenu: View {
     var containingAlbum: Album?
     var onMoved: () -> Void
 
-    @State var availableAlbums: [Album] = []
-    @State var parentAlbum: Album?
+    @State var rootAlbums: [Album] = []
 
     var body: some View {
         if containingAlbum != nil {
@@ -25,38 +24,17 @@ struct IllustrationMoveMenu: View {
                 }
             }
         }
-        if let containingAlbum, let parentAlbum {
-            Button {
-                Task {
-                    await actor.addIllustrations(withIDs: illustrations.map { $0.id },
-                                                 toAlbumWithID: parentAlbum.id)
-                    onMoved()
-                }
-            } label: {
-                Label(
-                    title: { Text("Shared.MoveOutTo.\(parentAlbum.name)") },
-                    icon: { Image(uiImage: parentAlbum.cover()) }
-                )
-            }
-            .task(id: containingAlbum.id) {
-                if let parentAlbumID = containingAlbum.parentAlbumID {
-                    self.parentAlbum = await actor.album(for: parentAlbumID)
-                }
-            }
-        }
-        Menu("Shared.AddToAlbum", systemImage: "tray.and.arrow.down") {
-            ForEach(availableAlbums) { album in
-                Button {
+        Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
+            ForEach(rootAlbums) { album in
+                AlbumHierarchyMenuItem(
+                    targetAlbum: album,
+                    excludingAlbumID: containingAlbum?.id ?? ""
+                ) { destinationAlbum in
                     Task {
                         await actor.addIllustrations(withIDs: illustrations.map { $0.id },
-                                                     toAlbumWithID: album.id)
+                                                     toAlbumWithID: destinationAlbum.id)
                         onMoved()
                     }
-                } label: {
-                    Label(
-                        title: { Text(album.name) },
-                        icon: { Image(uiImage: album.cover()) }
-                    )
                 }
             }
         }
@@ -66,10 +44,6 @@ struct IllustrationMoveMenu: View {
     }
 
     func loadAlbums() async {
-        if let containingAlbum {
-            availableAlbums = (try? await actor.albumsWithCounts(in: containingAlbum, sortedBy: .nameAscending)) ?? []
-        } else {
-            availableAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
-        }
+        rootAlbums = (try? await actor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
     }
 }
