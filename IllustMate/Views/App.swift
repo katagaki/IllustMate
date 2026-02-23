@@ -30,6 +30,9 @@ struct IllustMateApp: App {
             .environment(viewer)
             .environment(progressAlertManager)
             .environment(concurrency)
+            .task(priority: .background) {
+                await actor.vacuumIfNeeded()
+            }
         }
 #if targetEnvironment(macCatalyst)
         .defaultSize(CGSize(width: 880.0, height: 680.0))

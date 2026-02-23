@@ -64,10 +64,34 @@ actor DataActor {
             })
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
-            _ = try? database.vacuum()
         } catch {
             debugPrint("Database setup error: \(error)")
         }
+    }
+
+    // MARK: - Maintenance
+
+    private static let lastVacuumDateKey = "lastVacuumDate"
+    private static let vacuumMinIntervalSeconds: Double = 7 * 24 * 60 * 60  // 7 days
+    private static let vacuumFragmentationThreshold: Double = 0.1  // 10% free pages
+
+    func vacuumIfNeeded() {
+        let defaults = UserDefaults.standard
+
+        // Only vacuum if enough time has passed since the last vacuum
+        if let lastVacuumDate = defaults.object(forKey: DataActor.lastVacuumDateKey) as? Date {
+            let elapsed = Date().timeIntervalSince(lastVacuumDate)
+            guard elapsed >= DataActor.vacuumMinIntervalSeconds else { return }
+        }
+
+        // Only vacuum if the database has meaningful fragmentation
+        let freelistCount = (try? database.scalar("PRAGMA freelist_count") as? Int64) ?? 0
+        let pageCount = max((try? database.scalar("PRAGMA page_count") as? Int64) ?? 1, 1)
+        let fragmentationRatio = Double(freelistCount) / Double(pageCount)
+        guard fragmentationRatio >= DataActor.vacuumFragmentationThreshold else { return }
+
+        _ = try? database.vacuum()
+        defaults.set(Date(), forKey: DataActor.lastVacuumDateKey)
     }
 
     // MARK: - Row to Model Helpers
