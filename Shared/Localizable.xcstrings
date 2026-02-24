@@ -695,7 +695,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "「写真」アプリからインポートしたい写真を選択する、またはアルバムから選択してください。"
           }
         }
@@ -1459,6 +1459,86 @@
         }
       }
     },
+    "Shared.GridSize" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid Size"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グリッドのサイズ"
+          }
+        }
+      }
+    },
+    "Shared.GridSize.3" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Columns"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3列"
+          }
+        }
+      }
+    },
+    "Shared.GridSize.4" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 Columns"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4列"
+          }
+        }
+      }
+    },
+    "Shared.GridSize.5" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Columns"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5列"
+          }
+        }
+      }
+    },
+    "Shared.GridSize.8" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 Columns"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8列"
+          }
+        }
+      }
+    },
     "Shared.Import" : {
       "localizations" : {
         "en" : {
@@ -1680,13 +1760,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove Album Cover"
+            "value" : "Reset Album Cover"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アルバムカバーを消去"
+            "value" : "アルバムカバーを初期化"
           }
         }
       }

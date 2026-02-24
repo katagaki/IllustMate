@@ -14,6 +14,8 @@ struct PicsView: View {
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
+    @AppStorage(wrappedValue: 4, "PicColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
     @State var pics: [Pic] = []
     @State var viewerManager = ViewerManager()
@@ -45,6 +47,21 @@ struct PicsView: View {
                                 refreshPics()
                             }
 #endif
+                            Menu {
+                                Picker("Shared.GridSize",
+                                       selection: $columnCount.animation(.smooth.speed(2.0))) {
+                                    Text("Shared.GridSize.3")
+                                        .tag(3)
+                                    Text("Shared.GridSize.4")
+                                        .tag(4)
+                                    Text("Shared.GridSize.5")
+                                        .tag(5)
+                                    Text("Shared.GridSize.8")
+                                        .tag(8)
+                                }
+                            } label: {
+                                Image(systemName: "square.grid.2x2")
+                            }
                         }
                     }
                 }

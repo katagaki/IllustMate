@@ -42,7 +42,7 @@ struct PicLabel: View {
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 3.0))
-            .task(id: pic.id) {
+            .task(id: pic.identifiableString()) {
                 if let thumbData = await dataActor.thumbnailData(forPicWithID: pic.id),
                    let uiImage = UIImage(data: thumbData) {
                     pic.thumbnailData = thumbData

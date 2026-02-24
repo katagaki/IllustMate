@@ -17,7 +17,7 @@ struct AlbumView: View {
 
     @Namespace var namespace
 
-    var currentAlbum: Album?
+    @State var currentAlbum: Album?
     @State var albums: [Album] = []
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var albumPendingDeletion: Album?
@@ -38,6 +38,8 @@ struct AlbumView: View {
     @State var selectedPics: [Pic] = []
     @State var isImportingPhotos: Bool = false
     @AppStorage(wrappedValue: false, "PicSortReversed") var isPicSortReversed: Bool
+    @AppStorage(wrappedValue: 4, "PicColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
     var body: some View {
         ScrollView(.vertical) {
@@ -93,6 +95,20 @@ struct AlbumView: View {
                             .tag(true)
                         Text("Shared.Sort.DateAdded.Descending")
                             .tag(false)
+                    }
+                    .pickerStyle(.menu)
+                    Divider()
+                    Picker("Shared.GridSize",
+                           systemImage: "square.grid.2x2",
+                           selection: $columnCount.animation(.smooth.speed(2.0))) {
+                        Text("Shared.GridSize.3")
+                            .tag(3)
+                        Text("Shared.GridSize.4")
+                            .tag(4)
+                        Text("Shared.GridSize.5")
+                            .tag(5)
+                        Text("Shared.GridSize.8")
+                            .tag(8)
                     }
                     .pickerStyle(.menu)
                 }

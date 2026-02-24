@@ -118,6 +118,15 @@ extension AlbumView {
 
     func refreshData() async {
         await withTaskGroup(of: Void.self) { group in
+            if let currentAlbum {
+                group.addTask {
+                    if let album = await dataActor.album(for: currentAlbum.id) {
+                        await MainActor.run {
+                            self.currentAlbum = album
+                        }
+                    }
+                }
+            }
             group.addTask {
                 let albums = await self.fetchAlbums()
                 await MainActor.run {

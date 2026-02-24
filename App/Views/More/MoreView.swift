@@ -25,25 +25,6 @@ struct MoreView: View {
         NavigationStack(path: $navigation.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    Button {
-                        let documentsUrl = FileManager.default.urls(
-                            for: .documentDirectory, in: .userDomainMask
-                        ).first!
-#if targetEnvironment(macCatalyst)
-                        UIApplication.shared.open(documentsUrl)
-#else
-                        if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
-                            if UIApplication.shared.canOpenURL(sharedUrl) {
-                                UIApplication.shared.open(sharedUrl)
-                            }
-                        }
-#endif
-                    } label: {
-                        ListRow(image: "ListIcon.Files", title: "Shared.OpenFilesApp")
-                    }
-                    .tint(.primary)
-                }
-                Section {
                     HStack(alignment: .top) {
                         VStack(spacing: 8.0) {
                             Image(systemName: "photo.on.rectangle.angled")
@@ -76,10 +57,28 @@ struct MoreView: View {
                     Text("More.Stats")
                 }
                 Section {
-                    Button {
-                        isPickingBackupFolder = true
-                    } label: {
-                        ListRow(image: "ListIcon.Database", title: "More.Backup")
+                    Group {
+                        Button {
+                            let documentsUrl = FileManager.default.urls(
+                                for: .documentDirectory, in: .userDomainMask
+                            ).first!
+#if targetEnvironment(macCatalyst)
+                            UIApplication.shared.open(documentsUrl)
+#else
+                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
+                                if UIApplication.shared.canOpenURL(sharedUrl) {
+                                    UIApplication.shared.open(sharedUrl)
+                                }
+                            }
+#endif
+                        } label: {
+                            ListRow(image: "ListIcon.Files", title: "Shared.OpenFilesApp")
+                        }
+                        Button {
+                            isPickingBackupFolder = true
+                        } label: {
+                            ListRow(image: "ListIcon.Database", title: "More.Backup")
+                        }
                     }
                     .tint(.primary)
                 } header: {

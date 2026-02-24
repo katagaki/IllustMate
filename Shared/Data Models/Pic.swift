@@ -38,6 +38,11 @@ final class Pic: Identifiable, Hashable, @unchecked Sendable {
         hasher.combine(id)
     }
 
+    func identifiableString() -> String {
+        let thumbnailSize = thumbnailData?.count ?? 0
+        return "\(id)-\(thumbnailSize)"
+    }
+
     func thumbnail() -> UIImage? {
         if let thumbnailData {
             return UIImage(data: thumbnailData)

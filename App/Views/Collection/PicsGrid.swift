@@ -22,16 +22,11 @@ struct PicsGrid<Content: View>: View {
     var onDelete: ((Pic) -> Void)?
     @ViewBuilder var moveMenu: (Pic) -> Content
 
-    let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
-#if targetEnvironment(macCatalyst)
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 2.0)]
-#else
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 120.0), spacing: 2.0)]
-#endif
+    @AppStorage(wrappedValue: 4, "PicColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
     var body: some View {
-        LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                  phoneColumnConfiguration : padOrMacColumnConfiguration,
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
                   spacing: 2.0) {
             ForEach(pics) { pic in
                 Button {
@@ -108,6 +103,7 @@ struct PicsGrid<Content: View>: View {
 #endif
             }
         }
+        .animation(.smooth, value: columnCount)
     }
 }
 

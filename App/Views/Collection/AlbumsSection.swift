@@ -81,10 +81,12 @@ struct AlbumsSection<Content: View>: View {
     func contextMenu(_ album: Album) -> some View {
         if enablesContextMenu {
             moveMenu(album)
-            Divider()
-            Button("Shared.ResetCover", systemImage: "photo") {
-                Task {
-                    await dataActor.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
+            if album.coverPhoto != nil {
+                Divider()
+                Button("Shared.ResetCover", systemImage: "photo") {
+                    Task {
+                        await dataActor.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
+                    }
                 }
             }
             if onRename != nil || onDelete != nil {
