@@ -40,9 +40,9 @@ struct IllustMateApp: App {
                     isImportingBackup = true
                 }
             }
-            .sheet(isPresented: $isImportingBackup, onDismiss: {
+            .sheet(isPresented: $isImportingBackup) {
                 importedURL = nil
-            }) {
+            } content: {
                 if let importedURL {
                     RestoreBackupView(backupURL: importedURL)
                 } else {

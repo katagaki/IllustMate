@@ -56,17 +56,11 @@ struct ImporterView: View {
                             .buttonBorderShape(.capsule)
                             .disabled(isImporting)
                         } else {
-                            Text("Import.Importing")
-                            ProgressView(value: Float(importCurrentCount), total: Float(importTotalCount))
-                                .progressViewStyle(.linear)
+                            StatusView(type: .inProgress, title: "Import.Importing",
+                                       currentCount: importCurrentCount, totalCount: importTotalCount)
                         }
                     } else {
-                        Image(systemName: "checkmark.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64.0, height: 64.0)
-                            .symbolRenderingMode(.multicolor)
-                        Text("Import.Completed.Text.\(importCompletedCount)")
+                        StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)")
                     }
                 }
                 .padding(20.0)

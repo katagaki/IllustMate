@@ -19,7 +19,7 @@
 			</dict>
 		</dict>
 		<key>NSExtensionPrincipalClass</key>
-		<string>Importer.ShareViewController</string>
+		<string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 	</dict>

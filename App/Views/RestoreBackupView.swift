@@ -23,28 +23,11 @@ struct RestoreBackupView: View {
         NavigationStack {
             ScrollView(.vertical) {
                 if isImporting {
-                    VStack(alignment: .center, spacing: 16.0) {
-                        Text("Backup.Restoring")
-                            .bold()
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                    }
-                    .padding()
+                    StatusView(type: .inProgress, title: "Backup.Restoring")
                 } else if isCompleted {
-                    Image(systemName: "checkmark.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 64.0, height: 64.0)
-                        .symbolRenderingMode(.multicolor)
-                    Text("Backup.Restore.Completed")
+                    StatusView(type: .success, title: "Backup.Restore.Completed")
                 } else if isError {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 64.0, height: 64.0)
-                        .symbolRenderingMode(.multicolor)
-                    Text("Backup.Restore.Error")
-                        .foregroundColor(.red)
+                    StatusView(type: .error, title: "Backup.Restore.Error")
                 } else {
                     VStack(alignment: .center, spacing: 16.0) {
                         VStack(alignment: .leading, spacing: 16.0) {

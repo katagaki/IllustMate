@@ -132,13 +132,19 @@ actor DataActor {
             let backupFileName = "Backup-\(timestamp).pics"
 
             if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
-                try fileManager.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+                try fileManager.createDirectory(
+                    at: destinationDirectoryURL,
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
             }
 
             let destinationURL = destinationDirectoryURL.appendingPathComponent(backupFileName)
             try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
         } else {
-            throw NSError(domain: "DataActor", code: 2, userInfo: [NSLocalizedDescriptionKey: "Could not access destination folder"])
+            throw NSError(domain: "DataActor",
+                          code: 2,
+                          userInfo: [NSLocalizedDescriptionKey: "Could not access destination folder"])
         }
     }
 

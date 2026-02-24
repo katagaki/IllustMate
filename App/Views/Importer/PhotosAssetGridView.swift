@@ -26,16 +26,7 @@ struct PhotosAssetGridView: View {
     var body: some View {
         VStack(spacing: 0) {
             if isImportCompleted {
-                Spacer()
-                VStack(spacing: 16.0) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 64.0, height: 64.0)
-                        .symbolRenderingMode(.multicolor)
-                    Text("Import.Completed.Text.\(importCompletedCount)")
-                }
-                Spacer()
+                StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)")
                 Button {
                     onDismiss()
                 } label: {
@@ -48,14 +39,8 @@ struct PhotosAssetGridView: View {
                 .buttonBorderShape(.capsule)
                 .padding(20.0)
             } else if isImporting {
-                Spacer()
-                VStack(spacing: 16.0) {
-                    Text("Import.Importing")
-                    ProgressView(value: Float(importCurrentCount), total: Float(importTotalCount))
-                        .progressViewStyle(.linear)
-                        .padding(.horizontal, 40.0)
-                }
-                Spacer()
+                StatusView(type: .inProgress, title: "Import.Importing",
+                           currentCount: importCurrentCount, totalCount: importTotalCount)
             } else {
                 ScrollView {
                     let columns = [GridItem(.adaptive(minimum: 80), spacing: 2)]

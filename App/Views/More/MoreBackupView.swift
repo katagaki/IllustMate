@@ -19,31 +19,13 @@ struct MoreBackupView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical) {
-                VStack(alignment: .center, spacing: 16.0) {
-                    if isExporting {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                        Text("Backup.Exporting")
-                            .bold()
-                    } else if isCompleted {
-                        Image(systemName: "checkmark.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64.0, height: 64.0)
-                            .symbolRenderingMode(.multicolor)
-                        Text("Backup.Export.Completed")
-                    } else if let error {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64.0, height: 64.0)
-                            .symbolRenderingMode(.multicolor)
-                        Text(error)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                    }
+                if isExporting {
+                    StatusView(type: .inProgress, title: "Backup.Exporting")
+                } else if isCompleted {
+                    StatusView(type: .success, title: "Backup.Export.Completed")
+                } else if let error {
+                    StatusView(type: .error, title: LocalizedStringKey(error))
                 }
-                .padding()
             }
             .navigationTitle("ViewTitle.Backup")
             .navigationBarTitleDisplayMode(.inline)

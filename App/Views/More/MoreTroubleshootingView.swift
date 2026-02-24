@@ -70,27 +70,13 @@ struct MoreTroubleshootingView: View {
         .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isRebuildingThumbnails) {
-            VStack(alignment: .center, spacing: 16.0) {
-                Text("More.Troubleshooting.RebuildThumbnails.Rebuilding")
-                    .bold()
-                ProgressView(
-                    value: min(Float(rebuildTotal > 0 ? Float(rebuildProgress) / Float(rebuildTotal) : 0), 1.0),
-                    total: 1.0
-                )
-                .progressViewStyle(.linear)
-            }
-            .padding()
+            StatusView(type: .inProgress, title: "More.Troubleshooting.RebuildThumbnails.Rebuilding",
+                       currentCount: rebuildProgress, totalCount: rebuildTotal)
             .presentationDetents([.medium])
             .interactiveDismissDisabled()
         }
         .sheet(isPresented: $isFreeingUpSpace) {
-            VStack(alignment: .center, spacing: 16.0) {
-                Text("More.Troubleshooting.FreeUpSpace.Freeing")
-                    .bold()
-                ProgressView()
-                .progressViewStyle(.circular)
-            }
-            .padding()
+            StatusView(type: .inProgress, title: "More.Troubleshooting.FreeUpSpace.Freeing")
             .presentationDetents([.medium])
             .interactiveDismissDisabled()
         }
