@@ -41,7 +41,7 @@ extension DataActor {
         let query = picsTable
             .filter(picAlbumId == albumID)
             .select(picId)
-            .order(picDateAdded.asc)
+            .order(picDateAdded.desc)
             .limit(limit)
         guard let rows = try? database.prepare(query) else { return [] }
 
