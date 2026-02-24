@@ -36,11 +36,13 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     }
 
     static func == (lhs: Album, rhs: Album) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id && lhs.name == rhs.name && lhs.coverPhoto == rhs.coverPhoto
     }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+        hasher.combine(name)
+        hasher.combine(coverPhoto)
     }
 
     func identifiableString() -> String {
