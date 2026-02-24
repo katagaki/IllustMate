@@ -684,6 +684,22 @@
         }
       }
     },
+    "Import.ImportHere" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Here"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここにインポート"
+          }
+        }
+      }
+    },
     "Import.Importing" : {
       "extractionState" : "manual",
       "localizations" : {

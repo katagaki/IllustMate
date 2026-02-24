@@ -89,7 +89,7 @@ struct ShareView: View {
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         } else {
-                            Text("Import.StartImport")
+                            Text("Import.ImportHere")
                                 .bold()
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
