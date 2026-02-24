@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PhotosAlbumPickerView: View {
 
-    var folder: PHCollectionList? = nil
+    var folder: PHCollectionList?
     var selectedAlbum: Album?
     var onDismiss: () -> Void
 

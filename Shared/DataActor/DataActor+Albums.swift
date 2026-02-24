@@ -58,11 +58,19 @@ extension DataActor {
     func representativeThumbnails(forAlbumWithID albumID: String, limit: Int = 3) -> [Data] {
         let query = picsTable
             .filter(picAlbumId == albumID)
-            .select(picThumbnailData)
+            .select(picId)
             .order(picDateAdded.asc)
             .limit(limit)
         guard let rows = try? database.prepare(query) else { return [] }
-        return rows.compactMap { try? $0.get(picThumbnailData) }
+
+        let ids = rows.compactMap { try? $0.get(picId) }
+        var thumbnails: [Data] = []
+        for id in ids {
+            if let thumbData = thumbnailData(forPicWithID: id) {
+                thumbnails.append(thumbData)
+            }
+        }
+        return thumbnails
     }
 
     func album(for id: String) -> Album? {

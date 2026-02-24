@@ -138,8 +138,8 @@ struct ImporterView: View {
         Task {
             for selectedPhotoItem in selectedPhotoItems {
                 if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
-                    var creationDate: Date? = nil
-                    var filename: String? = nil
+                    var creationDate: Date?
+                    var filename: String?
                     if let identifier = selectedPhotoItem.itemIdentifier {
                         let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
                         if let asset = result.firstObject {

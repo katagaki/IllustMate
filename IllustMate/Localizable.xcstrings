@@ -1702,23 +1702,6 @@
         }
       }
     },
-    "ViewTitle.More.Customization.AppIcon" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Icon"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アイコン"
-          }
-        }
-      }
-    },
     "ViewTitle.Pictures" : {
       "extractionState" : "manual",
       "localizations" : {
