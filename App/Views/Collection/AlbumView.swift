@@ -129,6 +129,7 @@ struct AlbumView: View {
                     Button("Shared.Select") {
                         startOrStopSelectingPics()
                     }
+                    .disabled(pics.isEmpty)
                 }
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 ToolbarItemGroup(placement: .topBarTrailing) {
