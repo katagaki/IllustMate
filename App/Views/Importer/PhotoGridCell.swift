@@ -22,7 +22,7 @@ struct PhotoGridCell: View {
                     .clipped()
                 SelectionOverlay(isSelected)
             }
-            .clipShape(.rect(cornerRadius: 3.0))
+            .clipShape(.rect(cornerRadius: 4.0))
         }
         .buttonStyle(.plain)
     }
