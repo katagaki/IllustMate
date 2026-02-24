@@ -155,7 +155,7 @@ struct AlbumView: View {
         }
 #endif
         .safeAreaInset(edge: .bottom) {
-            if isSelectingPics, !pics.isEmpty {
+            if isSelectingPics {
                 SelectionBar(pics: pics, selectedPics: $selectedPics) {
                     startOrStopSelectingPics()
                 } menuItems: {
