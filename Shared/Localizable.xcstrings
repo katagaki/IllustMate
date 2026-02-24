@@ -1004,7 +1004,7 @@
       }
     },
     "More.Backup" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1606,7 +1606,7 @@
       }
     },
     "Shared.More" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1740,7 +1740,7 @@
       }
     },
     "Shared.OpenFilesApp" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

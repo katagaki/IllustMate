@@ -163,25 +163,6 @@ struct AlbumCover: View {
             tertiaryImage = images[2]
         }
     }
-
-    struct AlbumCoverChildImage: View {
-
-        var image: Image
-        var metrics: GeometryProxy
-
-        var body: some View {
-            image
-                .resizable()
-                .scaledToFill()
-                .frame(width: metrics.size.width * 0.66,
-                       height: metrics.size.height * 0.66)
-                .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.05))
-                .overlay {
-                    RoundedRectangle(cornerRadius: metrics.size.height * 0.05)
-                        .stroke(Color.primary.opacity(0.2), style: .init(lineWidth: CGFloat(0.5)))
-                }
-        }
-    }
 }
 
 struct AlbumItemCount: View {
