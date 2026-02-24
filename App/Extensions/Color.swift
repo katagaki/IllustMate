@@ -1,6 +1,6 @@
 //
 //  Color.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2026/02/24.
 //
@@ -16,21 +16,6 @@ typealias XPColor = UIColor
 #endif
 
 extension Color {
-    init(from text: String) {
-        let finalHash = Color.hash(text)
-        let color = XPColor(
-            red: max(CGFloat(0.2), CGFloat((finalHash & 0xFF0000) >> 16) / 255.0),
-            green: max(CGFloat(0.2), CGFloat((finalHash & 0xFF00) >> 8) / 255.0),
-            blue: max(CGFloat(0.2), CGFloat((finalHash & 0xFF)) / 255.0),
-            alpha: 1.0
-        )
-        #if os(macOS)
-        self.init(nsColor: color)
-        #else
-        self.init(uiColor: color)
-        #endif
-    }
-
     static func hash(_ text: String) -> Int {
         var hash = 0
         let colorConstant = 131

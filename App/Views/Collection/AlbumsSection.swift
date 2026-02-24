@@ -69,6 +69,26 @@ struct AlbumsSection<Content: View>: View {
                         }
                     }
                 }
+            case .carousel:
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(alignment: .top, spacing: 20.0) {
+                        ForEach(albums) { album in
+                            NavigationLink(value: ViewPath.album(album: album)) {
+                                AlbumGridLabel(namespace: albumTransitionNamespace, album: album, length: 80.0)
+                                    .draggable(AlbumTransferable(id: album.id))
+                                    .albumDropDestination(onDrop: onDrop, album: album)
+                            }
+                            .id("\(album.identifiableString())")
+                            .contextMenu {
+                                contextMenu(album)
+                            }
+                            .buttonStyleAdaptive()
+                        }
+                    }
+                    .padding(20.0)
+                }
+                .scrollIndicators(.hidden)
+                .frame(height: 120.0)
             }
         }
     }

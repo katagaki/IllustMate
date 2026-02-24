@@ -9,8 +9,6 @@ import SwiftUI
 
 struct PicLabel: View {
 
-    var namespace: Namespace.ID
-
     var pic: Pic
 
     @State var isThumbnailReadyToPresent: Bool = false

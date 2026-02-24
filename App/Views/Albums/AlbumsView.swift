@@ -34,19 +34,9 @@ struct AlbumsView: View {
                         HStack(alignment: .center, spacing: 8.0) {
                             Text("\(albums.count)")
                                 .foregroundStyle(.secondary)
-#if targetEnvironment(macCatalyst)
-                            Button("Shared.Refresh") {
-                                refreshAlbums()
-                            }
-#endif
                         }
                     }
                 }
-#if !targetEnvironment(macCatalyst)
-                .refreshable {
-                    refreshAlbums()
-                }
-#endif
                 .navigationTitle("ViewTitle.Albums")
             }
         }

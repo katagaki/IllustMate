@@ -1,6 +1,6 @@
 //
 //  PicMateApp.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -10,7 +10,6 @@ import SwiftUI
 @main
 struct IllustMateApp: App {
 
-    @StateObject var tabManager = TabManager()
     @StateObject var navigation = NavigationManager()
     @State var viewer = ViewerManager()
     @State var concurrency = ConcurrencyManager()
@@ -26,7 +25,6 @@ struct IllustMateApp: App {
                     MainSplitView()
                 }
             }
-            .environmentObject(tabManager)
             .environmentObject(navigation)
             .environment(viewer)
             .environment(concurrency)

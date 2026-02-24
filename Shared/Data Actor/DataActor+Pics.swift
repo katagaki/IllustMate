@@ -1,6 +1,6 @@
 //
 //  DataActor+Pics.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2026/02/22.
 //
@@ -52,14 +52,6 @@ extension DataActor {
         return try? database.pluck(query).flatMap { try? $0.get(picThumbnailData) }
     }
 
-    func pic(for id: String) -> Pic? {
-        let query = picsTable
-            .filter(picId == id)
-            .select(picId, picName, picAlbumId,
-                    picDateAdded, picThumbnailData)
-        return try? database.pluck(query).map { picFrom(row: $0) }
-    }
-
     func imageData(forPicWithID id: String) -> Data? {
         let query = picsTable
             .filter(picId == id)
@@ -91,11 +83,6 @@ extension DataActor {
     func addPic(withID picID: String, toAlbumWithID albumID: String) {
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.update(picAlbumId <- albumID))
-    }
-
-    func removeParentAlbum(forPicWithID picID: String) {
-        let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picAlbumId <- nil))
     }
 
     func removeParentAlbum(forPicsWithIDs picIDs: [String]) {
@@ -136,12 +123,7 @@ extension DataActor {
         _ = try? database.run(query.delete())
     }
 
-    // MARK: - Thumbnails (stored within pics table)
-
-    func thumbnailCount() -> Int {
-        let query = picsTable.filter(picThumbnailData != nil)
-        return (try? database.scalar(query.count)) ?? 0
-    }
+    // MARK: - Thumbnails
 
     func deleteAllThumbnails() {
         _ = try? database.run(picsTable.update(picThumbnailData <- nil))

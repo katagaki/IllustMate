@@ -1,6 +1,6 @@
 //
 //  PhotosAlbumPickerView.swift
-//  IllustMate
+//  PicMate
 //
 //  Created on 2026/02/22.
 //

@@ -1,6 +1,6 @@
 //
 //  DataActor+Albums.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2026/02/22.
 //
@@ -9,24 +9,6 @@ import Foundation
 @preconcurrency import SQLite
 
 extension DataActor {
-    func albums(sortedBy sortType: SortType) throws -> [Album] {
-        let rows = try database.prepare(albumsTable)
-        let albums = rows.map { albumFrom(row: $0, loadChildren: true) }
-        return sortAlbum(albums, sortedBy: sortType)
-    }
-
-    func albums(in album: Album?, sortedBy sortType: SortType) throws -> [Album] {
-        let query: QueryType
-        if let albumID = album?.id {
-            query = albumsTable.filter(albumParentId == albumID)
-        } else {
-            query = albumsTable.filter(albumParentId == nil)
-        }
-        let rows = try database.prepare(query)
-        let albums = rows.map { albumFrom(row: $0, loadChildren: true) }
-        return sortAlbum(albums, sortedBy: sortType)
-    }
-
     func albumsWithCounts(sortedBy sortType: SortType) throws -> [Album] {
         let rows = try database.prepare(albumsTable)
         let albums = rows.map { row -> Album in
@@ -118,10 +100,6 @@ extension DataActor {
                 $1.albumCount() + $1.picCount()
             })
         }
-    }
-
-    func objectCount(forAlbumWithID id: String) -> Int {
-        return albumCount(forAlbumWithID: id) + picCount(forAlbumWithID: id)
     }
 
     func albumCount(forAlbumWithID id: String) -> Int {

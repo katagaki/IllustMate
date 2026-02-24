@@ -17,8 +17,7 @@ struct AlbumListRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            AlbumCover.AsyncAlbumCover(album: album,
-                                       length: 48.0)
+            AlbumCover.AsyncAlbumCover(album: album, length: 48.0)
                 .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(album.name)

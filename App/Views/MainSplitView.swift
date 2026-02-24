@@ -44,7 +44,7 @@ struct MainSplitView: View {
                     }
                     NavigationLink(value: ViewPath.pics) {
                         Label {
-                            Text("ViewTitle.Pictures")
+                            Text("ViewTitle.Pics")
                         } icon: {
                             Image(systemName: "photo.on.rectangle.angled")
                         }
@@ -95,7 +95,7 @@ struct MainSplitView: View {
                 PicViewer(pic: pic)
                     .id(pic.id)
             } else {
-                ContentUnavailableView("Shared.SelectAPicture", systemImage: "photo.on.rectangle.angled")
+                ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
             }
         }
         .task {

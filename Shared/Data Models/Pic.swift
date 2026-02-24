@@ -1,6 +1,6 @@
 //
 //  Pic.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -15,12 +15,7 @@ final class Pic: Identifiable, Hashable, @unchecked Sendable {
     var name: String
     var containingAlbumID: String?
     var dateAdded: Date
-
-    // Transient - loaded from database
     var thumbnailData: Data?
-
-    // Transient - reference to containing album (may be nil)
-    var containingAlbum: Album?
 
     init(id: String = UUID().uuidString, name: String, containingAlbumID: String? = nil,
          dateAdded: Date = Date.now) {

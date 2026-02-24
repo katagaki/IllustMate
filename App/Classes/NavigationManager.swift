@@ -22,19 +22,6 @@ class NavigationManager: ObservableObject {
         moreTabPath.removeAll()
     }
 
-    func popToRoot(for tab: TabType) {
-        switch tab {
-        case .collection:
-            collectionTabPath.removeAll()
-        case .albums:
-            albumsTabPath.removeAll()
-        case .pics:
-            picsTabPath.removeAll()
-        case .more:
-            moreTabPath.removeAll()
-        }
-    }
-
     func push(_ viewPath: ViewPath, for tab: TabType) {
         switch tab {
         case .collection:

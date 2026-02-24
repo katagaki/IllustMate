@@ -45,6 +45,7 @@ struct AlbumView: View {
 
     var body: some View {
         ZStack {
+            // Background image
             if let currentAlbum, let coverPhoto = currentAlbum.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -64,112 +65,16 @@ struct AlbumView: View {
                     }
                     .transition(.opacity.animation(.smooth))
             }
+
+            // Main scroll view
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 0.0) {
                     if !isSelectingPics {
-                        SectionHeader(title: "Albums.Albums", count: albums.count) {
-                            Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
-                                Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                                    .tag(ViewStyle.grid)
-                                Label("Albums.Style.List", systemImage: "list.bullet")
-                                    .tag(ViewStyle.list)
-                            }
-                            Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
-                                Text("Shared.Sort.Name.Ascending")
-                                    .tag(SortType.nameAscending)
-                                Text("Shared.Sort.Name.Descending")
-                                    .tag(SortType.nameDescending)
-                                Text("Shared.Sort.PictureCount.Ascending")
-                                    .tag(SortType.sizeAscending)
-                                Text("Shared.Sort.PictureCount.Descending")
-                                    .tag(SortType.sizeDescending)
-                            }
-                            .pickerStyle(.menu)
-                            if albumStyleState == .grid {
-                                Picker("Shared.GridSize",
-                                       systemImage: "square.grid.2x2",
-                                       selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
-                                    Text("Shared.GridSize.2")
-                                        .tag(2)
-                                    Text("Shared.GridSize.3")
-                                        .tag(3)
-                                    Text("Shared.GridSize.4")
-                                        .tag(4)
-                                }
-                                .pickerStyle(.menu)
-                            }
-                        }
-                        .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                        if !albums.isEmpty {
-                            AlbumsSection(albums: albums, style: $albumStyleState) { album in
-                                albumToRename = album
-                            } onDelete: { album in
-                                deleteAlbum(album)
-                            } onDrop: { transferable, album in
-                                moveDropToAlbum(transferable, to: album)
-                            } moveMenu: { album in
-                                AlbumMoveMenu(album: album) {
-                                    refreshAlbumsAndSet()
-                                }
-                            }
-                        } else {
-                            Text("Albums.NoAlbums")
-                                .foregroundStyle(.secondary)
-                                .padding(20.0)
-                        }
+                        albumSection
                         Spacer()
                             .frame(height: 20.0)
                     }
-                    SectionHeader(title: "Albums.Pictures", count: pics.count) {
-                        Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
-                            isImportingPhotos = true
-                        }
-                        Divider()
-                        Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isPicSortReversed) {
-                            Text("Shared.Sort.DateAdded.Ascending")
-                                .tag(true)
-                            Text("Shared.Sort.DateAdded.Descending")
-                                .tag(false)
-                        }
-                        .pickerStyle(.menu)
-                        Picker("Shared.GridSize",
-                               systemImage: "square.grid.2x2",
-                               selection: $columnCount.animation(.smooth.speed(2.0))) {
-                            Text("Shared.GridSize.3")
-                                .tag(3)
-                            Text("Shared.GridSize.4")
-                                .tag(4)
-                            Text("Shared.GridSize.5")
-                                .tag(5)
-                            Text("Shared.GridSize.8")
-                                .tag(8)
-                        }
-                        .pickerStyle(.menu)
-                    }
-                    .disabled(isSelectingPics)
-                    .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                    if !pics.isEmpty {
-                        PicsGrid(namespace: namespace, pics: pics,
-                                          isSelecting: $isSelectingPics) { pic in
-                            selectedPics.contains(pic)
-                        } onSelect: { pic in
-                            selectOrDeselectPic(pic)
-                        } selectedCount: {
-                            selectedPics.count
-                        } onDelete: { pic in
-                            deletePic(pic)
-                        } moveMenu: { pic in
-                            PicMoveMenu(pics: isSelectingPics ?
-                                                 selectedPics : [pic],
-                                                 containingAlbum: currentAlbum) {
-                                refreshDataAfterPicMoved()
-                            }
-                        }
-                    } else {
-                        Text("Albums.NoPictures")
-                            .foregroundStyle(.secondary)
-                            .padding(20.0)
-                    }
+                    picsSection
                 }
                 .padding([.top], 20.0)
             }
@@ -190,21 +95,6 @@ struct AlbumView: View {
                 }
             }
         }
-#if targetEnvironment(macCatalyst)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Shared.Refresh") {
-                    Task {
-                        await refreshData()
-                    }
-                }
-            }
-        }
-#else
-        .refreshable {
-            await refreshData()
-        }
-#endif
         .safeAreaInset(edge: .bottom) {
             if isSelectingPics {
                 SelectionBar(pics: pics, selectedPics: $selectedPics) {
@@ -245,7 +135,7 @@ struct AlbumView: View {
                 albumPendingDeletion = nil
             }
         }
-        .confirmationDialog("Shared.DeleteConfirmation.Picture",
+        .confirmationDialog("Shared.DeleteConfirmation.Pic",
                             isPresented: $isConfirmingDeletePic, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
                 confirmDeletePic()
@@ -254,7 +144,7 @@ struct AlbumView: View {
                 picPendingDeletion = nil
             }
         }
-        .confirmationDialog("Shared.DeleteConfirmation.Picture.\(selectedPics.count)",
+        .confirmationDialog("Shared.DeleteConfirmation.Pic.\(selectedPics.count)",
                             isPresented: $isConfirmingDeleteSelectedPics, titleVisibility: .visible) {
             Button("Shared.Yes", role: .destructive) {
                 confirmDeletePic()
@@ -291,5 +181,4 @@ struct AlbumView: View {
         }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
-
 }

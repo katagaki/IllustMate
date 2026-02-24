@@ -1,6 +1,6 @@
 //
 //  RestoreBackupView.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2026/02/24.
 //

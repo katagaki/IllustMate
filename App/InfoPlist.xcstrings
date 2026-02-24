@@ -42,7 +42,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "IllustMate needs access to your Photos library to browse and import images from your albums."
+            "value" : "PicMate needs access to your Photos library to browse and import images from your albums."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "「ピックメイト」は画像をインポートする際に写真ライブラリにアクセスします。"
           }
         }
       }
@@ -65,7 +71,20 @@
       }
     },
     "PicMate Backup" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピックメイトバックアップ"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

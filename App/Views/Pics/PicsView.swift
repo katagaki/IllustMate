@@ -23,9 +23,9 @@ struct PicsView: View {
             NavigationStack(path: $navigation.picsTabPath) {
                 ScrollView(.vertical) {
                     PicsGrid(namespace: namespace,
-                                      pics: pics,
-                                      isSelecting: .constant(false),
-                                      enableSelection: false) { pic in
+                             pics: pics,
+                             isSelecting: .constant(false),
+                             enableSelection: false) { pic in
                         viewer.setDisplay(pic) { [navigation] in
                             navigation.push(.picViewer(namespace: namespace), for: .pics)
                         }
@@ -40,28 +40,18 @@ struct PicsView: View {
                         HStack(alignment: .center, spacing: 8.0) {
                             Text("\(pics.count)")
                                 .foregroundStyle(.secondary)
-#if targetEnvironment(macCatalyst)
-                            Button("Shared.Refresh") {
-                                refreshPics()
-                            }
-#endif
                         }
                     }
                 }
-#if !targetEnvironment(macCatalyst)
-                .refreshable {
+                .navigationTitle("ViewTitle.Pics")
+            }
+            .onAppear {
+                refreshPics()
+            }
+            .onChange(of: scenePhase) { _, newValue in
+                if newValue == .active {
                     refreshPics()
                 }
-#endif
-                .navigationTitle("ViewTitle.Pictures")
-            }
-        }
-        .onAppear {
-            refreshPics()
-        }
-        .onChange(of: scenePhase) { _, newValue in
-            if newValue == .active {
-                refreshPics()
             }
         }
     }

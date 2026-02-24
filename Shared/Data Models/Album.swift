@@ -1,6 +1,6 @@
 //
 //  Album.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/02.
 //
@@ -50,14 +50,6 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
         return "\(id)-\(coverSize)-\(albumCount())-\(picCount())"
     }
 
-    func albums() -> [Album] {
-        return childAlbums?.sorted(by: { $0.name < $1.name }) ?? []
-    }
-
-    func pics() -> [Pic] {
-        return childPics ?? []
-    }
-
     func albumCount() -> Int {
         return childAlbumCount ?? childAlbums?.count ?? 0
     }
@@ -78,38 +70,6 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
             return sourceImage.jpegThumbnail(of: 160.0)
         }
         return nil
-    }
-
-    func representativePhotos() -> [Image?] {
-        var imagesToReturn: [Image?] = []
-        if let pics = childPics {
-            let sortedPics = pics.sorted { lhs, rhs in
-                lhs.dateAdded < rhs.dateAdded
-            }
-            let primaryImage: Pic? = sortedPics.count >= 1 ? sortedPics[0] : nil
-            let secondaryImage: Pic? = sortedPics.count >= 2 ? sortedPics[1] : nil
-            let tertiaryImage: Pic? = sortedPics.count >= 3 ? sortedPics[2] : nil
-            if let coverPhoto = coverPhoto, let coverImage = UIImage(data: coverPhoto) {
-                imagesToReturn.append(Image(uiImage: coverImage))
-            }
-            if let primaryImage, let thumbnailData = primaryImage.thumbnailData,
-               let thumbnail = UIImage(data: thumbnailData) {
-                imagesToReturn.append(Image(uiImage: thumbnail))
-            }
-            if let secondaryImage, let thumbnailData = secondaryImage.thumbnailData,
-               let thumbnail = UIImage(data: thumbnailData) {
-                imagesToReturn.append(Image(uiImage: thumbnail))
-            }
-            if let tertiaryImage, let thumbnailData = tertiaryImage.thumbnailData,
-               let thumbnail = UIImage(data: thumbnailData) {
-                imagesToReturn.append(Image(uiImage: thumbnail))
-            }
-        }
-        for _ in 0..<3 {
-            imagesToReturn.append(nil)
-        }
-        imagesToReturn = Array(imagesToReturn[0..<3])
-        return imagesToReturn
     }
 }
 

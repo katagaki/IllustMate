@@ -32,7 +32,7 @@ struct PicsGrid<Content: View>: View {
                 Button {
                     onSelect(pic)
                 } label: {
-                    PicLabel(namespace: namespace, pic: pic)
+                    PicLabel(pic: pic)
                         .overlay {
                             if isSelecting {
                                 if let isSelected {

@@ -33,7 +33,7 @@ struct MoreView: View {
                             Text("\(picCount)")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                            Text("Shared.Pictures")
+                            Text("Shared.Pics")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)

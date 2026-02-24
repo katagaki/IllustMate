@@ -1,6 +1,6 @@
 //
 //  DataActor.swift
-//  IllustMate
+//  PicMate
 //
 //  Created by シン・ジャスティン on 2023/10/17.
 //
@@ -146,38 +146,6 @@ actor DataActor {
                           code: 2,
                           userInfo: [NSLocalizedDescriptionKey: "Could not access destination folder"])
         }
-    }
-
-    func backupDatabase() throws -> URL {
-        let fileManager = FileManager.default
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
-        let timestamp = dateFormatter.string(from: Date())
-        let backupFileName = "Backup-\(timestamp).pics"
-
-        var destinationFolder: URL? = fileManager.url(
-            forUbiquityContainerIdentifier: nil
-        )?.appendingPathComponent("Documents")
-        if destinationFolder == nil {
-            destinationFolder = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-        }
-
-        guard let targetDirectory = destinationFolder else {
-            throw NSError(
-                domain: "DataActor",
-                code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "No destination folder available"]
-            )
-        }
-
-        if !fileManager.fileExists(atPath: targetDirectory.path) {
-            try fileManager.createDirectory(at: targetDirectory, withIntermediateDirectories: true, attributes: nil)
-        }
-
-        let destinationURL = targetDirectory.appendingPathComponent(backupFileName)
-        try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
-
-        return destinationURL
     }
 
     func importFromBackup(at url: URL, targetAlbumID: String?) throws {

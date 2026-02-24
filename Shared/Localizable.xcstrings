@@ -197,7 +197,7 @@
         }
       }
     },
-    "Albums.NoPictures" : {
+    "Albums.NoPics" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -214,7 +214,7 @@
         }
       }
     },
-    "Albums.Pictures" : {
+    "Albums.Pics" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -243,6 +243,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示スタイル"
+          }
+        }
+      }
+    },
+    "Albums.Style.Carousel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carousel View"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カルーセル表示"
           }
         }
       }
@@ -971,6 +988,7 @@
       }
     },
     "More.Backup" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1352,7 +1370,7 @@
         }
       }
     },
-    "Shared.DeleteConfirmation.Picture" : {
+    "Shared.DeleteConfirmation.Pic" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1369,7 +1387,7 @@
         }
       }
     },
-    "Shared.DeleteConfirmation.Picture.%lld" : {
+    "Shared.DeleteConfirmation.Pic.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1572,6 +1590,7 @@
       }
     },
     "Shared.More" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1705,6 +1724,7 @@
       }
     },
     "Shared.OpenFilesApp" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1720,7 +1740,7 @@
         }
       }
     },
-    "Shared.Pictures" : {
+    "Shared.Pics" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1821,7 +1841,7 @@
         }
       }
     },
-    "Shared.SelectAPicture" : {
+    "Shared.SelectAPic" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -1986,7 +2006,8 @@
         }
       }
     },
-    "Shared.Sort.PictureCount.Ascending" : {
+    "Shared.Sort.PicCount.Ascending" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2002,7 +2023,8 @@
         }
       }
     },
-    "Shared.Sort.PictureCount.Descending" : {
+    "Shared.Sort.PicCount.Descending" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2185,7 +2207,7 @@
         }
       }
     },
-    "ViewTitle.Pictures" : {
+    "ViewTitle.Pics" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
