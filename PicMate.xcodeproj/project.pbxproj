@@ -112,7 +112,6 @@
 				"Data Actor/DataActor+Pics.swift",
 				"Data Models/Album.swift",
 				"Data Models/Pic.swift",
-				FileManager.swift,
 				Localizable.xcstrings,
 			);
 			target = E4D6F05D2F4D4DF1006965BD /* Save to PicMate */;
