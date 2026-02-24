@@ -42,45 +42,47 @@ struct AlbumView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                SectionHeader(title: "Albums.Albums", count: albums.count) {
-                    Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
-                        Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
-                            .tag(ViewStyle.grid)
-                        Label("Albums.Style.List", systemImage: "list.bullet")
-                            .tag(ViewStyle.list)
-                    }
-                    Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
-                        Text("Shared.Sort.Name.Ascending")
-                            .tag(SortType.nameAscending)
-                        Text("Shared.Sort.Name.Descending")
-                            .tag(SortType.nameDescending)
-                        Text("Shared.Sort.PictureCount.Ascending")
-                            .tag(SortType.sizeAscending)
-                        Text("Shared.Sort.PictureCount.Descending")
-                            .tag(SortType.sizeDescending)
-                    }
-                    .pickerStyle(.menu)
-                }
-                .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-                if !albums.isEmpty {
-                    AlbumsSection(albums: albums, style: $albumStyleState) { album in
-                        albumToRename = album
-                    } onDelete: { album in
-                        deleteAlbum(album)
-                    } onDrop: { transferable, album in
-                        moveDropToAlbum(transferable, to: album)
-                    } moveMenu: { album in
-                        AlbumMoveMenu(album: album) {
-                            refreshAlbumsAndSet()
+                if !isSelectingPics {
+                    SectionHeader(title: "Albums.Albums", count: albums.count) {
+                        Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
+                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                                .tag(ViewStyle.grid)
+                            Label("Albums.Style.List", systemImage: "list.bullet")
+                                .tag(ViewStyle.list)
                         }
+                        Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
+                            Text("Shared.Sort.Name.Ascending")
+                                .tag(SortType.nameAscending)
+                            Text("Shared.Sort.Name.Descending")
+                                .tag(SortType.nameDescending)
+                            Text("Shared.Sort.PictureCount.Ascending")
+                                .tag(SortType.sizeAscending)
+                            Text("Shared.Sort.PictureCount.Descending")
+                                .tag(SortType.sizeDescending)
+                        }
+                        .pickerStyle(.menu)
                     }
-                } else {
-                    Text("Albums.NoAlbums")
-                        .foregroundStyle(.secondary)
-                        .padding(20.0)
+                    .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
+                    if !albums.isEmpty {
+                        AlbumsSection(albums: albums, style: $albumStyleState) { album in
+                            albumToRename = album
+                        } onDelete: { album in
+                            deleteAlbum(album)
+                        } onDrop: { transferable, album in
+                            moveDropToAlbum(transferable, to: album)
+                        } moveMenu: { album in
+                            AlbumMoveMenu(album: album) {
+                                refreshAlbumsAndSet()
+                            }
+                        }
+                    } else {
+                        Text("Albums.NoAlbums")
+                            .foregroundStyle(.secondary)
+                            .padding(20.0)
+                    }
+                    Spacer()
+                        .frame(height: 20.0)
                 }
-                Spacer()
-                    .frame(height: 20.0)
                 SectionHeader(title: "Albums.Pictures", count: pics.count) {
                     Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
                         isImportingPhotos = true
@@ -94,6 +96,7 @@ struct AlbumView: View {
                     }
                     .pickerStyle(.menu)
                 }
+                .disabled(isSelectingPics)
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 if !pics.isEmpty {
                     PicsGrid(namespace: namespace, pics: pics,
@@ -121,15 +124,17 @@ struct AlbumView: View {
             .padding([.top], 20.0)
         }
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button("Shared.Select", systemImage: "checkmark.circle") {
-                    startOrStopSelectingPics()
+            if !isSelectingPics {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Shared.Select") {
+                        startOrStopSelectingPics()
+                    }
                 }
-            }
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button("Shared.Create", systemImage: "plus") {
-                    isAddingAlbum = true
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
+                        isAddingAlbum = true
+                    }
                 }
             }
         }

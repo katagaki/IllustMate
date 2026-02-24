@@ -39,8 +39,7 @@ struct MoreView: View {
                         }
 #endif
                     } label: {
-                        ListRow(image: "ListIcon.Files",
-                                title: "Shared.OpenFilesApp")
+                        ListRow(image: "ListIcon.Files", title: "Shared.OpenFilesApp")
                     }
                     .tint(.primary)
                 }
@@ -77,9 +76,12 @@ struct MoreView: View {
                     Text("More.Stats")
                 }
                 Section {
-                    Button("More.Backup") {
+                    Button {
                         isPickingBackupFolder = true
+                    } label: {
+                        ListRow(image: "ListIcon.Database", title: "More.Backup")
                     }
+                    .tint(.primary)
                 } header: {
                     Text("More.Data")
                 }
