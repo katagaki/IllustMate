@@ -100,7 +100,7 @@ struct MainSplitView: View {
         }
         .task {
             do {
-                albums = try await dataActor.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
             } catch {
                 debugPrint(error.localizedDescription)
             }

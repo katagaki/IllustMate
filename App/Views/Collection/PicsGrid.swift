@@ -66,7 +66,7 @@ struct PicsGrid<Content: View>: View {
                         }
                         Button("Shared.Copy", systemImage: "doc.on.doc") {
                             Task {
-                                if let data = await dataActor.imageData(forPicWithID: pic.id),
+                                if let data = await DataActor.shared.imageData(forPicWithID: pic.id),
                                    let image = UIImage(data: data) {
                                     UIPasteboard.general.image = image
                                 }
@@ -80,7 +80,7 @@ struct PicsGrid<Content: View>: View {
                         if pic.containingAlbumID != nil {
                             Button("Shared.SetAsCover", systemImage: "photo") {
                                 Task {
-                                    await dataActor.setAsAlbumCover(for: pic.id)
+                                    await DataActor.shared.setAsAlbumCover(for: pic.id)
                                 }
                             }
                         }
@@ -112,7 +112,7 @@ struct PicShareable: Transferable {
 
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(exportedContentType: .image) { shareable in
-            await dataActor.imageData(forPicWithID: shareable.picID) ?? Data()
+            await DataActor.shared.imageData(forPicWithID: shareable.picID) ?? Data()
         }
     }
 }
@@ -135,7 +135,7 @@ struct PicPreview: View {
             }
         }
         .task {
-            if let thumbData = await dataActor.thumbnailData(forPicWithID: picID),
+            if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID),
                let uiImage = UIImage(data: thumbData) {
                 image = uiImage
             }

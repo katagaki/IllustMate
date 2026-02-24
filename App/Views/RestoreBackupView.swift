@@ -126,7 +126,7 @@ struct RestoreBackupView: View {
         .presentationDetents([.medium])
         .interactiveDismissDisabled()
         .task {
-            rootAlbums = (try? await dataActor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+            rootAlbums = (try? await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
             if let resources = try? backupURL.resourceValues(forKeys: [.fileSizeKey]),
                let size = resources.fileSize {
                 let formatter = ByteCountFormatter()
@@ -144,7 +144,7 @@ struct RestoreBackupView: View {
         } completion: {
             Task {
                 do {
-                    try await dataActor.importFromBackup(at: backupURL, targetAlbumID: targetAlbumID)
+                    try await DataActor.shared.importFromBackup(at: backupURL, targetAlbumID: targetAlbumID)
                     await MainActor.run {
                         isImporting = false
                         isCompleted = true

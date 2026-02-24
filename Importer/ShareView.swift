@@ -190,6 +190,6 @@ struct ShareView: View {
     }
 
     func importPic(_ name: String, data: Data, to albumID: String?) async {
-        await dataActor.createPic(name, data: data, inAlbumWithID: albumID)
+        await DataActor.shared.createPic(name, data: data, inAlbumWithID: albumID)
     }
 }

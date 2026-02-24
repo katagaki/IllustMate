@@ -47,7 +47,7 @@ struct MoreBackupView: View {
         }
         .task {
             do {
-                try await dataActor.backupDatabase(to: destinationURL)
+                try await DataActor.shared.backupDatabase(to: destinationURL)
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
                         isExporting = false

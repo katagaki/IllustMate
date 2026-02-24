@@ -156,7 +156,7 @@ struct PhotosAssetGridView: View {
                 if let data {
                     let resources = PHAssetResource.assetResources(for: asset)
                     let filename = resources.first?.originalFilename ?? Pic.newFilename()
-                    await dataActor.createPic(
+                    await DataActor.shared.createPic(
                         filename, data: data,
                         inAlbumWithID: selectedAlbum?.id,
                         dateAdded: asset.creationDate

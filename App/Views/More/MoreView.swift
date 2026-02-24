@@ -152,8 +152,8 @@ SOFTWARE.
     }
 
     func loadCounts() async {
-        let albums = await dataActor.albumCount()
-        let pics = await dataActor.picCount()
+        let albums = await DataActor.shared.albumCount()
+        let pics = await DataActor.shared.picCount()
         await MainActor.run {
             albumCount = albums
             picCount = pics

@@ -123,7 +123,7 @@ struct PicViewer: View {
         }
         .task {
             if let albumID = pic.containingAlbumID {
-                let containingAlbumName = await dataActor.album(for: albumID)?.name
+                let containingAlbumName = await DataActor.shared.album(for: albumID)?.name
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
                         self.containingAlbumName = containingAlbumName

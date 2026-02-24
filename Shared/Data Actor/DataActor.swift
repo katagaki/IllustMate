@@ -11,6 +11,8 @@ import SwiftUI
 
 actor DataActor {
 
+    static let shared = DataActor()
+
     let database: Connection
     let databaseURL: URL
 

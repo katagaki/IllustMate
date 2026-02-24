@@ -18,7 +18,7 @@ extension AlbumView {
     func confirmDeleteAlbum() {
         if let albumPendingDeletion {
             Task {
-                await dataActor.deleteAlbum(withID: albumPendingDeletion.id)
+                await DataActor.shared.deleteAlbum(withID: albumPendingDeletion.id)
                 await refreshData()
             }
         }
@@ -41,11 +41,11 @@ extension AlbumView {
         Task { [isSelectingPics, selectedPics] in
             if isSelectingPics {
                 for pic in selectedPics {
-                    await dataActor.deletePic(withID: pic.id)
+                    await DataActor.shared.deletePic(withID: pic.id)
                 }
             } else {
                 if let picPendingDeletion = picPendingDeletion {
-                    await dataActor.deletePic(withID: picPendingDeletion.id)
+                    await DataActor.shared.deletePic(withID: picPendingDeletion.id)
                 }
             }
             self.selectedPics.removeAll()
@@ -79,17 +79,17 @@ extension AlbumView {
     }
 
     func movePicToAlbum(_ picID: String, to album: Album) async {
-        await dataActor.addPic(withID: picID, toAlbumWithID: album.id)
+        await DataActor.shared.addPic(withID: picID, toAlbumWithID: album.id)
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
-        await dataActor.addAlbum(withID: albumID, toAlbumWithID: album.id)
+        await DataActor.shared.addAlbum(withID: albumID, toAlbumWithID: album.id)
     }
 
     func importPhotoToAlbum(_ photo: Image, to album: Album) async {
         let uiImage = photo.render()
         if let data = uiImage?.data() {
-            await dataActor.createPic(Pic.newFilename(), data: data,
+            await DataActor.shared.createPic(Pic.newFilename(), data: data,
                                            inAlbumWithID: album.id)
         }
     }
@@ -120,7 +120,7 @@ extension AlbumView {
         await withTaskGroup(of: Void.self) { group in
             if let currentAlbum {
                 group.addTask {
-                    if let album = await dataActor.album(for: currentAlbum.id) {
+                    if let album = await DataActor.shared.album(for: currentAlbum.id) {
                         await MainActor.run {
                             self.currentAlbum = album
                         }
@@ -148,7 +148,7 @@ extension AlbumView {
 
     func fetchAlbums() async -> [Album] {
         do {
-            let albums = try await dataActor.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
+            let albums = try await DataActor.shared.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
             return albums
         } catch {
             debugPrint(error.localizedDescription)
@@ -169,8 +169,9 @@ extension AlbumView {
 
     func fetchPics() async -> [Pic] {
         do {
-            let pics = try await dataActor
-                .picSkeletons(in: currentAlbum, order: isPicSortReversed ? .forward : .reverse)
+            let pics = try await DataActor.shared.picSkeletons(
+                in: currentAlbum, order: isPicSortReversed ? .forward : .reverse
+            )
             return pics
         } catch {
             debugPrint(error.localizedDescription)

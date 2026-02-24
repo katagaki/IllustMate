@@ -59,7 +59,7 @@ struct PicsView: View {
     func refreshPics() {
         Task.detached(priority: .userInitiated) {
             do {
-                let pics = try await dataActor.pics()
+                let pics = try await DataActor.shared.pics()
                 await MainActor.run {
                     doWithAnimation {
                         self.pics = pics

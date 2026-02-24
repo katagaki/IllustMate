@@ -43,7 +43,7 @@ struct MoreTroubleshootingView: View {
         .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
             Button("Shared.Yes", role: .destructive) {
                 Task {
-                    await dataActor.deleteAll()
+                    await DataActor.shared.deleteAll()
                     navigation.popAll()
                 }
             }
@@ -57,7 +57,7 @@ struct MoreTroubleshootingView: View {
         .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
             Button("Shared.Yes", role: .destructive) {
                 Task {
-                    await dataActor.deleteAll()
+                    await DataActor.shared.deleteAll()
                     navigation.popAll()
                 }
             }
@@ -90,15 +90,15 @@ struct MoreTroubleshootingView: View {
             rebuildTotal = 0
         }
         do {
-            let pics = try await dataActor.pics()
+            let pics = try await DataActor.shared.pics()
             await MainActor.run {
                 rebuildTotal = pics.count
             }
-            await dataActor.deleteAllThumbnails()
+            await DataActor.shared.deleteAllThumbnails()
             for pic in pics {
-                if let data = await dataActor.imageData(forPicWithID: pic.id) {
+                if let data = await DataActor.shared.imageData(forPicWithID: pic.id) {
                     let thumbnailData = Pic.makeThumbnail(data)
-                    await dataActor.updateThumbnail(forPicWithID: pic.id,
+                    await DataActor.shared.updateThumbnail(forPicWithID: pic.id,
                                                 thumbnailData: thumbnailData)
                 }
                 await MainActor.run {
@@ -123,7 +123,7 @@ struct MoreTroubleshootingView: View {
             UIApplication.shared.isIdleTimerDisabled = true
             isFreeingUpSpace = true
         }
-        await dataActor.vacuum()
+        await DataActor.shared.vacuum()
         await MainActor.run {
             isFreeingUpSpace = false
             UIApplication.shared.isIdleTimerDisabled = false

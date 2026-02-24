@@ -27,7 +27,7 @@ struct RenameAlbumView: View {
             .safeAreaInset(edge: .bottom) {
                 Button {
                     Task {
-                        await dataActor.renameAlbum(withID: album.id, to: newAlbumName)
+                        await DataActor.shared.renameAlbum(withID: album.id, to: newAlbumName)
                         await MainActor.run {
                             dismiss()
                         }

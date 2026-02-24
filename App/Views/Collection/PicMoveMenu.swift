@@ -19,7 +19,7 @@ struct PicMoveMenu: View {
         if containingAlbum != nil {
             Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
                 Task {
-                    await dataActor.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
+                    await DataActor.shared.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
                     onMoved()
                 }
             }
@@ -31,7 +31,7 @@ struct PicMoveMenu: View {
                     excludingAlbumID: containingAlbum?.id ?? ""
                 ) { destinationAlbum in
                     Task {
-                        await dataActor.addPics(withIDs: pics.map { $0.id },
+                        await DataActor.shared.addPics(withIDs: pics.map { $0.id },
                                                      toAlbumWithID: destinationAlbum.id)
                         onMoved()
                     }
@@ -44,6 +44,6 @@ struct PicMoveMenu: View {
     }
 
     func loadAlbums() async {
-        rootAlbums = (try? await dataActor.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+        rootAlbums = (try? await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
     }
 }
