@@ -21,31 +21,31 @@ struct RestoreBackupView: View {
 
     var body: some View {
         NavigationStack {
-            if isImporting {
-                VStack(alignment: .center, spacing: 16.0) {
-                    Text("Backup.Restoring")
-                        .bold()
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                }
-                .padding()
-            } else if isCompleted {
-                Image(systemName: "checkmark.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 64.0, height: 64.0)
-                    .symbolRenderingMode(.multicolor)
-                Text("Backup.Restore.Completed")
-            } else if isError {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 64.0, height: 64.0)
-                    .symbolRenderingMode(.multicolor)
-                Text("Backup.Restore.Error")
-                    .foregroundColor(.red)
-            } else {
-                ScrollView(.vertical) {
+            ScrollView(.vertical) {
+                if isImporting {
+                    VStack(alignment: .center, spacing: 16.0) {
+                        Text("Backup.Restoring")
+                            .bold()
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    }
+                    .padding()
+                } else if isCompleted {
+                    Image(systemName: "checkmark.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 64.0, height: 64.0)
+                        .symbolRenderingMode(.multicolor)
+                    Text("Backup.Restore.Completed")
+                } else if isError {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 64.0, height: 64.0)
+                        .symbolRenderingMode(.multicolor)
+                    Text("Backup.Restore.Error")
+                        .foregroundColor(.red)
+                } else {
                     VStack(alignment: .center, spacing: 16.0) {
                         VStack(alignment: .leading, spacing: 16.0) {
                             VStack(alignment: .leading, spacing: 8.0) {
@@ -71,71 +71,70 @@ struct RestoreBackupView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 16.0))
                         }
                     }
-                    .padding(20.0)
                 }
-                .safeAreaInset(edge: .bottom) {
-                    if isCompleted || isError {
+            }
+            .safeAreaInset(edge: .bottom) {
+                if isCompleted || isError {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Shared.OK")
+                            .bold()
+                            .padding(4.0)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .padding(20.0)
+                } else {
+                    VStack(alignment: .leading, spacing: 8.0) {
                         Button {
-                            dismiss()
+                            startImport(targetAlbumID: nil)
                         } label: {
-                            Text("Shared.OK")
+                            Text("Backup.Restore.Merge")
                                 .bold()
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
                         .buttonBorderShape(.capsule)
-                        .padding(20.0)
-                    } else {
-                        VStack(alignment: .leading, spacing: 8.0) {
-                            Button {
-                                startImport(targetAlbumID: nil)
-                            } label: {
-                                Text("Backup.Restore.Merge")
-                                    .bold()
-                                    .padding(4.0)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .buttonBorderShape(.capsule)
 
-                            Text("Backup.Restore.Merge.Description")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .padding(.bottom, 8.0)
+                        Text("Backup.Restore.Merge.Description")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.bottom, 8.0)
 
-                            Menu {
-                                ForEach(rootAlbums) { rootAlbum in
-                                    AlbumHierarchyMenuItem(
-                                        targetAlbum: rootAlbum, excludingAlbumID: ""
-                                    ) { destinationAlbum in
-                                        startImport(targetAlbumID: destinationAlbum.id)
-                                    }
+                        Menu {
+                            ForEach(rootAlbums) { rootAlbum in
+                                AlbumHierarchyMenuItem(
+                                    targetAlbum: rootAlbum, excludingAlbumID: ""
+                                ) { destinationAlbum in
+                                    startImport(targetAlbumID: destinationAlbum.id)
                                 }
-                            } label: {
-                                Text("Backup.Restore.ToAlbum")
-                                    .bold()
-                                    .padding(4.0)
-                                    .frame(maxWidth: .infinity)
                             }
-                            .buttonStyle(.borderedProminent)
-                            .buttonBorderShape(.capsule)
-
-                            Text("Backup.Restore.ToAlbum.Description")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                        } label: {
+                            Text("Backup.Restore.ToAlbum")
+                                .bold()
+                                .padding(4.0)
+                                .frame(maxWidth: .infinity)
                         }
-                        .padding(20.0)
+                        .buttonStyle(.borderedProminent)
+                        .buttonBorderShape(.capsule)
+
+                        Text("Backup.Restore.ToAlbum.Description")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
+                    .padding(20.0)
                 }
-                .navigationTitle("ViewTitle.RestoreBackup")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        if !isImporting && !isCompleted && !isError {
-                            Button(role: .cancel) {
-                                dismiss()
-                            }
+            }
+            .navigationTitle("ViewTitle.RestoreBackup")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if !isImporting && !isCompleted && !isError {
+                        Button(role: .cancel) {
+                            dismiss()
                         }
                     }
                 }

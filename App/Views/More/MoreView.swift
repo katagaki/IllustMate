@@ -7,6 +7,7 @@
 
 import Komponents
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct MoreView: View {
 
@@ -15,6 +16,10 @@ struct MoreView: View {
 
     @State var albumCount: Int = 0
     @State var picCount: Int = 0
+
+    @State var isPickingBackupFolder: Bool = false
+    @State var isBackupSheetPresented: Bool = false
+    @State var backupFolderURL: URL?
 
     var body: some View {
         NavigationStack(path: $navigation.moreTabPath) {
@@ -73,18 +78,7 @@ struct MoreView: View {
                 }
                 Section {
                     Button("More.Backup") {
-                        Task {
-                            do {
-                                _ = try await dataActor.backupDatabase()
-                                await MainActor.run {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                }
-                            } catch {
-                                await MainActor.run {
-                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                                }
-                            }
-                        }
+                        isPickingBackupFolder = true
                     }
                 } header: {
                     Text("More.Data")
@@ -139,6 +133,20 @@ SOFTWARE.
         }
         .task {
             await loadCounts()
+        }
+        .fileImporter(isPresented: $isPickingBackupFolder, allowedContentTypes: [.folder]) { result in
+            switch result {
+            case .success(let url):
+                backupFolderURL = url
+                isBackupSheetPresented = true
+            case .failure(let error):
+                debugPrint(error.localizedDescription)
+            }
+        }
+        .sheet(isPresented: $isBackupSheetPresented) {
+            if let backupFolderURL {
+                MoreBackupView(destinationURL: backupFolderURL)
+            }
         }
     }
 

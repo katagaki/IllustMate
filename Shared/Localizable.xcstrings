@@ -313,6 +313,38 @@
         }
       }
     },
+    "Backup.Export.Completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup exported successfully."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの書き出しが完了しました。"
+          }
+        }
+      }
+    },
+    "Backup.Exporting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporting backup..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを書き出し中…"
+          }
+        }
+      }
+    },
     "Backup.Restore.Completed" : {
       "localizations" : {
         "en" : {
@@ -943,13 +975,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Backup"
+            "value" : "Export Backup File"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "バックアップ"
+            "value" : "バックアップを書き出す"
           }
         }
       }
@@ -1952,6 +1984,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アルバムの名前を変更"
+          }
+        }
+      }
+    },
+    "ViewTitle.Backup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
           }
         }
       }

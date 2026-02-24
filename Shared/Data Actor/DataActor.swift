@@ -122,6 +122,26 @@ actor DataActor {
         return (try? database.prepare(query).map { picFrom(row: $0) }) ?? []
     }
 
+    func backupDatabase(to destinationDirectoryURL: URL) throws {
+        if destinationDirectoryURL.startAccessingSecurityScopedResource() {
+            defer { destinationDirectoryURL.stopAccessingSecurityScopedResource() }
+            let fileManager = FileManager.default
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
+            let timestamp = dateFormatter.string(from: Date())
+            let backupFileName = "Backup-\(timestamp).pics"
+
+            if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
+                try fileManager.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+            }
+
+            let destinationURL = destinationDirectoryURL.appendingPathComponent(backupFileName)
+            try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
+        } else {
+            throw NSError(domain: "DataActor", code: 2, userInfo: [NSLocalizedDescriptionKey: "Could not access destination folder"])
+        }
+    }
+
     func backupDatabase() throws -> URL {
         let fileManager = FileManager.default
         let dateFormatter = DateFormatter()
