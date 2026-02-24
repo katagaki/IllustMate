@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PhotosAlbumPickerView: View {
 
+    var folder: PHCollectionList? = nil
     var selectedAlbum: Album?
     var onDismiss: () -> Void
 
@@ -19,19 +20,27 @@ struct PhotosAlbumPickerView: View {
 
     var body: some View {
         Group {
-            switch authorizationStatus {
-            case .authorized, .limited:
+            if folder != nil {
                 albumListView
-            case .denied, .restricted:
-                deniedView
-            default:
-                ProgressView()
-                    .onAppear {
-                        requestAuthorization()
-                    }
+            } else {
+                switch authorizationStatus {
+                case .authorized, .limited:
+                    albumListView
+                case .denied, .restricted:
+                    deniedView
+                default:
+                    ProgressView()
+                        .onAppear {
+                            requestAuthorization()
+                        }
+                }
             }
         }
-        .navigationTitle("Import.Albums")
+        .navigationTitle(
+            folder == nil
+            ? String(localized: "Import.Albums")
+            : (folder?.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+        )
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: PHAssetCollectionWrapper.self) { wrapper in
             PhotosAssetGridView(
@@ -41,7 +50,7 @@ struct PhotosAlbumPickerView: View {
             )
         }
         .navigationDestination(for: PHCollectionListWrapper.self) { wrapper in
-            PhotosFolderView(
+            PhotosAlbumPickerView(
                 folder: wrapper.collectionList,
                 selectedAlbum: selectedAlbum,
                 onDismiss: onDismiss
@@ -53,12 +62,16 @@ struct PhotosAlbumPickerView: View {
 
     private var albumListView: some View {
         List {
-            ForEach(items) { item in
-                switch item {
-                case .album(let collection):
-                    albumRow(for: collection)
-                case .folder(let folder):
-                    folderRow(for: folder)
+            if folder != nil && items.isEmpty && hasFetched {
+                ContentUnavailableView("Import.Folder.Empty", systemImage: "folder")
+            } else {
+                ForEach(items) { item in
+                    switch item {
+                    case .album(let collection):
+                        albumRow(for: collection)
+                    case .folder(let folder):
+                        folderRow(for: folder)
+                    }
                 }
             }
         }
@@ -157,14 +170,25 @@ struct PhotosAlbumPickerView: View {
     }
 
     private func fetchAlbums() {
-        let topLevelResult = PHCollectionList.fetchTopLevelUserCollections(with: nil)
         var collected: [PHCollectionItem] = []
 
-        topLevelResult.enumerateObjects { collection, _, _ in
-            if let album = collection as? PHAssetCollection {
-                collected.append(.album(album))
-            } else if let folder = collection as? PHCollectionList {
-                collected.append(.folder(folder))
+        if let folder {
+            let result = PHCollection.fetchCollections(in: folder, options: nil)
+            result.enumerateObjects { collection, _, _ in
+                if let album = collection as? PHAssetCollection {
+                    collected.append(.album(album))
+                } else if let subfolder = collection as? PHCollectionList {
+                    collected.append(.folder(subfolder))
+                }
+            }
+        } else {
+            let topLevelResult = PHCollectionList.fetchTopLevelUserCollections(with: nil)
+            topLevelResult.enumerateObjects { collection, _, _ in
+                if let album = collection as? PHAssetCollection {
+                    collected.append(.album(album))
+                } else if let subfolder = collection as? PHCollectionList {
+                    collected.append(.folder(subfolder))
+                }
             }
         }
 
