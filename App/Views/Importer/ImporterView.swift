@@ -44,9 +44,6 @@ struct ImporterView: View {
                             .buttonStyle(.borderedProminent)
                             .buttonBorderShape(.capsule)
                             .disabled(isImporting)
-
-                            Text("Import.BulkInstructions")
-                                .frame(maxWidth: .infinity, alignment: .leading)
                             Button {
                                 navigationPath.append("albumPicker")
                             } label: {

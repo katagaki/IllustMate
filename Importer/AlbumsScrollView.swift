@@ -66,7 +66,7 @@ struct AlbumsScrollView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                CloseButton {
+                Button(role: .close) {
                     close()
                 }
             }

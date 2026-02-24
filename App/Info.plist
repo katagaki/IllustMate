@@ -4,6 +4,19 @@
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>IllustMate needs access to your Photos library to browse and import images from your albums.</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PicMate Backup</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.tsubuzaki.IllustMate.picsBackup</string>
+			</array>
+		</dict>
+	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -25,6 +38,23 @@
 			<string>com.tsubuzaki.IllustMate.Album</string>
 			<key>UTTypeTagSpecification</key>
 			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>PicMate Backup</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.tsubuzaki.IllustMate.picsBackup</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>pics</string>
+				</array>
+			</dict>
 		</dict>
 	</array>
 	<key>UIFileSharingEnabled</key>

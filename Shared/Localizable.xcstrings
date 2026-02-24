@@ -15,7 +15,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "(%lld)" : {
       "localizations" : {
@@ -25,7 +26,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%lld" : {
       "localizations" : {
@@ -35,7 +37,8 @@
             "value" : ""
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Albums.Albums" : {
       "extractionState" : "manual",
@@ -177,6 +180,23 @@
         }
       }
     },
+    "Albums.NoMoreAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This album does not contain any albums."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアルバムにはアルバムがありません。"
+          }
+        }
+      }
+    },
     "Albums.NoPictures" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -289,6 +309,118 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのデータを消去"
+          }
+        }
+      }
+    },
+    "Backup.Restore.Completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup restored successfully."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの復元ができました。"
+          }
+        }
+      }
+    },
+    "Backup.Restore.Error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An error occurred while restoring the backup."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの復元中エラーが発生しました。"
+          }
+        }
+      }
+    },
+    "Backup.Restore.Merge" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを合成"
+          }
+        }
+      }
+    },
+    "Backup.Restore.Merge.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup will be merged into your existing collection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップされたアルバムは既存のコレクションに復元されます。"
+          }
+        }
+      }
+    },
+    "Backup.Restore.ToAlbum" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを洗濯"
+          }
+        }
+      }
+    },
+    "Backup.Restore.ToAlbum.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup will be restored into an album of your selection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップされたアルバムは選択されたアルバムに復元されます。"
+          }
+        }
+      }
+    },
+    "Backup.Restoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring backup..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元中…"
           }
         }
       }
@@ -428,23 +560,6 @@
         }
       }
     },
-    "Import.BulkInstructions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Or, import an album from your Photos library."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "または、「写真」ライブラリからアルバムを一括でインポートします。"
-          }
-        }
-      }
-    },
     "Import.Completed.Text.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -543,13 +658,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select photos to import from the Photos app, then select Start Import."
+            "value" : "Select photos or an album to import from your Photos library, then select Start Import."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "「写真」アプリからインポートしたい写真を選択し、「インポートを開始」をタップしてください。"
+            "state" : "needs_review",
+            "value" : "「写真」アプリからインポートしたい写真を選択する、またはアルバムから選択してください。"
           }
         }
       }
@@ -680,6 +795,132 @@
         }
       }
     },
+    "Importer.Album.None" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムなし"
+          }
+        }
+      }
+    },
+    "Importer.DoneText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Successful"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存完了"
+          }
+        }
+      }
+    },
+    "Importer.DoneText.WithError.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Import Completed With %lld Error"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Import Completed With %lld Errors"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "保存完了（%lld個失敗）"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "保存完了（%lld個失敗）"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Importer.Import" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Here"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここに保存"
+          }
+        }
+      }
+    },
+    "Importer.Note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the in-app importer when importing large pics."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大きい画像を保存する場合、アプリ内のインポート機能のご利用を推薦します。"
+          }
+        }
+      }
+    },
+    "Importer.ProgressText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込み中…"
+          }
+        }
+      }
+    },
     "More.Advanced" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -693,6 +934,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高度オプション"
+          }
+        }
+      }
+    },
+    "More.Backup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
+          }
+        }
+      }
+    },
+    "More.Data" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Management"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ管理"
           }
         }
       }
@@ -965,6 +1238,23 @@
         }
       }
     },
+    "Shared.Collection" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コレクション"
+          }
+        }
+      }
+    },
     "Shared.Copy" : {
       "localizations" : {
         "en" : {
@@ -1101,6 +1391,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての選択を解除"
+          }
+        }
+      }
+    },
+    "Shared.FileName" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル名"
+          }
+        }
+      }
+    },
+    "Shared.FileSize" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Size"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルサイズ"
           }
         }
       }
@@ -1685,6 +2007,23 @@
         }
       }
     },
+    "ViewTitle.Importer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select An Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを選択"
+          }
+        }
+      }
+    },
     "ViewTitle.More" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1715,6 +2054,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像"
+          }
+        }
+      }
+    },
+    "ViewTitle.RestoreBackup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Backup"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを復元"
           }
         }
       }

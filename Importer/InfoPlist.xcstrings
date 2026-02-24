@@ -25,13 +25,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importer"
+            "value" : "Save to PicMate"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "インポーター"
+            "value" : "ピックメイトに保存"
           }
         }
       }

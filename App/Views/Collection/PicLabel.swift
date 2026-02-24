@@ -42,13 +42,13 @@ struct PicLabel: View {
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 3.0))
-        .task(id: pic.id) {
-            if let thumbData = await dataActor.thumbnailData(forPicWithID: pic.id),
-               let uiImage = UIImage(data: thumbData) {
-                pic.thumbnailData = thumbData
-                thumbnail = Image(uiImage: uiImage)
+            .task(id: pic.id) {
+                if let thumbData = await dataActor.thumbnailData(forPicWithID: pic.id),
+                   let uiImage = UIImage(data: thumbData) {
+                    pic.thumbnailData = thumbData
+                    thumbnail = Image(uiImage: uiImage)
+                }
+                isThumbnailReadyToPresent = true
             }
-            isThumbnailReadyToPresent = true
-        }
     }
 }

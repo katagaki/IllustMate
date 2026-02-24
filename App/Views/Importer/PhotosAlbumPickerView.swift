@@ -182,6 +182,11 @@ struct PhotosAlbumPickerView: View {
                 }
             }
         } else {
+            let smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil)
+            smartAlbums.enumerateObjects { collection, _, _ in
+                collected.append(.album(collection))
+            }
+
             let topLevelResult = PHCollectionList.fetchTopLevelUserCollections(with: nil)
             topLevelResult.enumerateObjects { collection, _, _ in
                 if let album = collection as? PHAssetCollection {

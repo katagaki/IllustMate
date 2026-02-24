@@ -72,6 +72,24 @@ struct MoreView: View {
                     Text("More.Stats")
                 }
                 Section {
+                    Button("More.Backup") {
+                        Task {
+                            do {
+                                _ = try await dataActor.backupDatabase()
+                                await MainActor.run {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                }
+                            } catch {
+                                await MainActor.run {
+                                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                                }
+                            }
+                        }
+                    }
+                } header: {
+                    Text("More.Data")
+                }
+                Section {
                     NavigationLink(value: ViewPath.moreTroubleshooting) {
                         ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
                     }

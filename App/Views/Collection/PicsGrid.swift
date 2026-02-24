@@ -38,26 +38,26 @@ struct PicsGrid<Content: View>: View {
                     onSelect(pic)
                 } label: {
                     PicLabel(namespace: namespace, pic: pic)
-                    .overlay {
-                        if isSelecting {
-                            if let isSelected {
-                                ZStack(alignment: .bottomTrailing) {
-                                    SelectionOverlay(isSelected(pic))
-                                    Color.clear
+                        .overlay {
+                            if isSelecting {
+                                if let isSelected {
+                                    ZStack(alignment: .bottomTrailing) {
+                                        SelectionOverlay(isSelected(pic))
+                                        Color.clear
+                                    }
                                 }
                             }
                         }
-                    }
-                    .draggable(PicTransferable(id: pic.id)) {
-                        if let image = pic.thumbnail() {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100.0, height: 100.0)
+                        .draggable(PicTransferable(id: pic.id)) {
+                            if let image = pic.thumbnail() {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100.0, height: 100.0)
+                            }
                         }
-                    }
                 }
-                .automaticMatchedTransitionSource(id: pic.id, in: namespace)
+                .matchedTransitionSource(id: pic.id, in: namespace)
                 .contextMenu {
                     if !isSelecting {
                         if enableSelection {

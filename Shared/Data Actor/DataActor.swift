@@ -12,6 +12,7 @@ import SwiftUI
 actor DataActor {
 
     let database: Connection
+    let databaseURL: URL
 
     // Tables
     let albumsTable = Table("albums")
@@ -34,14 +35,19 @@ actor DataActor {
 
     init() {
         let databaseFileName = "Collection.db"
-        let databaseURL = FileManager.default
-            .urls(for: .documentDirectory, in: .userDomainMask)
-            .first!
-            .appendingPathComponent(databaseFileName)
+        let fileManager = FileManager.default
+
+        if let appGroupURL = fileManager.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
+        ) {
+            self.databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+        } else {
+            fatalError()
+        }
 
         let database: Connection
         do {
-            database = try Connection(databaseURL.path)
+            database = try Connection(self.databaseURL.path)
         } catch {
             fatalError("Could not open SQLite database: \(error)")
         }
@@ -114,5 +120,67 @@ actor DataActor {
             .select(picId, picName, picAlbumId,
                     picDateAdded, picThumbnailData)
         return (try? database.prepare(query).map { picFrom(row: $0) }) ?? []
+    }
+
+    func backupDatabase() throws -> URL {
+        let fileManager = FileManager.default
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
+        let timestamp = dateFormatter.string(from: Date())
+        let backupFileName = "Backup-\(timestamp).pics"
+
+        var destinationFolder: URL? = fileManager.url(
+            forUbiquityContainerIdentifier: nil
+        )?.appendingPathComponent("Documents")
+        if destinationFolder == nil {
+            destinationFolder = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+        }
+
+        guard let targetDirectory = destinationFolder else {
+            throw NSError(
+                domain: "DataActor",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "No destination folder available"]
+            )
+        }
+
+        if !fileManager.fileExists(atPath: targetDirectory.path) {
+            try fileManager.createDirectory(at: targetDirectory, withIntermediateDirectories: true, attributes: nil)
+        }
+
+        let destinationURL = targetDirectory.appendingPathComponent(backupFileName)
+        try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
+
+        return destinationURL
+    }
+
+    func importFromBackup(at url: URL, targetAlbumID: String?) throws {
+        guard url.startAccessingSecurityScopedResource() else { return }
+        defer { url.stopAccessingSecurityScopedResource() }
+
+        let foreignDB = try Connection(url.path)
+
+        if let targetAlbumID {
+            let foreignPics = try foreignDB.prepare(picsTable)
+            for foreignPic in foreignPics {
+                if let pData = try? foreignPic.get(picData) {
+                    let id = UUID().uuidString
+                    _ = try? self.database.run(self.picsTable.insert(
+                        self.picId <- id,
+                        self.picName <- (try? foreignPic.get(picName)) ?? Pic.newFilename(),
+                        self.picAlbumId <- targetAlbumID,
+                        self.picDateAdded <- (try? foreignPic.get(picDateAdded)) ?? Date.now.timeIntervalSince1970,
+                        self.picData <- pData,
+                        self.picThumbnailData <- (try? foreignPic.get(picThumbnailData))
+                    ))
+                }
+            }
+        } else {
+            // Merge
+            try self.database.execute("ATTACH DATABASE '\(url.path)' AS backup;")
+            try self.database.execute("INSERT OR IGNORE INTO main.albums SELECT * FROM backup.albums;")
+            try self.database.execute("INSERT OR IGNORE INTO main.pics SELECT * FROM backup.pics;")
+            try self.database.execute("DETACH DATABASE backup;")
+        }
     }
 }
