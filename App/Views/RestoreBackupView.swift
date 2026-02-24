@@ -69,7 +69,7 @@ struct RestoreBackupView: View {
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
                     .padding(20.0)
-                } else {
+                } else if !isImporting {
                     VStack(alignment: .leading, spacing: 8.0) {
                         Button {
                             startImport(targetAlbumID: nil)
@@ -140,6 +140,7 @@ struct RestoreBackupView: View {
     func startImport(targetAlbumID: String?) {
         withAnimation(.smooth.speed(2.0)) {
             isImporting = true
+            UIApplication.shared.isIdleTimerDisabled = true
         } completion: {
             Task {
                 do {
@@ -148,15 +149,14 @@ struct RestoreBackupView: View {
                         isImporting = false
                         isCompleted = true
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            dismiss()
-                        }
+                        UIApplication.shared.isIdleTimerDisabled = false
                     }
                 } catch {
                     await MainActor.run {
                         isImporting = false
                         isError = true
                         UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        UIApplication.shared.isIdleTimerDisabled = false
                     }
                 }
             }
