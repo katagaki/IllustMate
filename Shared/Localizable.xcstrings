@@ -1475,6 +1475,22 @@
         }
       }
     },
+    "Shared.GridSize.2" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Columns"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2列"
+          }
+        }
+      }
+    },
     "Shared.GridSize.3" : {
       "localizations" : {
         "en" : {

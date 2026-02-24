@@ -40,6 +40,8 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "PicSortReversed") var isPicSortReversed: Bool
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+    @AppStorage(wrappedValue: 3, "AlbumColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
 
     var body: some View {
         ScrollView(.vertical) {
@@ -63,6 +65,19 @@ struct AlbumView: View {
                                 .tag(SortType.sizeDescending)
                         }
                         .pickerStyle(.menu)
+                        if albumStyleState == .grid {
+                            Picker("Shared.GridSize",
+                                   systemImage: "square.grid.2x2",
+                                   selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
+                                Text("Shared.GridSize.2")
+                                    .tag(2)
+                                Text("Shared.GridSize.3")
+                                    .tag(3)
+                                Text("Shared.GridSize.4")
+                                    .tag(4)
+                            }
+                            .pickerStyle(.menu)
+                        }
                     }
                     .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                     if !albums.isEmpty {
@@ -97,7 +112,6 @@ struct AlbumView: View {
                             .tag(false)
                     }
                     .pickerStyle(.menu)
-                    Divider()
                     Picker("Shared.GridSize",
                            systemImage: "square.grid.2x2",
                            selection: $columnCount.animation(.smooth.speed(2.0))) {

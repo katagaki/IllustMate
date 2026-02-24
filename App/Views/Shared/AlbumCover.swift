@@ -94,7 +94,7 @@ struct AlbumCover: View {
                             RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous)
                                 .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
                         }
-                        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: metrics.size.height * 0.03)
+                        .shadow(color: .black.opacity(0.35), radius: 4.0, x: 0.0, y: metrics.size.height * 0.03)
                         .padding(metrics.size.width * 0.04)
                     } else {
                         // Use color for empty albums
@@ -104,25 +104,24 @@ struct AlbumCover: View {
                                                  startPoint: .topLeading,
                                                  endPoint: .bottomTrailing))
                             .frame(width: metrics.size.width * 0.92, height: metrics.size.height * 0.92)
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: metrics.size.height * 0.03)
+                            .shadow(color: .black.opacity(0.35), radius: 4.0, x: 0.0, y: metrics.size.height * 0.03)
                             .padding(metrics.size.width * 0.04)
                     }
                 }
                 .overlay(alignment: .bottom) {
-                    if metrics.size.width >= 70 {
+                    if metrics.size.width >= 80 {
                         VStack(alignment: .center, spacing: 2.0) {
-                            HStack(alignment: .center, spacing: 8.0) {
-                                HStack(alignment: .center, spacing: 3.0) {
+                            HStack(alignment: .center, spacing: 6.0) {
+                                HStack(alignment: .center, spacing: 2.0) {
                                     Image(systemName: "photo.fill")
                                     Text(String(album.picCount()))
                                 }
-                                HStack(alignment: .center, spacing: 3.0) {
+                                HStack(alignment: .center, spacing: 2.0) {
                                     Image(systemName: "rectangle.stack.fill")
                                     Text(String(album.albumCount()))
                                 }
                             }
-                            .font(.system(size: max(10.0, metrics.size.width * 0.1),
-                                          weight: .semibold, design: .rounded))
+                            .font(.system(size: 10.0, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white)
                             .shadow(color: .black.opacity(0.5), radius: 2.0, x: 0.0, y: 1.0)
                         }

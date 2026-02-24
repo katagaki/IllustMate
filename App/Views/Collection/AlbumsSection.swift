@@ -21,19 +21,14 @@ struct AlbumsSection<Content: View>: View {
     var onDrop: ((Drop, Album) -> Void)?
     @ViewBuilder var moveMenu: (Album) -> Content
 
-    let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
-#if targetEnvironment(macCatalyst)
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: 20.0)]
-#else
-    let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 100.0), spacing: 20.0)]
-#endif
+    @AppStorage(wrappedValue: 3, "AlbumColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
     var body: some View {
         Group {
             switch style {
             case .grid:
-                LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                          phoneColumnConfiguration : padOrMacColumnConfiguration,
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20.0), count: columnCount),
                           spacing: 20.0) {
                     ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
@@ -53,7 +48,8 @@ struct AlbumsSection<Content: View>: View {
                         .buttonStyleAdaptive()
                     }
                 }
-                          .padding(20.0)
+                .padding(20.0)
+                .animation(.smooth, value: columnCount)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {
                     ForEach(albums) { album in
