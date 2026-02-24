@@ -13,22 +13,21 @@ struct MoreTroubleshootingView: View {
 
     @EnvironmentObject var navigation: NavigationManager
     @Environment(ConcurrencyManager.self) var concurrency
-    @Environment(ProgressAlertManager.self) var progressAlertManager
 
     @State var isDeleteConfirming: Bool = false
+    @State var isRebuildingThumbnails: Bool = false
+    @State var rebuildProgress: Int = 0
+    @State var rebuildTotal: Int = 0
+    @State var isFreeingUpSpace: Bool = false
 
     var body: some View {
         List {
             Section {
                 Button("More.Troubleshooting.RebuildThumbnails") {
-                    Task {
-                        await rebuildThumbnails()
-                    }
+                    Task { await rebuildThumbnails() }
                 }
                 Button("More.Troubleshooting.FreeUpSpace") {
-                    Task {
-                        await dataActor.vacuum()
-                    }
+                    Task { await freeUpSpace() }
                 }
             } header: {
                 Text("More.Troubleshooting.DataManagement")
@@ -55,23 +54,61 @@ struct MoreTroubleshootingView: View {
             Text("Alert.DeleteAll.Text")
         }
         .navigationTitle("ViewTitle.Troubleshooting")
+        .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
+            Button("Shared.Yes", role: .destructive) {
+                Task {
+                    await dataActor.deleteAll()
+                    navigation.popAll()
+                }
+            }
+            Button("Shared.No", role: .cancel) {
+                isDeleteConfirming = false
+            }
+        } message: {
+            Text("Alert.DeleteAll.Text")
+        }
+        .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isRebuildingThumbnails) {
+            VStack(alignment: .center, spacing: 16.0) {
+                Text("More.Troubleshooting.RebuildThumbnails.Rebuilding")
+                    .bold()
+                ProgressView(
+                    value: min(Float(rebuildTotal > 0 ? Float(rebuildProgress) / Float(rebuildTotal) : 0), 1.0),
+                    total: 1.0
+                )
+                .progressViewStyle(.linear)
+            }
+            .padding()
+            .presentationDetents([.medium])
+            .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: $isFreeingUpSpace) {
+            VStack(alignment: .center, spacing: 16.0) {
+                Text("More.Troubleshooting.FreeUpSpace.Freeing")
+                    .bold()
+                ProgressView()
+                .progressViewStyle(.circular)
+            }
+            .padding()
+            .presentationDetents([.medium])
+            .interactiveDismissDisabled()
+        }
     }
 
     func rebuildThumbnails() async {
         await MainActor.run {
             UIApplication.shared.isIdleTimerDisabled = true
+            isRebuildingThumbnails = true
+            rebuildProgress = 0
+            rebuildTotal = 0
         }
         do {
             let pics = try await dataActor.pics()
             await MainActor.run {
-                progressAlertManager.prepare("More.Troubleshooting.RebuildThumbnails.Rebuilding",
-                                             total: pics.count)
+                rebuildTotal = pics.count
             }
             await dataActor.deleteAllThumbnails()
-            await MainActor.run {
-                progressAlertManager.show()
-            }
             for pic in pics {
                 if let data = await dataActor.imageData(forPicWithID: pic.id) {
                     let thumbnailData = Pic.makeThumbnail(data)
@@ -79,18 +116,31 @@ struct MoreTroubleshootingView: View {
                                                 thumbnailData: thumbnailData)
                 }
                 await MainActor.run {
-                    progressAlertManager.incrementProgress()
+                    rebuildProgress += 1
                 }
             }
             await MainActor.run {
                 UIApplication.shared.isIdleTimerDisabled = false
-                progressAlertManager.hide()
+                isRebuildingThumbnails = false
             }
         } catch {
             debugPrint(error.localizedDescription)
             await MainActor.run {
                 UIApplication.shared.isIdleTimerDisabled = false
+                isRebuildingThumbnails = false
             }
+        }
+    }
+
+    func freeUpSpace() async {
+        await MainActor.run {
+            UIApplication.shared.isIdleTimerDisabled = true
+            isFreeingUpSpace = true
+        }
+        await dataActor.vacuum()
+        await MainActor.run {
+            isFreeingUpSpace = false
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 }

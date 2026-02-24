@@ -13,7 +13,6 @@ struct IllustMateApp: App {
     @StateObject var tabManager = TabManager()
     @StateObject var navigation = NavigationManager()
     @State var viewer = ViewerManager()
-    @State var progressAlertManager = ProgressAlertManager()
     @State var concurrency = ConcurrencyManager()
 
     var body: some Scene {
@@ -28,7 +27,6 @@ struct IllustMateApp: App {
             .environmentObject(tabManager)
             .environmentObject(navigation)
             .environment(viewer)
-            .environment(progressAlertManager)
             .environment(concurrency)
         }
 #if targetEnvironment(macCatalyst)

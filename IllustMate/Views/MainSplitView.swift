@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MainSplitView: View {
 
-    @Environment(ProgressAlertManager.self) var progressAlertManager
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
@@ -97,12 +96,6 @@ struct MainSplitView: View {
                     .id(pic.id)
             } else {
                 ContentUnavailableView("Shared.SelectAPicture", systemImage: "photo.on.rectangle.angled")
-            }
-        }
-        .overlay {
-            if progressAlertManager.isDisplayed {
-                ProgressAlert()
-                    .ignoresSafeArea()
             }
         }
         .task {

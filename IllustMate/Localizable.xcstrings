@@ -846,6 +846,22 @@
         }
       }
     },
+    "More.Troubleshooting.FreeUpSpace.Freeing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freeing up disk space..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データベースを最適化中…"
+          }
+        }
+      }
+    },
     "More.Troubleshooting.RebuildThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
