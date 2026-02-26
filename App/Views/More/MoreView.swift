@@ -21,6 +21,11 @@ struct MoreView: View {
     @State var isBackupSheetPresented: Bool = false
     @State var backupFolderURL: URL?
 
+    @AppStorage("PhotosModeEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
+    @AppStorage("PhotosNestedAlbumsEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isNestedAlbumsEnabled: Bool = false
+
     var body: some View {
         NavigationStack(path: $navigation.moreTabPath) {
             MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
@@ -57,6 +62,15 @@ struct MoreView: View {
                     Text("More.Stats")
                 }
                 Section {
+                    Toggle(isOn: $isPhotosModeEnabled) {
+                        ListRow(image: "ListIcon.Photos", title: "More.PhotosMode")
+                    }
+                } header: {
+                    Text("More.PhotosMode.Header")
+                } footer: {
+                    Text("More.PhotosMode.Description")
+                }
+                Section {
                     Group {
                         Button {
                             let documentsUrl = FileManager.default.urls(
@@ -90,6 +104,16 @@ struct MoreView: View {
                     }
                 } header: {
                     Text("More.Advanced")
+                }
+                Section {
+                    Toggle(isOn: $isNestedAlbumsEnabled) {
+                        Text("More.Experiments.NestedAlbums")
+                    }
+                    .disabled(!isPhotosModeEnabled)
+                } header: {
+                    Text("More.Experiments")
+                } footer: {
+                    Text("More.Experiments.NestedAlbums.Description")
                 }
             }
             .navigationBarTitleDisplayMode(.inline)

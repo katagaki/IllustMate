@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Photos
 import UIKit
 import SwiftUI
 
@@ -19,4 +20,6 @@ enum ViewPath: Hashable {
     case moreDebug
     case moreTroubleshooting
     case moreAttributions
+    case photosFolder(folder: PHCollectionListWrapper)
+    case photosAlbum(album: PHAssetCollectionWrapper)
 }

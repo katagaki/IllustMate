@@ -1235,6 +1235,108 @@
         }
       }
     },
+    "More.PhotosMode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真モード"
+          }
+        }
+      }
+    },
+    "More.PhotosMode.Header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos Library"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリ"
+          }
+        }
+      }
+    },
+    "More.PhotosMode.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse albums and photos directly from your Photos library."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリのアルバムと写真を直接閲覧します。"
+          }
+        }
+      }
+    },
+    "More.Experiments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experiments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試験的機能"
+          }
+        }
+      }
+    },
+    "More.Experiments.NestedAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nested Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ネストアルバム"
+          }
+        }
+      }
+    },
+    "More.Experiments.NestedAlbums.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Photos mode, if a folder contains an album with '▶︎ ' before the folder's name, that album's photos become the folder's own pics. Remaining albums become nested sub-albums."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真モードで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの写真がフォルダ自体の写真になります。残りのアルバムはネストされたサブアルバムになります。"
+          }
+        }
+      }
+    },
     "Shared.AddToAlbum" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2219,6 +2321,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "その他"
+          }
+        }
+      }
+    },
+    "ViewTitle.Photos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真"
           }
         }
       }

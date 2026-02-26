@@ -13,6 +13,7 @@ struct IllustMateApp: App {
     @StateObject var navigation = NavigationManager()
     @State var viewer = ViewerManager()
     @State var concurrency = ConcurrencyManager()
+    @State var photosManager = PhotosManager()
     @State var isImportingBackup: Bool = false
     @State var importedURL: URL?
 
@@ -28,6 +29,7 @@ struct IllustMateApp: App {
             .environmentObject(navigation)
             .environment(viewer)
             .environment(concurrency)
+            .environment(photosManager)
             .onOpenURL { url in
                 if url.pathExtension == "pics" {
                     importedURL = url
