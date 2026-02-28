@@ -14,6 +14,8 @@ struct PhotosAlbumContentView: View {
 
     let collection: PHAssetCollection
 
+    @Namespace var namespace
+
     @State private var assets: [PHAsset] = []
     @State private var hasFetched: Bool = false
 
@@ -41,7 +43,7 @@ struct PhotosAlbumContentView: View {
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
 
                 if !assets.isEmpty {
-                    PhotosAssetsGrid(assets: assets)
+                    PhotosAssetsGrid(namespace: namespace, assets: assets)
                 } else if hasFetched {
                     Text("Albums.NoPics")
                         .foregroundStyle(.secondary)

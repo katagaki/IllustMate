@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PhotosAssetsGrid: View {
 
+    var namespace: Namespace.ID
     var assets: [PHAsset]
 
     @AppStorage(wrappedValue: 4, "PicColumnCount",
@@ -21,9 +22,11 @@ struct PhotosAssetsGrid: View {
             spacing: 2.0
         ) {
             ForEach(assets, id: \.localIdentifier) { asset in
-                NavigationLink(value: ViewPath.photosAssetViewer(asset: PHAssetWrapper(asset: asset))) {
+                NavigationLink(value: ViewPath.photosAssetViewer(
+                    asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
                     PhotosAssetLabel(asset: asset)
                 }
+                .matchedTransitionSource(id: asset.localIdentifier, in: namespace)
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
 #else

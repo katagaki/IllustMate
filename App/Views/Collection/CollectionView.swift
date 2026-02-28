@@ -59,8 +59,15 @@ struct CollectionView: View {
                   PhotosFolderView(folder: wrapper.collectionList)
               case .photosAlbum(let wrapper):
                   PhotosAlbumContentView(collection: wrapper.collection)
-              case .photosAssetViewer(let wrapper):
-                  PhotosAssetViewer(asset: wrapper.asset)
+              case .photosAssetViewer(let wrapper, let namespace):
+                  if #available(iOS 18, *) {
+                      PhotosAssetViewer(asset: wrapper.asset)
+                          .navigationTransition(.zoom(
+                              sourceID: wrapper.asset.localIdentifier,
+                              in: namespace))
+                  } else {
+                      PhotosAssetViewer(asset: wrapper.asset)
+                  }
               default: Color.clear
               }
             })

@@ -22,5 +22,5 @@ enum ViewPath: Hashable {
     case moreAttributions
     case photosFolder(folder: PHCollectionListWrapper)
     case photosAlbum(album: PHAssetCollectionWrapper)
-    case photosAssetViewer(asset: PHAssetWrapper)
+    case photosAssetViewer(asset: PHAssetWrapper, namespace: Namespace.ID)
 }

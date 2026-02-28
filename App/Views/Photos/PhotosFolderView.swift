@@ -17,6 +17,8 @@ struct PhotosFolderView: View {
     @AppStorage("PhotosNestedAlbumsEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isNestedAlbumsEnabled: Bool = false
 
+    @Namespace var namespace
+
     @State private var items: [PHCollectionItem] = []
     @State private var ownPicsAssets: [PHAsset] = []
     @State private var hasFetched: Bool = false
@@ -91,7 +93,7 @@ struct PhotosFolderView: View {
                 .pickerStyle(.menu)
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            PhotosAssetsGrid(assets: ownPicsAssets)
+            PhotosAssetsGrid(namespace: namespace, assets: ownPicsAssets)
         }
     }
 
