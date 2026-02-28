@@ -42,13 +42,23 @@ struct PhotosAssetLabel: View {
 
     let asset: PHAsset
 
+    @Environment(\.displayScale) private var displayScale
+
     @State private var thumbnail: UIImage?
 
     var body: some View {
         Rectangle()
             .fill(.primary.opacity(0.05))
             .aspectRatio(1.0, contentMode: .fit)
-            .overlay {
+            .overlay { geometryOverlay }
+            .clipped()
+            .contentShape(.rect)
+            .clipShape(.rect(cornerRadius: 4.0))
+    }
+
+    private var geometryOverlay: some View {
+        GeometryReader { metrics in
+            ZStack {
                 if let thumbnail {
                     Image(uiImage: thumbnail)
                         .resizable()
@@ -56,20 +66,20 @@ struct PhotosAssetLabel: View {
                         .transition(.opacity.animation(.smooth.speed(2)))
                 }
             }
-            .clipped()
-            .contentShape(.rect)
-            .clipShape(.rect(cornerRadius: 4.0))
+            .frame(width: metrics.size.width, height: metrics.size.height)
             .task(id: asset.localIdentifier) {
-                loadThumbnail()
+                loadThumbnail(cellSize: metrics.size)
             }
+        }
     }
 
-    private func loadThumbnail() {
+    private func loadThumbnail(cellSize: CGSize) {
         let manager = PHCachingImageManager.default()
         let options = PHImageRequestOptions()
         options.deliveryMode = .opportunistic
         options.isNetworkAccessAllowed = true
-        let targetSize = CGSize(width: 240, height: 240)
+        let targetSize = CGSize(width: cellSize.width * displayScale,
+                                height: cellSize.height * displayScale)
 
         manager.requestImage(for: asset, targetSize: targetSize,
                              contentMode: .aspectFill, options: options) { result, _ in

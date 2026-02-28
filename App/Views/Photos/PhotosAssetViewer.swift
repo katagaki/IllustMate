@@ -14,6 +14,8 @@ struct PhotosAssetViewer: View {
 
     let asset: PHAsset
 
+    @Environment(\.displayScale) private var displayScale
+
     @State private var thumbnail: UIImage?
     @State private var fullImage: UIImage?
     @State private var isFullImageLoaded: Bool = false
@@ -161,7 +163,9 @@ struct PhotosAssetViewer: View {
         let options = PHImageRequestOptions()
         options.deliveryMode = .opportunistic
         options.isNetworkAccessAllowed = true
-        let targetSize = CGSize(width: 400, height: 400)
+        let screenSize = UIScreen.main.bounds.size
+        let targetSize = CGSize(width: screenSize.width * displayScale,
+                                height: screenSize.height * displayScale)
 
         manager.requestImage(for: asset, targetSize: targetSize,
                              contentMode: .aspectFit, options: options) { result, _ in

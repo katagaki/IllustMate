@@ -182,6 +182,8 @@ struct AlbumCover: View {
         var collection: PHAssetCollection
         var length: CGFloat?
 
+        @Environment(\.displayScale) private var displayScale
+
         @State private var primaryImage: Image?
         @State private var secondaryImage: Image?
         @State private var tertiaryImage: Image?
@@ -215,7 +217,9 @@ struct AlbumCover: View {
             let options = PHImageRequestOptions()
             options.deliveryMode = .opportunistic
             options.isNetworkAccessAllowed = true
-            let targetSize = CGSize(width: 200, height: 200)
+            let coverLength = length ?? 200
+            let targetSize = CGSize(width: coverLength * displayScale,
+                                    height: coverLength * displayScale)
 
             var images: [Image?] = []
             result.enumerateObjects { asset, _, _ in
