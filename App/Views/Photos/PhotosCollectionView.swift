@@ -16,6 +16,8 @@ struct PhotosCollectionView: View {
     @State var items: [PHCollectionItem] = []
     @State var hasFetched: Bool = false
 
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
 
@@ -56,21 +58,32 @@ struct PhotosCollectionView: View {
     private var photosAlbumsSection: some View {
         Group {
             SectionHeader(title: "Albums.Albums", count: items.count) {
-                Picker("Shared.GridSize",
-                       systemImage: "square.grid.2x2",
-                       selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
-                    Text("Shared.GridSize.2")
-                        .tag(2)
-                    Text("Shared.GridSize.3")
-                        .tag(3)
-                    Text("Shared.GridSize.4")
-                        .tag(4)
+                Picker("Albums.Style",
+                       selection: $albumStyleState.animation(.smooth.speed(2))) {
+                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                        .tag(ViewStyle.grid)
+                    Label("Albums.Style.List", systemImage: "list.bullet")
+                        .tag(ViewStyle.list)
+                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                        .tag(ViewStyle.carousel)
                 }
-                .pickerStyle(.menu)
+                if albumStyleState == .grid {
+                    Picker("Shared.GridSize",
+                           systemImage: "square.grid.2x2",
+                           selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
+                        Text("Shared.GridSize.2")
+                            .tag(2)
+                        Text("Shared.GridSize.3")
+                            .tag(3)
+                        Text("Shared.GridSize.4")
+                            .tag(4)
+                    }
+                    .pickerStyle(.menu)
+                }
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
             if !items.isEmpty {
-                PhotosItemsGrid(items: items)
+                PhotosAlbumsSection(items: items, style: $albumStyleState)
             } else if hasFetched {
                 Text("Albums.NoAlbums")
                     .foregroundStyle(.secondary)

@@ -1,5 +1,5 @@
 //
-//  PhotosItemsGrid.swift
+//  PhotosAlbumsSection.swift
 //  PicMate
 //
 //  Created on 2026/02/26.
@@ -8,34 +8,109 @@
 import Photos
 import SwiftUI
 
-struct PhotosItemsGrid: View {
+struct PhotosAlbumsSection: View {
 
     var items: [PHCollectionItem]
+    @Binding var style: ViewStyle
+
+    @Namespace var albumTransitionNamespace
 
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
     var body: some View {
-        LazyVGrid(
-            columns: Array(repeating: GridItem(.flexible(), spacing: 20.0), count: columnCount),
-            spacing: 20.0
-        ) {
-            ForEach(items) { item in
-                switch item {
-                case .album(let collection):
-                    NavigationLink(value: ViewPath.photosAlbum(album: PHAssetCollectionWrapper(collection: collection))) {
-                        PhotosAlbumGridLabel(collection: collection)
+        Group {
+            switch style {
+            case .grid:
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(), spacing: 20.0), count: columnCount),
+                    spacing: 20.0
+                ) {
+                    ForEach(items) { item in
+                        itemLink(for: item) {
+                            itemGridLabel(for: item)
+                        }
+                        .buttonStyleAdaptive()
                     }
-                    .buttonStyleAdaptive()
-                case .folder(let folder):
-                    NavigationLink(value: ViewPath.photosFolder(folder: PHCollectionListWrapper(collectionList: folder))) {
-                        PhotosFolderGridLabel(folder: folder)
-                    }
-                    .buttonStyleAdaptive()
                 }
+                .padding(20.0)
+                .animation(.smooth, value: columnCount)
+            case .list:
+                LazyVStack(alignment: .leading, spacing: 0.0) {
+                    ForEach(items) { item in
+                        itemLink(for: item) {
+                            itemListRow(for: item)
+                        }
+                        .buttonStyleAdaptive()
+                        if item.id != items.last?.id {
+                            Divider()
+                                .padding([.leading], 84.0)
+                        }
+                    }
+                }
+            case .carousel:
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(alignment: .top, spacing: 20.0) {
+                        ForEach(items) { item in
+                            itemLink(for: item) {
+                                itemGridLabel(for: item, length: 80.0)
+                            }
+                            .buttonStyleAdaptive()
+                        }
+                    }
+                    .padding(20.0)
+                }
+                .scrollIndicators(.hidden)
+                .frame(height: 120.0)
             }
         }
-        .padding(20.0)
+    }
+
+    // MARK: - Navigation Links
+
+    @ViewBuilder
+    private func itemLink<Label: View>(
+        for item: PHCollectionItem,
+        @ViewBuilder label: () -> Label
+    ) -> some View {
+        switch item {
+        case .album(let collection):
+            NavigationLink(value: ViewPath.photosAlbum(
+                album: PHAssetCollectionWrapper(collection: collection))) {
+                label()
+            }
+        case .folder(let folder):
+            NavigationLink(value: ViewPath.photosFolder(
+                folder: PHCollectionListWrapper(collectionList: folder))) {
+                label()
+            }
+        }
+    }
+
+    // MARK: - Grid Labels
+
+    @ViewBuilder
+    private func itemGridLabel(for item: PHCollectionItem, length: CGFloat? = nil) -> some View {
+        switch item {
+        case .album(let collection):
+            PhotosAlbumGridLabel(namespace: albumTransitionNamespace,
+                                 collection: collection, length: length)
+        case .folder(let folder):
+            PhotosFolderGridLabel(namespace: albumTransitionNamespace,
+                                  folder: folder, length: length)
+        }
+    }
+
+    // MARK: - List Rows
+
+    @ViewBuilder
+    private func itemListRow(for item: PHCollectionItem) -> some View {
+        switch item {
+        case .album(let collection):
+            PhotosAlbumListRow(namespace: albumTransitionNamespace, collection: collection)
+        case .folder(let folder):
+            PhotosFolderListRow(namespace: albumTransitionNamespace, folder: folder)
+        }
     }
 }
 
@@ -43,66 +118,22 @@ struct PhotosItemsGrid: View {
 
 struct PhotosAlbumGridLabel: View {
 
-    let collection: PHAssetCollection
-
-    @State private var thumbnail: UIImage?
+    var namespace: Namespace.ID
+    var collection: PHAssetCollection
+    var length: CGFloat?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12.0, style: .continuous)
-                    .fill(Color(.systemGray5))
-                    .aspectRatio(1.0, contentMode: .fit)
-                if let thumbnail {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                        .aspectRatio(1.0, contentMode: .fit)
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0, style: .continuous))
-                } else {
-                    Image(systemName: "photo.on.rectangle")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 12.0, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 12.0, style: .continuous)
-                    .stroke(Color.primary.opacity(0.1), lineWidth: 0.5)
-            }
+            AsyncPhotosAlbumCover(collection: collection, length: length)
+                .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
             Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                .matchedGeometryEffect(id: "\(collection.localIdentifier).Title", in: namespace)
                 .font(.caption)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
         }
         .contentShape(.rect)
-        .task {
-            loadThumbnail()
-        }
-    }
-
-    private func loadThumbnail() {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.fetchLimit = 1
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
-        guard let asset = PHAsset.fetchAssets(in: collection, options: fetchOptions).firstObject else { return }
-
-        let manager = PHCachingImageManager.default()
-        let options = PHImageRequestOptions()
-        options.deliveryMode = .opportunistic
-        options.isNetworkAccessAllowed = true
-        let targetSize = CGSize(width: 200, height: 200)
-
-        manager.requestImage(for: asset, targetSize: targetSize,
-                             contentMode: .aspectFill, options: options) { result, _ in
-            if let result {
-                DispatchQueue.main.async {
-                    self.thumbnail = result
-                }
-            }
-        }
+        .frame(width: length)
     }
 }
 
@@ -110,24 +141,103 @@ struct PhotosAlbumGridLabel: View {
 
 struct PhotosFolderGridLabel: View {
 
-    let folder: PHCollectionList
+    var namespace: Namespace.ID
+    var folder: PHCollectionList
+    var length: CGFloat?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12.0, style: .continuous)
-                    .fill(Color(.systemGray5))
-                    .aspectRatio(1.0, contentMode: .fit)
-                Image(systemName: "folder.fill")
-                    .font(.largeTitle)
-                    .foregroundStyle(.secondary)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 12.0, style: .continuous))
+            AsyncPhotosFolderCover(folder: folder, length: length)
+                .matchedGeometryEffect(id: "\(folder.localIdentifier).Image", in: namespace)
             Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                .matchedGeometryEffect(id: "\(folder.localIdentifier).Title", in: namespace)
                 .font(.caption)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
         }
         .contentShape(.rect)
+        .frame(width: length)
+    }
+}
+
+// MARK: - Album List Row
+
+struct PhotosAlbumListRow: View {
+
+    var namespace: Namespace.ID
+    var collection: PHAssetCollection
+
+    @State private var picCount: Int = 0
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16.0) {
+            AsyncPhotosAlbumCover(collection: collection, length: 48.0)
+                .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
+            VStack(alignment: .leading, spacing: 2.0) {
+                Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                    .matchedGeometryEffect(id: "\(collection.localIdentifier).Title", in: namespace)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Text("Shared.Album.\(picCount)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 11.0, height: 11.0)
+                .foregroundStyle(.primary.opacity(0.25))
+                .fontWeight(.bold)
+        }
+        .contentShape(.rect)
+        .padding([.leading, .trailing], 20.0)
+        .padding([.top, .bottom], 8.0)
+        .task(id: collection.localIdentifier) {
+            let options = PHFetchOptions()
+            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            picCount = PHAsset.fetchAssets(in: collection, options: options).count
+        }
+    }
+}
+
+// MARK: - Folder List Row
+
+struct PhotosFolderListRow: View {
+
+    var namespace: Namespace.ID
+    var folder: PHCollectionList
+
+    @State private var childCount: Int = 0
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16.0) {
+            AsyncPhotosFolderCover(folder: folder, length: 48.0)
+                .matchedGeometryEffect(id: "\(folder.localIdentifier).Image", in: namespace)
+            VStack(alignment: .leading, spacing: 2.0) {
+                Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                    .matchedGeometryEffect(id: "\(folder.localIdentifier).Title", in: namespace)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Text("Shared.Album.\(childCount)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 11.0, height: 11.0)
+                .foregroundStyle(.primary.opacity(0.25))
+                .fontWeight(.bold)
+        }
+        .contentShape(.rect)
+        .padding([.leading, .trailing], 20.0)
+        .padding([.top, .bottom], 8.0)
+        .task(id: folder.localIdentifier) {
+            childCount = PHCollection.fetchCollections(in: folder, options: nil).count
+        }
     }
 }

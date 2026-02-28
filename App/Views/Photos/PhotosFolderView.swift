@@ -23,6 +23,8 @@ struct PhotosFolderView: View {
     @State private var ownPicsAssets: [PHAsset] = []
     @State private var hasFetched: Bool = false
 
+    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
     @AppStorage(wrappedValue: 4, "PicColumnCount",
@@ -31,14 +33,12 @@ struct PhotosFolderView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                // Albums section
                 if !items.isEmpty {
                     albumsSection
                     Spacer()
                         .frame(height: 20.0)
                 }
 
-                // Own pics section (nested albums mode only)
                 if isNestedAlbumsEnabled && !ownPicsAssets.isEmpty {
                     picsSection
                 }
@@ -58,20 +58,31 @@ struct PhotosFolderView: View {
     private var albumsSection: some View {
         Group {
             SectionHeader(title: "Albums.Albums", count: items.count) {
-                Picker("Shared.GridSize",
-                       systemImage: "square.grid.2x2",
-                       selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
-                    Text("Shared.GridSize.2")
-                        .tag(2)
-                    Text("Shared.GridSize.3")
-                        .tag(3)
-                    Text("Shared.GridSize.4")
-                        .tag(4)
+                Picker("Albums.Style",
+                       selection: $albumStyleState.animation(.smooth.speed(2))) {
+                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                        .tag(ViewStyle.grid)
+                    Label("Albums.Style.List", systemImage: "list.bullet")
+                        .tag(ViewStyle.list)
+                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                        .tag(ViewStyle.carousel)
                 }
-                .pickerStyle(.menu)
+                if albumStyleState == .grid {
+                    Picker("Shared.GridSize",
+                           systemImage: "square.grid.2x2",
+                           selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
+                        Text("Shared.GridSize.2")
+                            .tag(2)
+                        Text("Shared.GridSize.3")
+                            .tag(3)
+                        Text("Shared.GridSize.4")
+                            .tag(4)
+                    }
+                    .pickerStyle(.menu)
+                }
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            PhotosItemsGrid(items: items)
+            PhotosAlbumsSection(items: items, style: $albumStyleState)
         }
     }
 
@@ -103,7 +114,6 @@ struct PhotosFolderView: View {
         if isNestedAlbumsEnabled {
             let resolved = photosManager.resolveNestedAlbums(in: folder)
 
-            // Build items from resolved albums and folders
             var collected: [PHCollectionItem] = []
             for album in resolved.albums {
                 collected.append(.album(album))
@@ -113,12 +123,10 @@ struct PhotosFolderView: View {
             }
             items = collected
 
-            // Load own pics if marker album found
             if let ownPicsCollection = resolved.ownPicsCollection {
                 ownPicsAssets = photosManager.fetchAssets(in: ownPicsCollection)
             }
         } else {
-            // Standard mode: folders show only albums (no nested albums)
             items = photosManager.fetchCollections(in: folder)
         }
         hasFetched = true
