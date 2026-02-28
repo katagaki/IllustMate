@@ -124,7 +124,7 @@ struct PhotosAlbumGridLabel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            AsyncPhotosAlbumCover(collection: collection, length: length)
+            AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: length)
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
             Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Title", in: namespace)
@@ -147,7 +147,7 @@ struct PhotosFolderGridLabel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            AsyncPhotosFolderCover(folder: folder, length: length)
+            AlbumCover.AsyncPhotosFolderCover(folder: folder, length: length)
                 .matchedGeometryEffect(id: "\(folder.localIdentifier).Image", in: namespace)
             Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
                 .matchedGeometryEffect(id: "\(folder.localIdentifier).Title", in: namespace)
@@ -171,7 +171,7 @@ struct PhotosAlbumListRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            AsyncPhotosAlbumCover(collection: collection, length: 48.0)
+            AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: 48.0)
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
@@ -213,7 +213,7 @@ struct PhotosFolderListRow: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            AsyncPhotosFolderCover(folder: folder, length: 48.0)
+            AlbumCover.AsyncPhotosFolderCover(folder: folder, length: 48.0)
                 .matchedGeometryEffect(id: "\(folder.localIdentifier).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))

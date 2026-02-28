@@ -5,26 +5,33 @@
 //  Created by シン・ジャスティン on 2023/10/09.
 //
 
+import Photos
 import SwiftUI
 
 struct AlbumCover: View {
 
+    var name: String
     var length: CGFloat?
-    var album: Album
+    var picCount: Int
+    var albumCount: Int
 
     var primaryImage: Image?
     var secondaryImage: Image?
     var tertiaryImage: Image?
 
     init(
+        name: String,
         length: CGFloat? = nil,
-        album: Album,
+        picCount: Int = 0,
+        albumCount: Int = 0,
         primaryImage: Image? = nil,
         secondaryImage: Image? = nil,
         tertiaryImage: Image? = nil
     ) {
+        self.name = name
         self.length = length
-        self.album = album
+        self.picCount = picCount
+        self.albumCount = albumCount
         self.primaryImage = primaryImage
         self.secondaryImage = secondaryImage
         self.tertiaryImage = tertiaryImage
@@ -98,7 +105,7 @@ struct AlbumCover: View {
                         .padding(metrics.size.width * 0.04)
                     } else {
                         // Use color for empty albums
-                        let colors = Color.gradient(from: album.name)
+                        let colors = Color.gradient(from: name)
                         RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous)
                             .fill(LinearGradient(colors: [colors.primary, colors.secondary],
                                                  startPoint: .topLeading,
@@ -110,7 +117,7 @@ struct AlbumCover: View {
                 }
                 .overlay(alignment: .bottom) {
                     if metrics.size.width >= 80 {
-                        AlbumItemCount(of: album)
+                        AlbumItemCount(picCount: picCount, albumCount: albumCount)
                             .foregroundStyle(.white)
                             .shadow(color: .black.opacity(0.5),
                                     radius: 2.0,
@@ -126,6 +133,8 @@ struct AlbumCover: View {
         .frame(width: length, height: length)
     }
 
+    // MARK: - Async Cover (Local Database)
+
     struct AsyncAlbumCover: View {
 
         var album: Album
@@ -136,8 +145,10 @@ struct AlbumCover: View {
         @State private var tertiaryImage: Image?
 
         var body: some View {
-            AlbumCover(length: length,
-                       album: album,
+            AlbumCover(name: album.name,
+                       length: length,
+                       picCount: album.picCount(),
+                       albumCount: album.albumCount(),
                        primaryImage: primaryImage,
                        secondaryImage: secondaryImage,
                        tertiaryImage: tertiaryImage)
@@ -163,12 +174,93 @@ struct AlbumCover: View {
             tertiaryImage = images[2]
         }
     }
+
+    // MARK: - Async Cover (Photos Library Album)
+
+    struct AsyncPhotosAlbumCover: View {
+
+        var collection: PHAssetCollection
+        var length: CGFloat?
+
+        @State private var primaryImage: Image?
+        @State private var secondaryImage: Image?
+        @State private var tertiaryImage: Image?
+        @State private var picCount: Int = 0
+
+        var body: some View {
+            AlbumCover(name: collection.localizedTitle ?? "",
+                       length: length,
+                       picCount: picCount,
+                       albumCount: 0,
+                       primaryImage: primaryImage,
+                       secondaryImage: secondaryImage,
+                       tertiaryImage: tertiaryImage)
+            .task(id: collection.localIdentifier) {
+                loadRepresentativePhotos()
+            }
+        }
+
+        private func loadRepresentativePhotos() {
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            fetchOptions.fetchLimit = 3
+            let result = PHAsset.fetchAssets(in: collection, options: fetchOptions)
+
+            let countOptions = PHFetchOptions()
+            countOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            picCount = PHAsset.fetchAssets(in: collection, options: countOptions).count
+
+            let manager = PHCachingImageManager.default()
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .opportunistic
+            options.isNetworkAccessAllowed = true
+            let targetSize = CGSize(width: 200, height: 200)
+
+            var images: [Image?] = []
+            result.enumerateObjects { asset, _, _ in
+                manager.requestImage(for: asset, targetSize: targetSize,
+                                     contentMode: .aspectFill, options: options) { uiImage, _ in
+                    if let uiImage {
+                        DispatchQueue.main.async {
+                            images.append(Image(uiImage: uiImage))
+                            if images.count >= 1 { self.primaryImage = images[0] }
+                            if images.count >= 2 { self.secondaryImage = images[1] }
+                            if images.count >= 3 { self.tertiaryImage = images[2] }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Async Cover (Photos Library Folder)
+
+    struct AsyncPhotosFolderCover: View {
+
+        var folder: PHCollectionList
+        var length: CGFloat?
+
+        var body: some View {
+            AlbumCover(name: folder.localizedTitle ?? "",
+                       length: length,
+                       picCount: 0,
+                       albumCount: PHCollection.fetchCollections(in: folder, options: nil).count)
+        }
+    }
 }
+
+// MARK: - Item Count
 
 struct AlbumItemCount: View {
 
     let picCount: Int
     let albumCount: Int
+
+    init(picCount: Int, albumCount: Int) {
+        self.picCount = picCount
+        self.albumCount = albumCount
+    }
 
     init(of album: Album) {
         self.picCount = album.picCount()
