@@ -60,6 +60,8 @@ struct MoreView: View {
                     }
                 } header: {
                     Text("More.Stats")
+                } footer: {
+                    Text("More.Stats.Footer")
                 }
                 Section {
                     Toggle(isOn: $isPhotosModeEnabled) {

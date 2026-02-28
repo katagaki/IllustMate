@@ -1102,6 +1102,23 @@
         }
       }
     },
+    "More.Stats.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These numbers reflect your PicMate library, not the Photos library."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この数値はPicMateライブラリのものであり、写真ライブラリのものではありません。"
+          }
+        }
+      }
+    },
     "More.Troubleshooting" : {
       "extractionState" : "manual",
       "localizations" : {
