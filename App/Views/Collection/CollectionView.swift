@@ -59,6 +59,8 @@ struct CollectionView: View {
                   PhotosFolderView(folder: wrapper.collectionList)
               case .photosAlbum(let wrapper):
                   PhotosAlbumContentView(collection: wrapper.collection)
+              case .photosAssetViewer(let wrapper):
+                  PhotosAssetViewer(asset: wrapper.asset)
               default: Color.clear
               }
             })

@@ -21,7 +21,14 @@ struct PhotosAssetsGrid: View {
             spacing: 2.0
         ) {
             ForEach(assets, id: \.localIdentifier) { asset in
-                PhotosAssetLabel(asset: asset)
+                NavigationLink(value: ViewPath.photosAssetViewer(asset: PHAssetWrapper(asset: asset))) {
+                    PhotosAssetLabel(asset: asset)
+                }
+#if targetEnvironment(macCatalyst)
+                .buttonStyle(.borderless)
+#else
+                .buttonStyle(.plain)
+#endif
             }
         }
         .animation(.smooth, value: columnCount)
