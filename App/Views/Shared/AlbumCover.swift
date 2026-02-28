@@ -221,16 +221,18 @@ struct AlbumCover: View {
             let targetSize = CGSize(width: coverLength * displayScale,
                                     height: coverLength * displayScale)
 
-            var images: [Image?] = []
-            result.enumerateObjects { asset, _, _ in
+            result.enumerateObjects { asset, index, _ in
                 manager.requestImage(for: asset, targetSize: targetSize,
                                      contentMode: .aspectFill, options: options) { uiImage, _ in
                     if let uiImage {
+                        let image = Image(uiImage: uiImage)
                         DispatchQueue.main.async {
-                            images.append(Image(uiImage: uiImage))
-                            if images.count >= 1 { self.primaryImage = images[0] }
-                            if images.count >= 2 { self.secondaryImage = images[1] }
-                            if images.count >= 3 { self.tertiaryImage = images[2] }
+                            switch index {
+                            case 0: self.primaryImage = image
+                            case 1: self.secondaryImage = image
+                            case 2: self.tertiaryImage = image
+                            default: break
+                            }
                         }
                     }
                 }
