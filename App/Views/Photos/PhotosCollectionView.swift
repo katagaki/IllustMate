@@ -13,13 +13,18 @@ struct PhotosCollectionView: View {
     @Environment(PhotosManager.self) var photosManager
     @EnvironmentObject var navigation: NavigationManager
 
+    @Namespace var namespace
+
     @State var items: [PHCollectionItem] = []
+    @State var rootAssets: [PHAsset] = []
     @State var hasFetched: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
+    @AppStorage(wrappedValue: 4, "PicColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var picColumnCount: Int
 
     var body: some View {
         Group {
@@ -44,12 +49,18 @@ struct PhotosCollectionView: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
                 photosAlbumsSection
+                if !rootAssets.isEmpty {
+                    Spacer()
+                        .frame(height: 20.0)
+                    photosPicsSection
+                }
             }
             .padding([.top], 20.0)
         }
         .onAppear {
             if !hasFetched {
                 items = photosManager.fetchTopLevelCollections()
+                rootAssets = photosManager.fetchAssetsNotInAnyAlbum()
                 hasFetched = true
             }
         }
@@ -89,6 +100,28 @@ struct PhotosCollectionView: View {
                     .foregroundStyle(.secondary)
                     .padding(20.0)
             }
+        }
+    }
+
+    private var photosPicsSection: some View {
+        Group {
+            SectionHeader(title: "Albums.Pics", count: rootAssets.count) {
+                Picker("Shared.GridSize",
+                       systemImage: "square.grid.2x2",
+                       selection: $picColumnCount.animation(.smooth.speed(2.0))) {
+                    Text("Shared.GridSize.3")
+                        .tag(3)
+                    Text("Shared.GridSize.4")
+                        .tag(4)
+                    Text("Shared.GridSize.5")
+                        .tag(5)
+                    Text("Shared.GridSize.8")
+                        .tag(8)
+                }
+                .pickerStyle(.menu)
+            }
+            .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
+            PhotosAssetsGrid(namespace: namespace, assets: rootAssets)
         }
     }
 

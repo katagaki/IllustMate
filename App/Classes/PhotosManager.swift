@@ -83,6 +83,39 @@ class PhotosManager {
         return PHAsset.fetchAssets(in: collection, options: fetchOptions).firstObject
     }
 
+    // MARK: - Fetch Assets Not in Any Album
+
+    func fetchAssetsNotInAnyAlbum() -> [PHAsset] {
+        // Fetch all image assets
+        let allOptions = PHFetchOptions()
+        allOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        allOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        let allAssets = PHAsset.fetchAssets(with: allOptions)
+
+        // Collect identifiers of assets that belong to any user album
+        var albumedIdentifiers: Set<String> = []
+        let albums = PHAssetCollection.fetchAssetCollections(
+            with: .album, subtype: .any, options: nil
+        )
+        albums.enumerateObjects { collection, _, _ in
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
+            assets.enumerateObjects { asset, _, _ in
+                albumedIdentifiers.insert(asset.localIdentifier)
+            }
+        }
+
+        // Return assets not in any album
+        var result: [PHAsset] = []
+        allAssets.enumerateObjects { asset, _, _ in
+            if !albumedIdentifiers.contains(asset.localIdentifier) {
+                result.append(asset)
+            }
+        }
+        return result
+    }
+
     // MARK: - Nested Albums (Experimental)
 
     /// In nested albums mode, within a folder:
