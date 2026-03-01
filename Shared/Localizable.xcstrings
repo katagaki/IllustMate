@@ -1255,6 +1255,23 @@
         }
       }
     },
+    "More.Experiments.NestedAlbums.CopyPrefix": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Prefix to Clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接頭辞をクリップボードにコピー"
+          }
+        }
+      }
+    },
     "More.PhotosMode": {
       "extractionState": "manual",
       "localizations": {

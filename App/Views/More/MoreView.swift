@@ -125,6 +125,13 @@ struct MoreView: View {
                         Text("More.Experiments.NestedAlbums")
                     }
                     .disabled(!isPhotosModeEnabled)
+                    Button {
+                        UIPasteboard.general.string = "▶︎ "
+                    } label: {
+                        Label("More.Experiments.NestedAlbums.CopyPrefix", systemImage: "doc.on.doc")
+                    }
+                    .tint(.primary)
+                    .disabled(!isNestedAlbumsEnabled)
                 } header: {
                     Text("More.Experiments")
                 } footer: {
