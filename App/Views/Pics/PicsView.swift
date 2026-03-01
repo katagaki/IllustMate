@@ -16,6 +16,7 @@ struct PicsView: View {
     @Namespace var namespace
 
     @State var pics: [Pic] = []
+    @State var picToRename: Pic?
     @State var viewerManager = ViewerManager()
 
     var body: some View {
@@ -26,11 +27,13 @@ struct PicsView: View {
                              pics: pics,
                              isSelecting: .constant(false),
                              enableSelection: false) { pic in
-                        viewer.setDisplay(pic) { [navigation] in
+                        viewer.setDisplay(pic, in: pics) { [navigation] in
                             navigation.push(.picViewer(namespace: namespace), for: .pics)
                         }
                     } selectedCount: {
                         return 0
+                    } onRename: { pic in
+                        picToRename = pic
                     } moveMenu: { _ in
                         // TODO: Move menu support in macOS Pics view
                     }
@@ -52,6 +55,11 @@ struct PicsView: View {
                 if newValue == .active {
                     refreshPics()
                 }
+            }
+            .sheet(item: $picToRename) {
+                refreshPics()
+            } content: { pic in
+                RenamePicView(pic: pic)
             }
         }
     }

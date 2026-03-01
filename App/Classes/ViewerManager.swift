@@ -17,6 +17,12 @@ class ViewerManager {
     var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
 
+    var allPics: [Pic] = []
+    var currentIndex: Int = 0
+
+    var hasNext: Bool { currentIndex < allPics.count - 1 }
+    var hasPrevious: Bool { currentIndex > 0 }
+
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
     func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
@@ -45,13 +51,63 @@ class ViewerManager {
 
         // Load full image in background if not cached
         if !isFullImageLoaded {
-            Task(priority: .userInitiated) {
-                var loadedImage: UIImage?
-                if let data = await DataActor.shared.imageData(forPicWithID: pic.id),
-                   let image = await UIImage(data: data)?.byPreparingForDisplay() {
-                    loadedImage = image
-                }
-                self.imageCache[pic.id] = loadedImage
+            loadFullImage(for: pic.id)
+        }
+    }
+
+    func setDisplay(_ pic: Pic, in pics: [Pic], completion: @escaping @MainActor @Sendable () -> Void) {
+        allPics = pics
+        currentIndex = pics.firstIndex(where: { $0.id == pic.id }) ?? 0
+        setDisplay(pic, completion: completion)
+    }
+
+    func navigateTo(index: Int) {
+        guard index >= 0, index < allPics.count else { return }
+        currentIndex = index
+        let pic = allPics[index]
+
+        let thumbnail: UIImage?
+        if let thumbnailData = pic.thumbnailData {
+            thumbnail = UIImage(data: thumbnailData)
+        } else {
+            thumbnail = nil
+        }
+
+        displayedThumbnail = thumbnail
+        displayedPic = pic
+        displayedPicID = pic.id
+        isFullImageLoaded = false
+
+        if let cachedImage = imageCache[pic.id] {
+            displayedImage = cachedImage
+            isFullImageLoaded = true
+        } else {
+            displayedImage = nil
+            loadFullImage(for: pic.id)
+        }
+    }
+
+    func navigateToNext() {
+        if hasNext {
+            navigateTo(index: currentIndex + 1)
+        }
+    }
+
+    func navigateToPrevious() {
+        if hasPrevious {
+            navigateTo(index: currentIndex - 1)
+        }
+    }
+
+    private func loadFullImage(for picID: String) {
+        Task(priority: .userInitiated) {
+            var loadedImage: UIImage?
+            if let data = await DataActor.shared.imageData(forPicWithID: picID),
+               let image = await UIImage(data: data)?.byPreparingForDisplay() {
+                loadedImage = image
+            }
+            self.imageCache[picID] = loadedImage
+            if self.displayedPicID == picID {
                 self.displayedImage = loadedImage
                 withAnimation(.easeInOut(duration: 0.25)) {
                     self.isFullImageLoaded = true

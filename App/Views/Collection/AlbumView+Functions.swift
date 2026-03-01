@@ -110,7 +110,7 @@ extension AlbumView {
             }
         } else {
             let picCopy = pic
-            viewer.setDisplay(picCopy) { [navigation] in
+            viewer.setDisplay(picCopy, in: pics) { [navigation] in
                 navigation.push(.picViewer(namespace: namespace), for: .collection)
             }
         }

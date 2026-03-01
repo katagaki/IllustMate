@@ -75,6 +75,13 @@ struct PicViewer: View {
                     showImageSize.toggle()
                 }
             }
+
+            // Carousel strip for navigating between pics
+            if viewer.allPics.count > 1 {
+                PicCarouselStrip()
+                    .padding(.horizontal, -20.0)
+                    .padding(.bottom, 20.0)
+            }
         }
         .padding(20.0)
         .frame(maxHeight: .infinity)
@@ -92,7 +99,7 @@ struct PicViewer: View {
                     .ignoresSafeArea()
             }
         }
-        .navigationTitle(pic.name)
+        .navigationTitle(viewer.displayedPic?.name ?? pic.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if let containingAlbumName {
@@ -114,24 +121,35 @@ struct PicViewer: View {
                         "Shared.Share",
                         item: Image(cgImage, scale: image.scale, label: Text("")),
                         preview: SharePreview(
-                            pic.name,
+                            viewer.displayedPic?.name ?? pic.name,
                             image: Image(uiImage: image)
                         )
                     )
                 }
             }
         }
-        .task {
-            if let albumID = pic.containingAlbumID {
-                let containingAlbumName = await DataActor.shared.album(for: albumID)?.name
+        .task(id: viewer.displayedPicID) {
+            containingAlbumName = nil
+            if let albumID = viewer.displayedPic?.containingAlbumID ?? pic.containingAlbumID {
+                let name = await DataActor.shared.album(for: albumID)?.name
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
-                        self.containingAlbumName = containingAlbumName
+                        self.containingAlbumName = name
                     }
                 }
             }
         }
-#if !targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
+        .focusable()
+        .onKeyPress(.leftArrow) {
+            viewer.navigateToPrevious()
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            viewer.navigateToNext()
+            return .handled
+        }
+#else
         .gesture(
             MagnifyGesture()
                 .onChanged { gesture in
@@ -152,5 +170,85 @@ struct PicViewer: View {
                 }
         )
 #endif
+    }
+}
+
+// MARK: - Carousel Strip
+
+private struct PicCarouselStrip: View {
+
+    @Environment(ViewerManager.self) var viewer
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 4.0) {
+                    ForEach(Array(viewer.allPics.enumerated()), id: \.element.id) { index, pic in
+                        Button {
+                            withAnimation(.smooth.speed(2)) {
+                                viewer.navigateTo(index: index)
+                            }
+                        } label: {
+                            CarouselThumbnail(pic: pic, isSelected: index == viewer.currentIndex)
+                        }
+                        .buttonStyle(.plain)
+                        .id(pic.id)
+                    }
+                }
+                .padding(.horizontal, 20.0)
+            }
+            .frame(height: 56.0)
+            .onChange(of: viewer.currentIndex) { _, _ in
+                if let pic = viewer.displayedPic {
+                    withAnimation(.smooth) {
+                        proxy.scrollTo(pic.id, anchor: .center)
+                    }
+                }
+            }
+            .onAppear {
+                if let pic = viewer.displayedPic {
+                    proxy.scrollTo(pic.id, anchor: .center)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Carousel Thumbnail
+
+private struct CarouselThumbnail: View {
+
+    let pic: Pic
+    let isSelected: Bool
+
+    @State private var thumbnail: UIImage?
+
+    var body: some View {
+        Rectangle()
+            .fill(.primary.opacity(0.05))
+            .frame(width: 48.0, height: 48.0)
+            .overlay {
+                if let thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFill()
+                }
+            }
+            .clipped()
+            .clipShape(.rect(cornerRadius: 4.0))
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 4.0)
+                        .stroke(Color.accentColor, lineWidth: 2.0)
+                }
+            }
+            .opacity(isSelected ? 1.0 : 0.6)
+            .task(id: pic.identifiableString()) {
+                if let data = pic.thumbnailData {
+                    thumbnail = UIImage(data: data)
+                } else if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: pic.id) {
+                    thumbnail = UIImage(data: thumbData)
+                }
+            }
     }
 }

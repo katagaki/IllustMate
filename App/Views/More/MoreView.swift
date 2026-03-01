@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 struct MoreView: View {
 
     @Environment(\.dismiss) var dismiss
+    @Environment(AuthenticationManager.self) var auth
     @EnvironmentObject var navigation: NavigationManager
 
     @State var albumCount: Int = 0
@@ -23,6 +24,8 @@ struct MoreView: View {
 
     @AppStorage("PhotosModeEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
+    @AppStorage("AppLockEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
     @AppStorage("PhotosNestedAlbumsEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isNestedAlbumsEnabled: Bool = false
 
@@ -65,12 +68,22 @@ struct MoreView: View {
                 }
                 Section {
                     Toggle(isOn: $isPhotosModeEnabled) {
-                        ListRow(image: "ListIcon.Photos", title: "More.PhotosMode")
+                        Label("More.PhotosMode", systemImage: "photo.on.rectangle.angled")
                     }
                 } header: {
                     Text("More.PhotosMode.Header")
                 } footer: {
                     Text("More.PhotosMode.Description")
+                }
+                Section {
+                    Toggle(isOn: $isAppLockEnabled) {
+                        Label("More.AppLock", systemImage: "lock.fill")
+                    }
+                    .disabled(auth.biometryType == .none)
+                } header: {
+                    Text("More.Security")
+                } footer: {
+                    Text("More.AppLock.Description")
                 }
                 Section {
                     Group {
@@ -88,12 +101,12 @@ struct MoreView: View {
                             }
 #endif
                         } label: {
-                            ListRow(image: "ListIcon.Files", title: "Shared.OpenFilesApp")
+                            Label("Shared.OpenFilesApp", systemImage: "folder")
                         }
                         Button {
                             isPickingBackupFolder = true
                         } label: {
-                            ListRow(image: "ListIcon.Database", title: "More.Backup")
+                            Label("More.Backup", systemImage: "externaldrive")
                         }
                     }
                     .tint(.primary)
@@ -102,7 +115,7 @@ struct MoreView: View {
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreTroubleshooting) {
-                        ListRow(image: "ListIcon.Troubleshooting", title: "More.Troubleshooting")
+                        Label("More.Troubleshooting", systemImage: "wrench.and.screwdriver")
                     }
                 } header: {
                     Text("More.Advanced")

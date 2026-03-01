@@ -19,6 +19,7 @@ struct PicsGrid<Content: View>: View {
     var isSelected: ((Pic) -> Bool)?
     var onSelect: (Pic) -> Void
     var selectedCount: () -> Int
+    var onRename: ((Pic) -> Void)?
     var onDelete: ((Pic) -> Void)?
     @ViewBuilder var moveMenu: (Pic) -> Content
 
@@ -76,6 +77,12 @@ struct PicsGrid<Content: View>: View {
                                   preview: SharePreview(pic.name)) {
                             Label("Shared.Share", systemImage: "square.and.arrow.up")
                         }
+                        if let onRename {
+                            Divider()
+                            Button("Shared.Rename", systemImage: "pencil") {
+                                onRename(pic)
+                            }
+                        }
                         Divider()
                         if pic.containingAlbumID != nil {
                             Button("Shared.SetAsCover", systemImage: "photo") {
@@ -98,6 +105,7 @@ struct PicsGrid<Content: View>: View {
                 }
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
+                .hoverEffect(.highlight)
 #else
                 .buttonStyle(.plain)
 #endif
