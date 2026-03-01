@@ -80,7 +80,6 @@ struct PicViewer: View {
             if viewer.allPics.count > 1 {
                 PicCarouselStrip()
                     .padding(.horizontal, -20.0)
-                    .padding(.bottom, 20.0)
             }
         }
         .padding(20.0)
@@ -110,6 +109,7 @@ struct PicViewer: View {
                         .lineLimit(1)
                 }
             }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Button("Shared.Copy", systemImage: "doc.on.doc") {
                     if let image = currentImage {
