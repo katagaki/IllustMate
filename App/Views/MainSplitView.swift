@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainSplitView: View {
 
+    @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
@@ -103,6 +104,21 @@ struct MainSplitView: View {
                 albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
             } catch {
                 debugPrint(error.localizedDescription)
+            }
+        }
+        .onChange(of: navigation.dataVersion) { _, _ in
+            albums = []
+            selectedView = .collection
+            viewer.displayedPic = nil
+            viewer.displayedImage = nil
+            viewer.displayedThumbnail = nil
+            viewer.allPics = []
+            Task {
+                do {
+                    albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
             }
         }
     }

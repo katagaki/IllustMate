@@ -14,12 +14,18 @@ class NavigationManager: ObservableObject {
     @Published var albumsTabPath: [ViewPath] = []
     @Published var picsTabPath: [ViewPath] = []
     @Published var moreTabPath: [ViewPath] = []
+    @Published var dataVersion: Int = 0
 
     func popAll() {
         collectionTabPath.removeAll()
         albumsTabPath.removeAll()
         picsTabPath.removeAll()
         moreTabPath.removeAll()
+    }
+
+    func signalDataDeleted() {
+        popAll()
+        dataVersion += 1
     }
 
     func push(_ viewPath: ViewPath, for tab: TabType) {

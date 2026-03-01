@@ -56,6 +56,9 @@ struct PicsView: View {
                     refreshPics()
                 }
             }
+            .onChange(of: navigation.dataVersion) { _, _ in
+                refreshPics()
+            }
             .sheet(item: $picToRename) {
                 refreshPics()
             } content: { pic in

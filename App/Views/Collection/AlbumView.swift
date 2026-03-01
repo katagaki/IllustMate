@@ -179,6 +179,11 @@ struct AlbumView: View {
                 }
             }
         }
+        .onChange(of: navigation.dataVersion) { _, _ in
+            Task.detached(priority: .userInitiated) {
+                await refreshData()
+            }
+        }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 }

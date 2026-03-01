@@ -33,7 +33,7 @@ struct CollectionView: View {
                     Button {
                         isMoreViewPresenting = true
                     } label: {
-                        Image(systemName: "gearshape")
+                        Image(systemName: "ellipsis")
                     }
                 }
             }

@@ -48,6 +48,9 @@ struct AlbumsView: View {
                 refreshAlbums()
             }
         }
+        .onChange(of: navigation.dataVersion) { _, _ in
+            refreshAlbums()
+        }
     }
 
     func refreshAlbums() {

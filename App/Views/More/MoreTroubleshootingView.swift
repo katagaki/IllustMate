@@ -44,21 +44,7 @@ struct MoreTroubleshootingView: View {
             Button("Shared.Yes", role: .destructive) {
                 Task {
                     await DataActor.shared.deleteAll()
-                    navigation.popAll()
-                }
-            }
-            Button("Shared.No", role: .cancel) {
-                isDeleteConfirming = false
-            }
-        } message: {
-            Text("Alert.DeleteAll.Text")
-        }
-        .navigationTitle("ViewTitle.Troubleshooting")
-        .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
-            Button("Shared.Yes", role: .destructive) {
-                Task {
-                    await DataActor.shared.deleteAll()
-                    navigation.popAll()
+                    navigation.signalDataDeleted()
                 }
             }
             Button("Shared.No", role: .cancel) {

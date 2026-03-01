@@ -174,6 +174,9 @@ SOFTWARE.
         .task {
             await loadCounts()
         }
+        .onChange(of: navigation.dataVersion) { _, _ in
+            dismiss()
+        }
         .fileImporter(isPresented: $isPickingBackupFolder, allowedContentTypes: [.folder]) { result in
             switch result {
             case .success(let url):
