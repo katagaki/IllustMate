@@ -25,6 +25,14 @@ struct PicViewer: View {
         viewer.displayedImage ?? viewer.displayedThumbnail
     }
 
+    var shareImage: Image {
+        if let image = currentImage, let cgImage = image.cgImage {
+            Image(cgImage, scale: image.scale, label: Text(""))
+        } else {
+            Image(uiImage: UIImage())
+        }
+    }
+
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             // Image with size overlay - fills available space
@@ -116,16 +124,16 @@ struct PicViewer: View {
                         UIPasteboard.general.image = image
                     }
                 }
-                if let image = currentImage, let cgImage = image.cgImage {
-                    ShareLink(
-                        "Shared.Share",
-                        item: Image(cgImage, scale: image.scale, label: Text("")),
-                        preview: SharePreview(
-                            viewer.displayedPic?.name ?? pic.name,
-                            image: Image(uiImage: image)
-                        )
+                .disabled(currentImage == nil)
+                ShareLink(
+                    "Shared.Share",
+                    item: shareImage,
+                    preview: SharePreview(
+                        viewer.displayedPic?.name ?? pic.name,
+                        image: shareImage
                     )
-                }
+                )
+                .disabled(currentImage == nil)
             }
         }
         .task(id: viewer.displayedPicID) {
