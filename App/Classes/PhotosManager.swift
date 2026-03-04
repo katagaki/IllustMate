@@ -58,16 +58,11 @@ class PhotosManager {
 
     // MARK: - Fetch Assets in Album
 
-    func fetchAssets(in collection: PHAssetCollection) -> [PHAsset] {
+    func fetchAssets(in collection: PHAssetCollection) -> PHFetchResult<PHAsset> {
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        let result = PHAsset.fetchAssets(in: collection, options: fetchOptions)
-        var assets: [PHAsset] = []
-        result.enumerateObjects { asset, _, _ in
-            assets.append(asset)
-        }
-        return assets
+        return PHAsset.fetchAssets(in: collection, options: fetchOptions)
     }
 
     func imageCount(in collection: PHAssetCollection) -> Int {
@@ -85,35 +80,41 @@ class PhotosManager {
 
     // MARK: - Fetch Assets Not in Any Album
 
-    func fetchAssetsNotInAnyAlbum() -> [PHAsset] {
-        // Fetch all image assets
-        let allOptions = PHFetchOptions()
-        allOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
-        allOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        let allAssets = PHAsset.fetchAssets(with: allOptions)
+    func fetchAssetsNotInAnyAlbum() async -> [PHAsset] {
+        await Task.detached(priority: .userInitiated) {
+            // Fetch all image assets
+            let allOptions = PHFetchOptions()
+            allOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            allOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            let allAssets = PHAsset.fetchAssets(with: allOptions)
 
-        // Collect identifiers of assets that belong to any user album
-        var albumedIdentifiers: Set<String> = []
-        let albums = PHAssetCollection.fetchAssetCollections(
-            with: .album, subtype: .any, options: nil
-        )
-        albums.enumerateObjects { collection, _, _ in
-            let fetchOptions = PHFetchOptions()
-            fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
-            let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
-            assets.enumerateObjects { asset, _, _ in
-                albumedIdentifiers.insert(asset.localIdentifier)
+            // Collect identifiers of assets that belong to any user album
+            var albumedIdentifiers: Set<String> = []
+            albumedIdentifiers.reserveCapacity(allAssets.count)
+            let albums = PHAssetCollection.fetchAssetCollections(
+                with: .album, subtype: .any, options: nil
+            )
+            albums.enumerateObjects { collection, _, _ in
+                let fetchOptions = PHFetchOptions()
+                fetchOptions.predicate = NSPredicate(
+                    format: "mediaType = %d", PHAssetMediaType.image.rawValue
+                )
+                let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
+                assets.enumerateObjects { asset, _, _ in
+                    albumedIdentifiers.insert(asset.localIdentifier)
+                }
             }
-        }
 
-        // Return assets not in any album
-        var result: [PHAsset] = []
-        allAssets.enumerateObjects { asset, _, _ in
-            if !albumedIdentifiers.contains(asset.localIdentifier) {
-                result.append(asset)
+            // Return assets not in any album
+            var result: [PHAsset] = []
+            result.reserveCapacity(max(0, allAssets.count - albumedIdentifiers.count))
+            allAssets.enumerateObjects { asset, _, _ in
+                if !albumedIdentifiers.contains(asset.localIdentifier) {
+                    result.append(asset)
+                }
             }
-        }
-        return result
+            return result
+        }.value
     }
 
     // MARK: - Nested Albums (Experimental)

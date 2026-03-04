@@ -20,7 +20,7 @@ struct PhotosFolderView: View {
     @Namespace var namespace
 
     @State private var items: [PHCollectionItem] = []
-    @State private var ownPicsAssets: [PHAsset] = []
+    @State private var ownPicsFetchResult: PHFetchResult<PHAsset>?
     @State private var hasFetched: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
@@ -39,8 +39,8 @@ struct PhotosFolderView: View {
                         .frame(height: 20.0)
                 }
 
-                if isNestedAlbumsEnabled && !ownPicsAssets.isEmpty {
-                    picsSection
+                if isNestedAlbumsEnabled, let fetchResult = ownPicsFetchResult, fetchResult.count > 0 {
+                    picsSection(fetchResult: fetchResult)
                 }
             }
             .padding([.top], 20.0)
@@ -86,9 +86,9 @@ struct PhotosFolderView: View {
         }
     }
 
-    private var picsSection: some View {
+    private func picsSection(fetchResult: PHFetchResult<PHAsset>) -> some View {
         Group {
-            SectionHeader(title: "Albums.Pics", count: ownPicsAssets.count) {
+            SectionHeader(title: "Albums.Pics", count: fetchResult.count) {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
                        selection: $picColumnCount.animation(.smooth.speed(2.0))) {
@@ -104,7 +104,7 @@ struct PhotosFolderView: View {
                 .pickerStyle(.menu)
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            PhotosAssetsGrid(namespace: namespace, assets: ownPicsAssets)
+            PhotosFetchResultAssetsGrid(namespace: namespace, fetchResult: fetchResult)
         }
     }
 
@@ -124,7 +124,7 @@ struct PhotosFolderView: View {
             items = collected
 
             if let ownPicsCollection = resolved.ownPicsCollection {
-                ownPicsAssets = photosManager.fetchAssets(in: ownPicsCollection)
+                ownPicsFetchResult = photosManager.fetchAssets(in: ownPicsCollection)
             }
         } else {
             items = photosManager.fetchCollections(in: folder)
