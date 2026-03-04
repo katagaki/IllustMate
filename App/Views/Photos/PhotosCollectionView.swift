@@ -17,7 +17,9 @@ struct PhotosCollectionView: View {
 
     @State var items: [PHCollectionItem] = []
     @State var rootAssets: [PHAsset] = []
-    @State var hasFetched: Bool = false
+    @State var hasFetchedCollections: Bool = false
+    @State var hasFetchedRootAssets: Bool = false
+    @State var isFetchingRootAssets: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
@@ -49,19 +51,24 @@ struct PhotosCollectionView: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
                 photosAlbumsSection
-                if !rootAssets.isEmpty {
-                    Spacer()
-                        .frame(height: 20.0)
-                    photosPicsSection
-                }
+                Spacer()
+                    .frame(height: 20.0)
+                photosPicsSection
             }
             .padding([.top], 20.0)
         }
         .onAppear {
-            if !hasFetched {
+            if !hasFetchedCollections {
                 items = photosManager.fetchTopLevelCollections()
-                rootAssets = photosManager.fetchAssetsNotInAnyAlbum()
-                hasFetched = true
+                hasFetchedCollections = true
+            }
+        }
+        .task {
+            if !hasFetchedRootAssets && !isFetchingRootAssets {
+                isFetchingRootAssets = true
+                rootAssets = await photosManager.fetchAssetsNotInAnyAlbum()
+                hasFetchedRootAssets = true
+                isFetchingRootAssets = false
             }
         }
     }
@@ -95,7 +102,7 @@ struct PhotosCollectionView: View {
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
             if !items.isEmpty {
                 PhotosAlbumsSection(items: items, style: $albumStyleState)
-            } else if hasFetched {
+            } else if hasFetchedCollections {
                 Text("Albums.NoAlbums")
                     .foregroundStyle(.secondary)
                     .padding(20.0)
@@ -105,23 +112,31 @@ struct PhotosCollectionView: View {
 
     private var photosPicsSection: some View {
         Group {
-            SectionHeader(title: "Albums.Pics", count: rootAssets.count) {
-                Picker("Shared.GridSize",
-                       systemImage: "square.grid.2x2",
-                       selection: $picColumnCount.animation(.smooth.speed(2.0))) {
-                    Text("Shared.GridSize.3")
-                        .tag(3)
-                    Text("Shared.GridSize.4")
-                        .tag(4)
-                    Text("Shared.GridSize.5")
-                        .tag(5)
-                    Text("Shared.GridSize.8")
-                        .tag(8)
+            if isFetchingRootAssets && !hasFetchedRootAssets {
+                SectionHeader(title: "Albums.Pics", count: 0) { }
+                    .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(20.0)
+            } else if !rootAssets.isEmpty {
+                SectionHeader(title: "Albums.Pics", count: rootAssets.count) {
+                    Picker("Shared.GridSize",
+                           systemImage: "square.grid.2x2",
+                           selection: $picColumnCount.animation(.smooth.speed(2.0))) {
+                        Text("Shared.GridSize.3")
+                            .tag(3)
+                        Text("Shared.GridSize.4")
+                            .tag(4)
+                        Text("Shared.GridSize.5")
+                            .tag(5)
+                        Text("Shared.GridSize.8")
+                            .tag(8)
+                    }
+                    .pickerStyle(.menu)
                 }
-                .pickerStyle(.menu)
+                .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
+                PhotosAssetsGrid(namespace: namespace, assets: rootAssets)
             }
-            .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            PhotosAssetsGrid(namespace: namespace, assets: rootAssets)
         }
     }
 

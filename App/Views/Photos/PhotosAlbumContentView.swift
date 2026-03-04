@@ -16,16 +16,20 @@ struct PhotosAlbumContentView: View {
 
     @Namespace var namespace
 
-    @State private var assets: [PHAsset] = []
+    @State private var fetchResult: PHFetchResult<PHAsset>?
     @State private var hasFetched: Bool = false
 
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
+    private var assetCount: Int {
+        fetchResult?.count ?? 0
+    }
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                SectionHeader(title: "Albums.Pics", count: assets.count) {
+                SectionHeader(title: "Albums.Pics", count: assetCount) {
                     Picker("Shared.GridSize",
                            systemImage: "square.grid.2x2",
                            selection: $columnCount.animation(.smooth.speed(2.0))) {
@@ -42,8 +46,8 @@ struct PhotosAlbumContentView: View {
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
 
-                if !assets.isEmpty {
-                    PhotosAssetsGrid(namespace: namespace, assets: assets)
+                if let fetchResult, fetchResult.count > 0 {
+                    PhotosFetchResultAssetsGrid(namespace: namespace, fetchResult: fetchResult)
                 } else if hasFetched {
                     Text("Albums.NoPics")
                         .foregroundStyle(.secondary)
@@ -55,7 +59,7 @@ struct PhotosAlbumContentView: View {
         .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
         .onAppear {
             if !hasFetched {
-                assets = photosManager.fetchAssets(in: collection)
+                fetchResult = photosManager.fetchAssets(in: collection)
                 hasFetched = true
             }
         }

@@ -13,15 +13,23 @@ struct PhotosAssetsGrid: View {
     var namespace: Namespace.ID
     var assets: [PHAsset]
 
+    private let batchSize = 200
+
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+
+    @State private var displayCount: Int = 200
+
+    private var visibleAssets: ArraySlice<PHAsset> {
+        assets.prefix(displayCount)
+    }
 
     var body: some View {
         LazyVGrid(
             columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
             spacing: 2.0
         ) {
-            ForEach(assets, id: \.localIdentifier) { asset in
+            ForEach(Array(visibleAssets), id: \.localIdentifier) { asset in
                 NavigationLink(value: ViewPath.photosAssetViewer(
                     asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
                     PhotosAssetLabel(asset: asset)
@@ -33,8 +41,80 @@ struct PhotosAssetsGrid: View {
                 .buttonStyle(.plain)
 #endif
             }
+            if displayCount < assets.count {
+                Color.clear
+                    .frame(height: 1)
+                    .onAppear {
+                        displayCount = min(displayCount + batchSize, assets.count)
+                    }
+            }
         }
         .animation(.smooth, value: columnCount)
+        .onChange(of: assets.count) {
+            displayCount = min(batchSize, assets.count)
+        }
+    }
+}
+
+struct PhotosFetchResultAssetsGrid: View {
+
+    var namespace: Namespace.ID
+    var fetchResult: PHFetchResult<PHAsset>
+
+    private let batchSize = 200
+
+    @AppStorage(wrappedValue: 4, "PicColumnCount",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+
+    @State private var displayedAssets: [PHAsset] = []
+
+    private var hasMore: Bool {
+        displayedAssets.count < fetchResult.count
+    }
+
+    var body: some View {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
+            spacing: 2.0
+        ) {
+            ForEach(displayedAssets, id: \.localIdentifier) { asset in
+                NavigationLink(value: ViewPath.photosAssetViewer(
+                    asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
+                    PhotosAssetLabel(asset: asset)
+                }
+                .matchedTransitionSource(id: asset.localIdentifier, in: namespace)
+#if targetEnvironment(macCatalyst)
+                .buttonStyle(.borderless)
+#else
+                .buttonStyle(.plain)
+#endif
+            }
+            if hasMore {
+                Color.clear
+                    .frame(height: 1)
+                    .onAppear {
+                        loadMoreAssets()
+                    }
+            }
+        }
+        .animation(.smooth, value: columnCount)
+        .onAppear {
+            if displayedAssets.isEmpty {
+                loadMoreAssets()
+            }
+        }
+    }
+
+    private func loadMoreAssets() {
+        let start = displayedAssets.count
+        let end = min(start + batchSize, fetchResult.count)
+        guard start < end else { return }
+        var newAssets: [PHAsset] = []
+        newAssets.reserveCapacity(end - start)
+        for index in start..<end {
+            newAssets.append(fetchResult.object(at: index))
+        }
+        displayedAssets.append(contentsOf: newAssets)
     }
 }
 
