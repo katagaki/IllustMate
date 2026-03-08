@@ -48,9 +48,5 @@ struct PicLabel: View {
                 }
                 isThumbnailReadyToPresent = true
             }
-            .onDisappear {
-                thumbnail = nil
-                isThumbnailReadyToPresent = false
-            }
     }
 }
