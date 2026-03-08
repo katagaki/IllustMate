@@ -174,7 +174,7 @@ struct PhotosCollectionView: View {
 
     private var photosPicsSection: some View {
         Group {
-            if isFetchingRootAssets && !hasFetchedRootAssets {
+            if !hasFetchedRootAssets {
                 SectionHeader(title: "Albums.Pics", count: 0) { }
                     .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 ProgressView()
