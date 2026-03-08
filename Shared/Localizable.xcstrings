@@ -1,123 +1,123 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ""
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ""
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
           }
         }
       },
-      "shouldTranslate": false
+      "shouldTranslate" : false
     },
-    "%lld": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ""
+    "(%lld)" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
           }
         }
       },
-      "shouldTranslate": false
+      "shouldTranslate" : false
     },
-    "(%lld)": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": ""
+    "%lld" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
           }
         }
       },
-      "shouldTranslate": false
+      "shouldTranslate" : false
     },
-    "Albums.Albums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Albums"
+    "Albums.Albums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
           }
         }
       }
     },
-    "Albums.Create.Placeholder": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New Album Name"
+    "Albums.Create.Placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Album Name"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "新規アルバム名"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規アルバム名"
           }
         }
       }
     },
-    "Albums.Detail.%lld,%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%#@arg1@, %#@arg2@"
+    "Albums.Detail.%lld,%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg1@, %#@arg2@"
           },
-          "substitutions": {
-            "arg1": {
-              "argNum": 1,
-              "formatSpecifier": "d",
-              "variations": {
-                "plural": {
-                  "one": {
-                    "stringUnit": {
-                      "state": "translated",
-                      "value": "%arg Pic"
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "d",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Pic"
                     }
                   },
-                  "other": {
-                    "stringUnit": {
-                      "state": "translated",
-                      "value": "%arg Pics"
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Pics"
                     }
                   }
                 }
               }
             },
-            "arg2": {
-              "argNum": 2,
-              "formatSpecifier": "d",
-              "variations": {
-                "plural": {
-                  "one": {
-                    "stringUnit": {
-                      "state": "translated",
-                      "value": "%arg Album"
+            "arg2" : {
+              "argNum" : 2,
+              "formatSpecifier" : "d",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Album"
                     }
                   },
-                  "other": {
-                    "stringUnit": {
-                      "state": "translated",
-                      "value": "%arg Albums"
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg Albums"
                     }
                   }
                 }
@@ -125,35 +125,35 @@
             }
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%#@arg1@、%#@arg2@"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg1@、%#@arg2@"
           },
-          "substitutions": {
-            "arg1": {
-              "argNum": 1,
-              "formatSpecifier": "d",
-              "variations": {
-                "plural": {
-                  "other": {
-                    "stringUnit": {
-                      "state": "translated",
-                      "value": "%arg枚の画像"
+          "substitutions" : {
+            "arg1" : {
+              "argNum" : 1,
+              "formatSpecifier" : "d",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg枚の画像"
                     }
                   }
                 }
               }
             },
-            "arg2": {
-              "argNum": 2,
-              "formatSpecifier": "d",
-              "variations": {
-                "plural": {
-                  "other": {
-                    "stringUnit": {
-                      "state": "translated",
-                      "value": "%arg個のアルバム"
+            "arg2" : {
+              "argNum" : 2,
+              "formatSpecifier" : "d",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "%arg個のアルバム"
                     }
                   }
                 }
@@ -163,571 +163,571 @@
         }
       }
     },
-    "Albums.NoAlbums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This album does not contain any albums."
+    "Albums.NoAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This album does not contain any albums."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムがありません"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムがありません"
           }
         }
       }
     },
-    "Albums.NoMoreAlbums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This album does not contain any albums."
+    "Albums.NoMoreAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This album does not contain any albums."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このアルバムにはアルバムがありません。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアルバムにはアルバムがありません。"
           }
         }
       }
     },
-    "Albums.NoPics": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This album does not contain any pics."
+    "Albums.NoPics" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This album does not contain any pics."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画像がありません"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像がありません"
           }
         }
       }
     },
-    "Albums.Pics": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pics"
+    "Albums.Pics" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pics"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画像"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }
     },
-    "Albums.Style": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Style"
+    "Albums.Style" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Style"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "表示スタイル"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示スタイル"
           }
         }
       }
     },
-    "Albums.Style.Carousel": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Carousel View"
+    "Albums.Style.Carousel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carousel View"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カルーセル表示"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カルーセル表示"
           }
         }
       }
     },
-    "Albums.Style.Grid": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grid View"
+    "Albums.Style.Grid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid View"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "グリッド表示"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グリッド表示"
           }
         }
       }
     },
-    "Albums.Style.List": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "List View"
+    "Albums.Style.List" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List View"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リスト表示"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リスト表示"
           }
         }
       }
     },
-    "Alert.DeleteAll.Text": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Are you sure you want to delete all your data? This operation cannot be undone."
+    "Alert.DeleteAll.Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all your data? This operation cannot be undone."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのデータを削除してもよろしいですか？\n削除後、データは復元できません。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを削除してもよろしいですか？\n削除後、データは復元できません。"
           }
         }
       }
     },
-    "Alert.DeleteAll.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete All Data"
+    "Alert.DeleteAll.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Data"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのデータを消去"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを消去"
           }
         }
       }
     },
-    "Auth.Locked": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PicMate is Locked"
+    "Auth.Locked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate is Locked"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PicMateはロックされています"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMateはロックされています"
           }
         }
       }
     },
-    "Auth.Reason": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unlock PicMate"
+    "Auth.Reason" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock PicMate"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PicMateのロックを解除"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMateのロックを解除"
           }
         }
       }
     },
-    "Auth.Unlock": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unlock"
+    "Auth.Unlock" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ロック解除"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロック解除"
           }
         }
       }
     },
-    "Backup.Export.Completed": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Backup exported successfully."
+    "Backup.Export.Completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup exported successfully."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップの書き出しが完了しました。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの書き出しが完了しました。"
           }
         }
       }
     },
-    "Backup.Exporting": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exporting backup..."
+    "Backup.Exporting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporting backup..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップを書き出し中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを書き出し中…"
           }
         }
       }
     },
-    "Backup.Restore.Completed": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Backup restored successfully."
+    "Backup.Restore.Completed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup restored successfully."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップの復元ができました。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの復元ができました。"
           }
         }
       }
     },
-    "Backup.Restore.Error": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An error occurred while restoring the backup."
+    "Backup.Restore.Error" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An error occurred while restoring the backup."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップの復元中エラーが発生しました。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの復元中エラーが発生しました。"
           }
         }
       }
     },
-    "Backup.Restore.Merge": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Merge Albums"
+    "Backup.Restore.Merge" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムを合成"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを合成"
           }
         }
       }
     },
-    "Backup.Restore.Merge.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Backup will be merged into your existing collection."
+    "Backup.Restore.Merge.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup will be merged into your existing collection."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップされたアルバムは既存のコレクションに復元されます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップされたアルバムは既存のコレクションに復元されます。"
           }
         }
       }
     },
-    "Backup.Restore.ToAlbum": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select Album"
+    "Backup.Restore.ToAlbum" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムを選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを選択"
           }
         }
       }
     },
-    "Backup.Restore.ToAlbum.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Backup will be restored into an album of your selection."
+    "Backup.Restore.ToAlbum.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup will be restored into an album of your selection."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップされたアルバムは選択されたアルバムに復元されます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップされたアルバムは選択されたアルバムに復元されます。"
           }
         }
       }
     },
-    "Backup.Restoring": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restoring backup..."
+    "Backup.Restoring" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restoring backup..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元中…"
           }
         }
       }
     },
-    "Command.NextPic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next Pic"
+    "Command.NextPic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Pic"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "次の画像"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次の画像"
           }
         }
       }
     },
-    "Command.PreviousPic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Previous Pic"
+    "Command.PreviousPic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous Pic"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "前の画像"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前の画像"
           }
         }
       }
     },
-    "Experiments.ShowCloudStatusEverywhere": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Cloud Status Everywhere"
+    "Experiments.ShowCloudStatusEverywhere" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Cloud Status Everywhere"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "クラウド同期状況を常に表示"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クラウド同期状況を常に表示"
           }
         }
       }
     },
-    "Import.Album": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Album"
+    "Import.Album" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
           }
         }
       }
     },
-    "Import.Albums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Albums"
+    "Import.Albums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
           }
         }
       }
     },
-    "Import.Albums.Folders": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Folders"
+    "Import.Albums.Folders" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォルダ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダ"
           }
         }
       }
     },
-    "Import.Albums.MyAlbums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "My Albums"
+    "Import.Albums.MyAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイアルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイアルバム"
           }
         }
       }
     },
-    "Import.Albums.SmartAlbums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart Albums"
+    "Import.Albums.SmartAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "スマートアルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スマートアルバム"
           }
         }
       }
     },
-    "Import.Albums.Untitled": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Untitled Album"
+    "Import.Albums.Untitled" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untitled Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "名称未設定"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称未設定"
           }
         }
       }
     },
-    "Import.BrowseAlbums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browse Albums"
+    "Import.BrowseAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムを選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを選択"
           }
         }
       }
     },
-    "Import.Completed.Text.%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "The selected photo has been imported successfully."
+    "Import.Completed.Text.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The selected photo has been imported successfully."
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld photos have been imported successfully."
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld photos have been imported successfully."
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "選択した写真が正常にインポートされました。"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した写真が正常にインポートされました。"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld枚の写真が正常にインポートされました。"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld枚の写真が正常にインポートされました。"
                 }
               }
             }
@@ -735,192 +735,175 @@
         }
       }
     },
-    "Import.DeselectAll": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deselect All"
+    "Import.DeselectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべて選択解除"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択解除"
           }
         }
       }
     },
-    "Import.Folder.Empty": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This folder is empty."
+    "Import.Folder.Empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This folder is empty."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このフォルダは空です。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このフォルダは空です。"
           }
         }
       }
     },
-    "Import.ImportHere": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import Here"
+    "Import.ImportHere" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Here"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ここにインポート"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここにインポート"
           }
         }
       }
     },
-    "Import.Importing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Importing..."
+    "Import.Importing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "インポート中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート中…"
           }
         }
       }
     },
-    "Import.Instructions": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select photos or an album to import from your Photos library, then select Start Import."
+    "Import.Instructions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select photos or an album to import from your Photos library, then select Start Import."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「写真」アプリからインポートしたい写真を選択する、またはアルバムから選択してください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「写真」アプリからインポートしたい写真を選択する、またはアルバムから選択してください。"
           }
         }
       }
     },
-    "Import.OpenSettings": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open Settings"
+    "Import.OpenSettings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定を開く"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を開く"
           }
         }
       }
     },
-    "Import.PhotosAccessDenied": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photos library access has been denied. Please grant access in Settings to browse your albums."
+    "Import.PhotosAccessDenied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos library access has been denied. Please grant access in Settings to browse your albums."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真ライブラリへのアクセスが拒否されています。アルバムを閲覧するには、設定でアクセスを許可してください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリへのアクセスが拒否されています。アルバムを閲覧するには、設定でアクセスを許可してください。"
           }
         }
       }
     },
-    "Import.SelectAll": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select All"
+    "Import.SelectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべて選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて選択"
           }
         }
       }
     },
-    "Import.SelectPhotos": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select Photos"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真を選択"
-          }
-        }
-      }
-    },
-    "Import.SelectedPhotos.%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%d photo will be imported."
+    "Import.SelectedPhotos.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d photo will be imported."
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%d photos will be imported."
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d photos will be imported."
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%d枚の写真がインポートされます。"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d枚の写真がインポートされます。"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%d枚の写真がインポートされます。"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d枚の写真がインポートされます。"
                 }
               }
             }
@@ -928,91 +911,108 @@
         }
       }
     },
-    "Import.StartImport": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start Import"
+    "Import.SelectPhotos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Photos"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "インポートを開始"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真を選択"
           }
         }
       }
     },
-    "Importer.Album.None": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Album"
+    "Import.StartImport" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Import"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムなし"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポートを開始"
           }
         }
       }
     },
-    "Importer.DoneText": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import Successful"
+    "Importer.Album.None" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存完了"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムなし"
           }
         }
       }
     },
-    "Importer.DoneText.WithError.%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Import Completed With %lld Error"
+    "Importer.DoneText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Successful"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存完了"
+          }
+        }
+      }
+    },
+    "Importer.DoneText.WithError.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Import Completed With %lld Error"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Import Completed With %lld Errors"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Import Completed With %lld Errors"
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "保存完了（%lld個失敗）"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "保存完了（%lld個失敗）"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "保存完了（%lld個失敗）"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "保存完了（%lld個失敗）"
                 }
               }
             }
@@ -1020,538 +1020,573 @@
         }
       }
     },
-    "Importer.Import": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import Here"
+    "Importer.Import" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Here"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ここに保存"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここに保存"
           }
         }
       }
     },
-    "Importer.Note": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use the in-app importer when importing large pics."
+    "Importer.Note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the in-app importer when importing large pics."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "大きい画像を保存する場合、アプリ内のインポート機能のご利用を推薦します。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大きい画像を保存する場合、アプリ内のインポート機能のご利用を推薦します。"
           }
         }
       }
     },
-    "Importer.ProgressText": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Importing..."
+    "Importer.ProgressText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "読み込み中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込み中…"
           }
         }
       }
     },
-    "More.Advanced": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Advanced"
+    "katagaki/IllustMate" : {
+
+    },
+    "More.Advanced" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高度オプション"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度オプション"
           }
         }
       }
     },
-    "More.AppLock": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Lock"
+    "More.AppLock" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Lock"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アプリロック"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリロック"
           }
         }
       }
     },
-    "More.AppLock.Description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Require Face ID or Touch ID to open PicMate."
+    "More.AppLock.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Require Face ID or Touch ID to open PicMate."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PicMateを開くときにFace IDまたはTouch IDを要求します。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMateを開くときにFace IDまたはTouch IDを要求します。"
           }
         }
       }
     },
-    "More.Backup": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Export Backup File"
+    "More.Attributions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attributions"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップを書き出す"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "著者権表記"
           }
         }
       }
     },
-    "More.Data": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Data Management"
+    "More.Backup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Backup File"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "データ管理"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを書き出す"
           }
         }
       }
     },
-    "More.Debug": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Experiments"
+    "More.Data" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Management"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ラボ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ管理"
           }
         }
       }
     },
-    "More.Debug.Warning.Text": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not responsible for any data loss caused by any modification of the below options."
+    "More.Debug" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experiments"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "こちらの設定は実験的なものであり、アプリを再起動する必要がある場合があります。\n本アプリの開発者は、こちらの設定によるデータ損失の責任を一切負いかねます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ラボ"
           }
         }
       }
     },
-    "More.Debug.Warning.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caution"
+    "More.Debug.Warning.Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any setting changed here are experimental and may require a restart of the app to take effect.\nThe developer is not responsible for any data loss caused by any modification of the below options."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "警告"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "こちらの設定は実験的なものであり、アプリを再起動する必要がある場合があります。\n本アプリの開発者は、こちらの設定によるデータ損失の責任を一切負いかねます。"
           }
         }
       }
     },
-    "More.Experiments": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Experiments"
+    "More.Debug.Warning.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caution"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "試験的機能"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "警告"
           }
         }
       }
     },
-    "More.Experiments.NestedAlbums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nested Albums"
+    "More.Experiments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experiments"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ネストアルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試験的機能"
           }
         }
       }
     },
-    "More.Experiments.NestedAlbums.Description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In Photos mode, if a folder contains an album with '▶︎ ' before the folder's name, that album's photos become the folder's own pics. Remaining albums become nested sub-albums."
+    "More.Experiments.NestedAlbums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nested Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真モードで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの写真がフォルダ自体の写真になります。残りのアルバムはネストされたサブアルバムになります。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ネストアルバム"
           }
         }
       }
     },
-    "More.Experiments.NestedAlbums.CopyPrefix": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copy Prefix to Clipboard"
+    "More.Experiments.NestedAlbums.CopyPrefix" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Prefix to Clipboard"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "接頭辞をクリップボードにコピー"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接頭辞をクリップボードにコピー"
           }
         }
       }
     },
-    "More.PhotosMode": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photos Mode"
+    "More.Experiments.NestedAlbums.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Photos mode, if a folder contains an album with '▶︎ ' before the folder's name, that album's photos become the folder's own pics. Remaining albums become nested sub-albums."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真モード"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真モードで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの写真がフォルダ自体の写真になります。残りのアルバムはネストされたサブアルバムになります。"
           }
         }
       }
     },
-    "More.PhotosMode.Description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browse albums and photos directly from your Photos library."
+    "More.GitHub" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Code"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真ライブラリのアルバムと写真を直接閲覧します。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ソースコード"
           }
         }
       }
     },
-    "More.PhotosMode.Header": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photos Library"
+    "More.PhotosMode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos Mode"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真ライブラリ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真モード"
           }
         }
       }
     },
-    "More.Security": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Security"
+    "More.PhotosMode.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse albums and photos directly from your Photos library."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "セキュリティ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリのアルバムと写真を直接閲覧します。"
           }
         }
       }
     },
-    "More.Stats": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Statistics"
+    "More.PhotosMode.Header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos Library"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "集計"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真ライブラリ"
           }
         }
       }
     },
-    "More.Stats.Footer": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "These numbers reflect your PicMate library, not the Photos library."
+    "More.Security" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Security"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "この数値はPicMateライブラリのものであり、写真ライブラリのものではありません。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セキュリティ"
           }
         }
       }
     },
-    "More.Troubleshooting": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Troubleshooting"
+    "More.Stats" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トラブルシューティング"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "集計"
           }
         }
       }
     },
-    "More.Troubleshooting.DataManagement": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Data"
+    "More.Stats.Footer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These numbers reflect your PicMate library, not the Photos library."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "データ管理"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この数値はPicMateライブラリのものであり、写真ライブラリのものではありません。"
           }
         }
       }
     },
-    "More.Troubleshooting.DataManagement.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PicMate reuses existing space used by deleted pics to populate new data.\nYou can immediately free up this space by tapping ‘Free Up Space’."
+    "More.Troubleshooting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troubleshooting"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ピックメイトは、削除された画像のディスク領域を再利用し、新しい画像を保存します。\nディスク領域をすぐに増やしたい場合、「空き領域を増やす」をタッチしてください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トラブルシューティング"
           }
         }
       }
     },
-    "More.Troubleshooting.DeleteAll": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete All Data"
+    "More.Troubleshooting.DataManagement" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのデータを消去"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ管理"
           }
         }
       }
     },
-    "More.Troubleshooting.FreeUpSpace": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Free Up Space"
+    "More.Troubleshooting.DataManagement.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate reuses existing space used by deleted pics to populate new data.\nYou can immediately free up this space by tapping ‘Free Up Space’."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "空き領域を増やす"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピックメイトは、削除された画像のディスク領域を再利用し、新しい画像を保存します。\nディスク領域をすぐに増やしたい場合、「空き領域を増やす」をタッチしてください。"
           }
         }
       }
     },
-    "More.Troubleshooting.FreeUpSpace.Freeing": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Freeing up disk space..."
+    "More.Troubleshooting.DeleteAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Data"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "データベースを最適化中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのデータを消去"
           }
         }
       }
     },
-    "More.Troubleshooting.RebuildThumbnails": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recreate All Thumbnails"
+    "More.Troubleshooting.FreeUpSpace" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free Up Space"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのサムネイルを再生成"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "空き領域を増やす"
           }
         }
       }
     },
-    "More.Troubleshooting.RebuildThumbnails.Rebuilding": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recreating thumbnails..."
+    "More.Troubleshooting.FreeUpSpace.Freeing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freeing up disk space..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サムネイルを再生成中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データベースを最適化中…"
           }
         }
       }
     },
-    "Shared.AddToAlbum": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Into Album"
+    "More.Troubleshooting.RebuildThumbnails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recreate All Thumbnails"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムに移動"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのサムネイルを再生成"
           }
         }
       }
     },
-    "Shared.Album.%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld Photo"
+    "More.Troubleshooting.RebuildThumbnails.Rebuilding" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recreating thumbnails..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルを再生成中…"
+          }
+        }
+      }
+    },
+    "Shared.AddToAlbum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Into Album"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムに移動"
+          }
+        }
+      }
+    },
+    "Shared.Album.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Photo"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld Photos"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Photos"
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld枚の写真"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld枚の写真"
                 }
               }
             }
@@ -1559,156 +1594,156 @@
         }
       }
     },
-    "Shared.Albums": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Albums"
+    "Shared.Albums" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
           }
         }
       }
     },
-    "Shared.Collection": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collection"
+    "Shared.Collection" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collection"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コレクション"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コレクション"
           }
         }
       }
     },
-    "Shared.Copy": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copy"
+    "Shared.Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コピー"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピー"
           }
         }
       }
     },
-    "Shared.Create": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Create"
+    "Shared.Create" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "作成"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成"
           }
         }
       }
     },
-    "Shared.Delete": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete"
+    "Shared.Delete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "削除"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
           }
         }
       }
     },
-    "Shared.DeleteConfirmation.Album": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Are you sure you want to delete this pic?\nPics in the album will be moved to its containing album."
+    "Shared.DeleteConfirmation.Album" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this pic?\nPics in the album will be moved to its containing album."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このアルバムを削除してもよろしいですか？\nアルバム内の画像はそのアルバムの包含アルバムに戻されます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアルバムを削除してもよろしいですか？\nアルバム内の画像はそのアルバムの包含アルバムに戻されます。"
           }
         }
       }
     },
-    "Shared.DeleteConfirmation.Pic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Are you sure you want to delete this pic?"
+    "Shared.DeleteConfirmation.Pic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this pic?"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "この画像を削除してもよろしいですか？"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この画像を削除してもよろしいですか？"
           }
         }
       }
     },
-    "Shared.DeleteConfirmation.Pic.%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Are you sure you want to delete the selected pic?"
+    "Shared.DeleteConfirmation.Pic.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete the selected pic?"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Are you sure you want to delete the selected %lld pics?"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete the selected %lld pics?"
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "選択した画像を削除してもよろしいですか？"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した画像を削除してもよろしいですか？"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "選択した%lld枚の画像を削除してもよろしいですか？"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した%lld枚の画像を削除してもよろしいですか？"
                 }
               }
             }
@@ -1716,464 +1751,464 @@
         }
       }
     },
-    "Shared.DeselectAll": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deselect All"
+    "Shared.DeselectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect All"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべての選択を解除"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての選択を解除"
           }
         }
       }
     },
-    "Shared.FileName": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "File Name"
+    "Shared.FileName" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Name"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ファイル名"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル名"
           }
         }
       }
     },
-    "Shared.FileSize": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "File Size"
+    "Shared.FileSize" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Size"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ファイルサイズ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルサイズ"
           }
         }
       }
     },
-    "Shared.GridSize": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grid Size"
+    "Shared.GridSize" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid Size"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "グリッドのサイズ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グリッドのサイズ"
           }
         }
       }
     },
-    "Shared.GridSize.2": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "2 Columns"
+    "Shared.GridSize.2" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Columns"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "2列"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2列"
           }
         }
       }
     },
-    "Shared.GridSize.3": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3 Columns"
+    "Shared.GridSize.3" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Columns"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3列"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3列"
           }
         }
       }
     },
-    "Shared.GridSize.4": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "4 Columns"
+    "Shared.GridSize.4" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 Columns"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "4列"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4列"
           }
         }
       }
     },
-    "Shared.GridSize.5": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5 Columns"
+    "Shared.GridSize.5" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Columns"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5列"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5列"
           }
         }
       }
     },
-    "Shared.GridSize.8": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "8 Columns"
+    "Shared.GridSize.8" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 Columns"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "8列"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8列"
           }
         }
       }
     },
-    "Shared.Import": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import Photos"
+    "Shared.Import" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Photos"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真をインポート"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真をインポート"
           }
         }
       }
     },
-    "Shared.More": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "More"
+    "Shared.More" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "その他"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
           }
         }
       }
     },
-    "Shared.Move": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move"
+    "Shared.Move" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移動"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動"
           }
         }
       }
     },
-    "Shared.MoveHere": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Here"
+    "Shared.MoveHere" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Here"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ここに移動"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここに移動"
           }
         }
       }
     },
-    "Shared.MoveOutOfAlbum": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Out of Album"
+    "Shared.MoveOutOfAlbum" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Out of Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コレクションに戻す"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コレクションに戻す"
           }
         }
       }
     },
-    "Shared.MoveOutTo.%@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move Back to %@"
+    "Shared.MoveOutTo.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Back to %@"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@に戻す"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@に戻す"
           }
         }
       }
     },
-    "Shared.MoveTo": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Move To..."
+    "Shared.MoveTo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move To..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移動先…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動先…"
           }
         }
       }
     },
-    "Shared.No": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No"
+    "Shared.No" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "いいえ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いいえ"
           }
         }
       }
     },
-    "Shared.OK": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+    "Shared.OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
     },
-    "Shared.OpenFilesApp": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open Files App"
+    "Shared.OpenFilesApp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Files App"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「ファイル」アプリを開く"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「ファイル」アプリを開く"
           }
         }
       }
     },
-    "Shared.Pics": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pics"
+    "Shared.Pics" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pics"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画像"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }
     },
-    "Shared.Refresh": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Refresh"
+    "Shared.Refresh" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再読み込み"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再読み込み"
           }
         }
       }
     },
-    "Shared.Rename": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rename"
+    "Shared.Rename" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "名称変更"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称変更"
           }
         }
       }
     },
-    "Shared.ResetCover": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reset Album Cover"
+    "Shared.ResetCover" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Album Cover"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムカバーを初期化"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムカバーを初期化"
           }
         }
       }
     },
-    "Shared.Select": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select"
+    "Shared.Select" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択"
           }
         }
       }
     },
-    "Shared.SelectAPic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select a pic to preview."
+    "Shared.SelectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "表示する画像を選択してください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてを選択"
           }
         }
       }
     },
-    "Shared.SelectAll": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select All"
+    "Shared.SelectAPic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a pic to preview."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてを選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示する画像を選択してください。"
           }
         }
       }
     },
-    "Shared.Selected.%lld": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld Item"
+    "Shared.Selected.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Item"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld Items"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Items"
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld個の項目"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld個の項目"
                 }
               }
             }
@@ -2181,404 +2216,404 @@
         }
       }
     },
-    "Shared.SetAsCover": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set As Album Cover"
+    "Shared.SetAsCover" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set As Album Cover"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムカバーに設定"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムカバーに設定"
           }
         }
       }
     },
-    "Shared.Share": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Share"
+    "Shared.Share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "共有"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共有"
           }
         }
       }
     },
-    "Shared.Sort": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sort"
+    "Shared.Sort" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "並べ替え"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並べ替え"
           }
         }
       }
     },
-    "Shared.Sort.DateAdded.Ascending": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Date Added (Ascending)"
+    "Shared.Sort.DateAdded.Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date Added (Ascending)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "追加日（昇順）"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加日（昇順）"
           }
         }
       }
     },
-    "Shared.Sort.DateAdded.Descending": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Date Added (Descending)"
+    "Shared.Sort.DateAdded.Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date Added (Descending)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "追加日（降順）"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加日（降順）"
           }
         }
       }
     },
-    "Shared.Sort.Name.Ascending": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name (Ascending)"
+    "Shared.Sort.Name.Ascending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name (Ascending)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "名前（昇順）"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前（昇順）"
           }
         }
       }
     },
-    "Shared.Sort.Name.Descending": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name (Descending)"
+    "Shared.Sort.Name.Descending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name (Descending)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "名前（降順）"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名前（降順）"
           }
         }
       }
     },
-    "Shared.Sort.PicCount.Ascending": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pic Count (Ascending)"
+    "Shared.Sort.PicCount.Ascending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pic Count (Ascending)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムと画像数（昇順）"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムと画像数（昇順）"
           }
         }
       }
     },
-    "Shared.Sort.PicCount.Descending": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pic Count (Descending)"
+    "Shared.Sort.PicCount.Descending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pic Count (Descending)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムと画像数（降順）"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムと画像数（降順）"
           }
         }
       }
     },
-    "Shared.Yes": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yes"
+    "Shared.Yes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yes"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "はい"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はい"
           }
         }
       }
     },
-    "ViewTitle.Albums": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Albums"
+    "ViewTitle.Albums" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albums"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバム"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバム"
           }
         }
       }
     },
-    "ViewTitle.Albums.Create": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Create Album"
+    "ViewTitle.Albums.Create" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムを作成"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを作成"
           }
         }
       }
     },
-    "ViewTitle.Albums.Rename": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rename Album"
+    "ViewTitle.Albums.Rename" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムの名前を変更"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムの名前を変更"
           }
         }
       }
     },
-    "ViewTitle.Backup": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Backup"
+    "ViewTitle.Backup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
           }
         }
       }
     },
-    "ViewTitle.Collection": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collection"
+    "ViewTitle.Collection" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collection"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コレクション"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コレクション"
           }
         }
       }
     },
-    "ViewTitle.Debug": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Experiments"
+    "ViewTitle.Debug" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experiments"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ラボ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ラボ"
           }
         }
       }
     },
-    "ViewTitle.Import": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Import Photos"
+    "ViewTitle.Import" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Photos"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真をインポート"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真をインポート"
           }
         }
       }
     },
-    "ViewTitle.Importer": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select An Album"
+    "ViewTitle.Importer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select An Album"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アルバムを選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを選択"
           }
         }
       }
     },
-    "ViewTitle.More": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "More"
+    "ViewTitle.More" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "その他"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
           }
         }
       }
     },
-    "ViewTitle.Photos": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photos"
+    "ViewTitle.Photos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真"
           }
         }
       }
     },
-    "ViewTitle.Pics": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pics"
+    "ViewTitle.Pics" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pics"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画像"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像"
           }
         }
       }
     },
-    "ViewTitle.Pics.Rename": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rename Pic"
+    "ViewTitle.Pics.Rename" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename Pic"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "名称変更"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称変更"
           }
         }
       }
     },
-    "ViewTitle.RestoreBackup": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restore Backup"
+    "ViewTitle.RestoreBackup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Backup"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "バックアップを復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを復元"
           }
         }
       }
     },
-    "ViewTitle.Troubleshooting": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Troubleshooting"
+    "ViewTitle.Troubleshooting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troubleshooting"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トラブルシューティング"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トラブルシューティング"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
