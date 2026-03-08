@@ -16,6 +16,7 @@ struct IllustMateApp: App {
     @State var viewer = ViewerManager()
     @State var concurrency = ConcurrencyManager()
     @State var photosManager = PhotosManager()
+    @State var photosViewer = PhotosViewerManager()
     @State var auth = AuthenticationManager()
     @State var isImportingBackup: Bool = false
     @State var importedURL: URL?
@@ -38,6 +39,7 @@ struct IllustMateApp: App {
                 .environment(viewer)
                 .environment(concurrency)
                 .environment(photosManager)
+                .environment(photosViewer)
                 .environment(auth)
                 .onOpenURL { url in
                     if url.pathExtension == "pics" {
@@ -96,15 +98,17 @@ struct IllustMateApp: App {
             CommandGroup(after: .sidebar) {
                 Button("Command.PreviousPic") {
                     viewer.navigateToPrevious()
+                    photosViewer.navigateToPrevious()
                 }
                 .keyboardShortcut(.leftArrow, modifiers: .command)
-                .disabled(!viewer.hasPrevious)
+                .disabled(!viewer.hasPrevious && !photosViewer.hasPrevious)
 
                 Button("Command.NextPic") {
                     viewer.navigateToNext()
+                    photosViewer.navigateToNext()
                 }
                 .keyboardShortcut(.rightArrow, modifiers: .command)
-                .disabled(!viewer.hasNext)
+                .disabled(!viewer.hasNext && !photosViewer.hasNext)
             }
         }
 #endif
