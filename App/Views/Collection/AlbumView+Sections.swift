@@ -115,6 +115,10 @@ extension AlbumView {
                         refreshDataAfterPicMoved()
                     }
                 }
+            } else if !hasFetchedPics {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(20.0)
             } else {
                 Text("Albums.NoPics")
                     .foregroundStyle(.secondary)

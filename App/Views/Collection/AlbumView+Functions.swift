@@ -141,6 +141,7 @@ extension AlbumView {
                     withAnimation {
                         self.pics = pics
                     }
+                    self.hasFetchedPics = true
                 }
             }
         }
@@ -186,6 +187,7 @@ extension AlbumView {
                 withAnimation {
                     self.pics = pics
                 }
+                self.hasFetchedPics = true
             }
         }
     }
