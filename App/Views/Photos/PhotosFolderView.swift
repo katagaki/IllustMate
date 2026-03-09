@@ -24,11 +24,13 @@ struct PhotosFolderView: View {
     @State private var hasFetched: Bool = false
     @State private var searchText: String = ""
 
+    @State var searchResults: [PHCollectionItem]?
+
     private var filteredItems: [PHCollectionItem] {
         if searchText.isEmpty {
             return items
         }
-        return items.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+        return searchResults ?? []
     }
 
     // Album management state
@@ -55,11 +57,14 @@ struct PhotosFolderView: View {
             VStack(alignment: .leading, spacing: 0.0) {
                 if !filteredItems.isEmpty {
                     albumsSection
-                    Spacer()
-                        .frame(height: 20.0)
+                    if searchText.isEmpty {
+                        Spacer()
+                            .frame(height: 20.0)
+                    }
                 }
 
-                if isNestedAlbumsEnabled, let fetchResult = ownPicsFetchResult, fetchResult.count > 0 {
+                if searchText.isEmpty,
+                   isNestedAlbumsEnabled, let fetchResult = ownPicsFetchResult, fetchResult.count > 0 {
                     picsSection(fetchResult: fetchResult)
                 }
             }
@@ -67,6 +72,15 @@ struct PhotosFolderView: View {
         }
         .navigationTitle(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
         .searchable(text: $searchText)
+        .onChange(of: searchText) { _, newValue in
+            withAnimation(.smooth.speed(2.0)) {
+                if newValue.isEmpty {
+                    searchResults = nil
+                } else {
+                    searchResults = photosManager.searchAlbums(matching: newValue)
+                }
+            }
+        }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
@@ -191,9 +205,12 @@ struct PhotosFolderView: View {
         }
     }
 
-    // MARK: - Data
+}
 
-    private func fetchContent() {
+// MARK: - Data
+
+extension PhotosFolderView {
+    func fetchContent() {
         if isNestedAlbumsEnabled {
             let resolved = photosManager.resolveNestedAlbums(in: folder)
 

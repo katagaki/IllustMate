@@ -21,11 +21,13 @@ struct PhotosCollectionView: View {
     @State var isFetchingRootAssets: Bool = false
     @State var searchText: String = ""
 
+    @State var searchResults: [PHCollectionItem]?
+
     private var filteredItems: [PHCollectionItem] {
         if searchText.isEmpty {
             return items
         }
-        return items.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+        return searchResults ?? []
     }
 
     // Album management state
@@ -63,6 +65,15 @@ struct PhotosCollectionView: View {
         }
         .navigationTitle(String(localized: "ViewTitle.Photos"))
         .searchable(text: $searchText)
+        .onChange(of: searchText) { _, newValue in
+            withAnimation(.smooth.speed(2.0)) {
+                if newValue.isEmpty {
+                    searchResults = nil
+                } else {
+                    searchResults = photosManager.searchAlbums(matching: newValue)
+                }
+            }
+        }
         .toolbar {
             if photosManager.authorizationStatus == .authorized ||
                photosManager.authorizationStatus == .limited {
@@ -118,9 +129,11 @@ struct PhotosCollectionView: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
                 photosAlbumsSection
-                Spacer()
-                    .frame(height: 20.0)
-                photosPicsSection
+                if searchText.isEmpty {
+                    Spacer()
+                        .frame(height: 20.0)
+                    photosPicsSection
+                }
             }
             .padding([.top], 20.0)
         }
