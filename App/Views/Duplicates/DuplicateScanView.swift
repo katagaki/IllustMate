@@ -15,11 +15,7 @@ struct DuplicateScanView: View {
 
     @State var scanManager = DuplicateScanManager()
 
-    var preselectedAlbum: Album?
-
-    @State var selectedAlbum: Album?
-    @State var scanEntireCollection: Bool = true
-    @State var albums: [Album] = []
+    var scanScope: DuplicateScanManager.ScanScope
 
     var body: some View {
         NavigationStack {
@@ -53,39 +49,8 @@ struct DuplicateScanView: View {
         }
     }
 
-    private var albumForScan: Album? {
-        if preselectedAlbum != nil {
-            return preselectedAlbum
-        }
-        return scanEntireCollection ? nil : selectedAlbum
-    }
-
     private var scanConfigContent: some View {
         List {
-            if preselectedAlbum == nil {
-                Section {
-                    Toggle("Duplicates.ScanEntireCollection", isOn: $scanEntireCollection)
-                    if !scanEntireCollection {
-                        ForEach(albums) { album in
-                            Button {
-                                selectedAlbum = album
-                            } label: {
-                                HStack {
-                                    Text(album.name)
-                                    Spacer()
-                                    if selectedAlbum?.id == album.id {
-                                        Image(systemName: "checkmark")
-                                            .foregroundStyle(.accent)
-                                    }
-                                }
-                            }
-                            .tint(.primary)
-                        }
-                    }
-                } header: {
-                    Text("Duplicates.Scope")
-                }
-            }
             Section {
                 VStack(alignment: .leading, spacing: 8.0) {
                     Text("Duplicates.Sensitivity")
@@ -109,18 +74,8 @@ struct DuplicateScanView: View {
             Section {
                 Button("Duplicates.StartScan") {
                     Task {
-                        await scanManager.scan(album: albumForScan)
+                        await scanManager.scan(scope: scanScope)
                     }
-                }
-                .disabled(preselectedAlbum == nil && !scanEntireCollection && selectedAlbum == nil)
-            }
-        }
-        .task {
-            if preselectedAlbum == nil {
-                do {
-                    albums = try await DataActor.shared.albumsWithCounts(sortedBy: .nameAscending)
-                } catch {
-                    debugPrint(error.localizedDescription)
                 }
             }
         }

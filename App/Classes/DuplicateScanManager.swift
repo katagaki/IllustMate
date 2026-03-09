@@ -35,7 +35,13 @@ class DuplicateScanManager {
         case done
     }
 
-    func scan(album: Album?) async {
+    enum ScanScope {
+        case entireCollection
+        case picsNotInAlbums
+        case album(Album)
+    }
+
+    func scan(scope: ScanScope) async {
         isScanning = true
         scanPhase = .computingHashes
         scanProgress = 0
@@ -43,10 +49,13 @@ class DuplicateScanManager {
 
         // Get all pic IDs in scope
         let allScopedIDs: [String]
-        if let album {
-            allScopedIDs = await DataActor.shared.picIDs(inAlbumWithID: album.id)
-        } else {
+        switch scope {
+        case .entireCollection:
             allScopedIDs = await DataActor.shared.allPicIDs()
+        case .picsNotInAlbums:
+            allScopedIDs = await DataActor.shared.picIDsNotInAnyAlbum()
+        case .album(let album):
+            allScopedIDs = await DataActor.shared.picIDs(inAlbumWithID: album.id)
         }
 
         // Find which ones don't have cached hashes

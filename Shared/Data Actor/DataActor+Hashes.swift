@@ -17,14 +17,16 @@ extension DataActor {
         return rows.compactMap { try? $0.get(picId) }
     }
 
-    /// Fetch pic IDs in a specific album (nil for root-level pics).
-    func picIDs(inAlbumWithID albumID: String?) -> [String] {
-        let query: QueryType
-        if let albumID {
-            query = picsTable.filter(picAlbumId == albumID).select(picId)
-        } else {
-            query = picsTable.filter(picAlbumId == nil).select(picId)
-        }
+    /// Fetch pic IDs in a specific album.
+    func picIDs(inAlbumWithID albumID: String) -> [String] {
+        let query = picsTable.filter(picAlbumId == albumID).select(picId)
+        guard let rows = try? database.prepare(query) else { return [] }
+        return rows.compactMap { try? $0.get(picId) }
+    }
+
+    /// Fetch pic IDs that are not assigned to any album.
+    func picIDsNotInAnyAlbum() -> [String] {
+        let query = picsTable.filter(picAlbumId == nil).select(picId)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.compactMap { try? $0.get(picId) }
     }

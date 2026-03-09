@@ -173,7 +173,7 @@ struct MoreView: View {
             }
         }
         .sheet(isPresented: $isDuplicateCheckerPresented) {
-            DuplicateScanView()
+            DuplicateScanView(scanScope: .entireCollection)
         }
     }
 
