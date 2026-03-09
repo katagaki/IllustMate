@@ -24,6 +24,7 @@ struct PhotosAssetViewer: View {
     @State private var magnification: CGFloat = 1.0
     @State private var magnificationAnchor: UnitPoint = .center
     @State private var displayOffset: CGSize = .zero
+    @State private var viewSize: CGSize = .zero
 
     private var currentAsset: PHAsset {
         photosViewer.displayedAsset ?? asset
@@ -98,6 +99,11 @@ struct PhotosAssetViewer: View {
         }
         .padding(20.0)
         .frame(maxHeight: .infinity)
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newSize in
+            viewSize = newSize
+        }
         .background {
             if let backgroundImage = currentImage {
                 Image(uiImage: backgroundImage)
@@ -191,9 +197,8 @@ struct PhotosAssetViewer: View {
         let options = PHImageRequestOptions()
         options.deliveryMode = .opportunistic
         options.isNetworkAccessAllowed = true
-        let screenSize = UIScreen.main.bounds.size
-        let targetSize = CGSize(width: screenSize.width * displayScale,
-                                height: screenSize.height * displayScale)
+        let targetSize = CGSize(width: viewSize.width * displayScale,
+                                height: viewSize.height * displayScale)
 
         manager.requestImage(for: currentAsset, targetSize: targetSize,
                              contentMode: .aspectFit, options: options) { result, _ in

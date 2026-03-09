@@ -147,8 +147,8 @@ struct PhotosFolderView: View {
                                 onMoveToFolder: { collection in
                                     albumToMove = collection
                                 },
-                                onDeleteFolder: { f in
-                                    folderToDelete = f
+                                onDeleteFolder: { folder in
+                                    folderToDelete = folder
                                     isConfirmingDeleteFolder = true
                                 })
         }
@@ -336,10 +336,10 @@ struct PhotosFolderView: View {
     }
 
     private func confirmDeletePhotosFolder() {
-        guard let f = folderToDelete else { return }
+        guard let folder = folderToDelete else { return }
         Task {
             do {
-                try await photosManager.deleteFolder(f)
+                try await photosManager.deleteFolder(folder)
                 await MainActor.run {
                     folderToDelete = nil
                     hasFetched = false

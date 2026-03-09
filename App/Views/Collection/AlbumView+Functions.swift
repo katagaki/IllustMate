@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 extension AlbumView {
-
     func deleteAlbum(_ album: Album) {
         isConfirmingDeleteAlbum = true
         albumPendingDeletion = album
@@ -189,6 +188,21 @@ extension AlbumView {
                 }
                 self.hasFetchedPics = true
             }
+        }
+    }
+
+    func searchAlbums(matching searchText: String) async {
+        do {
+            let results = try await DataActor.shared.searchAlbums(
+                matching: searchText, in: currentAlbum, sortedBy: albumSort
+            )
+            await MainActor.run {
+                withAnimation {
+                    self.searchResults = results
+                }
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 }

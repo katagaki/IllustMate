@@ -10,7 +10,7 @@ import SwiftUI
 extension AlbumView {
     var albumSection: some View {
         Group {
-            SectionHeader(title: "Albums.Albums", count: filteredAlbums.count) {
+            SectionHeader(title: "Albums.Albums", count: displayedAlbums.count) {
                 Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
                     Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
@@ -45,8 +45,8 @@ extension AlbumView {
                 }
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            if !filteredAlbums.isEmpty {
-                AlbumsSection(albums: filteredAlbums, style: $albumStyleState) { album in
+            if !displayedAlbums.isEmpty {
+                AlbumsSection(albums: displayedAlbums, style: $albumStyleState) { album in
                     albumToRename = album
                 } onDelete: { album in
                     deleteAlbum(album)

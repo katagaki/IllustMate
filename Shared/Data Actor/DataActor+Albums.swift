@@ -184,4 +184,40 @@ extension DataActor {
         }
         return sortAlbum(albums, sortedBy: sortType)
     }
+
+    func searchAlbums(
+        matching searchText: String, in parentAlbum: Album?, sortedBy sortType: SortType
+    ) throws -> [Album] {
+        let descendantIDs = descendantAlbumIDs(of: parentAlbum?.id)
+        let pattern = "%\(searchText)%"
+        let query = albumsTable.filter(
+            descendantIDs.contains(albumId) && albumName.like(pattern, escape: nil)
+        )
+        let rows = try database.prepare(query)
+        let albums = rows.map { row -> Album in
+            let album = albumFrom(row: row, loadChildren: false)
+            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
+            album.childPicCount = picCount(forAlbumWithID: album.id)
+            return album
+        }
+        return sortAlbum(albums, sortedBy: sortType)
+    }
+
+    private func descendantAlbumIDs(of parentID: String?) -> [String] {
+        let query: QueryType
+        if let parentID {
+            query = albumsTable.filter(albumParentId == parentID).select(albumId)
+        } else {
+            query = albumsTable.filter(albumParentId == nil).select(albumId)
+        }
+        guard let rows = try? database.prepare(query) else { return [] }
+        var ids: [String] = []
+        for row in rows {
+            if let childID = try? row.get(albumId) {
+                ids.append(childID)
+                ids.append(contentsOf: descendantAlbumIDs(of: childID))
+            }
+        }
+        return ids
+    }
 }
