@@ -44,6 +44,14 @@ struct IllustMateApp: App {
                 .onOpenURL { url in
                     if url.pathExtension == "pics" {
                         importedURL = url
+                    } else if url.scheme == "picmate", url.host == "album",
+                              let albumID = url.pathComponents.dropFirst().first {
+                        Task {
+                            if let album = await DataActor.shared.album(for: albumID) {
+                                navigation.popAll()
+                                navigation.push(.album(album: album), for: .collection)
+                            }
+                        }
                     }
                 }
                 .onChange(of: importedURL) { _, newValue in
