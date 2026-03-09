@@ -135,13 +135,13 @@ extension AlbumView {
                 }
             }
             group.addTask {
-                // Fetch count first for immediate layout
+                // Fetch count first for immediate placeholder layout
                 let count = await DataActor.shared.picCount(in: self.currentAlbum)
                 await MainActor.run {
                     self.picCount = count
                     self.hasFetchedPicCount = true
                 }
-                // Then fetch skeletons (lightweight — no blob data)
+                // Then fetch all skeletons (lightweight — no blob data)
                 let pics = await self.fetchPics()
                 await MainActor.run {
                     self.pics = pics
@@ -174,10 +174,9 @@ extension AlbumView {
 
     func fetchPics() async -> [Pic] {
         do {
-            let pics = try await DataActor.shared.picSkeletons(
+            return try await DataActor.shared.picSkeletons(
                 in: currentAlbum, order: isPicSortReversed ? .forward : .reverse
             )
-            return pics
         } catch {
             debugPrint(error.localizedDescription)
             return []

@@ -14,6 +14,7 @@ struct PicsGrid<Content: View>: View {
     var namespace: Namespace.ID
 
     var pics: [Pic]
+    var placeholderCount: Int = 0
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
     var isSelected: ((Pic) -> Bool)?
@@ -110,6 +111,14 @@ struct PicsGrid<Content: View>: View {
 #else
                 .buttonStyle(.plain)
 #endif
+            }
+            if placeholderCount > 0 {
+                ForEach(0..<placeholderCount, id: \.self) { _ in
+                    Rectangle()
+                        .fill(.primary.opacity(0.05))
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 4.0))
+                }
             }
         }
         .animation(.smooth, value: columnCount)

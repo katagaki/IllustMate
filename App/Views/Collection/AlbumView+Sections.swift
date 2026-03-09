@@ -98,8 +98,9 @@ extension AlbumView {
                                 leading: 20.0,
                                 bottom: 6.0,
                                 trailing: 20.0))
-            if !pics.isEmpty {
+            if hasFetchedPicCount && picCount > 0 {
                 PicsGrid(namespace: namespace, pics: pics,
+                         placeholderCount: max(picCount - pics.count, 0),
                          isSelecting: $isSelectingPics) { pic in
                     selectedPics.contains(pic)
                 } onSelect: { pic in
@@ -119,14 +120,9 @@ extension AlbumView {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(20.0)
-            } else if picCount == 0 && hasFetchedPicCount {
+            } else if picCount == 0 {
                 Text("Albums.NoPics")
                     .foregroundStyle(.secondary)
-                    .padding(20.0)
-            } else if !hasFetchedPics {
-                // Count is known but skeletons still loading — show spinner
-                ProgressView()
-                    .frame(maxWidth: .infinity)
                     .padding(20.0)
             }
         }
