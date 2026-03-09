@@ -18,7 +18,8 @@
       },
       "shouldTranslate" : false
     },
-    "(%lld)" : {
+    "%@" : {},
+    "%lld" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -29,10 +30,7 @@
       },
       "shouldTranslate" : false
     },
-    "%@" : {
-
-    },
-    "%lld" : {
+    "(%lld)" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1506,6 +1504,47 @@
         }
       }
     },
+    "Duplicates.DeleteAllSelected.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle %lld Ausgewählte löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All %lld Selected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択した全%lld件を削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택한 %lld개 모두 삭제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除所有已选中的 %lld 张"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除所有已選取的 %lld 張"
+          }
+        }
+      }
+    },
     "Duplicates.DeleteSelected.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2911,6 +2950,47 @@
         }
       }
     },
+    "Import.SelectPhotos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择照片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇照片"
+          }
+        }
+      }
+    },
     "Import.SelectedPhotos.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3002,47 +3082,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "Import.SelectPhotos" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fotos auswählen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select Photos"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "写真を選択"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사진 선택"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择照片"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇照片"
           }
         }
       }
@@ -3387,9 +3426,6 @@
           }
         }
       }
-    },
-    "katagaki/IllustMate" : {
-      "shouldTranslate" : false
     },
     "More.Advanced" : {
       "extractionState" : "manual",
@@ -6750,47 +6786,6 @@
         }
       }
     },
-    "Shared.SelectAll" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle auswählen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select All"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてを選択"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "전체 선택"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全选"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全選"
-          }
-        }
-      }
-    },
     "Shared.SelectAPic" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6828,6 +6823,47 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選擇一張圖片以預覽。"
+          }
+        }
+      }
+    },
+    "Shared.SelectAll" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてを選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全選"
           }
         }
       }
@@ -7976,6 +8012,10 @@
           }
         }
       }
+    },
+    "katagaki/IllustMate" : {
+      "localizations" : {},
+      "shouldTranslate" : false
     }
   },
   "version" : "1.0"

@@ -41,8 +41,8 @@ struct DuplicateScanView: View {
             }
         }
         .interactiveDismissDisabled(scanManager.isScanning)
-        .onAppear {
-            UIApplication.shared.isIdleTimerDisabled = true
+        .onChange(of: scanManager.isScanning) { _, isScanning in
+            UIApplication.shared.isIdleTimerDisabled = isScanning
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
