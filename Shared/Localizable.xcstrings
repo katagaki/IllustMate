@@ -18,8 +18,7 @@
       },
       "shouldTranslate" : false
     },
-    "%@" : {},
-    "%lld" : {
+    "(%lld)" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -30,7 +29,10 @@
       },
       "shouldTranslate" : false
     },
-    "(%lld)" : {
+    "%@" : {
+      "shouldTranslate" : false
+    },
+    "%lld" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -2950,47 +2952,6 @@
         }
       }
     },
-    "Import.SelectPhotos" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fotos auswählen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select Photos"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "写真を選択"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사진 선택"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择照片"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇照片"
-          }
-        }
-      }
-    },
     "Import.SelectedPhotos.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3082,6 +3043,47 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Import.SelectPhotos" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写真を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사진 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择照片"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇照片"
           }
         }
       }
@@ -3426,6 +3428,9 @@
           }
         }
       }
+    },
+    "katagaki/IllustMate" : {
+      "shouldTranslate" : false
     },
     "More.Advanced" : {
       "extractionState" : "manual",
@@ -6786,47 +6791,6 @@
         }
       }
     },
-    "Shared.SelectAPic" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wählen Sie ein Bild zur Vorschau."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a pic to preview."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "表示する画像を選択してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "미리 볼 사진을 선택하세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择一张图片以预览。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選擇一張圖片以預覽。"
-          }
-        }
-      }
-    },
     "Shared.SelectAll" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6864,6 +6828,47 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全選"
+          }
+        }
+      }
+    },
+    "Shared.SelectAPic" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie ein Bild zur Vorschau."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a pic to preview."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示する画像を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미리 볼 사진을 선택하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择一张图片以预览。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇一張圖片以預覽。"
           }
         }
       }
@@ -8012,10 +8017,6 @@
           }
         }
       }
-    },
-    "katagaki/IllustMate" : {
-      "localizations" : {},
-      "shouldTranslate" : false
     }
   },
   "version" : "1.0"
