@@ -135,11 +135,16 @@ extension AlbumView {
                 }
             }
             group.addTask {
+                // Fetch count first for immediate layout
+                let count = await DataActor.shared.picCount(in: self.currentAlbum)
+                await MainActor.run {
+                    self.picCount = count
+                    self.hasFetchedPicCount = true
+                }
+                // Then fetch skeletons (lightweight — no blob data)
                 let pics = await self.fetchPics()
                 await MainActor.run {
-                    withAnimation {
-                        self.pics = pics
-                    }
+                    self.pics = pics
                     self.hasFetchedPics = true
                 }
             }
@@ -181,11 +186,14 @@ extension AlbumView {
 
     func refreshPicsAndSet() {
         Task.detached(priority: .userInitiated) {
-            let pics = await fetchPics()
+            let count = await DataActor.shared.picCount(in: self.currentAlbum)
             await MainActor.run {
-                withAnimation {
-                    self.pics = pics
-                }
+                self.picCount = count
+                self.hasFetchedPicCount = true
+            }
+            let pics = await self.fetchPics()
+            await MainActor.run {
+                self.pics = pics
                 self.hasFetchedPics = true
             }
         }

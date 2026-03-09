@@ -45,6 +45,16 @@ extension DataActor {
         return try database.prepare(orderedQuery).map { picFrom(row: $0) }
     }
 
+    func picCount(in album: Album?) -> Int {
+        let query: SQLite.Table
+        if let albumID = album?.id {
+            query = picsTable.filter(picAlbumId == albumID)
+        } else {
+            query = picsTable.filter(picAlbumId == nil)
+        }
+        return (try? database.scalar(query.count)) ?? 0
+    }
+
     func thumbnailData(forPicWithID id: String) -> Data? {
         let query = picsTable
             .filter(picId == id)

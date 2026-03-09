@@ -252,14 +252,23 @@ private struct CarouselThumbnail: View {
             }
             .opacity(isSelected ? 1.0 : 0.6)
             .task(id: pic.identifiableString()) {
-                if let data = pic.thumbnailData {
-                    thumbnail = UIImage(data: data)
-                } else if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: pic.id) {
-                    thumbnail = UIImage(data: thumbData)
+                // Check in-memory cache first
+                if let cached = ThumbnailCache.shared.image(forKey: pic.id) {
+                    thumbnail = cached
+                    return
                 }
-            }
-            .onDisappear {
-                thumbnail = nil
+                // Try pic's in-memory data, else fetch from DB
+                let thumbData: Data?
+                if let data = pic.thumbnailData {
+                    thumbData = data
+                } else {
+                    thumbData = await DataActor.shared.thumbnailData(forPicWithID: pic.id)
+                }
+                if let thumbData, let uiImage = UIImage(data: thumbData),
+                   let prepared = await uiImage.byPreparingForDisplay() {
+                    ThumbnailCache.shared.setImage(prepared, forKey: pic.id)
+                    thumbnail = prepared
+                }
             }
     }
 }

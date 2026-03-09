@@ -31,6 +31,8 @@ struct AlbumView: View {
     @State var albumStyleState: ViewStyle = .grid
 
     @State var pics: [Pic] = []
+    @State var picCount: Int = 0
+    @State var hasFetchedPicCount: Bool = false
     @State var hasFetchedPics: Bool = false
     @State var isConfirmingDeletePic: Bool = false
     @State var isConfirmingDeleteSelectedPics: Bool = false

@@ -67,7 +67,7 @@ extension AlbumView {
 
     var picsSection: some View {
         Group {
-            SectionHeader(title: "Albums.Pics", count: pics.count) {
+            SectionHeader(title: "Albums.Pics", count: hasFetchedPicCount ? picCount : pics.count) {
                 Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
                     isImportingPhotos = true
                 }
@@ -115,13 +115,18 @@ extension AlbumView {
                         refreshDataAfterPicMoved()
                     }
                 }
-            } else if !hasFetchedPics {
+            } else if !hasFetchedPicCount {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(20.0)
-            } else {
+            } else if picCount == 0 && hasFetchedPicCount {
                 Text("Albums.NoPics")
                     .foregroundStyle(.secondary)
+                    .padding(20.0)
+            } else if !hasFetchedPics {
+                // Count is known but skeletons still loading — show spinner
+                ProgressView()
+                    .frame(maxWidth: .infinity)
                     .padding(20.0)
             }
         }

@@ -27,12 +27,8 @@ class ViewerManager {
 
     func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
         // Show thumbnail immediately to open viewer without delay
-        let thumbnail: UIImage?
-        if let thumbnailData = pic.thumbnailData {
-            thumbnail = UIImage(data: thumbnailData)
-        } else {
-            thumbnail = nil
-        }
+        let thumbnail: UIImage? = ThumbnailCache.shared.image(forKey: pic.id)
+            ?? pic.thumbnailData.flatMap { UIImage(data: $0) }
 
         displayedThumbnail = thumbnail
         displayedPic = pic
@@ -66,12 +62,8 @@ class ViewerManager {
         currentIndex = index
         let pic = allPics[index]
 
-        let thumbnail: UIImage?
-        if let thumbnailData = pic.thumbnailData {
-            thumbnail = UIImage(data: thumbnailData)
-        } else {
-            thumbnail = nil
-        }
+        let thumbnail: UIImage? = ThumbnailCache.shared.image(forKey: pic.id)
+            ?? pic.thumbnailData.flatMap { UIImage(data: $0) }
 
         displayedThumbnail = thumbnail
         displayedPic = pic
@@ -111,6 +103,25 @@ class ViewerManager {
                 self.displayedImage = loadedImage
                 withAnimation(.easeInOut(duration: 0.25)) {
                     self.isFullImageLoaded = true
+                }
+                // Prefetch adjacent images after current one loads
+                prefetchAdjacentImages()
+            }
+        }
+    }
+
+    private func prefetchAdjacentImages() {
+        let indicesToPrefetch = [currentIndex - 1, currentIndex + 1]
+        for index in indicesToPrefetch {
+            guard index >= 0, index < allPics.count else { continue }
+            let pic = allPics[index]
+            guard imageCache[pic.id] == nil else { continue }
+            Task.detached(priority: .utility) {
+                if let data = await DataActor.shared.imageData(forPicWithID: pic.id),
+                   let image = await UIImage(data: data)?.byPreparingForDisplay() {
+                    await MainActor.run {
+                        self.imageCache[pic.id] = image
+                    }
                 }
             }
         }

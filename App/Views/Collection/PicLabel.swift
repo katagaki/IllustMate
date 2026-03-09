@@ -7,6 +7,23 @@
 
 import SwiftUI
 
+final class ThumbnailCache: @unchecked Sendable {
+    static let shared = ThumbnailCache()
+    private let cache = NSCache<NSString, UIImage>()
+
+    init() {
+        cache.countLimit = 500
+    }
+
+    func image(forKey key: String) -> UIImage? {
+        cache.object(forKey: key as NSString)
+    }
+
+    func setImage(_ image: UIImage, forKey key: String) {
+        cache.setObject(image, forKey: key as NSString)
+    }
+}
+
 struct PicLabel: View {
 
     var pic: Pic
@@ -41,10 +58,17 @@ struct PicLabel: View {
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 4.0))
             .task(id: pic.identifiableString()) {
+                if let cached = ThumbnailCache.shared.image(forKey: pic.id) {
+                    thumbnail = Image(uiImage: cached)
+                    isThumbnailReadyToPresent = true
+                    return
+                }
                 if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: pic.id),
-                   let uiImage = UIImage(data: thumbData) {
+                   let uiImage = UIImage(data: thumbData),
+                   let prepared = await uiImage.byPreparingForDisplay() {
+                    ThumbnailCache.shared.setImage(prepared, forKey: pic.id)
                     pic.thumbnailData = thumbData
-                    thumbnail = Image(uiImage: uiImage)
+                    thumbnail = Image(uiImage: prepared)
                 }
                 isThumbnailReadyToPresent = true
             }
