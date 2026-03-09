@@ -28,42 +28,29 @@ struct AlbumsScrollView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: 0.0) {
-                Text(title)
-                    .font(.title)
-                    .bold()
-                    .padding([.leading, .trailing], 20.0)
-                    .padding([.top], 10.0)
-                Divider()
-                    .padding([.leading], 20.0)
-                    .padding([.top], 10.0)
-
-                if isAlbumsLoaded {
-                    if displayedAlbums.isEmpty {
-                        if searchResults != nil && !searchText.isEmpty {
-                            Text("Albums.NoSearchResults")
-                                .foregroundStyle(.secondary)
-                                .padding([.leading, .trailing], 20.0)
-                                .padding([.top], 10.0)
-                        } else {
-                            Text("Albums.NoMoreAlbums")
-                                .foregroundStyle(.secondary)
-                                .padding([.leading, .trailing], 20.0)
-                                .padding([.top], 10.0)
-                        }
+            if isAlbumsLoaded {
+                if displayedAlbums.isEmpty {
+                    if searchResults != nil && !searchText.isEmpty {
+                        Text("Albums.NoSearchResults")
+                            .foregroundStyle(.secondary)
+                            .padding(20.0)
                     } else {
-                        AlbumsSection(albums: displayedAlbums, style: $style,
-                                      enablesContextMenu: false) { _ in
-                        }
+                        Text("Albums.NoMoreAlbums")
+                            .foregroundStyle(.secondary)
+                            .padding(20.0)
                     }
                 } else {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .padding([.leading, .trailing], 20.0)
-                        .padding([.top], 10.0)
+                    AlbumsSection(albums: displayedAlbums, style: $style,
+                                  enablesContextMenu: false) { _ in
+                    }
                 }
+            } else {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .padding(20.0)
             }
         }
+        .navigationTitle(title)
         .onAppear {
             Task {
                 do {
@@ -105,7 +92,8 @@ struct AlbumsScrollView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Albums.Search.Prompt")
     }
 
     func close() {
