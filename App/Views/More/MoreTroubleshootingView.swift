@@ -29,6 +29,9 @@ struct MoreTroubleshootingView: View {
                 Button("More.Troubleshooting.FreeUpSpace") {
                     Task { await freeUpSpace() }
                 }
+                Button("More.Troubleshooting.ClearHashCache") {
+                    Task { await HashActor.shared.deleteAllHashes() }
+                }
             } header: {
                 Text("More.Troubleshooting.DataManagement")
             } footer: {

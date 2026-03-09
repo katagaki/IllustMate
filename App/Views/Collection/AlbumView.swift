@@ -48,6 +48,7 @@ struct AlbumView: View {
 
     @State var searchText: String = ""
     @State var searchResults: [Album]?
+    @State var isDuplicateCheckerPresented: Bool = false
 
     var displayedAlbums: [Album] {
         searchResults ?? albums
@@ -69,6 +70,9 @@ struct AlbumView: View {
                 onAlbumDismiss: { refreshAlbumsAndSet() },
                 onImportDismiss: { refreshPicsAndSet() }
             ))
+            .sheet(isPresented: $isDuplicateCheckerPresented) {
+                DuplicateScanView(preselectedAlbum: currentAlbum)
+            }
             .modifier(AlbumViewDialogs(
                 isConfirmingDeleteAlbum: $isConfirmingDeleteAlbum,
                 isConfirmingDeletePic: $isConfirmingDeletePic,
@@ -153,9 +157,9 @@ struct AlbumView: View {
                     .overlay {
                         Group {
                             if colorScheme == .light {
-                                Color.white.opacity(0.2)
+                                Color.white.opacity(0.9)
                             } else {
-                                Color.black.opacity(0.7)
+                                Color.black.opacity(0.8)
                             }
                         }
                         .ignoresSafeArea()

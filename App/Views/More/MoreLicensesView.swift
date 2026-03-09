@@ -63,7 +63,7 @@ private struct Dependency: Identifiable {
             OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
             SOFTWARE.
             """
-        ),
+        )
     ]
 }
 // swiftlint:enable type_body_length

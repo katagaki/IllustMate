@@ -20,6 +20,7 @@ struct MoreView: View {
     @State var isPickingBackupFolder: Bool = false
     @State var isBackupSheetPresented: Bool = false
     @State var backupFolderURL: URL?
+    @State var isDuplicateCheckerPresented: Bool = false
 
     @AppStorage("PhotosModeEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
@@ -73,6 +74,13 @@ struct MoreView: View {
                     Text("More.Security")
                 } footer: {
                     Text("More.AppLock.Description")
+                }
+                Section {
+                    Button("More.DuplicateChecker") {
+                        isDuplicateCheckerPresented = true
+                    }
+                } header: {
+                    Text("More.Tools")
                 }
                 Section {
                     Button("Shared.OpenFilesApp") {
@@ -163,6 +171,9 @@ struct MoreView: View {
             if let backupFolderURL {
                 MoreBackupView(destinationURL: backupFolderURL)
             }
+        }
+        .sheet(isPresented: $isDuplicateCheckerPresented) {
+            DuplicateScanView()
         }
     }
 

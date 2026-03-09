@@ -102,7 +102,7 @@ struct ImporterView: View {
                 .padding(20.0)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if !isImporting {
                         Button(role: .cancel) {
                             dismiss()

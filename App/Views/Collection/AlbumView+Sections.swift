@@ -71,6 +71,9 @@ extension AlbumView {
                 Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
                     isImportingPhotos = true
                 }
+                Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
+                    isDuplicateCheckerPresented = true
+                }
                 Divider()
                 Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isPicSortReversed) {
                     Text("Shared.Sort.DateAdded.Ascending")
