@@ -83,7 +83,7 @@ struct PhotostandDatabase {
 
 extension UIImage {
     func resizedForWidget() -> Data? {
-        let maxDimension: CGFloat = 600
+        let maxDimension: CGFloat = 500
         let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
         let targetSize = CGSize(width: size.width * scale, height: size.height * scale)
         let format = UIGraphicsImageRendererFormat()
