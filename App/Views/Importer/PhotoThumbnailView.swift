@@ -16,6 +16,7 @@ struct PhotoThumbnailView: View {
 
     @Environment(\.displayScale) private var displayScale
     @State private var image: UIImage?
+    @State private var requestID: PHImageRequestID?
 
     var body: some View {
         Group {
@@ -30,9 +31,16 @@ struct PhotoThumbnailView: View {
         .onAppear {
             loadThumbnail()
         }
+        .onDisappear {
+            if let requestID {
+                PHCachingImageManager.default().cancelImageRequest(requestID)
+                self.requestID = nil
+            }
+        }
     }
 
     private func loadThumbnail() {
+        guard image == nil else { return }
         let manager = PHCachingImageManager.default()
         let options = PHImageRequestOptions()
         options.deliveryMode = .opportunistic
@@ -40,7 +48,7 @@ struct PhotoThumbnailView: View {
 
         let targetSize = CGSize(width: size.width * displayScale, height: size.height * displayScale)
 
-        manager.requestImage(for: asset, targetSize: targetSize,
+        requestID = manager.requestImage(for: asset, targetSize: targetSize,
                              contentMode: .aspectFill, options: options) { result, _ in
             if let result {
                 DispatchQueue.main.async {

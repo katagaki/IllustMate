@@ -16,6 +16,7 @@ struct AlbumsView: View {
     @Namespace var namespace
 
     @State var albums: [Album] = []
+    @State private var lastDataVersion: Int = -1
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var style: ViewStyle
 
@@ -41,19 +42,22 @@ struct AlbumsView: View {
             }
         }
         .onAppear {
-            refreshAlbums()
+            refreshAlbumsIfNeeded()
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
-                refreshAlbums()
+                refreshAlbumsIfNeeded()
             }
         }
         .onChange(of: navigation.dataVersion) { _, _ in
-            refreshAlbums()
+            refreshAlbumsIfNeeded()
         }
     }
 
-    func refreshAlbums() {
+    func refreshAlbumsIfNeeded() {
+        let currentVersion = navigation.dataVersion
+        guard currentVersion != lastDataVersion || albums.isEmpty else { return }
+        lastDataVersion = currentVersion
         Task.detached(priority: .userInitiated) {
             do {
                 let albums = try await DataActor.shared.albumsWithCounts(sortedBy: .nameAscending)

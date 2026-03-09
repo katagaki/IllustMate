@@ -12,11 +12,9 @@ extension DataActor {
     func albumsWithCounts(sortedBy sortType: SortType) throws -> [Album] {
         let rows = try database.prepare(albumsTable)
         let albums = rows.map { row -> Album in
-            let album = albumFrom(row: row, loadChildren: false)
-            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
-            album.childPicCount = picCount(forAlbumWithID: album.id)
-            return album
+            albumFrom(row: row, loadChildren: false)
         }
+        populateCounts(for: albums)
         return sortAlbum(albums, sortedBy: sortType)
     }
 
@@ -29,35 +27,63 @@ extension DataActor {
         }
         let rows = try database.prepare(query)
         let albums = rows.map { row -> Album in
-            let album = albumFrom(row: row, loadChildren: false)
-            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
-            album.childPicCount = picCount(forAlbumWithID: album.id)
-            return album
+            albumFrom(row: row, loadChildren: false)
         }
+        populateCounts(for: albums)
         return sortAlbum(albums, sortedBy: sortType)
+    }
+
+    /// Batch-populates childAlbumCount and childPicCount for all albums in one pass.
+    private func populateCounts(for albums: [Album]) {
+        let ids = albums.map { $0.id }
+        guard !ids.isEmpty else { return }
+
+        let bindings: [Binding?] = ids.map { $0 as Binding? }
+        let placeholders = ids.map { _ in "?" }.joined(separator: ", ")
+
+        // Batch album counts
+        var albumCounts: [String: Int] = [:]
+        let albumCountSQL = "SELECT parent_album_id, COUNT(*) FROM albums WHERE parent_album_id IN (\(placeholders)) GROUP BY parent_album_id"
+        if let stmt = try? database.prepare(albumCountSQL, bindings) {
+            for row in stmt {
+                if let parentId = row[0] as? String,
+                   let count = row[1] as? Int64 {
+                    albumCounts[parentId] = Int(count)
+                }
+            }
+        }
+
+        // Batch pic counts
+        var picCounts: [String: Int] = [:]
+        let picCountSQL = "SELECT containing_album_id, COUNT(*) FROM pics WHERE containing_album_id IN (\(placeholders)) GROUP BY containing_album_id"
+        if let stmt = try? database.prepare(picCountSQL, bindings) {
+            for row in stmt {
+                if let albumId = row[0] as? String,
+                   let count = row[1] as? Int64 {
+                    picCounts[albumId] = Int(count)
+                }
+            }
+        }
+
+        for album in albums {
+            album.childAlbumCount = albumCounts[album.id] ?? 0
+            album.childPicCount = picCounts[album.id] ?? 0
+        }
     }
 
     func representativeThumbnails(forAlbumWithID albumID: String, limit: Int = 3) -> [Data] {
         let query = picsTable
             .filter(picAlbumId == albumID)
-            .select(picId)
+            .select(picThumbnailData)
             .order(picDateAdded.desc)
             .limit(limit)
         guard let rows = try? database.prepare(query) else { return [] }
-
-        let ids = rows.compactMap { try? $0.get(picId) }
-        var thumbnails: [Data] = []
-        for id in ids {
-            if let thumbData = thumbnailData(forPicWithID: id) {
-                thumbnails.append(thumbData)
-            }
-        }
-        return thumbnails
+        return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
     func album(for id: String) -> Album? {
         let query = albumsTable.filter(albumId == id)
-        return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: true) }
+        return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: false) }
     }
 
     func createAlbum(_ name: String) -> Album {
@@ -177,11 +203,9 @@ extension DataActor {
         let query = albumsTable.filter(albumName.like(pattern, escape: nil))
         let rows = try database.prepare(query)
         let albums = rows.map { row -> Album in
-            let album = albumFrom(row: row, loadChildren: false)
-            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
-            album.childPicCount = picCount(forAlbumWithID: album.id)
-            return album
+            albumFrom(row: row, loadChildren: false)
         }
+        populateCounts(for: albums)
         return sortAlbum(albums, sortedBy: sortType)
     }
 
@@ -195,29 +219,32 @@ extension DataActor {
         )
         let rows = try database.prepare(query)
         let albums = rows.map { row -> Album in
-            let album = albumFrom(row: row, loadChildren: false)
-            album.childAlbumCount = albumCount(forAlbumWithID: album.id)
-            album.childPicCount = picCount(forAlbumWithID: album.id)
-            return album
+            albumFrom(row: row, loadChildren: false)
         }
+        populateCounts(for: albums)
         return sortAlbum(albums, sortedBy: sortType)
     }
 
     private func descendantAlbumIDs(of parentID: String?) -> [String] {
-        let query: QueryType
+        // Iterative BFS: one query per level instead of one query per node
+        let firstQuery: QueryType
         if let parentID {
-            query = albumsTable.filter(albumParentId == parentID).select(albumId)
+            firstQuery = albumsTable.filter(albumParentId == parentID).select(albumId)
         } else {
-            query = albumsTable.filter(albumParentId == nil).select(albumId)
+            firstQuery = albumsTable.filter(albumParentId == nil).select(albumId)
         }
-        guard let rows = try? database.prepare(query) else { return [] }
-        var ids: [String] = []
-        for row in rows {
-            if let childID = try? row.get(albumId) {
-                ids.append(childID)
-                ids.append(contentsOf: descendantAlbumIDs(of: childID))
-            }
+        guard let rows = try? database.prepare(firstQuery) else { return [] }
+        var currentLevel = rows.compactMap { try? $0.get(albumId) }
+        var allIDs = currentLevel
+
+        while !currentLevel.isEmpty {
+            let nextQuery = albumsTable
+                .filter(currentLevel.contains(albumParentId))
+                .select(albumId)
+            guard let nextRows = try? database.prepare(nextQuery) else { break }
+            currentLevel = nextRows.compactMap { try? $0.get(albumId) }
+            allIDs.append(contentsOf: currentLevel)
         }
-        return ids
+        return allIDs
     }
 }

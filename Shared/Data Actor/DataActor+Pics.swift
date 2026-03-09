@@ -84,10 +84,9 @@ extension DataActor {
     }
 
     func addPics(withIDs picIDs: [String], toAlbumWithID albumID: String) {
-        for picID in picIDs {
-            let query = picsTable.filter(picId == picID)
-            _ = try? database.run(query.update(picAlbumId <- albumID))
-        }
+        guard !picIDs.isEmpty else { return }
+        let query = picsTable.filter(picIDs.contains(picId))
+        _ = try? database.run(query.update(picAlbumId <- albumID))
     }
 
     func addPic(withID picID: String, toAlbumWithID albumID: String) {
@@ -96,10 +95,9 @@ extension DataActor {
     }
 
     func removeParentAlbum(forPicsWithIDs picIDs: [String]) {
-        for picID in picIDs {
-            let query = picsTable.filter(picId == picID)
-            _ = try? database.run(query.update(picAlbumId <- nil))
-        }
+        guard !picIDs.isEmpty else { return }
+        let query = picsTable.filter(picIDs.contains(picId))
+        _ = try? database.run(query.update(picAlbumId <- nil))
     }
 
     func setAsAlbumCover(for picID: String) {

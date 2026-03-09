@@ -60,7 +60,7 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
 
     func cover() -> UIImage {
         if let coverPhoto, let uiImage = UIImage(data: coverPhoto) {
-            return uiImage.scalePreservingAspectRatio(targetSize: CGSize(width: 60.0, height: 60.0))
+            return uiImage
         }
         return UIImage(named: "Album.Generic")!
     }
