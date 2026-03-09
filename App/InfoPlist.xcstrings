@@ -15,6 +15,30 @@
             "state" : "translated",
             "value" : "ピックメイト"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
         }
       }
     },
@@ -31,6 +55,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ピックメイト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
           }
         }
       }
@@ -50,6 +98,30 @@
             "state" : "translated",
             "value" : "「ピックメイト」はコレクションを保護するためにFace IDを使用します。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate는 컬렉션을 보호하기 위해 Face ID를 사용합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 使用 Face ID 来保护您的收藏。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate verwendet Face ID, um Ihre Sammlung zu schützen."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 使用 Face ID 來保護您的收藏。"
+          }
         }
       }
     },
@@ -68,6 +140,30 @@
             "state" : "needs_review",
             "value" : "「ピックメイト」は画像をインポートする際に写真ライブラリにアクセスします。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate가 앨범에서 이미지를 탐색하고 가져오려면 사진 보관함에 대한 접근 권한이 필요합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 需要访问您的照片图库，以便浏览和导入相册中的图片。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate benötigt Zugriff auf Ihre Fotomediathek, um Bilder aus Ihren Alben zu durchsuchen und zu importieren."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 需要存取您的照片圖庫，以便瀏覽和匯入相簿中的圖片。"
+          }
         }
       }
     },
@@ -85,6 +181,30 @@
             "state" : "translated",
             "value" : "ピックメイト"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
         }
       }
     },
@@ -100,6 +220,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ピックメイトバックアップ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 백업"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 备份"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate-Backup"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate 備份"
           }
         }
       }
