@@ -71,13 +71,24 @@ struct DuplicateScanView: View {
             } header: {
                 Text("Duplicates.Settings")
             }
-            Section {
-                Button("Duplicates.StartScan") {
+        }
+        .safeAreaInset(edge: .bottom) {
+            VStack(alignment: .center, spacing: 16.0) {
+                Button {
                     Task {
                         await scanManager.scan(scope: scanScope)
                     }
+                } label: {
+                    Text("Duplicates.StartScan")
+                        .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
             }
+            .frame(maxWidth: .infinity)
+            .padding(20.0)
         }
     }
 

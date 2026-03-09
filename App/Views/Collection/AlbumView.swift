@@ -71,11 +71,15 @@ struct AlbumView: View {
                 onImportDismiss: { refreshPicsAndSet() }
             ))
             .sheet(isPresented: $isDuplicateCheckerPresented) {
-                if let currentAlbum {
-                    DuplicateScanView(scanScope: .album(currentAlbum))
-                } else {
-                    DuplicateScanView(scanScope: .picsNotInAlbums)
+                Group {
+                    if let currentAlbum {
+                        DuplicateScanView(scanScope: .album(currentAlbum))
+                    } else {
+                        DuplicateScanView(scanScope: .picsNotInAlbums)
+                    }
                 }
+                .presentationDetents([.medium, .large])
+                .interactiveDismissDisabled()
             }
             .modifier(AlbumViewDialogs(
                 isConfirmingDeleteAlbum: $isConfirmingDeleteAlbum,

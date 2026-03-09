@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import UIKit
 
 struct DuplicateGroup: Identifiable {
@@ -42,8 +43,10 @@ class DuplicateScanManager {
     }
 
     func scan(scope: ScanScope) async {
-        isScanning = true
-        scanPhase = .computingHashes
+        withAnimation(.smooth.speed(2.0)) {
+            isScanning = true
+            scanPhase = .computingHashes
+        }
         scanProgress = 0
         duplicateGroups = []
 
@@ -105,8 +108,10 @@ class DuplicateScanManager {
         }
 
         duplicateGroups = resultGroups
-        scanPhase = .done
-        isScanning = false
+        withAnimation(.smooth.speed(2.0)) {
+            scanPhase = .done
+            isScanning = false
+        }
     }
 
     func removePics(withIDs deletedIDs: Set<String>) {
