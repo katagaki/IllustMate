@@ -75,26 +75,23 @@ struct MoreView: View {
                     Text("More.AppLock.Description")
                 }
                 Section {
-                    Group {
-                        Button("Shared.OpenFilesApp") {
-                            let documentsUrl = FileManager.default.urls(
-                                for: .documentDirectory, in: .userDomainMask
-                            ).first!
+                    Button("Shared.OpenFilesApp") {
+                        let documentsUrl = FileManager.default.urls(
+                            for: .documentDirectory, in: .userDomainMask
+                        ).first!
 #if targetEnvironment(macCatalyst)
-                            UIApplication.shared.open(documentsUrl)
+                        UIApplication.shared.open(documentsUrl)
 #else
-                            if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
-                                if UIApplication.shared.canOpenURL(sharedUrl) {
-                                    UIApplication.shared.open(sharedUrl)
-                                }
+                        if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
+                            if UIApplication.shared.canOpenURL(sharedUrl) {
+                                UIApplication.shared.open(sharedUrl)
                             }
+                        }
 #endif
-                        }
-                        Button("More.Backup") {
-                            isPickingBackupFolder = true
-                        }
                     }
-                    .tint(.primary)
+                    Button("More.Backup") {
+                        isPickingBackupFolder = true
+                    }
                 } header: {
                     Text("More.Data")
                 }
