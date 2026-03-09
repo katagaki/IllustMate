@@ -12,6 +12,17 @@ struct DuplicateResultsView: View {
 
     var scanManager: DuplicateScanManager
 
+    @State var selectedForDeletion: [UUID: Set<String>] = [:]
+    @State var isConfirmingDeleteAll: Bool = false
+
+    var allSelectedIDs: Set<String> {
+        selectedForDeletion.values.reduce(into: Set<String>()) { $0.formUnion($1) }
+    }
+
+    var groupsWithSelections: Int {
+        selectedForDeletion.values.filter { !$0.isEmpty }.count
+    }
+
     var body: some View {
         if scanManager.duplicateGroups.isEmpty {
             ContentUnavailableView {
@@ -22,13 +33,51 @@ struct DuplicateResultsView: View {
         } else {
             List {
                 ForEach(scanManager.duplicateGroups) { group in
-                    DuplicateGroupSection(group: group) { deletedIDs in
+                    DuplicateGroupSection(
+                        group: group,
+                        selectedForDeletion: Binding(
+                            get: { selectedForDeletion[group.id] ?? [] },
+                            set: { selectedForDeletion[group.id] = $0 }
+                        )
+                    ) { deletedIDs in
                         scanManager.removePics(withIDs: deletedIDs)
+                        selectedForDeletion[group.id] = nil
                     }
                 }
             }
             .listStyle(.insetGrouped)
             .listSectionSpacing(.compact)
+            .toolbar {
+                if groupsWithSelections > 1 {
+                    ToolbarItem(placement: .bottomBar) {
+                        Button("Duplicates.DeleteAllSelected.\(allSelectedIDs.count)",
+                               role: .destructive) {
+                            isConfirmingDeleteAll = true
+                        }
+                    }
+                }
+            }
+            .alert(
+                "Shared.DeleteConfirmation.Pic.\(allSelectedIDs.count)",
+                isPresented: $isConfirmingDeleteAll
+            ) {
+                Button("Shared.Yes", role: .destructive) {
+                    Task {
+                        let idsToDelete = allSelectedIDs
+                        for picID in idsToDelete {
+                            await DataActor.shared.deletePic(withID: picID)
+                            await HashActor.shared.deleteHash(forPicWithID: picID)
+                        }
+                        await MainActor.run {
+                            withAnimation(.smooth.speed(2.0)) {
+                                scanManager.removePics(withIDs: idsToDelete)
+                                selectedForDeletion = [:]
+                            }
+                        }
+                    }
+                }
+                Button("Shared.No", role: .cancel) {}
+            }
         }
     }
 }
@@ -38,9 +87,9 @@ struct DuplicateResultsView: View {
 struct DuplicateGroupSection: View {
 
     let group: DuplicateGroup
+    @Binding var selectedForDeletion: Set<String>
     var onDelete: (Set<String>) -> Void
 
-    @State var selectedForDeletion: Set<String> = []
     @State var comparisonViewerManager = ViewerManager()
     @State var isShowingComparison: Bool = false
     @State var isConfirmingDelete: Bool = false
