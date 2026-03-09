@@ -154,16 +154,7 @@ struct AlbumView: View {
                     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                     .ignoresSafeArea()
                     .blur(radius: 20.0)
-                    .overlay {
-                        Group {
-                            if colorScheme == .light {
-                                Color.white.opacity(0.9)
-                            } else {
-                                Color.black.opacity(0.8)
-                            }
-                        }
-                        .ignoresSafeArea()
-                    }
+                    .opacity(0.25)
                     .transition(.opacity.animation(.smooth))
             }
 
