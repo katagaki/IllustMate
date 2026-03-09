@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 @main
 struct IllustMateApp: App {
@@ -76,6 +77,9 @@ struct IllustMateApp: App {
             }
             .animation(.easeInOut(duration: 0.3), value: showLockCover)
             .onChange(of: scenePhase) { _, newValue in
+                if newValue == .background {
+                    WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
+                }
                 if isAppLockEnabled {
                     switch newValue {
                     case .inactive:

@@ -24,6 +24,7 @@ struct PhotostandDatabase {
     static let albumName = Expression<String>("name")
 
     // Pic columns
+    static let picId = Expression<String>("id")
     static let picAlbumId = Expression<String?>("containing_album_id")
     static let picData = Expression<Data>("data")
 
@@ -61,12 +62,19 @@ struct PhotostandDatabase {
 
     static func fetchRandomPicData(inAlbumWithID albumID: String) -> Data? {
         guard let database = openDatabase() else { return nil }
-        let query = picsTable
+        // Step 1: Pick a random pic ID without loading blob data
+        let idQuery = picsTable
             .filter(picAlbumId == albumID)
-            .select(picData)
+            .select(picId)
             .order(Expression<Int>.random())
             .limit(1)
-        guard let row = try? database.pluck(query),
+        guard let idRow = try? database.pluck(idQuery),
+              let randomId = try? idRow.get(picId) else { return nil }
+        // Step 2: Fetch only that single row's image data
+        let dataQuery = picsTable
+            .filter(picId == randomId)
+            .select(picData)
+        guard let row = try? database.pluck(dataQuery),
               let data = try? row.get(picData),
               let image = UIImage(data: data) else { return nil }
         return image.resizedForWidget()
@@ -83,7 +91,7 @@ struct PhotostandDatabase {
 
 extension UIImage {
     func resizedForWidget() -> Data? {
-        let maxDimension: CGFloat = 500
+        let maxDimension: CGFloat = 800
         let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
         let targetSize = CGSize(width: size.width * scale, height: size.height * scale)
         let format = UIGraphicsImageRendererFormat()
