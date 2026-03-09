@@ -38,6 +38,7 @@ struct PhotosCollectionView: View {
     @State var albumToMove: PHAssetCollection?
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var isConfirmingDeleteFolder: Bool = false
+    @State var coverRefreshID: Int = 0
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
@@ -181,7 +182,11 @@ struct PhotosCollectionView: View {
                                     onDeleteFolder: { folder in
                                         folderToDelete = folder
                                         isConfirmingDeleteFolder = true
-                                    })
+                                    },
+                                    onDropAssets: { transferable, collection in
+                                        addDroppedAsset(transferable, to: collection)
+                                    },
+                                    coverRefreshID: coverRefreshID)
             } else if hasFetchedCollections {
                 if searchText.isEmpty {
                     Text("Albums.NoAlbums")
@@ -396,5 +401,25 @@ extension PhotosCollectionView {
 
     func refreshCollections() {
         items = photosManager.fetchTopLevelCollections()
+    }
+
+    func addDroppedAsset(_ transferable: PHAssetTransferable, to collection: PHAssetCollection) {
+        let results = PHAsset.fetchAssets(withLocalIdentifiers: [transferable.localIdentifier], options: nil)
+        guard let asset = results.firstObject else { return }
+        Task {
+            do {
+                try await photosManager.addAssets([asset], to: collection)
+                let updatedAssets = await photosManager.fetchAssetsNotInAnyAlbum()
+                await MainActor.run {
+                    withAnimation(.smooth.speed(2.0)) {
+                        rootAssets = updatedAssets
+                        refreshCollections()
+                        coverRefreshID += 1
+                    }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
     }
 }

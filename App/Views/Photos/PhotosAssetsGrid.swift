@@ -40,6 +40,10 @@ struct PhotosAssetsGrid: View {
                 .simultaneousGesture(TapGesture().onEnded {
                     photosViewer.setDisplay(asset, in: assets)
                 })
+                .draggable(PHAssetTransferable(localIdentifier: asset.localIdentifier))
+                .contextMenu {
+                    PhotosAssetContextMenu(asset: asset)
+                }
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
 #else
@@ -93,6 +97,10 @@ struct PhotosFetchResultAssetsGrid: View {
                 .simultaneousGesture(TapGesture().onEnded {
                     photosViewer.setDisplay(asset, in: displayedAssets)
                 })
+                .draggable(PHAssetTransferable(localIdentifier: asset.localIdentifier))
+                .contextMenu {
+                    PhotosAssetContextMenu(asset: asset)
+                }
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
 #else
@@ -125,6 +133,74 @@ struct PhotosFetchResultAssetsGrid: View {
             newAssets.append(fetchResult.object(at: index))
         }
         displayedAssets.append(contentsOf: newAssets)
+    }
+}
+
+// MARK: - Context Menu
+
+struct PhotosAssetContextMenu: View {
+
+    let asset: PHAsset
+
+    var body: some View {
+        Button("Shared.Copy", systemImage: "doc.on.doc") {
+            let manager = PHCachingImageManager.default()
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .highQualityFormat
+            options.isNetworkAccessAllowed = true
+            options.isSynchronous = false
+            manager.requestImage(for: asset, targetSize: PHImageManagerMaximumSize,
+                                 contentMode: .default, options: options) { result, _ in
+                if let result {
+                    DispatchQueue.main.async {
+                        UIPasteboard.general.image = result
+                    }
+                }
+            }
+        }
+        ShareLink(item: PHAssetShareable(localIdentifier: asset.localIdentifier),
+                  preview: SharePreview(displayName,
+                                        image: PHAssetShareable(localIdentifier: asset.localIdentifier))) {
+            Label("Shared.Share", systemImage: "square.and.arrow.up")
+        }
+    }
+
+    private var displayName: String {
+        if let resource = PHAssetResource.assetResources(for: asset).first {
+            return resource.originalFilename
+        }
+        return asset.localIdentifier
+    }
+}
+
+// MARK: - Share Support
+
+struct PHAssetShareable: Transferable {
+    let localIdentifier: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(exportedContentType: .png) { shareable in
+            await withCheckedContinuation { continuation in
+                let results = PHAsset.fetchAssets(withLocalIdentifiers: [shareable.localIdentifier], options: nil)
+                guard let asset = results.firstObject else {
+                    continuation.resume(returning: Data())
+                    return
+                }
+                let manager = PHCachingImageManager.default()
+                let options = PHImageRequestOptions()
+                options.deliveryMode = .highQualityFormat
+                options.isNetworkAccessAllowed = true
+                options.isSynchronous = false
+                manager.requestImage(for: asset, targetSize: PHImageManagerMaximumSize,
+                                     contentMode: .default, options: options) { result, _ in
+                    if let result, let pngData = result.pngData() {
+                        continuation.resume(returning: pngData)
+                    } else {
+                        continuation.resume(returning: Data())
+                    }
+                }
+            }
+        }
     }
 }
 

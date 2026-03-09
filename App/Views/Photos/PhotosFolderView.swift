@@ -41,6 +41,7 @@ struct PhotosFolderView: View {
     @State var isConfirmingDeleteFolder: Bool = false
     @State var isAddingAlbum: Bool = false
     @State var newAlbumName: String = ""
+    @State var coverRefreshID: Int = 0
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
@@ -160,7 +161,11 @@ struct PhotosFolderView: View {
                                 onDeleteFolder: { folder in
                                     folderToDelete = folder
                                     isConfirmingDeleteFolder = true
-                                })
+                                },
+                                onDropAssets: { transferable, collection in
+                                    addDroppedAsset(transferable, to: collection)
+                                },
+                                coverRefreshID: coverRefreshID)
         }
     }
 
@@ -354,6 +359,24 @@ struct PhotosFolderView: View {
                     folderToDelete = nil
                     hasFetched = false
                     fetchContent()
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
+    private func addDroppedAsset(_ transferable: PHAssetTransferable, to collection: PHAssetCollection) {
+        let results = PHAsset.fetchAssets(withLocalIdentifiers: [transferable.localIdentifier], options: nil)
+        guard let asset = results.firstObject else { return }
+        Task {
+            do {
+                try await photosManager.addAssets([asset], to: collection)
+                await MainActor.run {
+                    withAnimation(.smooth.speed(2.0)) {
+                        fetchContent()
+                        coverRefreshID += 1
+                    }
                 }
             } catch {
                 debugPrint(error.localizedDescription)

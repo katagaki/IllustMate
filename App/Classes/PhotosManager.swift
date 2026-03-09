@@ -213,6 +213,13 @@ class PhotosManager {
         }
     }
 
+    nonisolated func addAssets(_ assets: [PHAsset], to collection: PHAssetCollection) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            guard let request = PHAssetCollectionChangeRequest(for: collection) else { return }
+            request.addAssets(assets as NSFastEnumeration)
+        }
+    }
+
     func searchAlbums(matching searchText: String) -> [PHCollectionItem] {
         let options = PHFetchOptions()
         options.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)

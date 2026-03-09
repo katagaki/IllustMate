@@ -17,6 +17,8 @@ struct PhotosAlbumsSection: View {
     var onDelete: ((PHAssetCollection) -> Void)?
     var onMoveToFolder: ((PHAssetCollection) -> Void)?
     var onDeleteFolder: ((PHCollectionList) -> Void)?
+    var onDropAssets: ((PHAssetTransferable, PHAssetCollection) -> Void)?
+    var coverRefreshID: Int = 0
 
     @Namespace var albumTransitionNamespace
 
@@ -34,6 +36,7 @@ struct PhotosAlbumsSection: View {
                     ForEach(items) { item in
                         itemLink(for: item) {
                             itemGridLabel(for: item)
+                                .photosAlbumDropDestination(item: item, onDropAssets: onDropAssets)
                         }
                         .contextMenu { contextMenu(for: item) }
                         .buttonStyleAdaptive()
@@ -46,6 +49,7 @@ struct PhotosAlbumsSection: View {
                     ForEach(items) { item in
                         itemLink(for: item) {
                             itemListRow(for: item)
+                                .photosAlbumDropDestination(item: item, onDropAssets: onDropAssets)
                         }
                         .contextMenu { contextMenu(for: item) }
                         .buttonStyleAdaptive()
@@ -61,6 +65,7 @@ struct PhotosAlbumsSection: View {
                         ForEach(items) { item in
                             itemLink(for: item) {
                                 itemGridLabel(for: item, length: 80.0)
+                                    .photosAlbumDropDestination(item: item, onDropAssets: onDropAssets)
                             }
                             .contextMenu { contextMenu(for: item) }
                             .buttonStyleAdaptive()
@@ -136,7 +141,8 @@ struct PhotosAlbumsSection: View {
         switch item {
         case .album(let collection):
             PhotosAlbumGridLabel(namespace: albumTransitionNamespace,
-                                 collection: collection, length: length)
+                                 collection: collection, length: length,
+                                 coverRefreshID: coverRefreshID)
         case .folder(let folder):
             PhotosFolderGridLabel(namespace: albumTransitionNamespace,
                                   folder: folder, length: length)
@@ -149,7 +155,8 @@ struct PhotosAlbumsSection: View {
     private func itemListRow(for item: PHCollectionItem) -> some View {
         switch item {
         case .album(let collection):
-            PhotosAlbumListRow(namespace: albumTransitionNamespace, collection: collection)
+            PhotosAlbumListRow(namespace: albumTransitionNamespace, collection: collection,
+                               coverRefreshID: coverRefreshID)
         case .folder(let folder):
             PhotosFolderListRow(namespace: albumTransitionNamespace, folder: folder)
         }
@@ -163,10 +170,12 @@ struct PhotosAlbumGridLabel: View {
     var namespace: Namespace.ID
     var collection: PHAssetCollection
     var length: CGFloat?
+    var coverRefreshID: Int = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: length)
+            AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: length,
+                                             refreshID: coverRefreshID)
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
             Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Title", in: namespace)
@@ -208,12 +217,14 @@ struct PhotosAlbumListRow: View {
 
     var namespace: Namespace.ID
     var collection: PHAssetCollection
+    var coverRefreshID: Int = 0
 
     @State private var picCount: Int = 0
 
     var body: some View {
         HStack(alignment: .center, spacing: 16.0) {
-            AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: 48.0)
+            AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: 48.0,
+                                             refreshID: coverRefreshID)
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
@@ -280,6 +291,32 @@ struct PhotosFolderListRow: View {
         .padding([.top, .bottom], 8.0)
         .task(id: folder.localIdentifier) {
             childCount = PHCollection.fetchCollections(in: folder, options: nil).count
+        }
+    }
+}
+
+// MARK: - Drop Destination
+
+extension View {
+    @ViewBuilder
+    func photosAlbumDropDestination(
+        item: PHCollectionItem,
+        onDropAssets: ((PHAssetTransferable, PHAssetCollection) -> Void)?
+    ) -> some View {
+        switch item {
+        case .album(let collection):
+            if let onDropAssets {
+                self.dropDestination(for: PHAssetTransferable.self) { items, _ in
+                    for transferable in items {
+                        onDropAssets(transferable, collection)
+                    }
+                    return !items.isEmpty
+                }
+            } else {
+                self
+            }
+        case .folder:
+            self
         }
     }
 }

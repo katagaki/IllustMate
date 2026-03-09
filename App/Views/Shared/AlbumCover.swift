@@ -162,6 +162,7 @@ struct AlbumCover: View {
 
         var collection: PHAssetCollection
         var length: CGFloat?
+        var refreshID: Int = 0
 
         @Environment(\.displayScale) private var displayScale
 
@@ -178,7 +179,7 @@ struct AlbumCover: View {
                        primaryImage: primaryImage,
                        secondaryImage: secondaryImage,
                        tertiaryImage: tertiaryImage)
-            .task(id: collection.localIdentifier) {
+            .task(id: "\(collection.localIdentifier)-\(refreshID)") {
                 loadRepresentativePhotos()
             }
         }
