@@ -1812,6 +1812,40 @@
         }
       }
     },
+    "Shared.DeleteConfirmation.Album.%@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete \"%@\"?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を削除してもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Shared.DeleteConfirmation.Album.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Items contained in the deleted album will be moved to its parent album."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除されたアルバム内のアイテムは親アルバムに移動されます。"
+          }
+        }
+      }
+    },
     "Shared.DeleteConfirmation.Pic" : {
       "extractionState" : "manual",
       "localizations" : {

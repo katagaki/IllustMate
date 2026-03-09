@@ -243,14 +243,18 @@ private struct AlbumViewDialogs: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .confirmationDialog("Shared.DeleteConfirmation.Album",
-                                isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
+            .alert(
+                Text("Shared.DeleteConfirmation.Album.\(albumPendingDeletion?.name ?? "")"),
+                isPresented: $isConfirmingDeleteAlbum
+            ) {
                 Button("Shared.Yes", role: .destructive) {
                     onConfirmDeleteAlbum()
                 }
                 Button("Shared.No", role: .cancel) {
                     albumPendingDeletion = nil
                 }
+            } message: {
+                Text("Shared.DeleteConfirmation.Album.Message")
             }
             .confirmationDialog("Shared.DeleteConfirmation.Pic",
                                 isPresented: $isConfirmingDeletePic, titleVisibility: .visible) {
