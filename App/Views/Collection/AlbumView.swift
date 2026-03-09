@@ -44,6 +44,15 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
 
+    @State var searchText: String = ""
+
+    private var filteredAlbums: [Album] {
+        if searchText.isEmpty {
+            return albums
+        }
+        return albums.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
     var body: some View {
         ZStack {
             // Background image
@@ -186,5 +195,6 @@ struct AlbumView: View {
             }
         }
         .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
+        .searchable(text: $searchText)
     }
 }

@@ -22,6 +22,14 @@ struct PhotosFolderView: View {
     @State private var items: [PHCollectionItem] = []
     @State private var ownPicsFetchResult: PHFetchResult<PHAsset>?
     @State private var hasFetched: Bool = false
+    @State private var searchText: String = ""
+
+    private var filteredItems: [PHCollectionItem] {
+        if searchText.isEmpty {
+            return items
+        }
+        return items.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+    }
 
     // Album management state
     @State var albumToRename: PHAssetCollection?
@@ -44,7 +52,7 @@ struct PhotosFolderView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                if !items.isEmpty {
+                if !filteredItems.isEmpty {
                     albumsSection
                     Spacer()
                         .frame(height: 20.0)
@@ -57,6 +65,7 @@ struct PhotosFolderView: View {
             .padding([.top], 20.0)
         }
         .navigationTitle(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+        .searchable(text: $searchText)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
@@ -102,7 +111,7 @@ struct PhotosFolderView: View {
 
     private var albumsSection: some View {
         Group {
-            SectionHeader(title: "Albums.Albums", count: items.count) {
+            SectionHeader(title: "Albums.Albums", count: filteredItems.count) {
                 Picker("Albums.Style",
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
                     Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
@@ -127,7 +136,7 @@ struct PhotosFolderView: View {
                 }
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            PhotosAlbumsSection(items: items, style: $albumStyleState,
+            PhotosAlbumsSection(items: filteredItems, style: $albumStyleState,
                                 onRename: { collection in
                                     albumToRename = collection
                                 },

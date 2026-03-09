@@ -20,6 +20,14 @@ struct PhotosCollectionView: View {
     @State var hasFetchedCollections: Bool = false
     @State var hasFetchedRootAssets: Bool = false
     @State var isFetchingRootAssets: Bool = false
+    @State var searchText: String = ""
+
+    private var filteredItems: [PHCollectionItem] {
+        if searchText.isEmpty {
+            return items
+        }
+        return items.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+    }
 
     // Album management state
     @State var isAddingAlbum: Bool = false
@@ -54,6 +62,7 @@ struct PhotosCollectionView: View {
             }
         }
         .navigationTitle(String(localized: "ViewTitle.Photos"))
+        .searchable(text: $searchText)
         .toolbar {
             if photosManager.authorizationStatus == .authorized ||
                photosManager.authorizationStatus == .limited {
@@ -123,7 +132,7 @@ struct PhotosCollectionView: View {
 
     private var photosAlbumsSection: some View {
         Group {
-            SectionHeader(title: "Albums.Albums", count: items.count) {
+            SectionHeader(title: "Albums.Albums", count: filteredItems.count) {
                 Picker("Albums.Style",
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
                     Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
@@ -148,8 +157,8 @@ struct PhotosCollectionView: View {
                 }
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            if !items.isEmpty {
-                PhotosAlbumsSection(items: items, style: $albumStyleState,
+            if !filteredItems.isEmpty {
+                PhotosAlbumsSection(items: filteredItems, style: $albumStyleState,
                                     onRename: { collection in
                                         albumToRename = collection
                                     },
@@ -165,9 +174,11 @@ struct PhotosCollectionView: View {
                                         isConfirmingDeleteFolder = true
                                     })
             } else if hasFetchedCollections {
-                Text("Albums.NoAlbums")
-                    .foregroundStyle(.secondary)
-                    .padding(20.0)
+                if searchText.isEmpty {
+                    Text("Albums.NoAlbums")
+                        .foregroundStyle(.secondary)
+                        .padding(20.0)
+                }
             }
         }
     }
