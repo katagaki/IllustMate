@@ -84,8 +84,15 @@ class DuplicateScanManager {
                 }
             }
             if pics.count >= 2 {
-                resultGroups.append(DuplicateGroup(pics: pics))
+                let sortedPics = pics.sorted { $0.dateAdded < $1.dateAdded }
+                resultGroups.append(DuplicateGroup(pics: sortedPics))
             }
+        }
+
+        resultGroups.sort { groupA, groupB in
+            let earliestA = groupA.pics.first?.dateAdded ?? .distantFuture
+            let earliestB = groupB.pics.first?.dateAdded ?? .distantFuture
+            return earliestA < earliestB
         }
 
         duplicateGroups = resultGroups
