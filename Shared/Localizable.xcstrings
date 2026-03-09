@@ -2697,6 +2697,23 @@
           }
         }
       }
+    },
+    "Albums.Search.Prompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album Name"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルバム名"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

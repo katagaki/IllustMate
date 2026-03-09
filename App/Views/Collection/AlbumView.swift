@@ -118,7 +118,7 @@ struct AlbumView: View {
                 }
             }
             .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
-            .searchable(text: $searchText)
+            .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
     }
 
     @ToolbarContentBuilder
@@ -165,10 +165,20 @@ struct AlbumView: View {
                 VStack(alignment: .leading, spacing: 0.0) {
                     if !isSelectingPics {
                         albumSection
-                        Spacer()
-                            .frame(height: 20.0)
+                        if !searchText.isEmpty {
+                            if displayedAlbums.isEmpty {
+                                Text("Albums.NoSearchResults")
+                                    .foregroundStyle(.secondary)
+                                    .padding(20.0)
+                            }
+                        } else {
+                            Spacer()
+                                .frame(height: 20.0)
+                        }
                     }
-                    picsSection
+                    if searchText.isEmpty {
+                        picsSection
+                    }
                 }
                 .padding([.top], 20.0)
             }
