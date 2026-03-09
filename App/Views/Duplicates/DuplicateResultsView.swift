@@ -85,10 +85,9 @@ struct DuplicateGroupSection: View {
         } header: {
             Text("Duplicates.GroupCount.\(group.pics.count)")
         }
-        .confirmationDialog(
+        .alert(
             "Shared.DeleteConfirmation.Pic.\(selectedForDeletion.count)",
-            isPresented: $isConfirmingDelete,
-            titleVisibility: .visible
+            isPresented: $isConfirmingDelete
         ) {
             Button("Shared.Yes", role: .destructive) {
                 Task {
