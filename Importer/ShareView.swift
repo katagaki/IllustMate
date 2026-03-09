@@ -44,7 +44,7 @@ struct ShareView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 NavigationStack(path: $viewPath) {
-                    AlbumsScrollView(title: "Shared.Collection")
+                    AlbumsScrollView(title: "ViewTitle.Importer")
                         .navigationDestination(for: ViewPath.self, destination: { viewPath in
                             if case .album(let album) = viewPath {
                                 AlbumsScrollView(title: LocalizedStringKey(album.name), parentAlbum: album)
@@ -113,22 +113,6 @@ struct ShareView: View {
                 }
             }
 
-            if !isImporting && itemsManager.isLoaded {
-                ZStack(alignment: .top) {
-                    Color.clear
-                    Text("ViewTitle.Importer")
-#if targetEnvironment(macCatalyst)
-                        .font(.system(size: 13.0))
-                        .bold()
-                        .padding([.top], 11.0)
-#else
-                        .font(.system(size: 17.0))
-                        .bold()
-                        .padding([.top], 18.0)
-#endif
-                }
-                .allowsHitTesting(false)
-            }
         }
     }
 
