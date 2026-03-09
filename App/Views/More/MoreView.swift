@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
-import Komponents
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -31,13 +30,10 @@ struct MoreView: View {
 
     var body: some View {
         NavigationStack(path: $navigation.moreTabPath) {
-            MoreList(repoName: "katagaki/IllustMate", viewPath: ViewPath.moreAttributions) {
+            List {
                 Section {
                     HStack(alignment: .top) {
                         VStack(spacing: 8.0) {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .font(.title2)
-                                .foregroundStyle(.secondary)
                             Text("\(picCount)")
                                 .font(.title2)
                                 .fontWeight(.bold)
@@ -48,9 +44,6 @@ struct MoreView: View {
                         }
                         .frame(maxWidth: .infinity)
                         VStack(spacing: 8.0) {
-                            Image(systemName: "rectangle.stack.fill")
-                                .font(.title2)
-                                .foregroundStyle(.secondary)
                             Text("\(albumCount)")
                                 .font(.title2)
                                 .fontWeight(.bold)
@@ -67,19 +60,15 @@ struct MoreView: View {
                     Text("More.Stats.Footer")
                 }
                 Section {
-                    Toggle(isOn: $isPhotosModeEnabled) {
-                        Label("More.PhotosMode", systemImage: "photo.on.rectangle.angled")
-                    }
+                    Toggle("More.PhotosMode", isOn: $isPhotosModeEnabled)
                 } header: {
                     Text("More.PhotosMode.Header")
                 } footer: {
                     Text("More.PhotosMode.Description")
                 }
                 Section {
-                    Toggle(isOn: $isAppLockEnabled) {
-                        Label("More.AppLock", systemImage: "lock.fill")
-                    }
-                    .disabled(auth.biometryType == .none)
+                    Toggle("More.AppLock", isOn: $isAppLockEnabled)
+                        .disabled(auth.biometryType == .none)
                 } header: {
                     Text("More.Security")
                 } footer: {
@@ -87,7 +76,7 @@ struct MoreView: View {
                 }
                 Section {
                     Group {
-                        Button {
+                        Button("Shared.OpenFilesApp") {
                             let documentsUrl = FileManager.default.urls(
                                 for: .documentDirectory, in: .userDomainMask
                             ).first!
@@ -100,13 +89,9 @@ struct MoreView: View {
                                 }
                             }
 #endif
-                        } label: {
-                            Label("Shared.OpenFilesApp", systemImage: "folder")
                         }
-                        Button {
+                        Button("More.Backup") {
                             isPickingBackupFolder = true
-                        } label: {
-                            Label("More.Backup", systemImage: "externaldrive")
                         }
                     }
                     .tint(.primary)
@@ -114,21 +99,15 @@ struct MoreView: View {
                     Text("More.Data")
                 }
                 Section {
-                    NavigationLink(value: ViewPath.moreTroubleshooting) {
-                        Label("More.Troubleshooting", systemImage: "wrench.and.screwdriver")
-                    }
+                    NavigationLink("More.Troubleshooting", value: ViewPath.moreTroubleshooting)
                 } header: {
                     Text("More.Advanced")
                 }
                 Section {
-                    Toggle(isOn: $isNestedAlbumsEnabled) {
-                        Text("More.Experiments.NestedAlbums")
-                    }
-                    .disabled(!isPhotosModeEnabled)
-                    Button {
+                    Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
+                        .disabled(!isPhotosModeEnabled)
+                    Button("More.Experiments.NestedAlbums.CopyPrefix") {
                         UIPasteboard.general.string = "▶︎ "
-                    } label: {
-                        Label("More.Experiments.NestedAlbums.CopyPrefix", systemImage: "doc.on.doc")
                     }
                     .tint(.primary)
                     .disabled(!isNestedAlbumsEnabled)
@@ -137,7 +116,20 @@ struct MoreView: View {
                 } footer: {
                     Text("More.Experiments.NestedAlbums.Description")
                 }
+                Section {
+                    Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
+                        HStack {
+                            Text(String(localized: "More.GitHub"))
+                            Spacer()
+                            Text("katagaki/IllustMate")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .tint(.primary)
+                    NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
+                }
             }
+            .navigationTitle("ViewTitle.More")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -150,30 +142,7 @@ struct MoreView: View {
                 switch viewPath {
                 case .moreDebug: MoreExperimentsView()
                 case .moreTroubleshooting: MoreTroubleshootingView()
-                case .moreAttributions: LicensesView(licenses: [
-                    License(libraryName: "SQLite.swift", text:
-"""
-Copyright (c) 2014-2015 Stephen Celis (<stephen@stephencelis.com>)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-""")
-                ])
+                case .moreAttributions: MoreLicensesView()
                 default: Color.clear
                 }
             }
