@@ -74,7 +74,8 @@ struct PicsGrid<Content: View>: View {
                             }
                         }
                         ShareLink(item: PicShareable(picID: pic.id),
-                                  preview: SharePreview(pic.name)) {
+                                  preview: SharePreview(pic.name,
+                                                        image: PicShareable(picID: pic.id))) {
                             Label("Shared.Share", systemImage: "square.and.arrow.up")
                         }
                         if let onRename {
@@ -119,8 +120,13 @@ struct PicShareable: Transferable {
     let picID: String
 
     static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(exportedContentType: .image) { shareable in
-            await DataActor.shared.imageData(forPicWithID: shareable.picID) ?? Data()
+        DataRepresentation(exportedContentType: .png) { shareable in
+            if let data = await DataActor.shared.imageData(forPicWithID: shareable.picID),
+               let image = UIImage(data: data),
+               let pngData = image.pngData() {
+                return pngData
+            }
+            return Data()
         }
     }
 }

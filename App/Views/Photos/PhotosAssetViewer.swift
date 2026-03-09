@@ -34,6 +34,14 @@ struct PhotosAssetViewer: View {
         fullImage ?? thumbnail
     }
 
+    private var shareImage: Image {
+        if let image = currentImage, let cgImage = image.cgImage {
+            Image(cgImage, scale: image.scale, label: Text(""))
+        } else {
+            Image(uiImage: UIImage())
+        }
+    }
+
     private var displayName: String {
         if let resource = PHAssetResource.assetResources(for: currentAsset).first {
             return resource.originalFilename
@@ -128,22 +136,23 @@ struct PhotosAssetViewer: View {
                         .lineLimit(1)
                 }
             }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Button("Shared.Copy", systemImage: "doc.on.doc") {
                     if let image = currentImage {
                         UIPasteboard.general.image = image
                     }
                 }
-                if let image = currentImage, let cgImage = image.cgImage {
-                    ShareLink(
-                        "Shared.Share",
-                        item: Image(cgImage, scale: image.scale, label: Text("")),
-                        preview: SharePreview(
-                            displayName,
-                            image: Image(uiImage: image)
-                        )
+                .disabled(currentImage == nil)
+                ShareLink(
+                    "Shared.Share",
+                    item: shareImage,
+                    preview: SharePreview(
+                        displayName,
+                        image: shareImage
                     )
-                }
+                )
+                .disabled(currentImage == nil)
             }
         }
         .task(id: currentAsset.localIdentifier) {

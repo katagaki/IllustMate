@@ -81,11 +81,21 @@ struct PhotosFolderView: View {
         .sheet(isPresented: $isAddingAlbum) {
             photosNewAlbumInFolderSheet
         }
-        .sheet(item: $albumToRename) { collection in
-            photosRenameAlbumSheet(collection)
+        .sheet(isPresented: Binding(
+            get: { albumToRename != nil },
+            set: { if !$0 { albumToRename = nil } }
+        )) {
+            if let collection = albumToRename {
+                photosRenameAlbumSheet(collection)
+            }
         }
-        .sheet(item: $albumToMove) { collection in
-            photosMoveFolderSheet(collection)
+        .sheet(isPresented: Binding(
+            get: { albumToMove != nil },
+            set: { if !$0 { albumToMove = nil } }
+        )) {
+            if let collection = albumToMove {
+                photosMoveFolderSheet(collection)
+            }
         }
         .confirmationDialog("Shared.DeleteConfirmation.Album",
                             isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {

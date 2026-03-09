@@ -25,15 +25,19 @@ struct PicMoveMenu: View {
             }
         }
         Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
-            ForEach(rootAlbums) { album in
-                AlbumHierarchyMenuItem(
-                    targetAlbum: album,
-                    excludingAlbumID: containingAlbum?.id ?? ""
-                ) { destinationAlbum in
-                    Task {
-                        await DataActor.shared.addPics(withIDs: pics.map { $0.id },
-                                                     toAlbumWithID: destinationAlbum.id)
-                        onMoved()
+            if rootAlbums.isEmpty {
+                Text(verbatim: "")
+            } else {
+                ForEach(rootAlbums) { album in
+                    AlbumHierarchyMenuItem(
+                        targetAlbum: album,
+                        excludingAlbumID: containingAlbum?.id ?? ""
+                    ) { destinationAlbum in
+                        Task {
+                            await DataActor.shared.addPics(withIDs: pics.map { $0.id },
+                                                         toAlbumWithID: destinationAlbum.id)
+                            onMoved()
+                        }
                     }
                 }
             }

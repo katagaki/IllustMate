@@ -157,7 +157,7 @@ class PhotosManager {
 
     // MARK: - Album Management
 
-    func createAlbum(named title: String) async throws -> PHAssetCollection {
+    nonisolated func createAlbum(named title: String) async throws -> PHAssetCollection {
         var placeholder: PHObjectPlaceholder?
         try await PHPhotoLibrary.shared().performChanges {
             let request = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: title)
@@ -172,27 +172,27 @@ class PhotosManager {
         return collection
     }
 
-    func renameAlbum(_ collection: PHAssetCollection, to newTitle: String) async throws {
+    nonisolated func renameAlbum(_ collection: PHAssetCollection, to newTitle: String) async throws {
         try await PHPhotoLibrary.shared().performChanges {
             guard let request = PHAssetCollectionChangeRequest(for: collection) else { return }
             request.title = newTitle
         }
     }
 
-    func deleteAlbum(_ collection: PHAssetCollection) async throws {
+    nonisolated func deleteAlbum(_ collection: PHAssetCollection) async throws {
         try await PHPhotoLibrary.shared().performChanges {
             PHAssetCollectionChangeRequest.deleteAssetCollections([collection] as NSFastEnumeration)
         }
     }
 
-    func moveAlbum(_ collection: PHAssetCollection, into folder: PHCollectionList) async throws {
+    nonisolated func moveAlbum(_ collection: PHAssetCollection, into folder: PHCollectionList) async throws {
         try await PHPhotoLibrary.shared().performChanges {
             guard let folderRequest = PHCollectionListChangeRequest(for: folder) else { return }
             folderRequest.addChildCollections([collection] as NSFastEnumeration)
         }
     }
 
-    func createFolder(named title: String) async throws -> PHCollectionList {
+    nonisolated func createFolder(named title: String) async throws -> PHCollectionList {
         var placeholder: PHObjectPlaceholder?
         try await PHPhotoLibrary.shared().performChanges {
             let request = PHCollectionListChangeRequest.creationRequestForCollectionList(withTitle: title)
@@ -207,7 +207,7 @@ class PhotosManager {
         return folder
     }
 
-    func deleteFolder(_ folder: PHCollectionList) async throws {
+    nonisolated func deleteFolder(_ folder: PHCollectionList) async throws {
         try await PHPhotoLibrary.shared().performChanges {
             PHCollectionListChangeRequest.deleteCollectionLists([folder] as NSFastEnumeration)
         }

@@ -9,7 +9,6 @@ import Photos
 import SwiftUI
 
 struct PhotosCollectionView: View {
-
     @Environment(PhotosManager.self) var photosManager
     @EnvironmentObject var navigation: NavigationManager
 
@@ -76,11 +75,21 @@ struct PhotosCollectionView: View {
         .sheet(isPresented: $isAddingAlbum) {
             photosNewAlbumSheet
         }
-        .sheet(item: $albumToRename) { collection in
-            photosRenameAlbumSheet(collection)
+        .sheet(isPresented: Binding(
+            get: { albumToRename != nil },
+            set: { if !$0 { albumToRename = nil } }
+        )) {
+            if let collection = albumToRename {
+                photosRenameAlbumSheet(collection)
+            }
         }
-        .sheet(item: $albumToMove) { collection in
-            photosMoveFolderSheet(collection)
+        .sheet(isPresented: Binding(
+            get: { albumToMove != nil },
+            set: { if !$0 { albumToMove = nil } }
+        )) {
+            if let collection = albumToMove {
+                photosMoveFolderSheet(collection)
+            }
         }
         .confirmationDialog("Shared.DeleteConfirmation.Album",
                             isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
@@ -235,9 +244,11 @@ struct PhotosCollectionView: View {
         }
         .padding(40.0)
     }
+}
 
-    // MARK: - Album Management Sheets
+// MARK: - Album Management Sheets
 
+extension PhotosCollectionView {
     private var photosNewAlbumSheet: some View {
         NavigationStack {
             List {
@@ -278,7 +289,7 @@ struct PhotosCollectionView: View {
         .interactiveDismissDisabled()
     }
 
-    private func photosRenameAlbumSheet(_ collection: PHAssetCollection) -> some View {
+    func photosRenameAlbumSheet(_ collection: PHAssetCollection) -> some View {
         NavigationStack {
             List {
                 Section {
@@ -330,7 +341,7 @@ struct PhotosCollectionView: View {
         .interactiveDismissDisabled()
     }
 
-    private func photosMoveFolderSheet(_ collection: PHAssetCollection) -> some View {
+    func photosMoveFolderSheet(_ collection: PHAssetCollection) -> some View {
         NavigationStack {
             PhotosFolderPickerView(album: collection) {
                 albumToMove = nil
@@ -348,10 +359,12 @@ struct PhotosCollectionView: View {
         }
         .presentationDetents([.medium, .large])
     }
+}
 
-    // MARK: - Actions
+// MARK: - Actions
 
-    private func confirmDeletePhotosAlbum() {
+extension PhotosCollectionView {
+    func confirmDeletePhotosAlbum() {
         guard let album = albumToDelete else { return }
         Task {
             do {
@@ -366,7 +379,7 @@ struct PhotosCollectionView: View {
         }
     }
 
-    private func confirmDeletePhotosFolder() {
+    func confirmDeletePhotosFolder() {
         guard let folder = folderToDelete else { return }
         Task {
             do {
@@ -381,13 +394,7 @@ struct PhotosCollectionView: View {
         }
     }
 
-    private func refreshCollections() {
+    func refreshCollections() {
         items = photosManager.fetchTopLevelCollections()
     }
-}
-
-// MARK: - PHAssetCollection Identifiable conformance for sheet(item:)
-
-extension PHAssetCollection: @retroactive Identifiable {
-    public var id: String { localIdentifier }
 }
