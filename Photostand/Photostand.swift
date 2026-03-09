@@ -171,10 +171,10 @@ struct PhotostandProvider: AppIntentTimelineProvider {
             return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(3600)))
         }
 
-        // Generate entries for the next day, each with a random pic
+        // Generate entries for the next 5 hours, each with a random pic
         var entries: [PhotostandEntry] = []
         let currentDate = Date.now
-        for hourOffset in 0..<24 {
+        for hourOffset in 0..<5 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
             let imageData = PhotostandDatabase.fetchRandomPicData(inAlbumWithID: album.id)
             entries.append(PhotostandEntry(
