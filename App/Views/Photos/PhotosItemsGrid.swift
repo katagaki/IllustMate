@@ -12,6 +12,11 @@ struct PhotosAlbumsSection: View {
 
     var items: [PHCollectionItem]
     @Binding var style: ViewStyle
+    var enablesContextMenu: Bool = true
+    var onRename: ((PHAssetCollection) -> Void)?
+    var onDelete: ((PHAssetCollection) -> Void)?
+    var onMoveToFolder: ((PHAssetCollection) -> Void)?
+    var onDeleteFolder: ((PHCollectionList) -> Void)?
 
     @Namespace var albumTransitionNamespace
 
@@ -30,6 +35,7 @@ struct PhotosAlbumsSection: View {
                         itemLink(for: item) {
                             itemGridLabel(for: item)
                         }
+                        .contextMenu { contextMenu(for: item) }
                         .buttonStyleAdaptive()
                     }
                 }
@@ -41,6 +47,7 @@ struct PhotosAlbumsSection: View {
                         itemLink(for: item) {
                             itemListRow(for: item)
                         }
+                        .contextMenu { contextMenu(for: item) }
                         .buttonStyleAdaptive()
                         if item.id != items.last?.id {
                             Divider()
@@ -55,6 +62,7 @@ struct PhotosAlbumsSection: View {
                             itemLink(for: item) {
                                 itemGridLabel(for: item, length: 80.0)
                             }
+                            .contextMenu { contextMenu(for: item) }
                             .buttonStyleAdaptive()
                         }
                     }
@@ -62,6 +70,40 @@ struct PhotosAlbumsSection: View {
                 }
                 .scrollIndicators(.hidden)
                 .frame(height: 120.0)
+            }
+        }
+    }
+
+    // MARK: - Context Menu
+
+    @ViewBuilder
+    private func contextMenu(for item: PHCollectionItem) -> some View {
+        if enablesContextMenu {
+            switch item {
+            case .album(let collection):
+                if let onMoveToFolder {
+                    Button("Photos.MoveToFolder", systemImage: "folder") {
+                        onMoveToFolder(collection)
+                    }
+                }
+                if let onRename {
+                    Divider()
+                    Button("Shared.Rename", systemImage: "pencil") {
+                        onRename(collection)
+                    }
+                }
+                if let onDelete {
+                    Divider()
+                    Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                        onDelete(collection)
+                    }
+                }
+            case .folder(let folder):
+                if let onDeleteFolder {
+                    Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                        onDeleteFolder(folder)
+                    }
+                }
             }
         }
     }

@@ -258,5 +258,8 @@ private struct CarouselThumbnail: View {
                     thumbnail = UIImage(data: thumbData)
                 }
             }
+            .onDisappear {
+                thumbnail = nil
+            }
     }
 }

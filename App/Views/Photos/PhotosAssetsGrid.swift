@@ -13,6 +13,8 @@ struct PhotosAssetsGrid: View {
     var namespace: Namespace.ID
     var assets: [PHAsset]
 
+    @Environment(PhotosViewerManager.self) var photosViewer
+
     private let batchSize = 200
 
     @AppStorage(wrappedValue: 4, "PicColumnCount",
@@ -35,6 +37,9 @@ struct PhotosAssetsGrid: View {
                     PhotosAssetLabel(asset: asset)
                 }
                 .matchedTransitionSource(id: asset.localIdentifier, in: namespace)
+                .simultaneousGesture(TapGesture().onEnded {
+                    photosViewer.setDisplay(asset, in: assets)
+                })
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
 #else
@@ -61,6 +66,8 @@ struct PhotosFetchResultAssetsGrid: View {
     var namespace: Namespace.ID
     var fetchResult: PHFetchResult<PHAsset>
 
+    @Environment(PhotosViewerManager.self) var photosViewer
+
     private let batchSize = 200
 
     @AppStorage(wrappedValue: 4, "PicColumnCount",
@@ -83,6 +90,9 @@ struct PhotosFetchResultAssetsGrid: View {
                     PhotosAssetLabel(asset: asset)
                 }
                 .matchedTransitionSource(id: asset.localIdentifier, in: namespace)
+                .simultaneousGesture(TapGesture().onEnded {
+                    photosViewer.setDisplay(asset, in: displayedAssets)
+                })
 #if targetEnvironment(macCatalyst)
                 .buttonStyle(.borderless)
 #else
@@ -125,6 +135,7 @@ struct PhotosAssetLabel: View {
     @Environment(\.displayScale) private var displayScale
 
     @State private var thumbnail: UIImage?
+    @State private var requestID: PHImageRequestID?
 
     var body: some View {
         Rectangle()
@@ -134,6 +145,13 @@ struct PhotosAssetLabel: View {
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 4.0))
+            .onDisappear {
+                if let requestID {
+                    PHCachingImageManager.default().cancelImageRequest(requestID)
+                    self.requestID = nil
+                }
+                thumbnail = nil
+            }
     }
 
     private var geometryOverlay: some View {
@@ -161,7 +179,7 @@ struct PhotosAssetLabel: View {
         let targetSize = CGSize(width: cellSize.width * displayScale,
                                 height: cellSize.height * displayScale)
 
-        manager.requestImage(for: asset, targetSize: targetSize,
+        requestID = manager.requestImage(for: asset, targetSize: targetSize,
                              contentMode: .aspectFill, options: options) { result, _ in
             if let result {
                 DispatchQueue.main.async {

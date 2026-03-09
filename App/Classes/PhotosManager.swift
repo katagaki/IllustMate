@@ -154,4 +154,87 @@ class PhotosManager {
 
         return (ownPicsCollection, albums, folders)
     }
+
+    // MARK: - Album Management
+
+    func createAlbum(named title: String) async throws -> PHAssetCollection {
+        var placeholder: PHObjectPlaceholder?
+        try await PHPhotoLibrary.shared().performChanges {
+            let request = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: title)
+            placeholder = request.placeholderForCreatedAssetCollection
+        }
+        guard let localIdentifier = placeholder?.localIdentifier,
+              let collection = PHAssetCollection.fetchAssetCollections(
+                  withLocalIdentifiers: [localIdentifier], options: nil
+              ).firstObject else {
+            throw PhotosManagerError.albumCreationFailed
+        }
+        return collection
+    }
+
+    func renameAlbum(_ collection: PHAssetCollection, to newTitle: String) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            guard let request = PHAssetCollectionChangeRequest(for: collection) else { return }
+            request.title = newTitle
+        }
+    }
+
+    func deleteAlbum(_ collection: PHAssetCollection) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            PHAssetCollectionChangeRequest.deleteAssetCollections([collection] as NSFastEnumeration)
+        }
+    }
+
+    func moveAlbum(_ collection: PHAssetCollection, into folder: PHCollectionList) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            guard let folderRequest = PHCollectionListChangeRequest(for: folder) else { return }
+            folderRequest.addChildCollections([collection] as NSFastEnumeration)
+        }
+    }
+
+    func createFolder(named title: String) async throws -> PHCollectionList {
+        var placeholder: PHObjectPlaceholder?
+        try await PHPhotoLibrary.shared().performChanges {
+            let request = PHCollectionListChangeRequest.creationRequestForCollectionList(withTitle: title)
+            placeholder = request.placeholderForCreatedCollectionList
+        }
+        guard let localIdentifier = placeholder?.localIdentifier,
+              let folder = PHCollectionList.fetchCollectionLists(
+                  withLocalIdentifiers: [localIdentifier], options: nil
+              ).firstObject else {
+            throw PhotosManagerError.folderCreationFailed
+        }
+        return folder
+    }
+
+    func deleteFolder(_ folder: PHCollectionList) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            PHCollectionListChangeRequest.deleteCollectionLists([folder] as NSFastEnumeration)
+        }
+    }
+
+    func searchAlbums(matching searchText: String) -> [PHCollectionItem] {
+        let options = PHFetchOptions()
+        options.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
+        var results: [PHCollectionItem] = []
+        let albums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: options)
+        albums.enumerateObjects { collection, _, _ in
+            results.append(.album(collection))
+        }
+        return results.sorted {
+            $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+        }
+    }
+}
+
+enum PhotosManagerError: LocalizedError {
+    case albumCreationFailed
+    case folderCreationFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .albumCreationFailed: return String(localized: "Photos.Error.AlbumCreationFailed")
+        case .folderCreationFailed: return String(localized: "Photos.Error.FolderCreationFailed")
+        }
+    }
 }

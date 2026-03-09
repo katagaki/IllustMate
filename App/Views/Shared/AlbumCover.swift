@@ -70,26 +70,7 @@ struct AlbumCover: View {
                                 .scaledToFill()
 
                             if metrics.size.width >= 80 {
-                                // Variable blur
-                                Group {
-                                    ForEach(1...5, id: \.self) { index in
-                                        primaryImage
-                                            .resizable()
-                                            .scaledToFill()
-                                            .blur(radius: CGFloat(index * index) * 0.8)
-                                            .mask {
-                                                LinearGradient(
-                                                    stops: [
-                                                        .init(color: .clear, location: 0.5 + Double(index - 1) * 0.1),
-                                                        .init(color: .black, location: 1.0)
-                                                    ],
-                                                    startPoint: .top,
-                                                    endPoint: .bottom
-                                                )
-                                            }
-                                    }
-                                }
-                                // Gradient to darken background
+                                // Darkening gradient at bottom
                                 LinearGradient(colors: [.clear, .black.opacity(0.65)],
                                                startPoint: .center,
                                                endPoint: .bottom)

@@ -197,6 +197,23 @@
         }
       }
     },
+    "Albums.NoSearchResults" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No albums found."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムが見つかりません。"
+          }
+        }
+      }
+    },
     "Albums.NoPics" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -210,6 +227,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像がありません"
+          }
+        }
+      }
+    },
+    "Albums.Search" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Albums"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムを検索"
           }
         }
       }
@@ -1071,6 +1105,74 @@
         }
       }
     },
+    "Photos.Error.AlbumCreationFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to create album."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムの作成に失敗しました。"
+          }
+        }
+      }
+    },
+    "Photos.Error.FolderCreationFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to create folder."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダの作成に失敗しました。"
+          }
+        }
+      }
+    },
+    "Photos.MoveToFolder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Folder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダに移動"
+          }
+        }
+      }
+    },
+    "Photos.NoFolders" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No folders available."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用可能なフォルダがありません。"
+          }
+        }
+      }
+    },
     "katagaki/IllustMate" : {
 
     },
@@ -1640,6 +1742,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピー"
+          }
+        }
+      }
+    },
+    "Shared.Cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
           }
         }
       }
@@ -2610,6 +2729,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "トラブルシューティング"
+          }
+        }
+      }
+    },
+    "Albums.Search.Prompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album Name"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルバム名"
           }
         }
       }

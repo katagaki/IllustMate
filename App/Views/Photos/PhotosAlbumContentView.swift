@@ -46,9 +46,13 @@ struct PhotosAlbumContentView: View {
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
 
-                if let fetchResult, fetchResult.count > 0 {
+                if !hasFetched {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(20.0)
+                } else if let fetchResult, fetchResult.count > 0 {
                     PhotosFetchResultAssetsGrid(namespace: namespace, fetchResult: fetchResult)
-                } else if hasFetched {
+                } else {
                     Text("Albums.NoPics")
                         .foregroundStyle(.secondary)
                         .padding(20.0)

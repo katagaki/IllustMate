@@ -31,6 +31,7 @@ struct AlbumView: View {
     @State var albumStyleState: ViewStyle = .grid
 
     @State var pics: [Pic] = []
+    @State var hasFetchedPics: Bool = false
     @State var isConfirmingDeletePic: Bool = false
     @State var isConfirmingDeleteSelectedPics: Bool = false
     @State var picPendingDeletion: Pic?
@@ -43,9 +44,103 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
 
+    @State var searchText: String = ""
+    @State var searchResults: [Album]?
+
+    var displayedAlbums: [Album] {
+        searchResults ?? albums
+    }
+
     var body: some View {
+        mainContent
+            .toolbar { toolbarContent }
+            .safeAreaInset(edge: .bottom) {
+                if isSelectingPics {
+                    selectionBarContent
+                }
+            }
+            .modifier(AlbumViewSheets(
+                isAddingAlbum: $isAddingAlbum,
+                albumToRename: $albumToRename,
+                isImportingPhotos: $isImportingPhotos,
+                currentAlbum: currentAlbum,
+                onAlbumDismiss: { refreshAlbumsAndSet() },
+                onImportDismiss: { refreshPicsAndSet() }
+            ))
+            .modifier(AlbumViewDialogs(
+                isConfirmingDeleteAlbum: $isConfirmingDeleteAlbum,
+                isConfirmingDeletePic: $isConfirmingDeletePic,
+                isConfirmingDeleteSelectedPics: $isConfirmingDeleteSelectedPics,
+                albumPendingDeletion: $albumPendingDeletion,
+                picPendingDeletion: $picPendingDeletion,
+                selectedPicsCount: selectedPics.count,
+                onConfirmDeleteAlbum: { confirmDeleteAlbum() },
+                onConfirmDeletePic: { confirmDeletePic() }
+            ))
+            .onAppear {
+                albumStyleState = albumStyle
+                albumSortState = albumSort
+                Task.detached(priority: .userInitiated) {
+                    await refreshData()
+                }
+            }
+            .onChange(of: albumStyleState) { _, newValue in
+                albumStyle = newValue
+            }
+            .onChange(of: albumSortState) { _, newValue in
+                albumSort = newValue
+            }
+            .onChange(of: albumSort) { _, _ in
+                refreshAlbumsAndSet()
+            }
+            .onChange(of: isPicSortReversed) { _, _ in
+                refreshPicsAndSet()
+            }
+            .onChange(of: scenePhase) { _, newValue in
+                if newValue == .active {
+                    Task.detached(priority: .userInitiated) {
+                        await refreshData()
+                    }
+                }
+            }
+            .onChange(of: navigation.dataVersion) { _, _ in
+                Task.detached(priority: .userInitiated) {
+                    await refreshData()
+                }
+            }
+            .onChange(of: searchText) { _, newValue in
+                if newValue.isEmpty {
+                    searchResults = nil
+                } else {
+                    Task.detached(priority: .userInitiated) {
+                        await searchAlbums(matching: newValue)
+                    }
+                }
+            }
+            .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
+            .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        if !isSelectingPics {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Select") {
+                    startOrStopSelectingPics()
+                }
+                .disabled(pics.isEmpty)
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
+                    isAddingAlbum = true
+                }
+            }
+        }
+    }
+
+    private var mainContent: some View {
         ZStack {
-            // Background image
             if let currentAlbum, let coverPhoto = currentAlbum.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -66,124 +161,112 @@ struct AlbumView: View {
                     .transition(.opacity.animation(.smooth))
             }
 
-            // Main scroll view
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 0.0) {
                     if !isSelectingPics {
                         albumSection
-                        Spacer()
-                            .frame(height: 20.0)
+                        if !searchText.isEmpty {
+                            if displayedAlbums.isEmpty {
+                                Text("Albums.NoSearchResults")
+                                    .foregroundStyle(.secondary)
+                                    .padding(20.0)
+                            }
+                        } else {
+                            Spacer()
+                                .frame(height: 20.0)
+                        }
                     }
-                    picsSection
+                    if searchText.isEmpty {
+                        picsSection
+                    }
                 }
                 .padding([.top], 20.0)
             }
         }
-        .toolbar {
-            if !isSelectingPics {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Shared.Select") {
-                        startOrStopSelectingPics()
-                    }
-                    .disabled(pics.isEmpty)
-                }
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
-                        isAddingAlbum = true
-                    }
+    }
+
+    private var selectionBarContent: some View {
+        SelectionBar(pics: pics, selectedPics: $selectedPics) {
+            startOrStopSelectingPics()
+        } menuItems: {
+            Menu("Shared.Move", systemImage: "tray.full") {
+                PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
+                    refreshDataAfterPicMoved()
                 }
             }
+            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                deletePics()
+            }
         }
-        .safeAreaInset(edge: .bottom) {
-            if isSelectingPics {
-                SelectionBar(pics: pics, selectedPics: $selectedPics) {
-                    startOrStopSelectingPics()
-                } menuItems: {
-                    Menu("Shared.Move", systemImage: "tray.full") {
-                        PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
-                            refreshDataAfterPicMoved()
-                        }
-                    }
-                    Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                        deletePics()
-                    }
+    }
+}
+
+private struct AlbumViewSheets: ViewModifier {
+    @Binding var isAddingAlbum: Bool
+    @Binding var albumToRename: Album?
+    @Binding var isImportingPhotos: Bool
+    let currentAlbum: Album?
+    let onAlbumDismiss: () -> Void
+    let onImportDismiss: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $isAddingAlbum) {
+                onAlbumDismiss()
+            } content: {
+                NewAlbumView(albumToAddTo: currentAlbum)
+            }
+            .sheet(item: $albumToRename) {
+                onAlbumDismiss()
+            } content: { album in
+                RenameAlbumView(album: album)
+            }
+            .sheet(isPresented: $isImportingPhotos) {
+                onImportDismiss()
+            } content: {
+                ImporterView(selectedAlbum: currentAlbum)
+            }
+    }
+}
+
+private struct AlbumViewDialogs: ViewModifier {
+    @Binding var isConfirmingDeleteAlbum: Bool
+    @Binding var isConfirmingDeletePic: Bool
+    @Binding var isConfirmingDeleteSelectedPics: Bool
+    @Binding var albumPendingDeletion: Album?
+    @Binding var picPendingDeletion: Pic?
+    let selectedPicsCount: Int
+    let onConfirmDeleteAlbum: () -> Void
+    let onConfirmDeletePic: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .confirmationDialog("Shared.DeleteConfirmation.Album",
+                                isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
+                Button("Shared.Yes", role: .destructive) {
+                    onConfirmDeleteAlbum()
+                }
+                Button("Shared.No", role: .cancel) {
+                    albumPendingDeletion = nil
                 }
             }
-        }
-        .sheet(isPresented: $isAddingAlbum) {
-            refreshAlbumsAndSet()
-        } content: {
-            NewAlbumView(albumToAddTo: currentAlbum)
-        }
-        .sheet(item: $albumToRename) {
-            refreshAlbumsAndSet()
-        } content: { album in
-            RenameAlbumView(album: album)
-        }
-        .sheet(isPresented: $isImportingPhotos) {
-            refreshPicsAndSet()
-        } content: {
-            ImporterView(selectedAlbum: currentAlbum)
-        }
-        .confirmationDialog("Shared.DeleteConfirmation.Album",
-                            isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
-            Button("Shared.Yes", role: .destructive) {
-                confirmDeleteAlbum()
-            }
-            Button("Shared.No", role: .cancel) {
-                albumPendingDeletion = nil
-            }
-        }
-        .confirmationDialog("Shared.DeleteConfirmation.Pic",
-                            isPresented: $isConfirmingDeletePic, titleVisibility: .visible) {
-            Button("Shared.Yes", role: .destructive) {
-                confirmDeletePic()
-            }
-            Button("Shared.No", role: .cancel) {
-                picPendingDeletion = nil
-            }
-        }
-        .confirmationDialog("Shared.DeleteConfirmation.Pic.\(selectedPics.count)",
-                            isPresented: $isConfirmingDeleteSelectedPics, titleVisibility: .visible) {
-            Button("Shared.Yes", role: .destructive) {
-                confirmDeletePic()
-            }
-            Button("Shared.No", role: .cancel) {
-                picPendingDeletion = nil
-            }
-        }
-        .onAppear {
-            albumStyleState = albumStyle
-            albumSortState = albumSort
-            Task.detached(priority: .userInitiated) {
-                await refreshData()
-            }
-        }
-        .onChange(of: albumStyleState) { _, newValue in
-            albumStyle = newValue
-        }
-        .onChange(of: albumSortState) { _, newValue in
-            albumSort = newValue
-        }
-        .onChange(of: albumSort) { _, _ in
-            refreshAlbumsAndSet()
-        }
-        .onChange(of: isPicSortReversed) { _, _ in
-            refreshPicsAndSet()
-        }
-        .onChange(of: scenePhase) { _, newValue in
-            if newValue == .active {
-                Task.detached(priority: .userInitiated) {
-                    await refreshData()
+            .confirmationDialog("Shared.DeleteConfirmation.Pic",
+                                isPresented: $isConfirmingDeletePic, titleVisibility: .visible) {
+                Button("Shared.Yes", role: .destructive) {
+                    onConfirmDeletePic()
+                }
+                Button("Shared.No", role: .cancel) {
+                    picPendingDeletion = nil
                 }
             }
-        }
-        .onChange(of: navigation.dataVersion) { _, _ in
-            Task.detached(priority: .userInitiated) {
-                await refreshData()
+            .confirmationDialog("Shared.DeleteConfirmation.Pic.\(selectedPicsCount)",
+                                isPresented: $isConfirmingDeleteSelectedPics, titleVisibility: .visible) {
+                Button("Shared.Yes", role: .destructive) {
+                    onConfirmDeletePic()
+                }
+                Button("Shared.No", role: .cancel) {
+                    picPendingDeletion = nil
+                }
             }
-        }
-        .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
     }
 }

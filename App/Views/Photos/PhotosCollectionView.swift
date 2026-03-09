@@ -20,6 +20,25 @@ struct PhotosCollectionView: View {
     @State var hasFetchedCollections: Bool = false
     @State var hasFetchedRootAssets: Bool = false
     @State var isFetchingRootAssets: Bool = false
+    @State var searchText: String = ""
+
+    private var filteredItems: [PHCollectionItem] {
+        if searchText.isEmpty {
+            return items
+        }
+        return items.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    // Album management state
+    @State var isAddingAlbum: Bool = false
+    @State var newAlbumName: String = ""
+    @State var albumToRename: PHAssetCollection?
+    @State var renameText: String = ""
+    @State var albumToDelete: PHAssetCollection?
+    @State var folderToDelete: PHCollectionList?
+    @State var albumToMove: PHAssetCollection?
+    @State var isConfirmingDeleteAlbum: Bool = false
+    @State var isConfirmingDeleteFolder: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyleState: ViewStyle
@@ -43,6 +62,44 @@ struct PhotosCollectionView: View {
             }
         }
         .navigationTitle(String(localized: "ViewTitle.Photos"))
+        .searchable(text: $searchText)
+        .toolbar {
+            if photosManager.authorizationStatus == .authorized ||
+               photosManager.authorizationStatus == .limited {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
+                        isAddingAlbum = true
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isAddingAlbum) {
+            photosNewAlbumSheet
+        }
+        .sheet(item: $albumToRename) { collection in
+            photosRenameAlbumSheet(collection)
+        }
+        .sheet(item: $albumToMove) { collection in
+            photosMoveFolderSheet(collection)
+        }
+        .confirmationDialog("Shared.DeleteConfirmation.Album",
+                            isPresented: $isConfirmingDeleteAlbum, titleVisibility: .visible) {
+            Button("Shared.Yes", role: .destructive) {
+                confirmDeletePhotosAlbum()
+            }
+            Button("Shared.No", role: .cancel) {
+                albumToDelete = nil
+            }
+        }
+        .confirmationDialog("Shared.DeleteConfirmation.Album",
+                            isPresented: $isConfirmingDeleteFolder, titleVisibility: .visible) {
+            Button("Shared.Yes", role: .destructive) {
+                confirmDeletePhotosFolder()
+            }
+            Button("Shared.No", role: .cancel) {
+                folderToDelete = nil
+            }
+        }
     }
 
     // MARK: - Collection Content
@@ -75,7 +132,7 @@ struct PhotosCollectionView: View {
 
     private var photosAlbumsSection: some View {
         Group {
-            SectionHeader(title: "Albums.Albums", count: items.count) {
+            SectionHeader(title: "Albums.Albums", count: filteredItems.count) {
                 Picker("Albums.Style",
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
                     Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
@@ -100,19 +157,35 @@ struct PhotosCollectionView: View {
                 }
             }
             .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
-            if !items.isEmpty {
-                PhotosAlbumsSection(items: items, style: $albumStyleState)
+            if !filteredItems.isEmpty {
+                PhotosAlbumsSection(items: filteredItems, style: $albumStyleState,
+                                    onRename: { collection in
+                                        albumToRename = collection
+                                    },
+                                    onDelete: { collection in
+                                        albumToDelete = collection
+                                        isConfirmingDeleteAlbum = true
+                                    },
+                                    onMoveToFolder: { collection in
+                                        albumToMove = collection
+                                    },
+                                    onDeleteFolder: { folder in
+                                        folderToDelete = folder
+                                        isConfirmingDeleteFolder = true
+                                    })
             } else if hasFetchedCollections {
-                Text("Albums.NoAlbums")
-                    .foregroundStyle(.secondary)
-                    .padding(20.0)
+                if searchText.isEmpty {
+                    Text("Albums.NoAlbums")
+                        .foregroundStyle(.secondary)
+                        .padding(20.0)
+                }
             }
         }
     }
 
     private var photosPicsSection: some View {
         Group {
-            if isFetchingRootAssets && !hasFetchedRootAssets {
+            if !hasFetchedRootAssets {
                 SectionHeader(title: "Albums.Pics", count: 0) { }
                     .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 ProgressView()
@@ -162,4 +235,159 @@ struct PhotosCollectionView: View {
         }
         .padding(40.0)
     }
+
+    // MARK: - Album Management Sheets
+
+    private var photosNewAlbumSheet: some View {
+        NavigationStack {
+            List {
+                Section {
+                    TextField("Albums.Create.Placeholder", text: $newAlbumName)
+                        .textInputAutocapitalization(.words)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .cancel) {
+                        newAlbumName = ""
+                        isAddingAlbum = false
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(role: .confirm) {
+                        Task {
+                            do {
+                                _ = try await photosManager.createAlbum(named: newAlbumName)
+                                await MainActor.run {
+                                    newAlbumName = ""
+                                    isAddingAlbum = false
+                                    refreshCollections()
+                                }
+                            } catch {
+                                debugPrint(error.localizedDescription)
+                            }
+                        }
+                    }
+                    .disabled(newAlbumName.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+            .navigationTitle("ViewTitle.Albums.Create")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .presentationDetents([.height(200.0)])
+        .interactiveDismissDisabled()
+    }
+
+    private func photosRenameAlbumSheet(_ collection: PHAssetCollection) -> some View {
+        NavigationStack {
+            List {
+                Section {
+                    TextField(collection.localizedTitle ?? "", text: $renameText)
+                        .textInputAutocapitalization(.words)
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    Task {
+                        do {
+                            try await photosManager.renameAlbum(collection, to: renameText)
+                            await MainActor.run {
+                                albumToRename = nil
+                                renameText = ""
+                                refreshCollections()
+                            }
+                        } catch {
+                            debugPrint(error.localizedDescription)
+                        }
+                    }
+                } label: {
+                    Text("Shared.Rename")
+                        .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .disabled(renameText.trimmingCharacters(in: .whitespaces).isEmpty)
+                .frame(maxWidth: .infinity)
+                .padding(20.0)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .cancel) {
+                        albumToRename = nil
+                        renameText = ""
+                    }
+                }
+            }
+            .navigationTitle("ViewTitle.Albums.Rename")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .onAppear {
+            renameText = collection.localizedTitle ?? ""
+        }
+        .presentationDetents([.medium])
+        .interactiveDismissDisabled()
+    }
+
+    private func photosMoveFolderSheet(_ collection: PHAssetCollection) -> some View {
+        NavigationStack {
+            PhotosFolderPickerView(album: collection) {
+                albumToMove = nil
+                refreshCollections()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .cancel) {
+                        albumToMove = nil
+                    }
+                }
+            }
+            .navigationTitle("Photos.MoveToFolder")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    // MARK: - Actions
+
+    private func confirmDeletePhotosAlbum() {
+        guard let album = albumToDelete else { return }
+        Task {
+            do {
+                try await photosManager.deleteAlbum(album)
+                await MainActor.run {
+                    albumToDelete = nil
+                    refreshCollections()
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
+    private func confirmDeletePhotosFolder() {
+        guard let folder = folderToDelete else { return }
+        Task {
+            do {
+                try await photosManager.deleteFolder(folder)
+                await MainActor.run {
+                    folderToDelete = nil
+                    refreshCollections()
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
+    private func refreshCollections() {
+        items = photosManager.fetchTopLevelCollections()
+    }
+}
+
+// MARK: - PHAssetCollection Identifiable conformance for sheet(item:)
+
+extension PHAssetCollection: @retroactive Identifiable {
+    public var id: String { localIdentifier }
 }
