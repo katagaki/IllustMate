@@ -50,6 +50,7 @@ struct IllustMateApp: App {
                         Task {
                             if let album = await DataActor.shared.album(for: albumID) {
                                 navigation.popAll()
+                                try? await Task.sleep(for: .milliseconds(250))
                                 navigation.push(.album(album: album), for: .collection)
                             }
                         }
