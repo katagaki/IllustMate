@@ -70,14 +70,16 @@ struct PhotostandDatabase {
             .limit(1)
         guard let idRow = try? database.pluck(idQuery),
               let randomId = try? idRow.get(picId) else { return nil }
-        // Step 2: Fetch only that single row's image data
-        let dataQuery = picsTable
-            .filter(picId == randomId)
-            .select(picData)
-        guard let row = try? database.pluck(dataQuery),
-              let data = try? row.get(picData),
-              let image = UIImage(data: data) else { return nil }
-        return image.resizedForWidget()
+        // Step 2: Fetch and resize in autoreleasepool so the full-size UIImage is freed
+        return autoreleasepool {
+            let dataQuery = picsTable
+                .filter(picId == randomId)
+                .select(picData)
+            guard let row = try? database.pluck(dataQuery),
+                  let data = try? row.get(picData),
+                  let image = UIImage(data: data) else { return nil }
+            return image.resizedForWidget()
+        }
     }
 
     static func fetchRandomPicDataMultiple(inAlbumWithID albumID: String, count: Int) -> [Data] {
@@ -90,13 +92,16 @@ struct PhotostandDatabase {
         guard let rows = try? database.prepare(idQuery) else { return [] }
         let ids = rows.compactMap { try? $0.get(picId) }
         return ids.compactMap { id in
-            let dataQuery = picsTable
-                .filter(picId == id)
-                .select(picData)
-            guard let row = try? database.pluck(dataQuery),
-                  let data = try? row.get(picData),
-                  let image = UIImage(data: data) else { return nil }
-            return image.resizedForWidget()
+            // Autoreleasepool ensures each full-size UIImage is freed before loading the next
+            autoreleasepool {
+                let dataQuery = picsTable
+                    .filter(picId == id)
+                    .select(picData)
+                guard let row = try? database.pluck(dataQuery),
+                      let data = try? row.get(picData),
+                      let image = UIImage(data: data) else { return nil }
+                return image.resizedForWidget()
+            }
         }
     }
 
@@ -179,12 +184,7 @@ enum RefreshInterval: String, CaseIterable, AppEnum {
     }
 
     var entryCount: Int {
-        switch self {
-        case .oneHour: return 5
-        case .threeHours: return 5
-        case .sixHours: return 4
-        case .twentyFourHours: return 3
-        }
+        Int(86400 / seconds)
     }
 }
 
@@ -239,12 +239,16 @@ struct PhotostandProvider: AppIntentTimelineProvider {
             return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(interval.seconds)))
         }
 
-        // Generate entries based on the selected refresh interval
+        // Generate entries covering the next 24 hours at the selected interval
         var entries: [PhotostandEntry] = []
+        entries.reserveCapacity(interval.entryCount)
         let currentDate = Date.now
         for entryIndex in 0..<interval.entryCount {
             let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
-            let imageData = PhotostandDatabase.fetchRandomPicData(inAlbumWithID: album.id)
+            // Use autoreleasepool so the full-size UIImage from decoding is freed each iteration
+            let imageData: Data? = autoreleasepool {
+                PhotostandDatabase.fetchRandomPicData(inAlbumWithID: album.id)
+            }
             entries.append(PhotostandEntry(
                 date: entryDate,
                 albumID: album.id,
@@ -385,10 +389,14 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
         }
 
         var entries: [PhotoGridEntry] = []
+        entries.reserveCapacity(interval.entryCount)
         let currentDate = Date.now
         for entryIndex in 0..<interval.entryCount {
             let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
-            let images = PhotostandDatabase.fetchRandomPicDataMultiple(inAlbumWithID: album.id, count: count)
+            // Use autoreleasepool so intermediate full-size UIImages are freed each iteration
+            let images: [Data] = autoreleasepool {
+                PhotostandDatabase.fetchRandomPicDataMultiple(inAlbumWithID: album.id, count: count)
+            }
             entries.append(PhotoGridEntry(
                 date: entryDate,
                 albumID: album.id,
