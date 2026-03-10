@@ -81,6 +81,47 @@ struct IllustMateApp: App {
         WindowGroup {
             ZStack {
                 mainContent
+                Group {
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        CollectionView()
+                    } else {
+                        MainSplitView()
+                    }
+                }
+                .environmentObject(navigation)
+                .environment(viewer)
+                .environment(concurrency)
+                .environment(photosManager)
+                .environment(photosViewer)
+                .environment(auth)
+                .onOpenURL { url in
+                    if url.pathExtension == "pics" {
+                        importedURL = url
+                    } else if url.scheme == "picmate", url.host == "album",
+                              let albumID = url.pathComponents.dropFirst().first {
+                        Task {
+                            if let album = await DataActor.shared.album(for: albumID) {
+                                navigation.popAll()
+                                try? await Task.sleep(for: .milliseconds(250))
+                                navigation.push(.album(album: album), for: .collection)
+                            }
+                        }
+                    }
+                }
+                .onChange(of: importedURL) { _, newValue in
+                    if newValue != nil {
+                        isImportingBackup = true
+                    }
+                }
+                .sheet(isPresented: $isImportingBackup) {
+                    importedURL = nil
+                } content: {
+                    if let importedURL {
+                        RestoreBackupView(backupURL: importedURL)
+                    } else {
+                        ProgressView()
+                    }
+                }
                 if showLockCover {
                     LockScreenView()
                         .environment(auth)
@@ -91,6 +132,7 @@ struct IllustMateApp: App {
             .onChange(of: scenePhase) { _, newValue in
                 if newValue == .background {
                     WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
+                    WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
                 }
                 if isAppLockEnabled {
                     switch newValue {
