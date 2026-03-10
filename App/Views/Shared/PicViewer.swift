@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/06.
 //
 
+import AVKit
 import SwiftUI
 
 struct PicViewer: View {
@@ -12,6 +13,8 @@ struct PicViewer: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(ViewerManager.self) var viewer
+    @EnvironmentObject var navigation: NavigationManager
+    @Environment(PictureInPictureManager.self) var pipManager
 
     var pic: Pic
 
@@ -117,6 +120,14 @@ struct PicViewer: View {
                         .lineLimit(1)
                 }
             }
+            if pipManager.isPossible {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                        startPictureInPicture()
+                    }
+                    .disabled(currentImage == nil)
+                }
+            }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Button("Shared.Copy", systemImage: "doc.on.doc") {
@@ -178,6 +189,34 @@ struct PicViewer: View {
                 }
         )
 #endif
+    }
+
+    private func startPictureInPicture() {
+        guard let image = currentImage else { return }
+
+        let picToRestore = viewer.displayedPic
+        let picsToRestore = viewer.allPics
+        let indexToRestore = viewer.currentIndex
+
+        pipManager.start(with: image) { [viewer, navigation] in
+            if let pic = picToRestore {
+                viewer.allPics = picsToRestore
+                viewer.currentIndex = indexToRestore
+                viewer.setDisplay(pic) {
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        navigation.push(.picViewerRestore, for: .collection)
+                    }
+                }
+            }
+        }
+
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            dismiss()
+        } else {
+            viewer.displayedPic = nil
+            viewer.displayedImage = nil
+            viewer.displayedThumbnail = nil
+        }
     }
 }
 
