@@ -39,8 +39,8 @@ class PictureInPictureManager: NSObject {
 
         onRestore = restore
 
-        bufferView.sampleBufferDisplayLayer.flush()
-        bufferView.sampleBufferDisplayLayer.enqueue(sampleBuffer)
+        bufferView.sampleBufferDisplayLayer.sampleBufferRenderer.flush()
+        bufferView.sampleBufferDisplayLayer.sampleBufferRenderer.enqueue(sampleBuffer)
 
         UIApplication.shared.isIdleTimerDisabled = true
 
