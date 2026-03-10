@@ -156,24 +156,24 @@ struct AlbumEntityQuery: EntityQuery {
 // MARK: - Refresh Interval Entity
 
 enum RefreshInterval: String, CaseIterable, AppEnum {
-    case oneHour = "1h"
     case threeHours = "3h"
     case sixHours = "6h"
+    case twelveHours = "12h"
     case twentyFourHours = "24h"
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Photostand.Entity.RefreshInterval"
     static var caseDisplayRepresentations: [RefreshInterval: DisplayRepresentation] = [
-        .oneHour: "Photostand.RefreshInterval.1Hour",
         .threeHours: "Photostand.RefreshInterval.3Hours",
         .sixHours: "Photostand.RefreshInterval.6Hours",
+        .twelveHours: "Photostand.RefreshInterval.12Hours",
         .twentyFourHours: "Photostand.RefreshInterval.24Hours"
     ]
 
     var seconds: TimeInterval {
         switch self {
-        case .oneHour: return 3600
         case .threeHours: return 10800
         case .sixHours: return 21600
+        case .twelveHours: return 43200
         case .twentyFourHours: return 86400
         }
     }
@@ -192,7 +192,7 @@ struct SelectAlbumIntent: WidgetConfigurationIntent {
     @Parameter(title: "Photostand.Intent.Album")
     var album: AlbumEntity?
 
-    @Parameter(title: "Photostand.Intent.RefreshInterval", default: .oneHour)
+    @Parameter(title: "Photostand.Intent.RefreshInterval", default: .threeHours)
     var refreshInterval: RefreshInterval
 }
 
@@ -333,9 +333,6 @@ struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
 
     @Parameter(title: "PhotoGrid.Intent.Album")
     var album: AlbumEntity?
-
-    @Parameter(title: "PhotoGrid.Intent.RefreshInterval", default: .oneHour)
-    var refreshInterval: RefreshInterval
 }
 
 // MARK: - Photo Grid Timeline Entry
@@ -378,35 +375,28 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
 
         let count = columns * rows
         let picCount = PhotostandDatabase.fetchPicCount(inAlbumWithID: album.id)
-        let interval = configuration.refreshInterval
 
         if picCount == 0 {
             let entry = PhotoGridEntry(date: .now, albumID: album.id, albumName: album.name, images: [], columns: columns, rows: rows)
-            return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(interval.seconds)))
+            return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(86400)))
         }
 
-        var entries: [PhotoGridEntry] = []
-        entries.reserveCapacity(interval.entryCount)
-        let currentDate = Date.now
-        for entryIndex in 0..<interval.entryCount {
-            let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
-            // Use autoreleasepool so intermediate full-size UIImages are freed each iteration
-            let images: [Data] = autoreleasepool {
-                PhotostandDatabase.fetchRandomPicDataMultiple(
-                    inAlbumWithID: album.id, count: count, maxDimension: 400
-                )
-            }
-            entries.append(PhotoGridEntry(
-                date: entryDate,
-                albumID: album.id,
-                albumName: album.name,
-                images: images,
-                columns: columns,
-                rows: rows
-            ))
+        // Single entry refreshed every 24 hours to stay within memory limits
+        let images: [Data] = autoreleasepool {
+            PhotostandDatabase.fetchRandomPicDataMultiple(
+                inAlbumWithID: album.id, count: count, maxDimension: 400
+            )
         }
+        let entry = PhotoGridEntry(
+            date: .now,
+            albumID: album.id,
+            albumName: album.name,
+            images: images,
+            columns: columns,
+            rows: rows
+        )
 
-        return Timeline(entries: entries, policy: .atEnd)
+        return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(86400)))
     }
 
     private func gridSize(for family: WidgetFamily) -> (columns: Int, rows: Int) {
