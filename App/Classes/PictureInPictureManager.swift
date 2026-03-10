@@ -50,6 +50,12 @@ class PictureInPictureManager: NSObject {
 
         let layer = bufferView.sampleBufferDisplayLayer
 
+        // Resize the buffer view to match the image so the display layer
+        // has real dimensions to render into (a 1×1 layer produces a blank PiP).
+        let imageSize = image.size
+        bufferView.frame = CGRect(origin: .zero, size: imageSize)
+        layer.frame = bufferView.bounds
+
         // Set up a control timebase so the layer knows when to render
         var timebase: CMTimebase?
         CMTimebaseCreateWithSourceClock(allocator: kCFAllocatorDefault,
@@ -66,7 +72,11 @@ class PictureInPictureManager: NSObject {
 
         UIApplication.shared.isIdleTimerDisabled = true
 
-        pipController.startPictureInPicture()
+        // Allow the display layer a brief moment to process the enqueued
+        // buffer before the PiP controller captures its content.
+        DispatchQueue.main.async {
+            pipController.startPictureInPicture()
+        }
     }
 
     func stop() {
