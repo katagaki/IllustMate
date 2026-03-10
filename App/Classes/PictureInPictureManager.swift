@@ -151,8 +151,8 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
     ) {
         Task { @MainActor in
             onRestore?()
-            completionHandler(true)
         }
+        completionHandler(true)
     }
 }
 
