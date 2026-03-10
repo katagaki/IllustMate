@@ -119,12 +119,7 @@ extension UIImage {
     func resizedForWidget(maxDimension: CGFloat = 800) -> Data? {
         let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
         let targetSize = CGSize(width: size.width * scale, height: size.height * scale)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1.0
-        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
-        let resized = renderer.image { _ in
-            draw(in: CGRect(origin: .zero, size: targetSize))
-        }
+        guard let resized = preparingThumbnail(of: targetSize) else { return nil }
         return resized.jpegData(compressionQuality: 0.8)
     }
 }
