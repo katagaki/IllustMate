@@ -5,13 +5,17 @@
 //  Created on 2026/02/28.
 //
 
+import AVKit
 import Photos
 import SwiftUI
 
 struct PhotosAssetViewer: View {
 
+    @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(PhotosViewerManager.self) var photosViewer
+    @EnvironmentObject var navigation: NavigationManager
+    @Environment(PictureInPictureManager.self) var pipManager
 
     let asset: PHAsset
 
@@ -136,6 +140,14 @@ struct PhotosAssetViewer: View {
                         .lineLimit(1)
                 }
             }
+            if pipManager.isPossible {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                        startPictureInPicture()
+                    }
+                    .disabled(currentImage == nil)
+                }
+            }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Button("Shared.Copy", systemImage: "doc.on.doc") {
@@ -197,6 +209,27 @@ struct PhotosAssetViewer: View {
                 }
         )
 #endif
+    }
+
+    // MARK: - Picture in Picture
+
+    private func startPictureInPicture() {
+        guard let image = currentImage else { return }
+
+        let assetToRestore = photosViewer.displayedAsset
+        let assetsToRestore = photosViewer.allAssets
+        let indexToRestore = photosViewer.currentIndex
+
+        pipManager.start(with: image) { [photosViewer, navigation] in
+            if let asset = assetToRestore {
+                photosViewer.allAssets = assetsToRestore
+                photosViewer.currentIndex = indexToRestore
+                photosViewer.displayedAsset = asset
+                navigation.push(.photosAssetViewerRestore, for: .collection)
+            }
+        }
+
+        dismiss()
     }
 
     // MARK: - Image Loading

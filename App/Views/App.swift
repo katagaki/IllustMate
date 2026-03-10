@@ -19,6 +19,7 @@ struct IllustMateApp: App {
     @State var photosManager = PhotosManager()
     @State var photosViewer = PhotosViewerManager()
     @State var auth = AuthenticationManager()
+    @State var pipManager = PictureInPictureManager()
     @State var isImportingBackup: Bool = false
     @State var importedURL: URL?
     @State var showLockCover: Bool = false
@@ -42,6 +43,15 @@ struct IllustMateApp: App {
                 .environment(photosManager)
                 .environment(photosViewer)
                 .environment(auth)
+                .environment(pipManager)
+                .background {
+                    PictureInPictureLayerView(pipManager: pipManager)
+                        .frame(width: 1, height: 1)
+                        .opacity(0)
+                }
+                .onAppear {
+                    pipManager.setup()
+                }
                 .onOpenURL { url in
                     if url.pathExtension == "pics" {
                         importedURL = url

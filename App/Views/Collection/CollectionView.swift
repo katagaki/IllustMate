@@ -13,6 +13,7 @@ struct CollectionView: View {
 
     @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
+    @Environment(PhotosViewerManager.self) var photosViewer
 
     @State var isMoreViewPresenting: Bool = false
 
@@ -67,6 +68,14 @@ struct CollectionView: View {
                               in: namespace))
                   } else {
                       PhotosAssetViewer(asset: wrapper.asset)
+                  }
+              case .picViewerRestore:
+                  if let displayedPic = viewer.displayedPic {
+                      PicViewer(pic: displayedPic)
+                  }
+              case .photosAssetViewerRestore:
+                  if let displayedAsset = photosViewer.displayedAsset {
+                      PhotosAssetViewer(asset: displayedAsset)
                   }
               default: Color.clear
               }
