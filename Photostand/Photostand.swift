@@ -82,7 +82,8 @@ struct PhotostandDatabase {
         }
     }
 
-    static func fetchRandomPicDataMultiple(inAlbumWithID albumID: String, count: Int) -> [Data] {
+    static func fetchRandomPicDataMultiple(inAlbumWithID albumID: String, count: Int,
+                                              maxDimension: CGFloat = 800) -> [Data] {
         guard let database = openDatabase() else { return [] }
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
@@ -100,7 +101,7 @@ struct PhotostandDatabase {
                 guard let row = try? database.pluck(dataQuery),
                       let data = try? row.get(picData),
                       let image = UIImage(data: data) else { return nil }
-                return image.resizedForWidget()
+                return image.resizedForWidget(maxDimension: maxDimension)
             }
         }
     }
@@ -115,8 +116,7 @@ struct PhotostandDatabase {
 // MARK: - Image Helpers
 
 extension UIImage {
-    func resizedForWidget() -> Data? {
-        let maxDimension: CGFloat = 800
+    func resizedForWidget(maxDimension: CGFloat = 800) -> Data? {
         let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
         let targetSize = CGSize(width: size.width * scale, height: size.height * scale)
         let format = UIGraphicsImageRendererFormat()
@@ -368,7 +368,9 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
             return PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: columns, rows: rows)
         }
         let count = columns * rows
-        let images = PhotostandDatabase.fetchRandomPicDataMultiple(inAlbumWithID: album.id, count: count)
+        let images = PhotostandDatabase.fetchRandomPicDataMultiple(
+            inAlbumWithID: album.id, count: count, maxDimension: 320
+        )
         return PhotoGridEntry(date: .now, albumID: album.id, albumName: album.name, images: images, columns: columns, rows: rows)
     }
 
@@ -395,7 +397,9 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
             let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
             // Use autoreleasepool so intermediate full-size UIImages are freed each iteration
             let images: [Data] = autoreleasepool {
-                PhotostandDatabase.fetchRandomPicDataMultiple(inAlbumWithID: album.id, count: count)
+                PhotostandDatabase.fetchRandomPicDataMultiple(
+                    inAlbumWithID: album.id, count: count, maxDimension: 320
+                )
             }
             entries.append(PhotoGridEntry(
                 date: entryDate,
