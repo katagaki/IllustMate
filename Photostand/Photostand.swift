@@ -265,10 +265,14 @@ struct PhotostandEntryView: SwiftUI.View {
         Group {
             if let imageData = entry.imageData,
                let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .widgetAccentedRenderingMode(.fullColor)
-                    .aspectRatio(contentMode: .fill)
+                GeometryReader { geometry in
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .widgetAccentedRenderingMode(.fullColor)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                        .clipped()
+                }
             } else {
                 placeholder
             }
@@ -438,7 +442,7 @@ struct PhotoGridEntryView: SwiftUI.View {
                                             .resizable()
                                             .widgetAccentedRenderingMode(.fullColor)
                                             .aspectRatio(contentMode: .fill)
-                                            .frame(width: cellWidth, height: cellHeight)
+                                            .frame(width: cellWidth, height: cellHeight, alignment: .top)
                                             .clipped()
                                     } else {
                                         Color(.systemGray5)
