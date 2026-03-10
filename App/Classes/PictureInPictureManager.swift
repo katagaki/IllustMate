@@ -48,8 +48,21 @@ class PictureInPictureManager: NSObject {
 
         onRestore = restore
 
-        bufferView.sampleBufferDisplayLayer.sampleBufferRenderer.flush()
-        bufferView.sampleBufferDisplayLayer.sampleBufferRenderer.enqueue(sampleBuffer)
+        let layer = bufferView.sampleBufferDisplayLayer
+
+        // Set up a control timebase so the layer knows when to render
+        var timebase: CMTimebase?
+        CMTimebaseCreateWithSourceClock(allocator: kCFAllocatorDefault,
+                                        sourceClock: CMClockGetHostTimeClock(),
+                                        timebaseOut: &timebase)
+        if let timebase {
+            CMTimebaseSetTime(timebase, time: .zero)
+            CMTimebaseSetRate(timebase, rate: 1.0)
+            layer.controlTimebase = timebase
+        }
+
+        layer.sampleBufferRenderer.flush()
+        layer.sampleBufferRenderer.enqueue(sampleBuffer)
 
         UIApplication.shared.isIdleTimerDisabled = true
 

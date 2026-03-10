@@ -42,8 +42,9 @@ struct IllustMateApp: App {
         .environment(photosViewer)
         .environment(auth)
         .environment(pipManager)
-        .background {
+        .overlay(alignment: .top) {
             PictureInPictureLayerView(pipManager: pipManager)
+                .frame(width: 1, height: 1)
         }
         .onAppear {
             pipManager.setup()
