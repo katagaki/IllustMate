@@ -5,6 +5,7 @@
 //  Created on 2026/03/10.
 //
 
+import AVFoundation
 import AVKit
 import CoreMedia
 import SwiftUI
@@ -24,6 +25,14 @@ class PictureInPictureManager: NSObject {
 
     func setup() {
         guard AVPictureInPictureController.isPictureInPictureSupported() else { return }
+
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .moviePlayback)
+            try session.setActive(true)
+        } catch {
+            debugPrint("PiP: Failed to configure audio session: \(error)")
+        }
 
         let source = AVPictureInPictureController.ContentSource(
             sampleBufferDisplayLayer: bufferView.sampleBufferDisplayLayer,
@@ -198,9 +207,11 @@ struct PictureInPictureLayerView: UIViewRepresentable {
 
     func makeUIView(context: UIViewRepresentableContext<PictureInPictureLayerView>) -> UIView {
         let container = UIView()
+        container.clipsToBounds = true
+        container.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
         let bufferView = pipManager.bufferView
         bufferView.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
-        bufferView.isHidden = true
+        bufferView.alpha = 0.01
         container.addSubview(bufferView)
         return container
     }
