@@ -209,9 +209,10 @@ class SampleBufferPiPView: UIView {
 struct PictureInPictureLayerView: UIViewRepresentable {
     let pipManager: PictureInPictureManager
 
-    func makeUIView(context: Context) -> SampleBufferPiPView {
+    func makeUIView(context: UIViewRepresentableContext<PictureInPictureLayerView>) -> SampleBufferPiPView {
         pipManager.bufferView
     }
 
-    func updateUIView(_ uiView: SampleBufferPiPView, context: Context) {}
+    func updateUIView(_ uiView: SampleBufferPiPView,
+                      context: UIViewRepresentableContext<PictureInPictureLayerView>) {}
 }
