@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import BackgroundTasks
 import SwiftUI
 import WidgetKit
 
@@ -26,6 +27,8 @@ struct IllustMateApp: App {
 
     @AppStorage("AppLockEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
+
+    static let widgetRefreshTaskID = "com.tsubuzaki.IllustMate.widgetRefresh"
 
     private var mainContent: some View {
         Group {
@@ -79,6 +82,12 @@ struct IllustMateApp: App {
         }
     }
 
+    func scheduleWidgetRefresh() {
+        let request = BGAppRefreshTaskRequest(identifier: IllustMateApp.widgetRefreshTaskID)
+        request.earliestBeginDate = Calendar.current.date(byAdding: .hour, value: 24, to: .now)
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
     var body: some Scene {
         WindowGroup {
             ZStack {
@@ -94,6 +103,7 @@ struct IllustMateApp: App {
                 if newValue == .background {
                     WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
                     WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
+                    scheduleWidgetRefresh()
                 }
                 if isAppLockEnabled {
                     switch newValue {
@@ -118,6 +128,11 @@ struct IllustMateApp: App {
                     showLockCover = false
                 }
             }
+        }
+        .backgroundTask(.appRefresh(IllustMateApp.widgetRefreshTaskID)) {
+            WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
+            WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
+            scheduleWidgetRefresh()
         }
 #if targetEnvironment(macCatalyst)
         .defaultSize(CGSize(width: 880.0, height: 680.0))
