@@ -18,6 +18,7 @@ class PictureInPictureManager: NSObject {
     @ObservationIgnored var onRestore: (@MainActor () -> Void)?
     @ObservationIgnored private var pipController: AVPictureInPictureController?
     @ObservationIgnored private(set) var bufferView = SampleBufferPiPView()
+    @ObservationIgnored private var currentImage: UIImage?
 
     var isPossible: Bool {
         AVPictureInPictureController.isPictureInPictureSupported()
@@ -46,6 +47,7 @@ class PictureInPictureManager: NSObject {
     func start(with image: UIImage, restore: @escaping @MainActor () -> Void) {
         guard let pipController, let sampleBuffer = createSampleBuffer(from: image) else { return }
 
+        currentImage = image
         onRestore = restore
 
         let layer = bufferView.sampleBufferDisplayLayer
@@ -56,14 +58,16 @@ class PictureInPictureManager: NSObject {
         bufferView.frame = CGRect(origin: .zero, size: imageSize)
         layer.frame = bufferView.bounds
 
-        // Set up a control timebase so the layer knows when to render
+        // Set up a control timebase so the layer knows when to render.
+        // Rate must be 1.0 so the layer considers playback active and
+        // actually renders the enqueued buffer.
         var timebase: CMTimebase?
         CMTimebaseCreateWithSourceClock(allocator: kCFAllocatorDefault,
                                         sourceClock: CMClockGetHostTimeClock(),
                                         timebaseOut: &timebase)
         if let timebase {
             CMTimebaseSetTime(timebase, time: .zero)
-            CMTimebaseSetRate(timebase, rate: 0.0)
+            CMTimebaseSetRate(timebase, rate: 1.0)
             layer.controlTimebase = timebase
         }
 
@@ -72,9 +76,9 @@ class PictureInPictureManager: NSObject {
 
         UIApplication.shared.isIdleTimerDisabled = true
 
-        // Allow the display layer a brief moment to process the enqueued
+        // Give the display layer enough time to process the enqueued
         // buffer before the PiP controller captures its content.
-        DispatchQueue.main.async {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             pipController.startPictureInPicture()
         }
     }
@@ -86,6 +90,7 @@ class PictureInPictureManager: NSObject {
     private func didStop() {
         isActive = false
         onRestore = nil
+        currentImage = nil
         UIApplication.shared.isIdleTimerDisabled = false
     }
 
@@ -188,7 +193,8 @@ extension PictureInPictureManager: AVPictureInPictureSampleBufferPlaybackDelegat
     nonisolated func pictureInPictureControllerTimeRangeForPlayback(
         _ pictureInPictureController: AVPictureInPictureController
     ) -> CMTimeRange {
-        CMTimeRange(start: .zero, duration: CMTime(value: 1, timescale: 1))
+        // Use a very long duration so PiP never considers the content finished.
+        CMTimeRange(start: .zero, duration: CMTime(value: 24 * 3600, timescale: 1))
     }
 
     nonisolated func pictureInPictureControllerIsPlaybackPaused(
@@ -201,7 +207,14 @@ extension PictureInPictureManager: AVPictureInPictureSampleBufferPlaybackDelegat
         _ pictureInPictureController: AVPictureInPictureController,
         didTransitionToRenderSize newRenderSize: CMVideoDimensions
     ) {
-        // No-op
+        // Re-enqueue the buffer so the image stays visible after PiP resizes.
+        Task { @MainActor in
+            guard let image = currentImage,
+                  let sampleBuffer = createSampleBuffer(from: image) else { return }
+            let layer = bufferView.sampleBufferDisplayLayer
+            layer.flush()
+            layer.enqueue(sampleBuffer)
+        }
     }
 
     nonisolated func pictureInPictureController(
