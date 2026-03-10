@@ -364,7 +364,7 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
         }
         let count = columns * rows
         let images = PhotostandDatabase.fetchRandomPicDataMultiple(
-            inAlbumWithID: album.id, count: count, maxDimension: 320
+            inAlbumWithID: album.id, count: count, maxDimension: 400
         )
         return PhotoGridEntry(date: .now, albumID: album.id, albumName: album.name, images: images, columns: columns, rows: rows)
     }
@@ -393,7 +393,7 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
             // Use autoreleasepool so intermediate full-size UIImages are freed each iteration
             let images: [Data] = autoreleasepool {
                 PhotostandDatabase.fetchRandomPicDataMultiple(
-                    inAlbumWithID: album.id, count: count, maxDimension: 320
+                    inAlbumWithID: album.id, count: count, maxDimension: 400
                 )
             }
             entries.append(PhotoGridEntry(
