@@ -63,12 +63,12 @@ class PictureInPictureManager: NSObject {
                                         timebaseOut: &timebase)
         if let timebase {
             CMTimebaseSetTime(timebase, time: .zero)
-            CMTimebaseSetRate(timebase, rate: 1.0)
+            CMTimebaseSetRate(timebase, rate: 0.0)
             layer.controlTimebase = timebase
         }
 
-        layer.sampleBufferRenderer.flush()
-        layer.sampleBufferRenderer.enqueue(sampleBuffer)
+        layer.flush()
+        layer.enqueue(sampleBuffer)
 
         UIApplication.shared.isIdleTimerDisabled = true
 
