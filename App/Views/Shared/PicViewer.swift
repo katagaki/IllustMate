@@ -121,7 +121,7 @@ struct PicViewer: View {
                 }
             }
             if pipManager.isPossible {
-                ToolbarItem(placement: .bottomBar) {
+                ToolbarItemGroup(placement: .bottomBar) {
                     Button("Shared.PictureInPicture", systemImage: "pip.enter") {
                         startPictureInPicture()
                     }
