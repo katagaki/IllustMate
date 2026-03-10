@@ -140,14 +140,15 @@ struct AlbumEntity: AppEntity {
 
 struct AlbumEntityQuery: EntityQuery {
     func entities(for identifiers: [String]) async throws -> [AlbumEntity] {
-        let allAlbums = PhotostandDatabase.fetchAllAlbums()
-        return allAlbums
+        PhotostandDatabase.fetchAllAlbums()
             .filter { identifiers.contains($0.id) }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
             .map { AlbumEntity(id: $0.id, name: $0.name) }
     }
 
     func suggestedEntities() async throws -> [AlbumEntity] {
         PhotostandDatabase.fetchAllAlbums()
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
             .map { AlbumEntity(id: $0.id, name: $0.name) }
     }
 }
