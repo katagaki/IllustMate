@@ -200,6 +200,7 @@ extension PictureInPictureManager: AVPictureInPictureSampleBufferPlaybackDelegat
 class SampleBufferPiPView: UIView {
     override class var layerClass: AnyClass { AVSampleBufferDisplayLayer.self }
     var sampleBufferDisplayLayer: AVSampleBufferDisplayLayer {
+        // swiftlint:disable:next force_cast
         layer as! AVSampleBufferDisplayLayer
     }
 }
