@@ -189,9 +189,9 @@ extension PictureInPictureManager: AVPictureInPictureSampleBufferPlaybackDelegat
     nonisolated func pictureInPictureController(
         _ pictureInPictureController: AVPictureInPictureController,
         skipByInterval skipInterval: CMTime,
-        completionHandler: @escaping () -> Void
+        completion: @escaping () -> Void
     ) {
-        completionHandler()
+        completion()
     }
 }
 
@@ -209,10 +209,15 @@ class SampleBufferPiPView: UIView {
 struct PictureInPictureLayerView: UIViewRepresentable {
     let pipManager: PictureInPictureManager
 
-    func makeUIView(context: UIViewRepresentableContext<PictureInPictureLayerView>) -> SampleBufferPiPView {
-        pipManager.bufferView
+    func makeUIView(context: UIViewRepresentableContext<PictureInPictureLayerView>) -> UIView {
+        let container = UIView()
+        let bufferView = pipManager.bufferView
+        bufferView.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+        bufferView.isHidden = true
+        container.addSubview(bufferView)
+        return container
     }
 
-    func updateUIView(_ uiView: SampleBufferPiPView,
+    func updateUIView(_ uiView: UIView,
                       context: UIViewRepresentableContext<PictureInPictureLayerView>) {}
 }

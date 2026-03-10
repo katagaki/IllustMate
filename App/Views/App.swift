@@ -44,8 +44,6 @@ struct IllustMateApp: App {
         .environment(pipManager)
         .background {
             PictureInPictureLayerView(pipManager: pipManager)
-                .frame(width: 1, height: 1)
-                .opacity(0)
         }
         .onAppear {
             pipManager.setup()
