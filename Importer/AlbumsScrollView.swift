@@ -12,10 +12,13 @@ struct AlbumsScrollView: View {
 
     var title: LocalizedStringKey
     var parentAlbum: Album?
+    @Binding var isSearching: Bool
+    var focusSearchOnAppear: Bool = false
     @State var albums: [Album] = []
     @State var searchResults: [Album]?
     @State var isAlbumsLoaded: Bool = false
     @State var searchText: String = ""
+    @State var isSearchPresented: Bool = false
 
     @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var style: ViewStyle
@@ -52,6 +55,9 @@ struct AlbumsScrollView: View {
         }
         .navigationTitle(title)
         .onAppear {
+            if focusSearchOnAppear {
+                isSearchPresented = true
+            }
             Task {
                 do {
                     let albums = try await DataActor.shared.albumsWithCounts(
@@ -67,6 +73,7 @@ struct AlbumsScrollView: View {
             }
         }
         .onChange(of: searchText) { _, newValue in
+            isSearching = !newValue.isEmpty
             if newValue.isEmpty {
                 searchResults = nil
             } else {
@@ -92,7 +99,8 @@ struct AlbumsScrollView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always),
+        .searchable(text: $searchText, isPresented: $isSearchPresented,
+                    placement: .navigationBarDrawer(displayMode: .always),
                     prompt: "Albums.Search.Prompt")
     }
 

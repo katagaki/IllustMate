@@ -9,6 +9,14 @@ struct ShareView: View {
     @State var total: Float = 0
     @State var isImporting: Bool = false
     @State var isCompleted: Bool = false
+    @State var isSearching: Bool = false
+
+    @AppStorage(wrappedValue: false, "ShareSheetOpenSearch",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var openSearchWhenSharing: Bool
+    @AppStorage(wrappedValue: true, "ShareSheetShowAnimation",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var showAnimationWhenSaving: Bool
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
@@ -44,10 +52,14 @@ struct ShareView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 NavigationStack(path: $viewPath) {
-                    AlbumsScrollView(title: "ViewTitle.Importer")
+                    AlbumsScrollView(title: "ViewTitle.Importer",
+                                     isSearching: $isSearching,
+                                     focusSearchOnAppear: openSearchWhenSharing)
                         .navigationDestination(for: ViewPath.self, destination: { viewPath in
                             if case .album(let album) = viewPath {
-                                AlbumsScrollView(title: LocalizedStringKey(album.name), parentAlbum: album)
+                                AlbumsScrollView(title: LocalizedStringKey(album.name),
+                                                 parentAlbum: album,
+                                                 isSearching: $isSearching)
                             } else {
                                 Color.clear
                             }
@@ -98,7 +110,8 @@ struct ShareView: View {
                     .tint(.green)
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
-                    .disabled(!itemsManager.isLoaded || itemsManager.items.isEmpty)
+                    .disabled(!itemsManager.isLoaded || itemsManager.items.isEmpty
+                             || (isSearching && viewPath.isEmpty))
                 }
                 .padding(20.0)
             }
@@ -138,16 +151,28 @@ struct ShareView: View {
                 }
             }
             await MainActor.run {
-                withAnimation(.smooth.speed(2)) {
-                    isCompleted = true
-                } completion: {
+                if !showAnimationWhenSaving {
                     if itemsManager.failedItemCount == 0 {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            close()
-                        }
+                        close()
                     } else {
                         UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                        withAnimation(.smooth.speed(2)) {
+                            isCompleted = true
+                        }
+                    }
+                } else {
+                    withAnimation(.smooth.speed(2)) {
+                        isCompleted = true
+                    } completion: {
+                        if itemsManager.failedItemCount == 0 {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                close()
+                            }
+                        } else {
+                            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                        }
                     }
                 }
             }

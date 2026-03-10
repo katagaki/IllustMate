@@ -259,8 +259,8 @@ private struct AlbumViewDialogs: ViewModifier {
             } message: {
                 Text("Shared.DeleteConfirmation.Album.Message")
             }
-            .confirmationDialog("Shared.DeleteConfirmation.Pic",
-                                isPresented: $isConfirmingDeletePic, titleVisibility: .visible) {
+            .alert("Shared.DeleteConfirmation.Pic",
+                   isPresented: $isConfirmingDeletePic) {
                 Button("Shared.Yes", role: .destructive) {
                     onConfirmDeletePic()
                 }
@@ -268,8 +268,8 @@ private struct AlbumViewDialogs: ViewModifier {
                     picPendingDeletion = nil
                 }
             }
-            .confirmationDialog("Shared.DeleteConfirmation.Pic.\(selectedPicsCount)",
-                                isPresented: $isConfirmingDeleteSelectedPics, titleVisibility: .visible) {
+            .alert("Shared.DeleteConfirmation.Pic.\(selectedPicsCount)",
+                   isPresented: $isConfirmingDeleteSelectedPics) {
                 Button("Shared.Yes", role: .destructive) {
                     onConfirmDeletePic()
                 }

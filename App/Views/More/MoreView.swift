@@ -28,6 +28,10 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
     @AppStorage("PhotosNestedAlbumsEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isNestedAlbumsEnabled: Bool = false
+    @AppStorage("ShareSheetOpenSearch",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openSearchWhenSharing: Bool = false
+    @AppStorage("ShareSheetShowAnimation",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var showAnimationWhenSaving: Bool = true
 
     var body: some View {
         NavigationStack(path: $navigation.moreTabPath) {
@@ -74,6 +78,12 @@ struct MoreView: View {
                     Text("More.Security")
                 } footer: {
                     Text("More.AppLock.Description")
+                }
+                Section {
+                    Toggle("More.ShareSheet.OpenSearch", isOn: $openSearchWhenSharing)
+                    Toggle("More.ShareSheet.ShowAnimation", isOn: $showAnimationWhenSaving)
+                } header: {
+                    Text("More.ShareSheet")
                 }
                 Section {
                     Button("More.DuplicateChecker") {
