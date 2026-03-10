@@ -82,7 +82,7 @@ struct IllustMateApp: App {
         }
     }
 
-    func scheduleWidgetRefresh() {
+    nonisolated func scheduleWidgetRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: IllustMateApp.widgetRefreshTaskID)
         request.earliestBeginDate = Calendar.current.date(byAdding: .hour, value: 24, to: .now)
         try? BGTaskScheduler.shared.submit(request)
