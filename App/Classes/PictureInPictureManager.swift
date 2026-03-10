@@ -95,33 +95,19 @@ class PictureInPictureManager: NSObject {
 
         context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
 
-        var formatDescription: CMFormatDescription?
-        CMVideoFormatDescriptionCreateForImageBuffer(
-            allocator: kCFAllocatorDefault,
-            imageBuffer: buffer,
-            formatDescriptionOut: &formatDescription
-        )
-        guard let format = formatDescription else { return nil }
+        guard let format = try? CMVideoFormatDescription(imageBuffer: buffer) else { return nil }
 
-        var sampleBuffer: CMSampleBuffer?
-        var timingInfo = CMSampleTimingInfo(
+        let timingInfo = CMSampleTimingInfo(
             duration: CMTime.positiveInfinity,
             presentationTimeStamp: .zero,
             decodeTimeStamp: .invalid
         )
 
-        CMSampleBufferCreateForImageBuffer(
-            allocator: kCFAllocatorDefault,
+        return try? CMSampleBuffer(
             imageBuffer: buffer,
-            dataReady: true,
-            makeDataReadyCallback: nil,
-            refcon: nil,
             formatDescription: format,
-            sampleTiming: &timingInfo,
-            sampleBufferOut: &sampleBuffer
+            sampleTiming: timingInfo
         )
-
-        return sampleBuffer
     }
 }
 
