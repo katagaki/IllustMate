@@ -50,6 +50,7 @@ struct IllustMateApp: App {
                         Task {
                             if let album = await DataActor.shared.album(for: albumID) {
                                 navigation.popAll()
+                                try? await Task.sleep(for: .milliseconds(250))
                                 navigation.push(.album(album: album), for: .collection)
                             }
                         }
@@ -79,6 +80,7 @@ struct IllustMateApp: App {
             .onChange(of: scenePhase) { _, newValue in
                 if newValue == .background {
                     WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
+                    WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
                 }
                 if isAppLockEnabled {
                     switch newValue {

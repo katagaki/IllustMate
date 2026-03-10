@@ -12,5 +12,6 @@ import SwiftUI
 struct PhotostandBundle: WidgetBundle {
     var body: some Widget {
         Photostand()
+        PhotoGrid()
     }
 }
