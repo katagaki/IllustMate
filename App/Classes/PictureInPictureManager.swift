@@ -7,7 +7,7 @@
 
 import AVKit
 import CoreMedia
-import UIKit
+import SwiftUI
 
 @MainActor @Observable
 class PictureInPictureManager: NSObject {
