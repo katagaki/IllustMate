@@ -404,7 +404,7 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
         case .systemSmall:
             return (2, 2)
         case .systemMedium:
-            return (3, 2)
+            return (4, 2)
         case .systemLarge:
             return (3, 3)
         @unknown default:
@@ -424,15 +424,12 @@ struct PhotoGridEntryView: SwiftUI.View {
                 gridPlaceholder
             } else {
                 GeometryReader { geometry in
-                    let spacing: CGFloat = 2
-                    let totalHSpacing = spacing * CGFloat(entry.columns - 1)
-                    let totalVSpacing = spacing * CGFloat(entry.rows - 1)
-                    let cellWidth = (geometry.size.width - totalHSpacing) / CGFloat(entry.columns)
-                    let cellHeight = (geometry.size.height - totalVSpacing) / CGFloat(entry.rows)
+                    let cellWidth = geometry.size.width / CGFloat(entry.columns)
+                    let cellHeight = geometry.size.height / CGFloat(entry.rows)
 
-                    VStack(spacing: spacing) {
+                    VStack(spacing: 0) {
                         ForEach(0..<entry.rows, id: \.self) { row in
-                            HStack(spacing: spacing) {
+                            HStack(spacing: 0) {
                                 ForEach(0..<entry.columns, id: \.self) { col in
                                     let index = row * entry.columns + col
                                     if index < entry.images.count,
@@ -535,7 +532,7 @@ struct PhotoGrid: Widget {
 #Preview(as: .systemMedium) {
     PhotoGrid()
 } timeline: {
-    PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: 3, rows: 2)
+    PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: 4, rows: 2)
 }
 
 #Preview(as: .systemLarge) {
