@@ -80,6 +80,26 @@ struct PhotostandDatabase {
         return image.resizedForWidget()
     }
 
+    static func fetchRandomPicDataMultiple(inAlbumWithID albumID: String, count: Int) -> [Data] {
+        guard let database = openDatabase() else { return [] }
+        let idQuery = picsTable
+            .filter(picAlbumId == albumID)
+            .select(picId)
+            .order(Expression<Int>.random())
+            .limit(count)
+        guard let rows = try? database.prepare(idQuery) else { return [] }
+        let ids = rows.compactMap { try? $0.get(picId) }
+        return ids.compactMap { id in
+            let dataQuery = picsTable
+                .filter(picId == id)
+                .select(picData)
+            guard let row = try? database.pluck(dataQuery),
+                  let data = try? row.get(picData),
+                  let image = UIImage(data: data) else { return nil }
+            return image.resizedForWidget()
+        }
+    }
+
     static func fetchPicCount(inAlbumWithID albumID: String) -> Int {
         guard let database = openDatabase() else { return 0 }
         let query = picsTable.filter(picAlbumId == albumID)
@@ -132,6 +152,41 @@ struct AlbumEntityQuery: EntityQuery {
     }
 }
 
+// MARK: - Refresh Interval Entity
+
+enum RefreshInterval: String, CaseIterable, AppEnum {
+    case oneHour = "1h"
+    case threeHours = "3h"
+    case sixHours = "6h"
+    case twentyFourHours = "24h"
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Photostand.Entity.RefreshInterval"
+    static var caseDisplayRepresentations: [RefreshInterval: DisplayRepresentation] = [
+        .oneHour: "Photostand.RefreshInterval.1Hour",
+        .threeHours: "Photostand.RefreshInterval.3Hours",
+        .sixHours: "Photostand.RefreshInterval.6Hours",
+        .twentyFourHours: "Photostand.RefreshInterval.24Hours"
+    ]
+
+    var seconds: TimeInterval {
+        switch self {
+        case .oneHour: return 3600
+        case .threeHours: return 10800
+        case .sixHours: return 21600
+        case .twentyFourHours: return 86400
+        }
+    }
+
+    var entryCount: Int {
+        switch self {
+        case .oneHour: return 5
+        case .threeHours: return 5
+        case .sixHours: return 4
+        case .twentyFourHours: return 3
+        }
+    }
+}
+
 // MARK: - Widget Configuration Intent
 
 struct SelectAlbumIntent: WidgetConfigurationIntent {
@@ -140,6 +195,9 @@ struct SelectAlbumIntent: WidgetConfigurationIntent {
 
     @Parameter(title: "Photostand.Intent.Album")
     var album: AlbumEntity?
+
+    @Parameter(title: "Photostand.Intent.RefreshInterval", default: .oneHour)
+    var refreshInterval: RefreshInterval
 }
 
 // MARK: - Timeline Entry
@@ -173,17 +231,18 @@ struct PhotostandProvider: AppIntentTimelineProvider {
         }
 
         let picCount = PhotostandDatabase.fetchPicCount(inAlbumWithID: album.id)
+        let interval = configuration.refreshInterval
 
         if picCount == 0 {
             let entry = PhotostandEntry(date: .now, albumID: album.id, albumName: album.name, imageData: nil)
-            return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(3600)))
+            return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(interval.seconds)))
         }
 
-        // Generate entries for the next 5 hours, each with a random pic
+        // Generate entries based on the selected refresh interval
         var entries: [PhotostandEntry] = []
         let currentDate = Date.now
-        for hourOffset in 0..<5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+        for entryIndex in 0..<interval.entryCount {
+            let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
             let imageData = PhotostandDatabase.fetchRandomPicData(inAlbumWithID: album.id)
             entries.append(PhotostandEntry(
                 date: entryDate,
@@ -266,7 +325,190 @@ struct Photostand: Widget {
     }
 }
 
-// MARK: - Preview
+// MARK: - Photo Grid Widget Configuration Intent
+
+struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "PhotoGrid.Intent.Title"
+    static var description: IntentDescription = "PhotoGrid.Intent.Description"
+
+    @Parameter(title: "PhotoGrid.Intent.Album")
+    var album: AlbumEntity?
+
+    @Parameter(title: "PhotoGrid.Intent.RefreshInterval", default: .oneHour)
+    var refreshInterval: RefreshInterval
+}
+
+// MARK: - Photo Grid Timeline Entry
+
+struct PhotoGridEntry: TimelineEntry {
+    let date: Date
+    let albumID: String?
+    let albumName: String?
+    let images: [Data]
+    let columns: Int
+    let rows: Int
+}
+
+// MARK: - Photo Grid Timeline Provider
+
+struct PhotoGridProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> PhotoGridEntry {
+        let (columns, rows) = gridSize(for: context.family)
+        return PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: columns, rows: rows)
+    }
+
+    func snapshot(for configuration: SelectAlbumForGridIntent, in context: Context) async -> PhotoGridEntry {
+        let (columns, rows) = gridSize(for: context.family)
+        guard let album = configuration.album else {
+            return PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: columns, rows: rows)
+        }
+        let count = columns * rows
+        let images = PhotostandDatabase.fetchRandomPicDataMultiple(inAlbumWithID: album.id, count: count)
+        return PhotoGridEntry(date: .now, albumID: album.id, albumName: album.name, images: images, columns: columns, rows: rows)
+    }
+
+    func timeline(for configuration: SelectAlbumForGridIntent, in context: Context) async -> Timeline<PhotoGridEntry> {
+        let (columns, rows) = gridSize(for: context.family)
+        guard let album = configuration.album else {
+            let entry = PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: columns, rows: rows)
+            return Timeline(entries: [entry], policy: .never)
+        }
+
+        let count = columns * rows
+        let picCount = PhotostandDatabase.fetchPicCount(inAlbumWithID: album.id)
+        let interval = configuration.refreshInterval
+
+        if picCount == 0 {
+            let entry = PhotoGridEntry(date: .now, albumID: album.id, albumName: album.name, images: [], columns: columns, rows: rows)
+            return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(interval.seconds)))
+        }
+
+        var entries: [PhotoGridEntry] = []
+        let currentDate = Date.now
+        for entryIndex in 0..<interval.entryCount {
+            let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
+            let images = PhotostandDatabase.fetchRandomPicDataMultiple(inAlbumWithID: album.id, count: count)
+            entries.append(PhotoGridEntry(
+                date: entryDate,
+                albumID: album.id,
+                albumName: album.name,
+                images: images,
+                columns: columns,
+                rows: rows
+            ))
+        }
+
+        return Timeline(entries: entries, policy: .atEnd)
+    }
+
+    private func gridSize(for family: WidgetFamily) -> (columns: Int, rows: Int) {
+        switch family {
+        case .systemSmall:
+            return (2, 2)
+        case .systemMedium:
+            return (3, 2)
+        case .systemLarge:
+            return (3, 3)
+        @unknown default:
+            return (2, 2)
+        }
+    }
+}
+
+// MARK: - Photo Grid Widget View
+
+struct PhotoGridEntryView: SwiftUI.View {
+    var entry: PhotoGridProvider.Entry
+
+    var body: some SwiftUI.View {
+        Group {
+            if entry.images.isEmpty {
+                gridPlaceholder
+            } else {
+                GeometryReader { geometry in
+                    let spacing: CGFloat = 2
+                    let totalHSpacing = spacing * CGFloat(entry.columns - 1)
+                    let totalVSpacing = spacing * CGFloat(entry.rows - 1)
+                    let cellWidth = (geometry.size.width - totalHSpacing) / CGFloat(entry.columns)
+                    let cellHeight = (geometry.size.height - totalVSpacing) / CGFloat(entry.rows)
+
+                    VStack(spacing: spacing) {
+                        ForEach(0..<entry.rows, id: \.self) { row in
+                            HStack(spacing: spacing) {
+                                ForEach(0..<entry.columns, id: \.self) { col in
+                                    let index = row * entry.columns + col
+                                    if index < entry.images.count,
+                                       let uiImage = UIImage(data: entry.images[index]) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .widgetAccentedRenderingMode(.fullColor)
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: cellWidth, height: cellHeight)
+                                            .clipped()
+                                    } else {
+                                        Color(.systemGray5)
+                                            .frame(width: cellWidth, height: cellHeight)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var gridPlaceholder: some SwiftUI.View {
+        ZStack {
+            Color(.systemGray5)
+            VStack(spacing: 4) {
+                Image(systemName: "square.grid.2x2")
+                    .font(.largeTitle)
+                    .foregroundStyle(.secondary)
+                if entry.albumID == nil {
+                    Text("PhotoGrid.Placeholder.SelectAlbum")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("PhotoGrid.Placeholder.NoPics")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Photo Grid Widget Definition
+
+struct PhotoGrid: Widget {
+    let kind: String = "PhotoGrid"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(
+            kind: kind,
+            intent: SelectAlbumForGridIntent.self,
+            provider: PhotoGridProvider()
+        ) { entry in
+            PhotoGridEntryView(entry: entry)
+                .containerBackground(for: .widget) {
+                    Color.clear
+                }
+                .widgetURL(widgetURL(for: entry))
+        }
+        .configurationDisplayName("PhotoGrid.DisplayName")
+        .description("PhotoGrid.Description")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .contentMarginsDisabled()
+    }
+
+    private func widgetURL(for entry: PhotoGridEntry) -> URL? {
+        guard let albumID = entry.albumID else { return nil }
+        return URL(string: "picmate://album/\(albumID)")
+    }
+}
+
+// MARK: - Previews
 
 #Preview(as: .systemSmall) {
     Photostand()
@@ -284,4 +526,22 @@ struct Photostand: Widget {
     Photostand()
 } timeline: {
     PhotostandEntry(date: .now, albumID: nil, albumName: nil, imageData: nil)
+}
+
+#Preview(as: .systemSmall) {
+    PhotoGrid()
+} timeline: {
+    PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: 2, rows: 2)
+}
+
+#Preview(as: .systemMedium) {
+    PhotoGrid()
+} timeline: {
+    PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: 3, rows: 2)
+}
+
+#Preview(as: .systemLarge) {
+    PhotoGrid()
+} timeline: {
+    PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: 3, rows: 3)
 }
