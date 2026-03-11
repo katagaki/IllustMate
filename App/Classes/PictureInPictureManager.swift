@@ -50,13 +50,15 @@ class PictureInPictureManager: NSObject {
     }
 
     func start(with image: UIImage, restore: @escaping @MainActor () -> Void) {
-        guard let pipController, let player else { return }
+        guard pipController != nil, player != nil else { return }
 
         onRestore = restore
 
         Task.detached(priority: .userInitiated) {
             guard let videoURL = Self.createVideo(from: image) else { return }
             await MainActor.run {
+                guard let pipController = self.pipController,
+                      let player = self.player else { return }
                 let asset = AVAsset(url: videoURL)
                 let item = AVPlayerItem(asset: asset)
                 // Loop the short video so PiP stays alive indefinitely.
