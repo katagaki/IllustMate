@@ -14,6 +14,8 @@ import SwiftUI
 class PictureInPictureManager: NSObject {
 
     var isActive: Bool = false
+    /// Set synchronously when `start()` is called so parent views can dismiss the viewer.
+    var isPreparing: Bool = false
 
     @ObservationIgnored var onRestore: (@MainActor () -> Void)?
     @ObservationIgnored private var pipController: AVPictureInPictureController?
@@ -49,6 +51,7 @@ class PictureInPictureManager: NSObject {
         guard pipController != nil, player != nil else { return }
 
         onRestore = restore
+        isPreparing = true
 
         do {
             let session = AVAudioSession.sharedInstance()
@@ -196,7 +199,19 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
+            isPreparing = false
             isActive = true
+        }
+    }
+
+    nonisolated func pictureInPictureController(
+        _ pictureInPictureController: AVPictureInPictureController,
+        failedToStartPictureInPictureWithError error: Error
+    ) {
+        debugPrint("PiP: Failed to start: \(error)")
+        Task { @MainActor in
+            isPreparing = false
+            didStop()
         }
     }
 

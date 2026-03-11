@@ -10,7 +10,6 @@ import SwiftUI
 
 struct PicViewer: View {
 
-    @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(ViewerManager.self) var viewer
     @EnvironmentObject var navigation: NavigationManager
@@ -208,14 +207,6 @@ struct PicViewer: View {
                     }
                 }
             }
-        }
-
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            dismiss()
-        } else {
-            viewer.displayedPic = nil
-            viewer.displayedImage = nil
-            viewer.displayedThumbnail = nil
         }
     }
 }
