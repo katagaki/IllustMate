@@ -17,7 +17,9 @@ class PictureInPictureManager: NSObject {
 
     @ObservationIgnored var onRestore: (@MainActor () -> Void)?
     @ObservationIgnored private var pipController: AVPictureInPictureController?
-    @ObservationIgnored private(set) var bufferView = SampleBufferPiPView()
+    @ObservationIgnored private var player: AVQueuePlayer?
+    @ObservationIgnored private var playerLooper: AVPlayerLooper?
+    @ObservationIgnored private(set) var playerLayer = AVPlayerLayer()
 
     var isPossible: Bool {
         AVPictureInPictureController.isPictureInPictureSupported()
@@ -34,48 +36,38 @@ class PictureInPictureManager: NSObject {
             debugPrint("PiP: Failed to configure audio session: \(error)")
         }
 
-        let source = AVPictureInPictureController.ContentSource(
-            sampleBufferDisplayLayer: bufferView.sampleBufferDisplayLayer,
-            playbackDelegate: self
-        )
-        pipController = AVPictureInPictureController(contentSource: source)
+        let player = AVQueuePlayer()
+        player.isMuted = true
+        player.allowsExternalPlayback = false
+        self.player = player
+
+        playerLayer.player = player
+        playerLayer.videoGravity = .resizeAspect
+
+        pipController = AVPictureInPictureController(playerLayer: playerLayer)
         pipController?.delegate = self
         pipController?.requiresLinearPlayback = true
     }
 
     func start(with image: UIImage, restore: @escaping @MainActor () -> Void) {
-        guard let pipController, let sampleBuffer = createSampleBuffer(from: image) else { return }
+        guard pipController != nil, player != nil else { return }
 
         onRestore = restore
 
-        let layer = bufferView.sampleBufferDisplayLayer
-
-        // Resize the buffer view to match the image so the display layer
-        // has real dimensions to render into (a 1×1 layer produces a blank PiP).
-        let imageSize = image.size
-        bufferView.frame = CGRect(origin: .zero, size: imageSize)
-        layer.frame = bufferView.bounds
-
-        // Set up a control timebase so the layer knows when to render
-        var timebase: CMTimebase?
-        CMTimebaseCreateWithSourceClock(allocator: kCFAllocatorDefault,
-                                        sourceClock: CMClockGetHostTimeClock(),
-                                        timebaseOut: &timebase)
-        if let timebase {
-            CMTimebaseSetTime(timebase, time: .zero)
-            CMTimebaseSetRate(timebase, rate: 0.0)
-            layer.controlTimebase = timebase
-        }
-
-        layer.flush()
-        layer.enqueue(sampleBuffer)
-
-        UIApplication.shared.isIdleTimerDisabled = true
-
-        // Allow the display layer a brief moment to process the enqueued
-        // buffer before the PiP controller captures its content.
-        DispatchQueue.main.async {
-            pipController.startPictureInPicture()
+        Task.detached(priority: .userInitiated) {
+            guard let videoURL = Self.createVideo(from: image) else { return }
+            await MainActor.run {
+                guard let pipController = self.pipController,
+                      let player = self.player else { return }
+                let asset = AVAsset(url: videoURL)
+                let item = AVPlayerItem(asset: asset)
+                // Loop the short video so PiP stays alive indefinitely.
+                player.removeAllItems()
+                self.playerLooper = AVPlayerLooper(player: player, templateItem: item)
+                player.play()
+                UIApplication.shared.isIdleTimerDisabled = true
+                pipController.startPictureInPicture()
+            }
         }
     }
 
@@ -86,25 +78,81 @@ class PictureInPictureManager: NSObject {
     private func didStop() {
         isActive = false
         onRestore = nil
+        player?.pause()
+        player?.removeAllItems()
+        playerLooper = nil
         UIApplication.shared.isIdleTimerDisabled = false
     }
 
-    // MARK: - Sample Buffer Creation
+    // MARK: - Video Creation
 
-    private func createSampleBuffer(from image: UIImage) -> CMSampleBuffer? {
+    /// Writes a single-frame video (~1 s) from the given image to a temporary file.
+    private nonisolated static func createVideo(from image: UIImage) -> URL? {
         guard let cgImage = image.cgImage else { return nil }
 
         let width = cgImage.width
         let height = cgImage.height
+        // Dimensions must be even for H.264.
+        let evenWidth = width % 2 == 0 ? width : width - 1
+        let evenHeight = height % 2 == 0 ? height : height - 1
 
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("mp4")
+
+        guard let writer = try? AVAssetWriter(outputURL: outputURL, fileType: .mp4) else {
+            return nil
+        }
+
+        let videoSettings: [String: Any] = [
+            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoWidthKey: evenWidth,
+            AVVideoHeightKey: evenHeight
+        ]
+        let writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
+        let adaptor = AVAssetWriterInputPixelBufferAdaptor(
+            assetWriterInput: writerInput,
+            sourcePixelBufferAttributes: [
+                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+                kCVPixelBufferWidthKey as String: evenWidth,
+                kCVPixelBufferHeightKey as String: evenHeight
+            ]
+        )
+
+        writer.add(writerInput)
+
+        guard writer.startWriting() else { return nil }
+        writer.startSession(atSourceTime: .zero)
+
+        guard let pixelBuffer = createPixelBuffer(from: cgImage,
+                                                  width: evenWidth,
+                                                  height: evenHeight) else {
+            writer.cancelWriting()
+            return nil
+        }
+
+        // Write two identical frames to produce a ~1-second video.
+        let frameDuration = CMTime(value: 1, timescale: 2)
+        adaptor.append(pixelBuffer, withPresentationTime: .zero)
+        adaptor.append(pixelBuffer, withPresentationTime: frameDuration)
+
+        writerInput.markAsFinished()
+
+        let semaphore = DispatchSemaphore(value: 0)
+        writer.finishWriting { semaphore.signal() }
+        semaphore.wait()
+
+        return writer.status == .completed ? outputURL : nil
+    }
+
+    private nonisolated static func createPixelBuffer(
+        from cgImage: CGImage, width: Int, height: Int
+    ) -> CVPixelBuffer? {
         var pixelBuffer: CVPixelBuffer?
         let attrs: [String: Any] = [
             kCVPixelBufferCGImageCompatibilityKey as String: true,
-            kCVPixelBufferCGBitmapContextCompatibilityKey as String: true,
-            kCVPixelBufferWidthKey as String: width,
-            kCVPixelBufferHeightKey as String: height
+            kCVPixelBufferCGBitmapContextCompatibilityKey as String: true
         ]
-
         let status = CVPixelBufferCreate(
             kCFAllocatorDefault, width, height,
             kCVPixelFormatType_32BGRA, attrs as CFDictionary,
@@ -126,20 +174,7 @@ class PictureInPictureManager: NSObject {
         ) else { return nil }
 
         context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
-
-        guard let format = try? CMVideoFormatDescription(imageBuffer: buffer) else { return nil }
-
-        let timingInfo = CMSampleTimingInfo(
-            duration: CMTime.positiveInfinity,
-            presentationTimeStamp: .zero,
-            decodeTimeStamp: .invalid
-        )
-
-        return try? CMSampleBuffer(
-            imageBuffer: buffer,
-            formatDescription: format,
-            sampleTiming: timingInfo
-        )
+        return buffer
     }
 }
 
@@ -174,55 +209,6 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
     }
 }
 
-// MARK: - AVPictureInPictureSampleBufferPlaybackDelegate
-
-extension PictureInPictureManager: AVPictureInPictureSampleBufferPlaybackDelegate {
-
-    nonisolated func pictureInPictureController(
-        _ pictureInPictureController: AVPictureInPictureController,
-        setPlaying playing: Bool
-    ) {
-        // No-op: static image, no playback
-    }
-
-    nonisolated func pictureInPictureControllerTimeRangeForPlayback(
-        _ pictureInPictureController: AVPictureInPictureController
-    ) -> CMTimeRange {
-        CMTimeRange(start: .zero, duration: CMTime(value: 1, timescale: 1))
-    }
-
-    nonisolated func pictureInPictureControllerIsPlaybackPaused(
-        _ pictureInPictureController: AVPictureInPictureController
-    ) -> Bool {
-        false
-    }
-
-    nonisolated func pictureInPictureController(
-        _ pictureInPictureController: AVPictureInPictureController,
-        didTransitionToRenderSize newRenderSize: CMVideoDimensions
-    ) {
-        // No-op
-    }
-
-    nonisolated func pictureInPictureController(
-        _ pictureInPictureController: AVPictureInPictureController,
-        skipByInterval skipInterval: CMTime,
-        completion: @escaping () -> Void
-    ) {
-        completion()
-    }
-}
-
-// MARK: - Sample Buffer Display View
-
-class SampleBufferPiPView: UIView {
-    override class var layerClass: AnyClass { AVSampleBufferDisplayLayer.self }
-    var sampleBufferDisplayLayer: AVSampleBufferDisplayLayer {
-        // swiftlint:disable:next force_cast
-        layer as! AVSampleBufferDisplayLayer
-    }
-}
-
 // MARK: - SwiftUI Wrapper
 
 struct PictureInPictureLayerView: UIViewRepresentable {
@@ -232,10 +218,9 @@ struct PictureInPictureLayerView: UIViewRepresentable {
         let container = UIView()
         container.clipsToBounds = true
         container.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
-        let bufferView = pipManager.bufferView
-        bufferView.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
-        bufferView.alpha = 0.01
-        container.addSubview(bufferView)
+        let playerLayer = pipManager.playerLayer
+        playerLayer.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+        container.layer.addSublayer(playerLayer)
         return container
     }
 
