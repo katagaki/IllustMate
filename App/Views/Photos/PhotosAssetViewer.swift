@@ -219,12 +219,11 @@ struct PhotosAssetViewer: View {
         let assetsToRestore = photosViewer.allAssets
         let indexToRestore = photosViewer.currentIndex
 
-        pipManager.start(with: image) { [photosViewer, navigation] in
+        pipManager.start(with: image) { [photosViewer] in
             if let asset = assetToRestore {
                 photosViewer.allAssets = assetsToRestore
                 photosViewer.currentIndex = indexToRestore
                 photosViewer.displayedAsset = asset
-                navigation.push(.photosAssetViewerRestore, for: .collection)
             }
         }
     }

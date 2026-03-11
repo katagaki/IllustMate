@@ -197,15 +197,11 @@ struct PicViewer: View {
         let picsToRestore = viewer.allPics
         let indexToRestore = viewer.currentIndex
 
-        pipManager.start(with: image) { [viewer, navigation] in
+        pipManager.start(with: image) { [viewer] in
             if let pic = picToRestore {
                 viewer.allPics = picsToRestore
                 viewer.currentIndex = indexToRestore
-                viewer.setDisplay(pic) {
-                    if UIDevice.current.userInterfaceIdiom == .phone {
-                        navigation.push(.picViewerRestore, for: .collection)
-                    }
-                }
+                viewer.setDisplay(pic) {}
             }
         }
     }

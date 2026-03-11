@@ -14,8 +14,6 @@ struct CollectionView: View {
     @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
     @Environment(PhotosViewerManager.self) var photosViewer
-    @Environment(PictureInPictureManager.self) var pipManager
-
     @State var isMoreViewPresenting: Bool = false
 
     @AppStorage("PhotosModeEnabled",
@@ -84,18 +82,6 @@ struct CollectionView: View {
         }
         .onChange(of: isPhotosModeEnabled) { _, _ in
             navigation.collectionTabPath.removeAll()
-        }
-        .onChange(of: pipManager.isPreparing) { _, isPreparing in
-            if isPreparing {
-                // Pop the viewer from the navigation stack when PiP is starting.
-                if let last = navigation.collectionTabPath.last,
-                   case .picViewer = last {
-                    navigation.collectionTabPath.removeLast()
-                } else if let last = navigation.collectionTabPath.last,
-                          case .photosAssetViewer = last {
-                    navigation.collectionTabPath.removeLast()
-                }
-            }
         }
     }
 }

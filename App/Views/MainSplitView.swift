@@ -11,8 +11,6 @@ struct MainSplitView: View {
 
     @EnvironmentObject var navigation: NavigationManager
     @Environment(ViewerManager.self) var viewer
-    @Environment(PictureInPictureManager.self) var pipManager
-
     @Namespace var namespace
 
     @State var albums: [Album] = []
@@ -105,13 +103,6 @@ struct MainSplitView: View {
                 albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
             } catch {
                 debugPrint(error.localizedDescription)
-            }
-        }
-        .onChange(of: pipManager.isPreparing) { _, isPreparing in
-            if isPreparing {
-                viewer.displayedPic = nil
-                viewer.displayedImage = nil
-                viewer.displayedThumbnail = nil
             }
         }
         .onChange(of: navigation.dataVersion) { _, _ in

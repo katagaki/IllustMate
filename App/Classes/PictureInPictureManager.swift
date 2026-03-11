@@ -22,6 +22,8 @@ class PictureInPictureManager: NSObject {
     @ObservationIgnored private var player: AVQueuePlayer?
     @ObservationIgnored private var playerLooper: AVPlayerLooper?
     @ObservationIgnored private(set) var playerLayer = AVPlayerLayer()
+    @ObservationIgnored private var pipPossibleObservation: NSKeyValueObservation?
+    @ObservationIgnored private var isSwapping: Bool = false
 
     var isPossible: Bool {
         AVPictureInPictureController.isPictureInPictureSupported()
@@ -45,13 +47,18 @@ class PictureInPictureManager: NSObject {
         pipController = AVPictureInPictureController(playerLayer: playerLayer)
         pipController?.delegate = self
         pipController?.requiresLinearPlayback = true
+        pipController?.setValue(1, forKey: "controlsStyle")
     }
 
     func start(with image: UIImage, restore: @escaping @MainActor () -> Void) {
         guard pipController != nil, player != nil else { return }
 
+        let alreadyActive = isActive
+
         onRestore = restore
-        isPreparing = true
+        if !alreadyActive {
+            isPreparing = true
+        }
 
         do {
             let session = AVAudioSession.sharedInstance()
@@ -62,18 +69,57 @@ class PictureInPictureManager: NSObject {
         }
 
         Task.detached(priority: .userInitiated) {
-            guard let videoURL = Self.createVideo(from: image) else { return }
+            guard let videoURL = Self.createVideo(from: image) else {
+                await MainActor.run { self.isPreparing = false }
+                return
+            }
             await MainActor.run {
                 guard let pipController = self.pipController,
                       let player = self.player else { return }
-                let asset = AVAsset(url: videoURL)
+
+                let asset = AVURLAsset(url: videoURL)
                 let item = AVPlayerItem(asset: asset)
-                // Loop the short video so PiP stays alive indefinitely.
+
+                if alreadyActive {
+                    // Replace the player entirely to avoid AVQueuePlayer queue conflicts.
+                    // isSwapping stays true until PiP is restarted from the delegate.
+                    self.isSwapping = true
+                    self.playerLooper?.disableLooping()
+                    self.playerLooper = nil
+                    player.pause()
+
+                    let newPlayer = AVQueuePlayer()
+                    newPlayer.isMuted = true
+                    newPlayer.allowsExternalPlayback = false
+                    self.player = newPlayer
+                    self.playerLayer.player = newPlayer
+                    self.playerLooper = AVPlayerLooper(player: newPlayer, templateItem: item)
+                    newPlayer.play()
+                    return
+                }
+
                 player.removeAllItems()
                 self.playerLooper = AVPlayerLooper(player: player, templateItem: item)
                 player.play()
+
                 UIApplication.shared.isIdleTimerDisabled = true
-                pipController.startPictureInPicture()
+
+                // Wait until the PiP controller reports that PiP is possible
+                // before actually starting it; starting too early silently fails.
+                if pipController.isPictureInPicturePossible {
+                    pipController.startPictureInPicture()
+                } else {
+                    self.pipPossibleObservation = pipController.observe(
+                        \.isPictureInPicturePossible,
+                        options: [.new]
+                    ) { [weak self] _, change in
+                        guard change.newValue == true else { return }
+                        Task { @MainActor [weak self] in
+                            self?.pipPossibleObservation = nil
+                            self?.pipController?.startPictureInPicture()
+                        }
+                    }
+                }
             }
         }
     }
@@ -84,7 +130,10 @@ class PictureInPictureManager: NSObject {
 
     private func didStop() {
         isActive = false
+        isPreparing = false
+        isSwapping = false
         onRestore = nil
+        pipPossibleObservation = nil
         player?.pause()
         player?.removeAllItems()
         playerLooper = nil
@@ -144,10 +193,10 @@ class PictureInPictureManager: NSObject {
             return nil
         }
 
-        // Write two identical frames to produce a ~1-second video.
-        let frameDuration = CMTime(value: 1, timescale: 2)
+        // Write two identical frames to produce a 1-hour video.
+        let oneHour = CMTime(value: 3600, timescale: 1)
         adaptor.append(pixelBuffer, withPresentationTime: .zero)
-        adaptor.append(pixelBuffer, withPresentationTime: frameDuration)
+        adaptor.append(pixelBuffer, withPresentationTime: oneHour)
 
         writerInput.markAsFinished()
 
@@ -219,6 +268,25 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
+            if isSwapping {
+                // PiP stopped because we swapped the player — restart it.
+                isSwapping = false
+                if pipController?.isPictureInPicturePossible == true {
+                    pipController?.startPictureInPicture()
+                } else {
+                    self.pipPossibleObservation = pipController?.observe(
+                        \.isPictureInPicturePossible,
+                        options: [.new]
+                    ) { [weak self] _, change in
+                        guard change.newValue == true else { return }
+                        Task { @MainActor [weak self] in
+                            self?.pipPossibleObservation = nil
+                            self?.pipController?.startPictureInPicture()
+                        }
+                    }
+                }
+                return
+            }
             didStop()
         }
     }
@@ -227,10 +295,15 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController,
         restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
     ) {
+        nonisolated(unsafe) let handler = completionHandler
         Task { @MainActor in
+            guard !isSwapping else {
+                handler(false)
+                return
+            }
             onRestore?()
+            handler(true)
         }
-        completionHandler(true)
     }
 }
 
