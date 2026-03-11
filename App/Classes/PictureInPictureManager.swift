@@ -56,9 +56,9 @@ class PictureInPictureManager: NSObject {
 
         Task.detached(priority: .userInitiated) {
             guard let videoURL = Self.createVideo(from: image) else { return }
-            let asset = AVAsset(url: videoURL)
-            let item = AVPlayerItem(asset: asset)
             await MainActor.run {
+                let asset = AVAsset(url: videoURL)
+                let item = AVPlayerItem(asset: asset)
                 // Loop the short video so PiP stays alive indefinitely.
                 player.removeAllItems()
                 self.playerLooper = AVPlayerLooper(player: player, templateItem: item)
