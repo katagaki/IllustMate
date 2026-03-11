@@ -15,6 +15,7 @@ struct MainSplitView: View {
 
     @State var albums: [Album] = []
     @State var selectedView: ViewPath? = .collection
+    @State var isMoreViewPresenting: Bool = false
 
     var body: some View {
         NavigationSplitView {
@@ -24,11 +25,7 @@ struct MainSplitView: View {
                         Label {
                             Text("ViewTitle.Collection")
                         } icon: {
-                            Image("Tab.Collection")
-#if targetEnvironment(macCatalyst)
-                                .resizable()
-                                .frame(width: 16.0, height: 16.0)
-#endif
+                            Image(systemName: "house.fill")
                         }
                     }
                     NavigationLink(value: ViewPath.albums) {
@@ -36,10 +33,6 @@ struct MainSplitView: View {
                             Text("ViewTitle.Albums")
                         } icon: {
                             Image(systemName: "rectangle.stack.fill")
-#if targetEnvironment(macCatalyst)
-                                .resizable()
-                                .frame(width: 16.0, height: 16.0)
-#endif
                         }
                     }
                     NavigationLink(value: ViewPath.pics) {
@@ -49,7 +42,9 @@ struct MainSplitView: View {
                             Image(systemName: "photo.on.rectangle.angled")
                         }
                     }
-                    NavigationLink(value: ViewPath.more) {
+                    Button {
+                        isMoreViewPresenting = true
+                    } label: {
                         Label("ViewTitle.More", systemImage: "ellipsis")
                     }
                 }
@@ -75,21 +70,18 @@ struct MainSplitView: View {
                     Text("Shared.Albums")
                 }
             }
-#if targetEnvironment(macCatalyst)
-            .navigationSplitViewColumnWidth(170.0)
-#endif
+            .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
         } content: {
             Group {
                 switch selectedView {
                 case .collection: CollectionView()
                 case .albums: AlbumsView()
                 case .pics: PicsView()
-                case .more: MoreView()
                 case .album(let album): AlbumNavigationStack(album: album)
                 default: Color.clear
                 }
             }
-            .navigationSplitViewColumnWidth(375.0)
+            .navigationSplitViewColumnWidth(min: 300.0, ideal: 375.0, max: 500.0)
         } detail: {
             if let pic = viewer.displayedPic {
                 PicViewer(pic: pic)
@@ -119,6 +111,9 @@ struct MainSplitView: View {
                     debugPrint(error.localizedDescription)
                 }
             }
+        }
+        .sheet(isPresented: $isMoreViewPresenting) {
+            MoreView()
         }
     }
 }

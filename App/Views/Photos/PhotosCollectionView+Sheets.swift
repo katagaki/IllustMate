@@ -47,7 +47,7 @@ extension PhotosCollectionView {
             .navigationTitle("ViewTitle.Albums.Create")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.height(200.0)])
+        .phonePresentationDetents([.height(200.0), .medium])
         .interactiveDismissDisabled()
     }
 
@@ -99,7 +99,7 @@ extension PhotosCollectionView {
         .onAppear {
             renameText = collection.localizedTitle ?? ""
         }
-        .presentationDetents([.medium])
+        .phonePresentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 
@@ -119,6 +119,6 @@ extension PhotosCollectionView {
             .navigationTitle("Photos.MoveToFolder")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.medium, .large])
+        .phonePresentationDetents([.medium, .large])
     }
 }

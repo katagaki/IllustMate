@@ -65,7 +65,7 @@ struct RenameAlbumView: View {
         .task {
             newAlbumName = album.name
         }
-        .presentationDetents([.medium])
+        .phonePresentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 

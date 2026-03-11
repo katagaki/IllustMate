@@ -31,10 +31,12 @@ struct AlbumsView: View {
                     }
                 }
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        HStack(alignment: .center, spacing: 8.0) {
-                            Text("\(albums.count)")
-                                .foregroundStyle(.secondary)
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            HStack(alignment: .center, spacing: 8.0) {
+                                Text("\(albums.count)")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }

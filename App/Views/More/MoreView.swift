@@ -33,134 +33,138 @@ struct MoreView: View {
     @AppStorage("ShareSheetShowAnimation",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var showAnimationWhenSaving: Bool = true
 
+    private var listContent: some View {
+        List {
+            Section {
+                HStack(alignment: .top) {
+                    VStack(spacing: 8.0) {
+                        Text("\(picCount)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("Shared.Pics")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    VStack(spacing: 8.0) {
+                        Text("\(albumCount)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("Shared.Albums")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            } header: {
+                Text("More.Stats")
+            } footer: {
+                Text("More.Stats.Footer")
+            }
+            Section {
+                Toggle("More.PhotosMode", isOn: $isPhotosModeEnabled)
+            } header: {
+                Text("More.PhotosMode.Header")
+            } footer: {
+                Text("More.PhotosMode.Description")
+            }
+            Section {
+                Toggle("More.AppLock", isOn: $isAppLockEnabled)
+                    .disabled(auth.biometryType == .none)
+            } header: {
+                Text("More.Security")
+            } footer: {
+                Text("More.AppLock.Description")
+            }
+            Section {
+                Toggle("More.ShareSheet.OpenSearch", isOn: $openSearchWhenSharing)
+                Toggle("More.ShareSheet.ShowAnimation", isOn: $showAnimationWhenSaving)
+            } header: {
+                Text("More.ShareSheet")
+            }
+            Section {
+                Button("More.DuplicateChecker") {
+                    isDuplicateCheckerPresented = true
+                }
+            } header: {
+                Text("More.Tools")
+            }
+            Section {
+                Button("Shared.OpenFilesApp") {
+                    let documentsUrl = FileManager.default.urls(
+                        for: .documentDirectory, in: .userDomainMask
+                    ).first!
+#if targetEnvironment(macCatalyst)
+                    UIApplication.shared.open(documentsUrl)
+#else
+                    if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
+                        if UIApplication.shared.canOpenURL(sharedUrl) {
+                            UIApplication.shared.open(sharedUrl)
+                        }
+                    }
+#endif
+                }
+                Button("More.Backup") {
+                    isPickingBackupFolder = true
+                }
+            } header: {
+                Text("More.Data")
+            }
+            Section {
+                NavigationLink("More.Troubleshooting", value: ViewPath.moreTroubleshooting)
+            } header: {
+                Text("More.Advanced")
+            }
+            Section {
+                Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
+                    .disabled(!isPhotosModeEnabled)
+                Button("More.Experiments.NestedAlbums.CopyPrefix") {
+                    UIPasteboard.general.string = "▶︎ "
+                }
+                .tint(.primary)
+                .disabled(!isNestedAlbumsEnabled)
+            } header: {
+                Text("More.Experiments")
+            } footer: {
+                Text("More.Experiments.NestedAlbums.Description")
+            }
+            Section {
+                Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
+                    HStack {
+                        Text(String(localized: "More.GitHub"))
+                        Spacer()
+                        Text("katagaki/IllustMate")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .tint(.primary)
+                NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
+            }
+        }
+        .navigationTitle("ViewTitle.More")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: ViewPath.self) { viewPath in
+            switch viewPath {
+            case .moreDebug: MoreExperimentsView()
+            case .moreTroubleshooting: MoreTroubleshootingView()
+            case .moreAttributions: MoreLicensesView()
+            default: Color.clear
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack(path: $navigation.moreTabPath) {
-            List {
-                Section {
-                    HStack(alignment: .top) {
-                        VStack(spacing: 8.0) {
-                            Text("\(picCount)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Shared.Pics")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
-                        VStack(spacing: 8.0) {
-                            Text("\(albumCount)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Shared.Albums")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                } header: {
-                    Text("More.Stats")
-                } footer: {
-                    Text("More.Stats.Footer")
-                }
-                Section {
-                    Toggle("More.PhotosMode", isOn: $isPhotosModeEnabled)
-                } header: {
-                    Text("More.PhotosMode.Header")
-                } footer: {
-                    Text("More.PhotosMode.Description")
-                }
-                Section {
-                    Toggle("More.AppLock", isOn: $isAppLockEnabled)
-                        .disabled(auth.biometryType == .none)
-                } header: {
-                    Text("More.Security")
-                } footer: {
-                    Text("More.AppLock.Description")
-                }
-                Section {
-                    Toggle("More.ShareSheet.OpenSearch", isOn: $openSearchWhenSharing)
-                    Toggle("More.ShareSheet.ShowAnimation", isOn: $showAnimationWhenSaving)
-                } header: {
-                    Text("More.ShareSheet")
-                }
-                Section {
-                    Button("More.DuplicateChecker") {
-                        isDuplicateCheckerPresented = true
-                    }
-                } header: {
-                    Text("More.Tools")
-                }
-                Section {
-                    Button("Shared.OpenFilesApp") {
-                        let documentsUrl = FileManager.default.urls(
-                            for: .documentDirectory, in: .userDomainMask
-                        ).first!
-#if targetEnvironment(macCatalyst)
-                        UIApplication.shared.open(documentsUrl)
-#else
-                        if let sharedUrl = URL(string: "shareddocuments://\(documentsUrl.path)") {
-                            if UIApplication.shared.canOpenURL(sharedUrl) {
-                                UIApplication.shared.open(sharedUrl)
-                            }
-                        }
-#endif
-                    }
-                    Button("More.Backup") {
-                        isPickingBackupFolder = true
-                    }
-                } header: {
-                    Text("More.Data")
-                }
-                Section {
-                    NavigationLink("More.Troubleshooting", value: ViewPath.moreTroubleshooting)
-                } header: {
-                    Text("More.Advanced")
-                }
-                Section {
-                    Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
-                        .disabled(!isPhotosModeEnabled)
-                    Button("More.Experiments.NestedAlbums.CopyPrefix") {
-                        UIPasteboard.general.string = "▶︎ "
-                    }
-                    .tint(.primary)
-                    .disabled(!isNestedAlbumsEnabled)
-                } header: {
-                    Text("More.Experiments")
-                } footer: {
-                    Text("More.Experiments.NestedAlbums.Description")
-                }
-                Section {
-                    Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
-                        HStack {
-                            Text(String(localized: "More.GitHub"))
-                            Spacer()
-                            Text("katagaki/IllustMate")
-                                .foregroundStyle(.secondary)
+            listContent
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(role: .close) {
+                            dismiss()
                         }
                     }
-                    .tint(.primary)
-                    NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
                 }
-            }
-            .navigationTitle("ViewTitle.More")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .close) {
-                        dismiss()
-                    }
-                }
-            }
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .moreDebug: MoreExperimentsView()
-                case .moreTroubleshooting: MoreTroubleshootingView()
-                case .moreAttributions: MoreLicensesView()
-                default: Color.clear
-                }
-            }
         }
         .task {
             await loadCounts()

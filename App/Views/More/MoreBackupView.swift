@@ -65,7 +65,7 @@ struct MoreBackupView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .phonePresentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 }

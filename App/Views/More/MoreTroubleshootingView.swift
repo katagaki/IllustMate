@@ -61,12 +61,12 @@ struct MoreTroubleshootingView: View {
         .sheet(isPresented: $isRebuildingThumbnails) {
             StatusView(type: .inProgress, title: "More.Troubleshooting.RebuildThumbnails.Rebuilding",
                        currentCount: rebuildProgress, totalCount: rebuildTotal)
-            .presentationDetents([.medium])
+            .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
         .sheet(isPresented: $isFreeingUpSpace) {
             StatusView(type: .inProgress, title: "More.Troubleshooting.FreeUpSpace.Freeing")
-            .presentationDetents([.medium])
+            .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
     }

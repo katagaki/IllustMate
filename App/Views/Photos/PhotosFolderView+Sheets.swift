@@ -49,7 +49,7 @@ extension PhotosFolderView {
             .navigationTitle("ViewTitle.Albums.Create")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.height(200.0)])
+        .phonePresentationDetents([.height(200.0), .medium])
         .interactiveDismissDisabled()
     }
 
@@ -102,7 +102,7 @@ extension PhotosFolderView {
         .onAppear {
             renameText = collection.localizedTitle ?? ""
         }
-        .presentationDetents([.medium])
+        .phonePresentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 
@@ -123,6 +123,6 @@ extension PhotosFolderView {
             .navigationTitle("Photos.MoveToFolder")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.medium, .large])
+        .phonePresentationDetents([.medium, .large])
     }
 }

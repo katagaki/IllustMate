@@ -2,18 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleURLTypes</key>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>CFBundleURLName</key>
-			<string>com.tsubuzaki.IllustMate</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>picmate</string>
-			</array>
-		</dict>
+		<string>com.tsubuzaki.IllustMate.widgetRefresh</string>
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
@@ -25,6 +16,19 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.tsubuzaki.IllustMate.picsBackup</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.tsubuzaki.IllustMate</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>picmate</string>
 			</array>
 		</dict>
 	</array>
@@ -40,10 +44,6 @@
 			<string>Any</string>
 		</dict>
 	</dict>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.tsubuzaki.IllustMate.widgetRefresh</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

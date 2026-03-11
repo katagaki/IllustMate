@@ -29,17 +29,19 @@ struct CollectionView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        isMoreViewPresenting = true
-                    } label: {
-                        Image(systemName: "ellipsis")
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            isMoreViewPresenting = true
+                        } label: {
+                            Image(systemName: "ellipsis")
+                        }
                     }
                 }
             }
             .sheet(isPresented: $isMoreViewPresenting) {
                 MoreView()
-                    .presentationDetents([.medium, .large])
+                    .phonePresentationDetents([.medium, .large])
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
               switch viewPath {

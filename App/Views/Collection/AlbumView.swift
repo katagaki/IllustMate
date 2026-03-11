@@ -78,7 +78,7 @@ struct AlbumView: View {
                         DuplicateScanView(scanScope: .picsNotInAlbums)
                     }
                 }
-                .presentationDetents([.medium, .large])
+                .phonePresentationDetents([.medium, .large])
                 .interactiveDismissDisabled()
             }
             .modifier(AlbumViewDialogs(

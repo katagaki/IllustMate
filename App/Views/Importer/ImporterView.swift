@@ -120,7 +120,7 @@ struct ImporterView: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled()
     }
 

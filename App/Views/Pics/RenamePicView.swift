@@ -65,7 +65,7 @@ struct RenamePicView: View {
         .task {
             newPicName = pic.name
         }
-        .presentationDetents([.medium])
+        .phonePresentationDetents([.medium])
         .interactiveDismissDisabled()
     }
 

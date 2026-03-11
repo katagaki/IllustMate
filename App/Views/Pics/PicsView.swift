@@ -27,8 +27,12 @@ struct PicsView: View {
                              pics: pics,
                              isSelecting: .constant(false),
                              enableSelection: false) { pic in
-                        viewer.setDisplay(pic, in: pics) { [navigation] in
-                            navigation.push(.picViewer(namespace: namespace), for: .pics)
+                        if UIDevice.current.userInterfaceIdiom == .phone {
+                            viewer.setDisplay(pic, in: pics) { [navigation] in
+                                navigation.push(.picViewer(namespace: namespace), for: .pics)
+                            }
+                        } else {
+                            viewer.setDisplay(pic, in: pics) { }
                         }
                     } selectedCount: {
                         return 0
@@ -39,10 +43,12 @@ struct PicsView: View {
                     }
                 }
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        HStack(alignment: .center, spacing: 8.0) {
-                            Text("\(pics.count)")
-                                .foregroundStyle(.secondary)
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            HStack(alignment: .center, spacing: 8.0) {
+                                Text("\(pics.count)")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }

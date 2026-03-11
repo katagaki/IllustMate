@@ -109,8 +109,12 @@ extension AlbumView {
             }
         } else {
             let picCopy = pic
-            viewer.setDisplay(picCopy, in: pics) { [navigation] in
-                navigation.push(.picViewer(namespace: namespace), for: .collection)
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                viewer.setDisplay(picCopy, in: pics) { [navigation] in
+                    navigation.push(.picViewer(namespace: namespace), for: .collection)
+                }
+            } else {
+                viewer.setDisplay(picCopy, in: pics) { }
             }
         }
     }
