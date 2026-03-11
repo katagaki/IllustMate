@@ -14,6 +14,8 @@ import SwiftUI
 class PictureInPictureManager: NSObject {
 
     var isActive: Bool = false
+    /// Set synchronously when `start()` is called so parent views can dismiss the viewer.
+    var isPreparing: Bool = false
 
     @ObservationIgnored var onRestore: (@MainActor () -> Void)?
     @ObservationIgnored private var pipController: AVPictureInPictureController?
@@ -28,14 +30,6 @@ class PictureInPictureManager: NSObject {
     func setup() {
         guard AVPictureInPictureController.isPictureInPictureSupported() else { return }
 
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .moviePlayback)
-            try session.setActive(true)
-        } catch {
-            debugPrint("PiP: Failed to configure audio session: \(error)")
-        }
-
         let player = AVQueuePlayer()
         player.isMuted = true
         player.allowsExternalPlayback = false
@@ -43,7 +37,11 @@ class PictureInPictureManager: NSObject {
 
         playerLayer.player = player
         playerLayer.videoGravity = .resizeAspect
+    }
 
+    /// Called by the layer view once the player layer is attached to the window.
+    func layerDidMoveToWindow() {
+        guard pipController == nil, player != nil else { return }
         pipController = AVPictureInPictureController(playerLayer: playerLayer)
         pipController?.delegate = self
         pipController?.requiresLinearPlayback = true
@@ -53,6 +51,15 @@ class PictureInPictureManager: NSObject {
         guard pipController != nil, player != nil else { return }
 
         onRestore = restore
+        isPreparing = true
+
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .moviePlayback)
+            try session.setActive(true)
+        } catch {
+            debugPrint("PiP: Failed to configure audio session: \(error)")
+        }
 
         Task.detached(priority: .userInitiated) {
             guard let videoURL = Self.createVideo(from: image) else { return }
@@ -82,6 +89,12 @@ class PictureInPictureManager: NSObject {
         player?.removeAllItems()
         playerLooper = nil
         UIApplication.shared.isIdleTimerDisabled = false
+
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            debugPrint("PiP: Failed to deactivate audio session: \(error)")
+        }
     }
 
     // MARK: - Video Creation
@@ -186,7 +199,19 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
+            isPreparing = false
             isActive = true
+        }
+    }
+
+    nonisolated func pictureInPictureController(
+        _ pictureInPictureController: AVPictureInPictureController,
+        failedToStartPictureInPictureWithError error: Error
+    ) {
+        debugPrint("PiP: Failed to start: \(error)")
+        Task { @MainActor in
+            isPreparing = false
+            didStop()
         }
     }
 
@@ -214,8 +239,8 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
 struct PictureInPictureLayerView: UIViewRepresentable {
     let pipManager: PictureInPictureManager
 
-    func makeUIView(context: UIViewRepresentableContext<PictureInPictureLayerView>) -> UIView {
-        let container = UIView()
+    func makeUIView(context: UIViewRepresentableContext<PictureInPictureLayerView>) -> PictureInPictureHostView {
+        let container = PictureInPictureHostView(pipManager: pipManager)
         container.clipsToBounds = true
         container.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
         let playerLayer = pipManager.playerLayer
@@ -224,6 +249,27 @@ struct PictureInPictureLayerView: UIViewRepresentable {
         return container
     }
 
-    func updateUIView(_ uiView: UIView,
+    func updateUIView(_ uiView: PictureInPictureHostView,
                       context: UIViewRepresentableContext<PictureInPictureLayerView>) {}
+}
+
+class PictureInPictureHostView: UIView {
+    private let pipManager: PictureInPictureManager
+
+    init(pipManager: PictureInPictureManager) {
+        self.pipManager = pipManager
+        super.init(frame: .zero)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window != nil {
+            Task { @MainActor in
+                pipManager.layerDidMoveToWindow()
+            }
+        }
+    }
 }

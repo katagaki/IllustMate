@@ -11,7 +11,6 @@ import SwiftUI
 
 struct PhotosAssetViewer: View {
 
-    @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(PhotosViewerManager.self) var photosViewer
     @EnvironmentObject var navigation: NavigationManager
@@ -228,8 +227,6 @@ struct PhotosAssetViewer: View {
                 navigation.push(.photosAssetViewerRestore, for: .collection)
             }
         }
-
-        dismiss()
     }
 
     // MARK: - Image Loading
