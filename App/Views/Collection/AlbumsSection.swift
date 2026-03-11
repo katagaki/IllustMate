@@ -91,6 +91,9 @@ struct AlbumsSection<Content: View>: View {
                 .frame(height: 120.0)
             }
         }
+        .task(id: albums.map(\.id)) {
+            await AlbumCoverCache.shared.prefetch(albums: albums)
+        }
     }
 
     @ViewBuilder
@@ -102,6 +105,7 @@ struct AlbumsSection<Content: View>: View {
                 Button("Shared.ResetCover", systemImage: "photo") {
                     Task {
                         await DataActor.shared.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
+                        AlbumCoverCache.shared.removeImages(forAlbumID: album.id)
                     }
                 }
             }

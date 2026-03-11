@@ -81,6 +81,38 @@ extension DataActor {
         return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
+    /// Fetches representative thumbnails for multiple albums in a single DB query.
+    /// Returns a dictionary mapping album ID to an array of up to `limit` thumbnail Data values.
+    func batchRepresentativeThumbnails(forAlbumIDs albumIDs: [String], limit: Int = 3) -> [String: [Data]] {
+        guard !albumIDs.isEmpty else { return [:] }
+
+        // Use a window function to rank thumbnails per album and pick the top N.
+        let bindings: [Binding?] = albumIDs.map { $0 as Binding? }
+        let placeholders = albumIDs.map { _ in "?" }.joined(separator: ", ")
+        let sql = """
+            SELECT containing_album_id, thumbnail_data
+            FROM (
+                SELECT containing_album_id, thumbnail_data,
+                       ROW_NUMBER() OVER (PARTITION BY containing_album_id ORDER BY date_added DESC) AS rn
+                FROM pics
+                WHERE containing_album_id IN (\(placeholders)) AND thumbnail_data IS NOT NULL
+            )
+            WHERE rn <= ?
+            """
+        var allBindings = bindings
+        allBindings.append(Int64(limit) as Binding?)
+
+        var result: [String: [Data]] = [:]
+        guard let stmt = try? database.prepare(sql, allBindings) else { return [:] }
+        for row in stmt {
+            if let albumId = row[0] as? String,
+               let thumbData = row[1] as? Data {
+                result[albumId, default: []].append(thumbData)
+            }
+        }
+        return result
+    }
+
     func album(for id: String) -> Album? {
         let query = albumsTable.filter(albumId == id)
         return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: false) }

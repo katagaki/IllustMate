@@ -8,6 +8,78 @@
 import Photos
 import SwiftUI
 
+/// In-memory cache for album cover images (the 3 representative thumbnails per album).
+final class AlbumCoverCache: @unchecked Sendable {
+    static let shared = AlbumCoverCache()
+
+    struct CoverImages {
+        let primary: Image?
+        let secondary: Image?
+        let tertiary: Image?
+    }
+
+    private let cache = NSCache<NSString, CoverImagesBox>()
+
+    init() {
+        cache.countLimit = 200
+    }
+
+    func images(forAlbumID id: String) -> CoverImages? {
+        cache.object(forKey: id as NSString)?.value
+    }
+
+    func setImages(_ images: CoverImages, forAlbumID id: String) {
+        cache.setObject(CoverImagesBox(images), forKey: id as NSString)
+    }
+
+    func removeImages(forAlbumID id: String) {
+        cache.removeObject(forKey: id as NSString)
+    }
+
+    /// Batch-prefetch representative thumbnails for a list of albums in a single DB query,
+    /// decode them, and populate the cache. Albums already cached are skipped.
+    func prefetch(albums: [Album]) async {
+        let uncachedAlbums = albums.filter { images(forAlbumID: $0.id) == nil }
+        guard !uncachedAlbums.isEmpty else { return }
+
+        let batchData = await DataActor.shared.batchRepresentativeThumbnails(
+            forAlbumIDs: uncachedAlbums.map(\.id)
+        )
+
+        for album in uncachedAlbums {
+            var uiImages: [UIImage] = []
+
+            // Album's own cover photo first
+            if let coverPhoto = album.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
+                uiImages.append(uiImage)
+            }
+
+            // Then representative thumbnails from DB
+            if let thumbnails = batchData[album.id] {
+                for thumbData in thumbnails {
+                    if let uiImage = UIImage(data: thumbData) {
+                        uiImages.append(uiImage)
+                    }
+                    if uiImages.count >= 3 { break }
+                }
+            }
+
+            let images = CoverImages(
+                primary: uiImages.count > 0 ? Image(uiImage: uiImages[0]) : nil,
+                secondary: uiImages.count > 1 ? Image(uiImage: uiImages[1]) : nil,
+                tertiary: uiImages.count > 2 ? Image(uiImage: uiImages[2]) : nil
+            )
+            setImages(images, forAlbumID: album.id)
+        }
+    }
+}
+
+/// Wrapper so CoverImages can be stored in NSCache.
+private final class CoverImagesBox: @unchecked Sendable {
+    let value: AlbumCoverCache.CoverImages
+    init(_ value: AlbumCoverCache.CoverImages) { self.value = value }
+}
+
 struct AlbumCover: View {
 
     var name: String
@@ -139,6 +211,15 @@ struct AlbumCover: View {
         }
 
         private func loadRepresentativePhotos() async {
+            // Fast path: check in-memory cache first (populated by batch prefetch)
+            if let cached = AlbumCoverCache.shared.images(forAlbumID: album.id) {
+                primaryImage = cached.primary
+                secondaryImage = cached.secondary
+                tertiaryImage = cached.tertiary
+                return
+            }
+
+            // Slow path: fetch individually (fallback for albums not batch-prefetched)
             var images: [Image?] = []
             if let coverPhoto = album.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
                 images.append(Image(uiImage: uiImage))
@@ -153,6 +234,16 @@ struct AlbumCover: View {
             primaryImage = images[0]
             secondaryImage = images[1]
             tertiaryImage = images[2]
+
+            // Cache for future use
+            AlbumCoverCache.shared.setImages(
+                AlbumCoverCache.CoverImages(
+                    primary: primaryImage,
+                    secondary: secondaryImage,
+                    tertiary: tertiaryImage
+                ),
+                forAlbumID: album.id
+            )
         }
     }
 
