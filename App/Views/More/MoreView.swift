@@ -65,10 +65,22 @@ struct MoreView: View {
             }
             Section {
                 Toggle("More.PhotosMode", isOn: $isPhotosModeEnabled)
+                if isPhotosModeEnabled {
+                    Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
+                    Button("More.Experiments.NestedAlbums.CopyPrefix") {
+                        UIPasteboard.general.string = "▶︎ "
+                    }
+                    .tint(.primary)
+                    .disabled(!isNestedAlbumsEnabled)
+                }
             } header: {
                 Text("More.PhotosMode.Header")
             } footer: {
-                Text("More.PhotosMode.Description")
+                if isPhotosModeEnabled {
+                    Text("More.Experiments.NestedAlbums.Description")
+                } else {
+                    Text("More.PhotosMode.Description")
+                }
             }
             Section {
                 Toggle("More.AppLock", isOn: $isAppLockEnabled)
@@ -88,10 +100,9 @@ struct MoreView: View {
                 Button("More.DuplicateChecker") {
                     isDuplicateCheckerPresented = true
                 }
-            } header: {
-                Text("More.Tools")
-            }
-            Section {
+                Button("More.Backup") {
+                    isPickingBackupFolder = true
+                }
                 Button("Shared.OpenFilesApp") {
                     let documentsUrl = FileManager.default.urls(
                         for: .documentDirectory, in: .userDomainMask
@@ -106,29 +117,13 @@ struct MoreView: View {
                     }
 #endif
                 }
-                Button("More.Backup") {
-                    isPickingBackupFolder = true
-                }
             } header: {
-                Text("More.Data")
+                Text("More.Tools")
             }
             Section {
                 NavigationLink("More.Troubleshooting", value: ViewPath.moreTroubleshooting)
             } header: {
                 Text("More.Advanced")
-            }
-            Section {
-                Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
-                    .disabled(!isPhotosModeEnabled)
-                Button("More.Experiments.NestedAlbums.CopyPrefix") {
-                    UIPasteboard.general.string = "▶︎ "
-                }
-                .tint(.primary)
-                .disabled(!isNestedAlbumsEnabled)
-            } header: {
-                Text("More.Experiments")
-            } footer: {
-                Text("More.Experiments.NestedAlbums.Description")
             }
             Section {
                 Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {

@@ -196,7 +196,9 @@ extension AlbumView {
             }
             let pics = await self.fetchPics()
             await MainActor.run {
-                self.pics = pics
+                withAnimation(.smooth.speed(2.0)) {
+                    self.pics = pics
+                }
                 self.hasFetchedPics = true
             }
         }

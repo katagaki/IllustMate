@@ -16,6 +16,15 @@ struct SectionHeader<Buttons: View, Content: View>: View {
     @ViewBuilder var trailingViews: () -> Content
 
     init(
+        title: LocalizedStringKey, count: Int
+    ) where Buttons == EmptyView, Content == EmptyView {
+        self.title = title
+        self.count = count
+        self.buttons = { EmptyView() }
+        self.trailingViews = { EmptyView() }
+    }
+
+    init(
         title: LocalizedStringKey, count: Int,
         @ViewBuilder trailingViews: @escaping () -> Content
     ) where Buttons == EmptyView {
@@ -54,20 +63,22 @@ struct SectionHeader<Buttons: View, Content: View>: View {
             }
             Spacer(minLength: 0)
             buttons()
+            if Content.self != EmptyView.self {
 #if targetEnvironment(macCatalyst)
-            Menu("Shared.More") {
-                trailingViews()
-            }
+                Menu("Shared.More") {
+                    trailingViews()
+                }
 #else
-            Menu {
-                trailingViews()
-            } label: {
-                Image(systemName: "ellipsis")
-                    .frame(width: 18.0, height: 18.0, alignment: .center)
-            }
-            .buttonStyle(.bordered)
-            .buttonBorderShape(.circle)
+                Menu {
+                    trailingViews()
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .frame(width: 18.0, height: 18.0, alignment: .center)
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.circle)
 #endif
+            }
         }
     }
 }
