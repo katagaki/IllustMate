@@ -86,10 +86,11 @@ struct PicsGrid<Content: View>: View {
                             }
                         }
                         Divider()
-                        if pic.containingAlbumID != nil {
+                        if let albumID = pic.containingAlbumID {
                             Button("Shared.SetAsCover", systemImage: "photo") {
                                 Task {
                                     await DataActor.shared.setAsAlbumCover(for: pic.id)
+                                    AlbumCoverCache.shared.removeImages(forAlbumID: albumID)
                                 }
                             }
                         }

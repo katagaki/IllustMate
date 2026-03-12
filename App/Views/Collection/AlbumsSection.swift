@@ -91,9 +91,6 @@ struct AlbumsSection<Content: View>: View {
                 .frame(height: 120.0)
             }
         }
-        .task(id: albums.map(\.id)) {
-            await AlbumCoverCache.shared.prefetch(albums: albums)
-        }
     }
 
     @ViewBuilder

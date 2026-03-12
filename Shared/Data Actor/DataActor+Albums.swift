@@ -81,36 +81,16 @@ extension DataActor {
         return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
-    /// Fetches representative thumbnails for multiple albums in a single DB query.
-    /// Returns a dictionary mapping album ID to an array of up to `limit` thumbnail Data values.
-    func batchRepresentativeThumbnails(forAlbumIDs albumIDs: [String], limit: Int = 3) -> [String: [Data]] {
-        guard !albumIDs.isEmpty else { return [:] }
-
-        // Use a window function to rank thumbnails per album and pick the top N.
-        let bindings: [Binding?] = albumIDs.map { $0 as Binding? }
-        let placeholders = albumIDs.map { _ in "?" }.joined(separator: ", ")
-        let sql = """
-            SELECT containing_album_id, thumbnail_data
-            FROM (
-                SELECT containing_album_id, thumbnail_data,
-                       ROW_NUMBER() OVER (PARTITION BY containing_album_id ORDER BY date_added DESC) AS rn
-                FROM pics
-                WHERE containing_album_id IN (\(placeholders)) AND thumbnail_data IS NOT NULL
-            )
-            WHERE rn <= ?
-            """
-        var allBindings = bindings
-        allBindings.append(Int64(limit) as Binding?)
-
-        var result: [String: [Data]] = [:]
-        guard let stmt = try? database.prepare(sql, allBindings) else { return [:] }
-        for row in stmt {
-            if let albumId = row[0] as? String,
-               let thumbData = row[1] as? Data {
-                result[albumId, default: []].append(thumbData)
-            }
-        }
-        return result
+    /// Fetches a single representative thumbnail at a given offset (0-indexed),
+    /// ordered by most recently added. Used for concurrent per-thumbnail fetching.
+    func representativeThumbnail(forAlbumWithID albumID: String, at offset: Int) -> Data? {
+        let query = picsTable
+            .filter(picAlbumId == albumID)
+            .select(picThumbnailData)
+            .order(picDateAdded.desc)
+            .limit(1, offset: offset)
+        guard let row = try? database.pluck(query) else { return nil }
+        return try? row.get(picThumbnailData)
     }
 
     func album(for id: String) -> Album? {
