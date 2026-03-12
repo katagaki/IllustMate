@@ -102,6 +102,7 @@ struct AlbumsSection<Content: View>: View {
                 Button("Shared.ResetCover", systemImage: "photo") {
                     Task {
                         await DataActor.shared.updateAlbumCover(forAlbumWithID: album.id, coverData: nil)
+                        AlbumCoverCache.shared.removeImages(forAlbumID: album.id)
                     }
                 }
             }

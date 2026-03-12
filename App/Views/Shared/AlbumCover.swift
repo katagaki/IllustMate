@@ -8,6 +8,41 @@
 import Photos
 import SwiftUI
 
+/// In-memory cache for album cover images (the 3 representative thumbnails per album).
+final class AlbumCoverCache: @unchecked Sendable {
+    static let shared = AlbumCoverCache()
+
+    struct CoverImages {
+        let primary: Image?
+        let secondary: Image?
+        let tertiary: Image?
+    }
+
+    private let cache = NSCache<NSString, CoverImagesBox>()
+
+    init() {
+        cache.countLimit = 200
+    }
+
+    func images(forAlbumID id: String) -> CoverImages? {
+        cache.object(forKey: id as NSString)?.value
+    }
+
+    func setImages(_ images: CoverImages, forAlbumID id: String) {
+        cache.setObject(CoverImagesBox(images), forKey: id as NSString)
+    }
+
+    func removeImages(forAlbumID id: String) {
+        cache.removeObject(forKey: id as NSString)
+    }
+}
+
+/// Wrapper so CoverImages can be stored in NSCache.
+private final class CoverImagesBox: @unchecked Sendable {
+    let value: AlbumCoverCache.CoverImages
+    init(_ value: AlbumCoverCache.CoverImages) { self.value = value }
+}
+
 struct AlbumCover: View {
 
     var name: String
@@ -139,20 +174,64 @@ struct AlbumCover: View {
         }
 
         private func loadRepresentativePhotos() async {
-            var images: [Image?] = []
-            if let coverPhoto = album.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
-                images.append(Image(uiImage: uiImage))
+            // Fast path: check in-memory cache
+            if let cached = AlbumCoverCache.shared.images(forAlbumID: album.id) {
+                primaryImage = cached.primary
+                secondaryImage = cached.secondary
+                tertiaryImage = cached.tertiary
+                return
             }
-            let thumbnails = await DataActor.shared.representativeThumbnails(forAlbumWithID: album.id)
-            for thumbData in thumbnails {
-                if let uiImage = UIImage(data: thumbData) {
-                    images.append(Image(uiImage: uiImage))
+
+            // Determine how many representative thumbnails we need from the DB.
+            // If a specific cover photo is set, it takes the primary slot.
+            let hasCoverPhoto = album.coverPhoto != nil
+            let neededFromDB = hasCoverPhoto ? 2 : 3
+
+            // Fetch representative thumbnails concurrently at background priority
+            // so pic thumbnail fetches (at default priority) take precedence.
+            let fetched: [Image?] = await withTaskGroup(
+                of: (Int, Image?).self,
+                returning: [Image?].self
+            ) { group in
+                for offset in 0..<neededFromDB {
+                    group.addTask(priority: .background) {
+                        guard let data = await DataActor.shared
+                                .representativeThumbnail(forAlbumWithID: album.id, at: offset),
+                              let uiImage = UIImage(data: data) else {
+                            return (offset, nil)
+                        }
+                        return (offset, Image(uiImage: uiImage))
+                    }
                 }
+                var results = Array<Image?>(repeating: nil, count: neededFromDB)
+                for await (offset, image) in group {
+                    results[offset] = image
+                }
+                return results
             }
-            while images.count < 3 { images.append(nil) }
-            primaryImage = images[0]
-            secondaryImage = images[1]
-            tertiaryImage = images[2]
+
+            // Assemble: cover photo first (if set), then DB thumbnails
+            var assembled: [Image?] = []
+            if hasCoverPhoto, let coverData = album.coverPhoto,
+               let uiImage = UIImage(data: coverData) {
+                assembled.append(Image(uiImage: uiImage))
+            }
+            assembled.append(contentsOf: fetched)
+            while assembled.count < 3 { assembled.append(nil) }
+
+            primaryImage = assembled[0]
+            secondaryImage = assembled[1]
+            tertiaryImage = assembled[2]
+
+            // Populate cache
+            AlbumCoverCache.shared.setImages(
+                AlbumCoverCache.CoverImages(
+                    primary: primaryImage,
+                    secondary: secondaryImage,
+                    tertiary: tertiaryImage
+                ),
+                forAlbumID: album.id
+            )
         }
     }
 

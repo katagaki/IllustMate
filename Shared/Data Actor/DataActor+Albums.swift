@@ -81,6 +81,18 @@ extension DataActor {
         return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
+    /// Fetches a single representative thumbnail at a given offset (0-indexed),
+    /// ordered by most recently added. Used for concurrent per-thumbnail fetching.
+    func representativeThumbnail(forAlbumWithID albumID: String, at offset: Int) -> Data? {
+        let query = picsTable
+            .filter(picAlbumId == albumID)
+            .select(picThumbnailData)
+            .order(picDateAdded.desc)
+            .limit(1, offset: offset)
+        guard let row = try? database.pluck(query) else { return nil }
+        return try? row.get(picThumbnailData)
+    }
+
     func album(for id: String) -> Album? {
         let query = albumsTable.filter(albumId == id)
         return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: false) }
