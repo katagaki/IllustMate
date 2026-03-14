@@ -143,6 +143,7 @@ struct AlbumView: View {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Text("Shared.Selected.\(selectedPics.count)")
+                    .fixedSize()
             }
             ToolbarItemGroup(placement: .bottomBar) {
                 Menu("Shared.Move", systemImage: "tray.full") {
