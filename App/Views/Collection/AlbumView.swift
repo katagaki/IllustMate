@@ -58,11 +58,6 @@ struct AlbumView: View {
     var body: some View {
         mainContent
             .toolbar { toolbarContent }
-            .safeAreaInset(edge: .bottom) {
-                if isSelectingPics {
-                    selectionBarContent
-                }
-            }
             .modifier(AlbumViewSheets(
                 isAddingAlbum: $isAddingAlbum,
                 albumToRename: $albumToRename,
@@ -138,7 +133,44 @@ struct AlbumView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        if !isSelectingPics {
+        if isSelectingPics {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button {
+                    startOrStopSelectingPics()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                Text("Shared.Selected.\(selectedPics.count)")
+                    .fixedSize()
+            }
+            ToolbarItemGroup(placement: .bottomBar) {
+                Menu("Shared.Move", systemImage: "tray.full") {
+                    PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
+                        refreshDataAfterPicMoved()
+                    }
+                }
+                .disabled(selectedPics.isEmpty)
+                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                    deletePics()
+                }
+                .disabled(selectedPics.isEmpty)
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button {
+                    selectOrDeselectAllPics()
+                } label: {
+                    if pics.count == selectedPics.count {
+                        Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                    } else {
+                        Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                    }
+                }
+            }
+        } else {
             if UIDevice.current.userInterfaceIdiom != .phone {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button("Shared.Select") {
@@ -284,20 +316,6 @@ struct AlbumView: View {
         }
     }
 
-    private var selectionBarContent: some View {
-        SelectionBar(pics: pics, selectedPics: $selectedPics) {
-            startOrStopSelectingPics()
-        } menuItems: {
-            Menu("Shared.Move", systemImage: "tray.full") {
-                PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
-                    refreshDataAfterPicMoved()
-                }
-            }
-            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                deletePics()
-            }
-        }
-    }
 }
 
 private struct AlbumViewSheets: ViewModifier {

@@ -54,6 +54,15 @@ extension AlbumView {
         }
     }
 
+    func selectOrDeselectAllPics() {
+        if pics.count == selectedPics.count {
+            selectedPics.removeAll()
+        } else {
+            selectedPics.removeAll()
+            selectedPics.append(contentsOf: pics)
+        }
+    }
+
     @MainActor
     func startOrStopSelectingPics() {
         doWithAnimation {
