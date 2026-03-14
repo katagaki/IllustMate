@@ -144,6 +144,18 @@ struct AlbumView: View {
             ToolbarItemGroup(placement: .bottomBar) {
                 Text("Shared.Selected.\(selectedPics.count)")
             }
+            ToolbarItemGroup(placement: .bottomBar) {
+                Menu("Shared.Move", systemImage: "tray.full") {
+                    PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
+                        refreshDataAfterPicMoved()
+                    }
+                }
+                .disabled(selectedPics.isEmpty)
+                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                    deletePics()
+                }
+                .disabled(selectedPics.isEmpty)
+            }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Button {
@@ -155,16 +167,6 @@ struct AlbumView: View {
                         Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
                     }
                 }
-                Menu("Shared.Move", systemImage: "tray.full") {
-                    PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
-                        refreshDataAfterPicMoved()
-                    }
-                }
-                .disabled(selectedPics.isEmpty)
-                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                    deletePics()
-                }
-                .disabled(selectedPics.isEmpty)
             }
         } else {
             if UIDevice.current.userInterfaceIdiom != .phone {
