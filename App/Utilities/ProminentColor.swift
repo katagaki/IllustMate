@@ -61,16 +61,20 @@ enum ProminentColor {
             // Skip transparent pixels
             guard a > 128 else { continue }
 
-            // Skip near-white and near-black pixels
-            if r > 220 && g > 220 && b > 220 { continue }
-            if r < 35 && g < 35 && b < 35 { continue }
+            // Skip near-black pixels
+            if r < 30 && g < 30 && b < 30 { continue }
+
+            // Skip near-white using perceived luminance
+            // This catches off-whites like (200, 210, 205) that RGB threshold misses
+            let luminance = 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b)
+            if luminance > 200 { continue }
 
             let maxC = max(r, g, b)
             let minC = min(r, g, b)
             let chroma = maxC - minC
 
-            // Skip grays (low chroma)
-            if chroma < 20 { continue }
+            // Skip grays/desaturated pixels entirely — they should never contribute
+            if chroma < 15 { continue }
 
             // Convert to HSB
             let rf = Double(r) / 255.0
@@ -101,10 +105,12 @@ enum ProminentColor {
             let bBin = min(Int(brightness * Double(briBins)), briBins - 1)
             let bucketIndex = hBin * (satBins * briBins) + sBin * briBins + bBin
 
-            // Cubic saturation weight so vivid colors strongly dominate over muted ones
-            // Also penalize very dark or very bright (pastel) colors slightly
-            let satWeight = saturation * saturation * saturation
-            let briWeight = 1.0 - abs(brightness - 0.6) * 0.5  // peak at 0.6 brightness
+            // s^5 weighting: a pixel at s=0.8 gets ~330× more weight than s=0.2
+            // This ensures even a small patch of vivid color dominates over large
+            // areas of muted/washed-out pixels
+            let s2 = saturation * saturation
+            let satWeight = s2 * s2 * saturation  // s^5
+            let briWeight = 1.0 - abs(brightness - 0.6) * 0.5
             let weight = satWeight * briWeight
 
             bucketWeights[bucketIndex] += weight
