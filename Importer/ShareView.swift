@@ -17,9 +17,9 @@ struct ShareView: View {
     @AppStorage(wrappedValue: true, "ShareSheetShowAnimation",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var showAnimationWhenSaving: Bool
-    @AppStorage(wrappedValue: "", "ShareSheetSelectToImportAlbumID",
+    @AppStorage(wrappedValue: false, "ShareSheetTapToImport",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
-    var selectToImportAlbumID: String
+    var tapToImport: Bool
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
@@ -129,16 +129,12 @@ struct ShareView: View {
                 }
             }
         }
-        .onChange(of: itemsManager.isLoaded) { _, isLoaded in
-            if isLoaded, !selectToImportAlbumID.isEmpty, !itemsManager.items.isEmpty {
-                total = Float(itemsManager.items.count)
-                withAnimation(.smooth.speed(2)) {
-                    isImporting = true
-                } completion: {
-                    Task {
-                        importItemsToAlbum(selectToImportAlbumID)
-                    }
-                }
+        .onChange(of: viewPath) { _, newPath in
+            if tapToImport,
+               let last = newPath.last,
+               case .album(let album) = last,
+               album.albumCount() == 0 {
+                startImport(to: album.id)
             }
         }
     }
@@ -155,8 +151,15 @@ struct ShareView: View {
         return nil
     }
 
-    func importItemsToAlbum(_ albumID: String) {
-        importItems(to: albumID)
+    func startImport(to albumID: String) {
+        total = Float(itemsManager.items.count)
+        withAnimation(.smooth.speed(2)) {
+            isImporting = true
+        } completion: {
+            Task {
+                importItems(to: albumID)
+            }
+        }
     }
 
     func importItems() {

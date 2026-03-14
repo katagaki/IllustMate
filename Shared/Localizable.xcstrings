@@ -4289,19 +4289,19 @@
         }
       }
     },
-    "More.ShareSheet.SelectToImport" : {
+    "More.ShareSheet.TapToImport" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select to Import"
+            "value" : "Tap to Import"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選択してインポート"
+            "value" : "タップしてインポート"
           }
         }
       }
@@ -7257,22 +7257,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "否"
-          }
-        }
-      }
-    },
-    "Shared.None" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "None"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "なし"
           }
         }
       }

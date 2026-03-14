@@ -32,10 +32,8 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openSearchWhenSharing: Bool = false
     @AppStorage("ShareSheetShowAnimation",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var showAnimationWhenSaving: Bool = true
-    @AppStorage("ShareSheetSelectToImportAlbumID",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var selectToImportAlbumID: String = ""
-
-    @State var leafAlbums: [Album] = []
+    @AppStorage("ShareSheetTapToImport",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var tapToImport: Bool = false
 
     private var listContent: some View {
         List {
@@ -96,16 +94,8 @@ struct MoreView: View {
             }
             Section {
                 Toggle("More.ShareSheet.OpenSearch", isOn: $openSearchWhenSharing)
-                    .disabled(!selectToImportAlbumID.isEmpty)
                 Toggle("More.ShareSheet.ShowAnimation", isOn: $showAnimationWhenSaving)
-                Picker("More.ShareSheet.SelectToImport", selection: $selectToImportAlbumID) {
-                    Text("Shared.None")
-                        .tag("")
-                    ForEach(leafAlbums) { album in
-                        Text(album.name)
-                            .tag(album.id)
-                    }
-                }
+                Toggle("More.ShareSheet.TapToImport", isOn: $tapToImport)
             } header: {
                 Text("More.ShareSheet")
             }
@@ -202,14 +192,9 @@ struct MoreView: View {
     func loadCounts() async {
         let albums = await DataActor.shared.albumCount()
         let pics = await DataActor.shared.picCount()
-        let allAlbums = (try? await DataActor.shared.albumsWithCounts(
-            sortedBy: .nameAscending
-        )) ?? []
-        let eligible = allAlbums.filter { $0.albumCount() == 0 }
         await MainActor.run {
             albumCount = albums
             picCount = pics
-            leafAlbums = eligible
         }
     }
 }
