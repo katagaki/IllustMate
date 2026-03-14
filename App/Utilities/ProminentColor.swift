@@ -39,13 +39,16 @@ enum ProminentColor {
         context.interpolationQuality = .low
         context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
 
-        // Bucket colors to reduce noise (quantize to 8 levels per channel = 512 buckets)
-        let shift = 5 // divide by 32
-        let bucketCount = 8 * 8 * 8
-        var bucketCounts = [Int](repeating: 0, count: bucketCount)
-        var bucketSumR = [Int](repeating: 0, count: bucketCount)
-        var bucketSumG = [Int](repeating: 0, count: bucketCount)
-        var bucketSumB = [Int](repeating: 0, count: bucketCount)
+        // Bucket in HSB space: 24 hue bins × 4 saturation bins × 4 brightness bins = 384 buckets
+        // HSB bucketing groups perceptually similar colors better than RGB
+        let hueBins = 24
+        let satBins = 4
+        let briBins = 4
+        let bucketCount = hueBins * satBins * briBins
+        var bucketWeights = [Double](repeating: 0, count: bucketCount)
+        var bucketSumR = [Double](repeating: 0, count: bucketCount)
+        var bucketSumG = [Double](repeating: 0, count: bucketCount)
+        var bucketSumB = [Double](repeating: 0, count: bucketCount)
 
         let pixelCount = width * height
         for i in 0..<pixelCount {
@@ -62,45 +65,73 @@ enum ProminentColor {
             if r > 220 && g > 220 && b > 220 { continue }
             if r < 35 && g < 35 && b < 35 { continue }
 
-            // Calculate saturation to skip very desaturated (gray) pixels
             let maxC = max(r, g, b)
             let minC = min(r, g, b)
             let chroma = maxC - minC
+
             // Skip grays (low chroma)
-            if chroma < 25 { continue }
+            if chroma < 20 { continue }
 
-            let br = r >> shift
-            let bg = g >> shift
-            let bb = b >> shift
-            let bucketIndex = br * 64 + bg * 8 + bb
+            // Convert to HSB
+            let rf = Double(r) / 255.0
+            let gf = Double(g) / 255.0
+            let bf = Double(b) / 255.0
+            let maxF = Double(maxC) / 255.0
+            let chromaF = Double(chroma) / 255.0
 
-            // Weight by saturation so more saturated colors are preferred
-            let saturationWeight = chroma
-            bucketCounts[bucketIndex] += saturationWeight
-            bucketSumR[bucketIndex] += r * saturationWeight
-            bucketSumG[bucketIndex] += g * saturationWeight
-            bucketSumB[bucketIndex] += b * saturationWeight
+            // Hue calculation (0.0 - 1.0)
+            let hue: Double
+            if maxC == r {
+                hue = fmod((gf - bf) / chromaF, 6.0) / 6.0
+            } else if maxC == g {
+                hue = ((bf - rf) / chromaF + 2.0) / 6.0
+            } else {
+                hue = ((rf - gf) / chromaF + 4.0) / 6.0
+            }
+            let normalizedHue = hue < 0 ? hue + 1.0 : hue
+
+            // Saturation (0.0 - 1.0)
+            let saturation = maxF > 0 ? chromaF / maxF : 0.0
+
+            // Brightness (0.0 - 1.0)
+            let brightness = maxF
+
+            let hBin = min(Int(normalizedHue * Double(hueBins)), hueBins - 1)
+            let sBin = min(Int(saturation * Double(satBins)), satBins - 1)
+            let bBin = min(Int(brightness * Double(briBins)), briBins - 1)
+            let bucketIndex = hBin * (satBins * briBins) + sBin * briBins + bBin
+
+            // Cubic saturation weight so vivid colors strongly dominate over muted ones
+            // Also penalize very dark or very bright (pastel) colors slightly
+            let satWeight = saturation * saturation * saturation
+            let briWeight = 1.0 - abs(brightness - 0.6) * 0.5  // peak at 0.6 brightness
+            let weight = satWeight * briWeight
+
+            bucketWeights[bucketIndex] += weight
+            bucketSumR[bucketIndex] += rf * weight
+            bucketSumG[bucketIndex] += gf * weight
+            bucketSumB[bucketIndex] += bf * weight
         }
 
         // Find the bucket with the highest weighted count
         var bestBucket = -1
-        var bestCount = 0
+        var bestWeight = 0.0
         for i in 0..<bucketCount {
-            if bucketCounts[i] > bestCount {
-                bestCount = bucketCounts[i]
+            if bucketWeights[i] > bestWeight {
+                bestWeight = bucketWeights[i]
                 bestBucket = i
             }
         }
 
-        guard bestBucket >= 0, bestCount > 0 else {
+        guard bestBucket >= 0, bestWeight > 0 else {
             // Fallback: no saturated color found, return gray
             return (r: 128, g: 128, b: 128)
         }
 
-        // Average color of the best bucket
-        let avgR = bucketSumR[bestBucket] / bestCount
-        let avgG = bucketSumG[bestBucket] / bestCount
-        let avgB = bucketSumB[bestBucket] / bestCount
+        // Weighted average color of the best bucket
+        let avgR = Int(round(bucketSumR[bestBucket] / bestWeight * 255.0))
+        let avgG = Int(round(bucketSumG[bestBucket] / bestWeight * 255.0))
+        let avgB = Int(round(bucketSumB[bestBucket] / bestWeight * 255.0))
 
         return (r: min(255, max(0, avgR)), g: min(255, max(0, avgG)), b: min(255, max(0, avgB)))
     }
