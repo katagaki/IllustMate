@@ -38,34 +38,6 @@ struct MoreView: View {
     private var listContent: some View {
         List {
             Section {
-                HStack(alignment: .top) {
-                    VStack(spacing: 8.0) {
-                        Text("\(picCount)")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        Text("Shared.Pics")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    VStack(spacing: 8.0) {
-                        Text("\(albumCount)")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        Text("Shared.Albums")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            } header: {
-                Text("More.Stats")
-            } footer: {
-                Text("More.Stats.Footer")
-            }
-            Section {
                 Toggle("More.PhotosMode", isOn: $isPhotosModeEnabled)
                 if isPhotosModeEnabled {
                     Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
@@ -124,6 +96,34 @@ struct MoreView: View {
                 }
             } header: {
                 Text("More.Tools")
+            }
+            Section {
+                HStack(alignment: .top) {
+                    VStack(spacing: 8.0) {
+                        Text("\(picCount)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("Shared.Pics")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    VStack(spacing: 8.0) {
+                        Text("\(albumCount)")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("Shared.Albums")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            } header: {
+                Text("More.Stats")
+            } footer: {
+                Text("More.Stats.Footer")
             }
             Section {
                 NavigationLink("More.Troubleshooting", value: ViewPath.moreTroubleshooting)
