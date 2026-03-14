@@ -182,6 +182,12 @@ struct AlbumView: View {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
+                    isImportingPhotos = true
+                }
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
                     isAddingAlbum = true
                 }
@@ -206,13 +212,9 @@ struct AlbumView: View {
     @ViewBuilder
     private var filterMenu: some View {
         Menu {
-            Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
-                isImportingPhotos = true
-            }
             Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
                 isDuplicateCheckerPresented = true
             }
-            Divider()
             Section("Albums.Albums") {
                 Picker("Albums.Style",
                        systemImage: "paintbrush",

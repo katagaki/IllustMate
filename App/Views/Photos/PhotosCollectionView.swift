@@ -77,9 +77,11 @@ struct PhotosCollectionView: View {
         .toolbar {
             if photosManager.authorizationStatus == .authorized ||
                photosManager.authorizationStatus == .limited {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
-                        isAddingAlbum = true
+                if UIDevice.current.userInterfaceIdiom != .phone {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
+                            isAddingAlbum = true
+                        }
                     }
                 }
                 if UIDevice.current.userInterfaceIdiom == .phone {
@@ -88,6 +90,12 @@ struct PhotosCollectionView: View {
                     }
                     ToolbarSpacer(.fixed, placement: .bottomBar)
                     DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                    ToolbarSpacer(.fixed, placement: .bottomBar)
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
+                            isAddingAlbum = true
+                        }
+                    }
                 }
             }
         }
