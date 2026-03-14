@@ -4289,6 +4289,23 @@
         }
       }
     },
+    "More.ShareSheet.TapToImport" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to Import"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タップしてインポート"
+          }
+        }
+      }
+    },
     "More.ShareSheet.ShowAnimation" : {
       "extractionState" : "manual",
       "localizations" : {

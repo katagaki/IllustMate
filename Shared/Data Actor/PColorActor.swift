@@ -81,6 +81,24 @@ actor PColorActor {
         return result
     }
 
+    func cachedColors(forPicIDs picIDs: [String]) -> [String: (r: Int, g: Int, b: Int)] {
+        guard !picIDs.isEmpty else { return [:] }
+        let placeholders = picIDs.map { _ in "?" }.joined(separator: ", ")
+        let sql = "SELECT pic_id, red, green, blue FROM pic_colors WHERE pic_id IN (\(placeholders))"
+        let bindings: [Binding?] = picIDs.map { $0 as Binding? }
+        guard let stmt = try? database.prepare(sql, bindings) else { return [:] }
+        var result: [String: (r: Int, g: Int, b: Int)] = [:]
+        for row in stmt {
+            if let picID = row[0] as? String,
+               let r = row[1] as? Int64,
+               let g = row[2] as? Int64,
+               let b = row[3] as? Int64 {
+                result[picID] = (r: Int(r), g: Int(g), b: Int(b))
+            }
+        }
+        return result
+    }
+
     func picIDsWithCachedColor() -> Set<String> {
         let query = picColorsTable.select(colorPicId)
         guard let rows = try? database.prepare(query) else { return [] }

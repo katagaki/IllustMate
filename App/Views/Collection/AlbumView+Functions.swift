@@ -211,24 +211,38 @@ extension AlbumView {
     }
 
     func sortPicsByProminentColor(_ pics: [Pic]) async -> [Pic] {
-        // Load cached colors
-        let cachedColors = await PColorActor.shared.allCachedColors()
+        // Load only colors for the pics in this list
+        let picIDs = pics.map(\.id)
+        let cachedColors = await PColorActor.shared.cachedColors(forPicIDs: picIDs)
 
         // Find pics that need color calculation
         var colorsMap = cachedColors
-        var newColors: [(picID: String, r: Int, g: Int, b: Int)] = []
+        let uncachedPics = pics.filter { colorsMap[$0.id] == nil && $0.thumbnailData != nil }
 
-        for pic in pics {
-            if colorsMap[pic.id] == nil, let thumbnailData = pic.thumbnailData {
-                if let color = ProminentColor.calculate(from: thumbnailData) {
-                    colorsMap[pic.id] = color
-                    newColors.append((picID: pic.id, r: color.r, g: color.g, b: color.b))
+        // Compute colors concurrently
+        if !uncachedPics.isEmpty {
+            let newColors: [(picID: String, r: Int, g: Int, b: Int)] = await withTaskGroup(
+                of: (String, (r: Int, g: Int, b: Int)?).self,
+                returning: [(picID: String, r: Int, g: Int, b: Int)].self
+            ) { group in
+                for pic in uncachedPics {
+                    group.addTask {
+                        guard let thumbnailData = pic.thumbnailData else { return (pic.id, nil) }
+                        let color = ProminentColor.calculate(from: thumbnailData)
+                        return (pic.id, color)
+                    }
                 }
+                var results: [(picID: String, r: Int, g: Int, b: Int)] = []
+                for await (picID, color) in group {
+                    if let color {
+                        results.append((picID: picID, r: color.r, g: color.g, b: color.b))
+                    }
+                }
+                return results
             }
-        }
-
-        // Batch-store newly calculated colors
-        if !newColors.isEmpty {
+            for entry in newColors {
+                colorsMap[entry.picID] = (r: entry.r, g: entry.g, b: entry.b)
+            }
             await PColorActor.shared.storeColors(newColors)
         }
 

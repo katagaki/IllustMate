@@ -267,12 +267,18 @@ struct AlbumCover: View {
             let fetchOptions = PHFetchOptions()
             fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
             fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-            fetchOptions.fetchLimit = 3
+
+            let estimated = collection.estimatedAssetCount
+            if estimated != NSNotFound {
+                picCount = estimated
+                fetchOptions.fetchLimit = 3
+            }
+
             let result = PHAsset.fetchAssets(in: collection, options: fetchOptions)
 
-            let countOptions = PHFetchOptions()
-            countOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
-            picCount = PHAsset.fetchAssets(in: collection, options: countOptions).count
+            if estimated == NSNotFound {
+                picCount = result.count
+            }
 
             let manager = PHCachingImageManager.default()
             let options = PHImageRequestOptions()

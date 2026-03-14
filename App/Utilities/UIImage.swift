@@ -11,9 +11,9 @@ import UIKit
 extension UIImage {
 
     func data() -> Data {
-        if let data = pngData() {
+        if let data = jpegData(compressionQuality: 1.0) {
             return data
-        } else if let data = jpegData(compressionQuality: 1.0) {
+        } else if let data = pngData() {
             return data
         } else if let data = heicData() {
             return data
