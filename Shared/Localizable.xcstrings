@@ -8109,37 +8109,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hauptfarbe"
+            "value" : "Farbe"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prominent Color"
+            "value" : "Color"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メインカラー"
+            "value" : "カラー"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "대표 색상"
+            "value" : "색상"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "主要颜色"
+            "value" : "颜色"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "主要顏色"
+            "value" : "顏色"
           }
         }
       }
