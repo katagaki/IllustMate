@@ -144,6 +144,8 @@ struct AlbumView: View {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
                 Text("Shared.Selected.\(selectedPics.count)")
+                    .font(.caption)
+                    .padding(.horizontal, 4.0)
                     .fixedSize()
             }
             ToolbarItemGroup(placement: .bottomBar) {
