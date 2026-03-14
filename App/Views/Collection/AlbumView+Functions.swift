@@ -178,12 +178,57 @@ extension AlbumView {
 
     func fetchPics() async -> [Pic] {
         do {
-            return try await DataActor.shared.picSkeletons(
-                in: currentAlbum, order: isPicSortReversed ? .forward : .reverse
-            )
+            switch picSortType {
+            case .dateAddedAscending:
+                return try await DataActor.shared.picSkeletons(
+                    in: currentAlbum, order: .forward
+                )
+            case .dateAddedDescending:
+                return try await DataActor.shared.picSkeletons(
+                    in: currentAlbum, order: .reverse
+                )
+            case .prominentColor:
+                let pics = try await DataActor.shared.pics(
+                    in: currentAlbum, order: .reverse
+                )
+                return await sortPicsByProminentColor(pics)
+            }
         } catch {
             debugPrint(error.localizedDescription)
             return []
+        }
+    }
+
+    func sortPicsByProminentColor(_ pics: [Pic]) async -> [Pic] {
+        // Load cached colors
+        let cachedColors = await PColorActor.shared.allCachedColors()
+
+        // Find pics that need color calculation
+        var colorsMap = cachedColors
+        var newColors: [(picID: String, r: Int, g: Int, b: Int)] = []
+
+        for pic in pics {
+            if colorsMap[pic.id] == nil, let thumbnailData = pic.thumbnailData {
+                if let color = ProminentColor.calculate(from: thumbnailData) {
+                    colorsMap[pic.id] = color
+                    newColors.append((picID: pic.id, r: color.r, g: color.g, b: color.b))
+                }
+            }
+        }
+
+        // Batch-store newly calculated colors
+        if !newColors.isEmpty {
+            await PColorActor.shared.storeColors(newColors)
+        }
+
+        // Sort by R, then G, then B
+        let defaultColor = (r: 128, g: 128, b: 128)
+        return pics.sorted { a, b in
+            let colorA = colorsMap[a.id] ?? defaultColor
+            let colorB = colorsMap[b.id] ?? defaultColor
+            if colorA.r != colorB.r { return colorA.r < colorB.r }
+            if colorA.g != colorB.g { return colorA.g < colorB.g }
+            return colorA.b < colorB.b
         }
     }
 

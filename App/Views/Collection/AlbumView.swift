@@ -40,7 +40,8 @@ struct AlbumView: View {
     @State var isSelectingPics: Bool = false
     @State var selectedPics: [Pic] = []
     @State var isImportingPhotos: Bool = false
-    @AppStorage(wrappedValue: false, "PicSortReversed") var isPicSortReversed: Bool
+    @AppStorage(wrappedValue: PicSortType.dateAddedDescending, "PicSortType",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var picSortType: PicSortType
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
@@ -107,7 +108,7 @@ struct AlbumView: View {
             .onChange(of: albumSort) { _, _ in
                 refreshAlbumsAndSet()
             }
-            .onChange(of: isPicSortReversed) { _, _ in
+            .onChange(of: picSortType) { _, _ in
                 refreshPicsAndSet()
             }
             .onChange(of: scenePhase) { _, newValue in
@@ -230,11 +231,13 @@ struct AlbumView: View {
                         .tag(8)
                 }
                 .pickerStyle(.menu)
-                Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isPicSortReversed) {
+                Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $picSortType) {
                     Text("Shared.Sort.DateAdded.Ascending")
-                        .tag(true)
+                        .tag(PicSortType.dateAddedAscending)
                     Text("Shared.Sort.DateAdded.Descending")
-                        .tag(false)
+                        .tag(PicSortType.dateAddedDescending)
+                    Text("Shared.Sort.ProminentColor")
+                        .tag(PicSortType.prominentColor)
                 }
                 .pickerStyle(.menu)
             }

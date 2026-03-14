@@ -129,6 +129,9 @@ extension DataActor {
     func deletePic(withID picID: String) {
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.delete())
+        Task {
+            await PColorActor.shared.deleteColor(forPicWithID: picID)
+        }
     }
 
     // MARK: - Thumbnails
