@@ -58,12 +58,12 @@ enum ProminentColor {
             // Skip transparent pixels
             guard a > 128 else { continue }
 
-            // Skip near-black
-            if r < 30 && g < 30 && b < 30 { continue }
-
-            // Skip near-white using perceived luminance
+            // Skip near-black using perceived luminance
             let luminance = 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b)
-            if luminance > 200 { continue }
+            if luminance < 40 { continue }
+
+            // Skip near-white
+            if luminance > 170 { continue }
 
             // Skip grays (low chroma)
             let maxC = max(r, g, b)
