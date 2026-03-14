@@ -139,8 +139,10 @@ struct AlbumView: View {
                 } label: {
                     Image(systemName: "xmark")
                 }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
                 Text("Shared.Selected.\(selectedPics.count)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
