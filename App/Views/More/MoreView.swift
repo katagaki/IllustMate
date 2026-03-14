@@ -98,6 +98,8 @@ struct MoreView: View {
                 Toggle("More.ShareSheet.QuickImport", isOn: $quickImport)
             } header: {
                 Text("More.ShareSheet")
+            } footer: {
+                Text("More.ShareSheet.QuickImport.Description")
             }
             Section {
                 Button("More.DuplicateChecker") {
