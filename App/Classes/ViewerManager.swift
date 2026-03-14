@@ -126,7 +126,7 @@ class ViewerManager {
             let pic = allPics[index]
             guard imageCache[pic.id] == nil, prefetchTasks[pic.id] == nil else { continue }
             let picID = pic.id
-            prefetchTasks[picID] = Task.detached(priority: .utility) {
+            let task = Task.detached(priority: .utility) {
                 if let data = await DataActor.shared.imageData(forPicWithID: picID),
                    let image = await UIImage(data: data)?.byPreparingForDisplay() {
                     await MainActor.run {
@@ -139,6 +139,7 @@ class ViewerManager {
                     }
                 }
             }
+            prefetchTasks[picID] = task
         }
     }
 
