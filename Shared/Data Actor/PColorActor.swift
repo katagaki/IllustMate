@@ -23,9 +23,6 @@ actor PColorActor {
     let colorGreen = Expression<Int>("green")
     let colorBlue = Expression<Int>("blue")
 
-    // Bump this when the color calculation algorithm changes to invalidate cached values
-    static let algorithmVersion = 2
-
     init() {
         let databaseFileName = "PColors.db"
         let fileManager = FileManager.default
@@ -53,14 +50,6 @@ actor PColorActor {
                 table.column(colorGreen)
                 table.column(colorBlue)
             })
-            // Invalidate cache when algorithm version changes
-            let versionKey = "PColorAlgorithmVersion"
-            let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
-            let storedVersion = defaults?.integer(forKey: versionKey) ?? 0
-            if storedVersion < PColorActor.algorithmVersion {
-                _ = try? database.run(picColorsTable.delete())
-                defaults?.set(PColorActor.algorithmVersion, forKey: versionKey)
-            }
         } catch {
             debugPrint("Color database setup error: \(error)")
         }

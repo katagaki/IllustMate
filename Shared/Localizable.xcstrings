@@ -4535,6 +4535,46 @@
         }
       }
     },
+    "More.Troubleshooting.ClearColorCache" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbsortierungs-Cache leeren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Color Sort Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーソートキャッシュを消去"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "색상 정렬 캐시 지우기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除颜色排序缓存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除顏色排序快取"
+          }
+        }
+      }
+    },
     "More.Troubleshooting.DataManagement" : {
       "extractionState" : "manual",
       "localizations" : {
