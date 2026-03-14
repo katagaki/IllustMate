@@ -85,11 +85,13 @@ extension AlbumView {
                             isDuplicateCheckerPresented = true
                         }
                         Divider()
-                        Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $isPicSortReversed) {
+                        Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $picSortType) {
                             Text("Shared.Sort.DateAdded.Ascending")
-                                .tag(true)
+                                .tag(PicSortType.dateAddedAscending)
                             Text("Shared.Sort.DateAdded.Descending")
-                                .tag(false)
+                                .tag(PicSortType.dateAddedDescending)
+                            Text("Shared.Sort.ProminentColor")
+                                .tag(PicSortType.prominentColor)
                         }
                         .pickerStyle(.menu)
                         Picker("Shared.GridSize",

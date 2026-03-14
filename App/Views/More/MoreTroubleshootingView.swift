@@ -32,6 +32,9 @@ struct MoreTroubleshootingView: View {
                 Button("More.Troubleshooting.ClearHashCache") {
                     Task { await HashActor.shared.deleteAllHashes() }
                 }
+                Button("More.Troubleshooting.ClearColorCache") {
+                    Task { await PColorActor.shared.deleteAllColors() }
+                }
             } header: {
                 Text("More.Troubleshooting.DataManagement")
             } footer: {
