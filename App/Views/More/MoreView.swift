@@ -32,8 +32,8 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openSearchWhenSharing: Bool = false
     @AppStorage("ShareSheetShowAnimation",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var showAnimationWhenSaving: Bool = true
-    @AppStorage("ShareSheetTapToImport",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var tapToImport: Bool = false
+    @AppStorage("ShareSheetQuickImport",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var quickImport: Bool = false
 
     private var listContent: some View {
         List {
@@ -95,7 +95,7 @@ struct MoreView: View {
             Section {
                 Toggle("More.ShareSheet.OpenSearch", isOn: $openSearchWhenSharing)
                 Toggle("More.ShareSheet.ShowAnimation", isOn: $showAnimationWhenSaving)
-                Toggle("More.ShareSheet.TapToImport", isOn: $tapToImport)
+                Toggle("More.ShareSheet.QuickImport", isOn: $quickImport)
             } header: {
                 Text("More.ShareSheet")
             }

@@ -4289,19 +4289,19 @@
         }
       }
     },
-    "More.ShareSheet.TapToImport" : {
+    "More.ShareSheet.QuickImport" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tap to Import"
+            "value" : "Quick Import"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "タップしてインポート"
+            "value" : "クイックインポート"
           }
         }
       }
