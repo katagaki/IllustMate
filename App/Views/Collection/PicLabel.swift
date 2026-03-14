@@ -35,7 +35,7 @@ struct PicLabel: View {
         Rectangle()
             .fill(.primary.opacity(0.05))
             .aspectRatio(1.0, contentMode: .fit)
-            .overlay {
+            .overlay(alignment: .top) {
                 if isThumbnailReadyToPresent {
                     Group {
                         if let thumbnail {
