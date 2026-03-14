@@ -41,10 +41,12 @@ extension AlbumView {
             if isSelectingPics {
                 for pic in selectedPics {
                     await DataActor.shared.deletePic(withID: pic.id)
+                    await PColorActor.shared.deleteColor(forPicWithID: pic.id)
                 }
             } else {
                 if let picPendingDeletion = picPendingDeletion {
                     await DataActor.shared.deletePic(withID: picPendingDeletion.id)
+                    await PColorActor.shared.deleteColor(forPicWithID: picPendingDeletion.id)
                 }
             }
             self.selectedPics.removeAll()
