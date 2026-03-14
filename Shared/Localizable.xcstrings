@@ -4312,13 +4312,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When Quick Import is enabled, images will be automatically imported as soon as you select an album with no sub-albums."
+            "value" : "When Quick Import is enabled, images will be automatically imported as soon as you select an album with no nested albums."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "クイックインポートが有効な場合、サブアルバムのないアルバムを選択すると画像が自動的にインポートされます。"
+            "value" : "クイックインポートが有効な場合、ネストされたアルバムのないアルバムを選択すると画像が自動的にインポートされます。"
           }
         }
       }
