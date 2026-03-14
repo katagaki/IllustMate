@@ -248,9 +248,9 @@ extension AlbumView {
 
         // Sort by R, then G, then B
         let defaultColor = (r: 128, g: 128, b: 128)
-        return pics.sorted { a, b in
-            let colorA = colorsMap[a.id] ?? defaultColor
-            let colorB = colorsMap[b.id] ?? defaultColor
+        return pics.sorted { lhs, rhs in
+            let colorA = colorsMap[lhs.id] ?? defaultColor
+            let colorB = colorsMap[rhs.id] ?? defaultColor
             if colorA.r != colorB.r { return colorA.r < colorB.r }
             if colorA.g != colorB.g { return colorA.g < colorB.g }
             return colorA.b < colorB.b

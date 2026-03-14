@@ -61,10 +61,10 @@ actor PColorActor {
         let query = picColorsTable.filter(colorPicId == picID)
             .select(colorRed, colorGreen, colorBlue)
         guard let row = try? database.pluck(query),
-              let r = try? row.get(colorRed),
-              let g = try? row.get(colorGreen),
-              let b = try? row.get(colorBlue) else { return nil }
-        return (r, g, b)
+              let red = try? row.get(colorRed),
+              let green = try? row.get(colorGreen),
+              let blue = try? row.get(colorBlue) else { return nil }
+        return (red, green, blue)
     }
 
     func allCachedColors() -> [String: (r: Int, g: Int, b: Int)] {
@@ -73,10 +73,10 @@ actor PColorActor {
         var result: [String: (r: Int, g: Int, b: Int)] = [:]
         for row in rows {
             guard let picID = try? row.get(colorPicId),
-                  let r = try? row.get(colorRed),
-                  let g = try? row.get(colorGreen),
-                  let b = try? row.get(colorBlue) else { continue }
-            result[picID] = (r, g, b)
+                  let red = try? row.get(colorRed),
+                  let green = try? row.get(colorGreen),
+                  let blue = try? row.get(colorBlue) else { continue }
+            result[picID] = (red, green, blue)
         }
         return result
     }
@@ -90,10 +90,10 @@ actor PColorActor {
         var result: [String: (r: Int, g: Int, b: Int)] = [:]
         for row in stmt {
             if let picID = row[0] as? String,
-               let r = row[1] as? Int64,
-               let g = row[2] as? Int64,
-               let b = row[3] as? Int64 {
-                result[picID] = (r: Int(r), g: Int(g), b: Int(b))
+               let red = row[1] as? Int64,
+               let green = row[2] as? Int64,
+               let blue = row[3] as? Int64 {
+                result[picID] = (r: Int(red), g: Int(green), b: Int(blue))
             }
         }
         return result

@@ -143,22 +143,21 @@ struct AlbumView: View {
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                Text("Shared.Selected.\(selectedPics.count)")
-                    .font(.caption)
-                    .padding(.horizontal, 4.0)
-                    .fixedSize()
-            }
-            ToolbarItemGroup(placement: .bottomBar) {
                 Menu("Shared.Move", systemImage: "tray.full") {
                     PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
                         refreshDataAfterPicMoved()
                     }
                 }
                 .disabled(selectedPics.isEmpty)
+                Text("Shared.Selected.\(selectedPics.count)")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                    .fixedSize()
                 Button("Shared.Delete", systemImage: "trash", role: .destructive) {
                     deletePics()
                 }
                 .disabled(selectedPics.isEmpty)
+                .tint(.red)
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {

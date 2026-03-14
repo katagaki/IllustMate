@@ -48,46 +48,46 @@ enum ProminentColor {
         var bucketSumB = [Int](repeating: 0, count: bucketCount)
 
         let pixelCount = width * height
-        for i in 0..<pixelCount {
-            let offset = i * bytesPerPixel
-            let r = Int(pixelData[offset])
-            let g = Int(pixelData[offset + 1])
-            let b = Int(pixelData[offset + 2])
-            let a = Int(pixelData[offset + 3])
+        for idx in 0..<pixelCount {
+            let offset = idx * bytesPerPixel
+            let red = Int(pixelData[offset])
+            let green = Int(pixelData[offset + 1])
+            let blue = Int(pixelData[offset + 2])
+            let alpha = Int(pixelData[offset + 3])
 
             // Skip transparent pixels
-            guard a > 128 else { continue }
+            guard alpha > 128 else { continue }
 
             // Skip near-black using perceived luminance
-            let luminance = 0.299 * Double(r) + 0.587 * Double(g) + 0.114 * Double(b)
+            let luminance = 0.299 * Double(red) + 0.587 * Double(green) + 0.114 * Double(blue)
             if luminance < 40 { continue }
 
             // Skip near-white
             if luminance > 170 { continue }
 
             // Skip grays (low chroma)
-            let maxC = max(r, g, b)
-            let minC = min(r, g, b)
+            let maxC = max(red, green, blue)
+            let minC = min(red, green, blue)
             if maxC - minC < 15 { continue }
 
-            let br = r >> shift
-            let bg = g >> shift
-            let bb = b >> shift
-            let bucketIndex = br * 64 + bg * 8 + bb
+            let bucketR = red >> shift
+            let bucketG = green >> shift
+            let bucketB = blue >> shift
+            let bucketIndex = bucketR * 64 + bucketG * 8 + bucketB
 
             bucketCounts[bucketIndex] += 1
-            bucketSumR[bucketIndex] += r
-            bucketSumG[bucketIndex] += g
-            bucketSumB[bucketIndex] += b
+            bucketSumR[bucketIndex] += red
+            bucketSumG[bucketIndex] += green
+            bucketSumB[bucketIndex] += blue
         }
 
         // Find the bucket with the most pixels
         var bestBucket = -1
         var bestCount = 0
-        for i in 0..<bucketCount {
-            if bucketCounts[i] > bestCount {
-                bestCount = bucketCounts[i]
-                bestBucket = i
+        for idx in 0..<bucketCount {
+            if bucketCounts[idx] > bestCount {
+                bestCount = bucketCounts[idx]
+                bestBucket = idx
             }
         }
 
