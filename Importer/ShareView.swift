@@ -17,6 +17,9 @@ struct ShareView: View {
     @AppStorage(wrappedValue: true, "ShareSheetShowAnimation",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var showAnimationWhenSaving: Bool
+    @AppStorage(wrappedValue: "", "ShareSheetSelectToImportAlbumID",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var selectToImportAlbumID: String
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
@@ -125,7 +128,18 @@ struct ShareView: View {
                         .progressViewStyle(.circular)
                 }
             }
-
+        }
+        .onChange(of: itemsManager.isLoaded) { _, isLoaded in
+            if isLoaded, !selectToImportAlbumID.isEmpty, !itemsManager.items.isEmpty {
+                total = Float(itemsManager.items.count)
+                withAnimation(.smooth.speed(2)) {
+                    isImporting = true
+                } completion: {
+                    Task {
+                        importItemsToAlbum(selectToImportAlbumID)
+                    }
+                }
+            }
         }
     }
 
@@ -141,8 +155,15 @@ struct ShareView: View {
         return nil
     }
 
+    func importItemsToAlbum(_ albumID: String) {
+        importItems(to: albumID)
+    }
+
     func importItems() {
-        let albumID = albumInViewPath()?.id
+        importItems(to: albumInViewPath()?.id)
+    }
+
+    private func importItems(to albumID: String?) {
         Task {
             for item in itemsManager.items {
                 await importItem(item, to: albumID, named: Pic.newFilename())
