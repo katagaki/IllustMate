@@ -17,9 +17,9 @@ struct ShareView: View {
     @AppStorage(wrappedValue: true, "ShareSheetShowAnimation",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var showAnimationWhenSaving: Bool
-    @AppStorage(wrappedValue: false, "ShareSheetTapToImport",
+    @AppStorage(wrappedValue: false, "ShareSheetQuickImport",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
-    var tapToImport: Bool
+    var quickImport: Bool
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
@@ -130,7 +130,7 @@ struct ShareView: View {
             }
         }
         .onChange(of: viewPath) { _, newPath in
-            if tapToImport,
+            if quickImport,
                let last = newPath.last,
                case .album(let album) = last,
                album.albumCount() == 0 {
