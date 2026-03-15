@@ -66,6 +66,7 @@ struct PhotosAlbumContentView: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     photosFilterMenu
                 }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
             }
         }
         .onAppear {
