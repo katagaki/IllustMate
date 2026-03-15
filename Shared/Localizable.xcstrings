@@ -47,11 +47,12 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "%1$lld × %2$lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Albums.Albums" : {
       "extractionState" : "manual",
@@ -2798,47 +2799,6 @@
         }
       }
     },
-    "Import.Instructions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wählen Sie Fotos oder ein Album aus Ihrer Fotomediathek aus und tippen Sie dann auf „Import starten“."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select photos or an album to import from your Photos library, then select Start Import."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "「写真」アプリからインポートしたい写真を選択する、またはアルバムから選択してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사진 보관함에서 사진이나 앨범을 선택한 후 가져오기 시작을 누르세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "从您的照片图库中选择照片或相册，然后点击「开始导入」。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "從您的照片圖庫中選擇照片或相簿，然後點選「開始匯入」。"
-          }
-        }
-      }
-    },
     "Import.OpenSettings" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3053,6 +3013,47 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Import.SelectFromFiles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Dateien auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select from Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルから選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "파일에서 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从文件中选择"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從檔案中選擇"
           }
         }
       }
@@ -3642,47 +3643,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "匯出備份檔案"
-          }
-        }
-      }
-    },
-    "More.Data" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datenverwaltung"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Data Management"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データ管理"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "데이터 관리"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "数据管理"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "資料管理"
           }
         }
       }
@@ -4302,6 +4262,12 @@
     "More.ShareSheet.QuickImport" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnellimport"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4313,12 +4279,36 @@
             "state" : "translated",
             "value" : "クイックインポート"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "빠른 가져오기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速导入"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速匯入"
+          }
         }
       }
     },
     "More.ShareSheet.QuickImport.Description" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn der Schnellimport aktiviert ist, werden Bilder automatisch importiert, sobald Sie ein Album ohne verschachtelte Alben auswählen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4329,6 +4319,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックインポートが有効な場合、ネストされたアルバムのないアルバムを選択すると画像が自動的にインポートされます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "빠른 가져오기가 활성화되면 중첩된 앨범이 없는 앨범을 선택하는 즉시 이미지가 자동으로 가져와집니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用快速导入后，选择没有嵌套相册的相册时，图片将自动导入。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "啟用快速匯入後，選擇沒有巢狀相簿的相簿時，圖片將自動匯入。"
           }
         }
       }
@@ -7062,19 +7070,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos importieren"
+            "value" : "Bilder importieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Photos"
+            "value" : "Import Pics"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真をインポート"
+            "value" : "画像をインポート"
           }
         },
         "ko" : {
@@ -7086,13 +7094,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导入照片"
+            "value" : "导入图片"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "匯入照片"
+            "value" : "匯入圖片"
           }
         }
       }
@@ -8655,19 +8663,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos importieren"
+            "value" : "Bilder importieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Photos"
+            "value" : "Import Pics"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真をインポート"
+            "value" : "画像をインポート"
           }
         },
         "ko" : {
@@ -8679,13 +8687,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导入照片"
+            "value" : "导入图片"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "匯入照片"
+            "value" : "匯入圖片"
           }
         }
       }

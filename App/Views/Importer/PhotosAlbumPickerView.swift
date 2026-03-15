@@ -91,7 +91,7 @@ struct PhotosAlbumPickerView: View {
                 VStack(alignment: .leading, spacing: 2.0) {
                     Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
                     Text("\(imageCount(in: collection))")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -104,12 +104,11 @@ struct PhotosAlbumPickerView: View {
     private func folderRow(for folder: PHCollectionList) -> some View {
         NavigationLink(value: PHCollectionListWrapper(collectionList: folder)) {
             HStack(spacing: 12.0) {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 4)
                     .fill(Color(.systemGray5))
-                    .frame(width: 56, height: 56)
+                    .frame(width: 32, height: 32)
                     .overlay {
                         Image(systemName: "folder")
-                            .font(.title2)
                             .foregroundStyle(.secondary)
                     }
                 Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
@@ -123,12 +122,12 @@ struct PhotosAlbumPickerView: View {
     private func albumThumbnail(for collection: PHAssetCollection) -> some View {
         if let firstAsset = firstAsset(in: collection) {
             PhotoThumbnailView(asset: firstAsset, size: CGSize(width: 56, height: 56))
-                .frame(width: 56, height: 56)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .frame(width: 32, height: 32)
+                .clipShape(.rect(cornerRadius: 4))
         } else {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 4)
                 .fill(Color(.systemGray5))
-                .frame(width: 56, height: 56)
+                .frame(width: 32, height: 32)
                 .overlay {
                     Image(systemName: "photo.on.rectangle")
                         .foregroundStyle(.secondary)

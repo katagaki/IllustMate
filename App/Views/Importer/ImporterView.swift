@@ -9,12 +9,14 @@ import Komponents
 import Photos
 import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ImporterView: View {
 
     @Environment(\.dismiss) var dismiss
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
+    @State var selectedFileURLs: [URL] = []
     @State var selectedAlbum: Album?
 
     @State var isImporting: Bool = false
@@ -23,7 +25,13 @@ struct ImporterView: View {
     @State var importTotalCount: Int = 0
     @State var importCompletedCount: Int = 0
 
+    @State var isFileImporterPresented: Bool = false
+
     @State var navigationPath = NavigationPath()
+
+    var selectedItemCount: Int {
+        selectedPhotoItems.count + selectedFileURLs.count
+    }
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -31,26 +39,31 @@ struct ImporterView: View {
                 VStack(alignment: .center, spacing: 16.0) {
                     if !isImportCompleted {
                         if !isImporting {
-                            Text("Import.Instructions")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            PhotosPicker(selection: $selectedPhotoItems,
-                                         matching: .images,
-                                         photoLibrary: .shared()) {
-                                Text("Import.SelectPhotos")
-                                    .bold()
-                                    .padding(4.0)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .buttonBorderShape(.capsule)
-                            .disabled(isImporting)
-                            Button {
-                                navigationPath.append("albumPicker")
-                            } label: {
-                                Text("Import.BrowseAlbums")
-                                    .bold()
-                                    .padding(4.0)
-                                    .frame(maxWidth: .infinity)
+                            Group {
+                                PhotosPicker(selection: $selectedPhotoItems,
+                                             matching: .images,
+                                             photoLibrary: .shared()) {
+                                    Text("Import.SelectPhotos")
+                                        .bold()
+                                        .padding(4.0)
+                                        .frame(maxWidth: .infinity)
+                                }
+                                Button {
+                                    navigationPath.append("albumPicker")
+                                } label: {
+                                    Text("Import.BrowseAlbums")
+                                        .bold()
+                                        .padding(4.0)
+                                        .frame(maxWidth: .infinity)
+                                }
+                                Button {
+                                    isFileImporterPresented = true
+                                } label: {
+                                    Text("Import.SelectFromFiles")
+                                        .bold()
+                                        .padding(4.0)
+                                        .frame(maxWidth: .infinity)
+                                }
                             }
                             .buttonStyle(.borderedProminent)
                             .buttonBorderShape(.capsule)
@@ -68,13 +81,13 @@ struct ImporterView: View {
             .safeAreaInset(edge: .bottom) {
                 VStack(alignment: .center, spacing: 16.0) {
                     if !isImportCompleted {
-                        Text("Import.SelectedPhotos.\(selectedPhotoItems.count)")
+                        Text("Import.SelectedPhotos.\(selectedItemCount)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Button {
                             isImporting = true
-                            importTotalCount = selectedPhotoItems.count
-                            importPhotos()
+                            importTotalCount = selectedItemCount
+                            importPhotosAndFiles()
                         } label: {
                             Text("Import.StartImport")
                                 .bold()
@@ -84,7 +97,7 @@ struct ImporterView: View {
                         .tint(.green)
                         .buttonStyle(.borderedProminent)
                         .buttonBorderShape(.capsule)
-                        .disabled(isImporting || selectedPhotoItems.isEmpty)
+                        .disabled(isImporting || selectedItemCount == 0)
                     } else {
                         Button {
                             dismiss()
@@ -119,12 +132,24 @@ struct ImporterView: View {
                     }
                 }
             }
+            .fileImporter(
+                isPresented: $isFileImporterPresented,
+                allowedContentTypes: [.image],
+                allowsMultipleSelection: true
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    selectedFileURLs = urls
+                case .failure:
+                    break
+                }
+            }
         }
         .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled()
     }
 
-    func importPhotos() {
+    func importPhotosAndFiles() {
         UIApplication.shared.isIdleTimerDisabled = true
         Task {
             for selectedPhotoItem in selectedPhotoItems {
@@ -147,9 +172,26 @@ struct ImporterView: View {
                     importCurrentCount += 1
                 }
             }
+            for fileURL in selectedFileURLs {
+                let didStartAccessing = fileURL.startAccessingSecurityScopedResource()
+                defer {
+                    if didStartAccessing {
+                        fileURL.stopAccessingSecurityScopedResource()
+                    }
+                }
+                if let data = try? Data(contentsOf: fileURL),
+                   UIImage(data: data) != nil {
+                    let filename = fileURL.lastPathComponent
+                    await DataActor.shared.createPic(filename, data: data,
+                                                   inAlbumWithID: selectedAlbum?.id)
+                }
+                await MainActor.run {
+                    importCurrentCount += 1
+                }
+            }
             await MainActor.run {
                 UIApplication.shared.isIdleTimerDisabled = false
-                importCompletedCount = selectedPhotoItems.count
+                importCompletedCount = selectedItemCount
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
                 doWithAnimation {
                     isImportCompleted = true

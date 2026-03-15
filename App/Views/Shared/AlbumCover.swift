@@ -203,7 +203,7 @@ struct AlbumCover: View {
                         return (offset, Image(uiImage: uiImage))
                     }
                 }
-                var results = Array<Image?>(repeating: nil, count: neededFromDB)
+                var results = [Image?](repeating: nil, count: neededFromDB)
                 for await (offset, image) in group {
                     results[offset] = image
                 }
