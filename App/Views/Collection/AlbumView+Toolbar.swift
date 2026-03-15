@@ -1,0 +1,183 @@
+//
+//  AlbumView+Toolbar.swift
+//  PicMate
+//
+//  Created by シン・ジャスティン on 2026/03/15.
+//
+
+import Komponents
+import SwiftUI
+
+extension AlbumView {
+
+    @ToolbarContentBuilder
+    var toolbarContent: some ToolbarContent {
+        if isSelectingPics {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button {
+                    startOrStopSelectingPics()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                Menu("Shared.Move", systemImage: "tray.full") {
+                    PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
+                        refreshDataAfterPicMoved()
+                    }
+                }
+                .disabled(selectedPics.isEmpty)
+                Text("Shared.Selected.\(selectedPics.count)")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                    .fixedSize()
+                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                    deletePics()
+                }
+                .disabled(selectedPics.isEmpty)
+                .tint(.red)
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button {
+                    selectOrDeselectAllPics()
+                } label: {
+                    if pics.count == selectedPics.count {
+                        Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                    } else {
+                        Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                    }
+                }
+            }
+        } else {
+            if UIDevice.current.userInterfaceIdiom != .phone {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Shared.Select") {
+                        startOrStopSelectingPics()
+                    }
+                    .disabled(pics.isEmpty)
+                }
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                importMenu
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
+                    isAddingAlbum = true
+                }
+            }
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    filterMenu
+                }
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button("Shared.Select") {
+                        startOrStopSelectingPics()
+                    }
+                    .disabled(pics.isEmpty)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var filterMenu: some View {
+        Menu {
+            Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
+                isDuplicateCheckerPresented = true
+            }
+            Section("Albums.Albums") {
+                Picker("Albums.Style",
+                       systemImage: "paintbrush",
+                       selection: ($albumStyleState.animation(.smooth.speed(2)))) {
+                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                        .tag(ViewStyle.grid)
+                    Label("Albums.Style.List", systemImage: "list.bullet")
+                        .tag(ViewStyle.list)
+                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                        .tag(ViewStyle.carousel)
+                }
+                .pickerStyle(.menu)
+                if albumStyleState == .grid {
+                    Picker("Shared.GridSize",
+                           systemImage: "square.grid.2x2",
+                           selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
+                        Text("Shared.GridSize.2")
+                            .tag(2)
+                        Text("Shared.GridSize.3")
+                            .tag(3)
+                        Text("Shared.GridSize.4")
+                            .tag(4)
+                    }
+                    .pickerStyle(.menu)
+                }
+                Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
+                    Text("Shared.Sort.Name.Ascending")
+                        .tag(SortType.nameAscending)
+                    Text("Shared.Sort.Name.Descending")
+                        .tag(SortType.nameDescending)
+                    Text("Shared.Sort.PicCount.Ascending")
+                        .tag(SortType.sizeAscending)
+                    Text("Shared.Sort.PicCount.Descending")
+                        .tag(SortType.sizeDescending)
+                }
+                .pickerStyle(.menu)
+            }
+            Section("Albums.Pics") {
+                Picker("Shared.GridSize",
+                       systemImage: "square.grid.2x2",
+                       selection: $columnCount.animation(.smooth.speed(2.0))) {
+                    Text("Shared.GridSize.3")
+                        .tag(3)
+                    Text("Shared.GridSize.4")
+                        .tag(4)
+                    Text("Shared.GridSize.5")
+                        .tag(5)
+                    Text("Shared.GridSize.8")
+                        .tag(8)
+                }
+                .pickerStyle(.menu)
+                Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $picSortType) {
+                    Text("Shared.Sort.DateAdded.Ascending")
+                        .tag(PicSortType.dateAddedAscending)
+                    Text("Shared.Sort.DateAdded.Descending")
+                        .tag(PicSortType.dateAddedDescending)
+                    Text("Shared.Sort.ProminentColor")
+                        .tag(PicSortType.prominentColor)
+                }
+                .pickerStyle(.menu)
+            }
+        } label: {
+            Label("Shared.Filter", systemImage: "line.3.horizontal.decrease")
+        }
+        .menuActionDismissBehavior(.disabled)
+    }
+
+    @ViewBuilder
+    var importMenu: some View {
+        Menu("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
+            Button {
+                isPhotosPickerPresented = true
+            } label: {
+                Label("Import.SelectPhotos", systemImage: "photo.on.rectangle.angled")
+            }
+            Button {
+                isBrowsingAlbums = true
+            } label: {
+                Label("Import.BrowseAlbums", systemImage: "rectangle.stack")
+            }
+            Divider()
+            Button {
+                isFileImporterPresented = true
+            } label: {
+                Label("Import.SelectFromFiles", systemImage: "folder")
+            }
+        }
+    }
+}

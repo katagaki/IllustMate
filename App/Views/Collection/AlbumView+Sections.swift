@@ -78,9 +78,6 @@ extension AlbumView {
                     SectionHeader(title: "Albums.Pics", count: hasFetchedPicCount ? picCount : pics.count)
                 } else {
                     SectionHeader(title: "Albums.Pics", count: hasFetchedPicCount ? picCount : pics.count) {
-                        Button("Shared.Import", systemImage: "square.and.arrow.down.on.square") {
-                            isImportingPhotos = true
-                        }
                         Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
                             isDuplicateCheckerPresented = true
                         }

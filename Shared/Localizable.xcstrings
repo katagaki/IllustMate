@@ -2881,6 +2881,18 @@
         }
       }
     },
+    "Import.Section.Files" : {
+
+    },
+    "Import.Section.Files.Description" : {
+
+    },
+    "Import.Section.Photos" : {
+
+    },
+    "Import.Section.Photos.Description" : {
+
+    },
     "Import.SelectAll" : {
       "extractionState" : "manual",
       "localizations" : {

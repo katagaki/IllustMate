@@ -36,26 +36,50 @@ struct ImporterView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ScrollView(.vertical) {
-                VStack(alignment: .center, spacing: 16.0) {
+                VStack(alignment: .center, spacing: 20.0) {
                     if !isImportCompleted {
                         if !isImporting {
-                            Group {
-                                PhotosPicker(selection: $selectedPhotoItems,
-                                             matching: .images,
-                                             photoLibrary: .shared()) {
-                                    Text("Import.SelectPhotos")
-                                        .bold()
-                                        .padding(4.0)
-                                        .frame(maxWidth: .infinity)
+                            VStack(alignment: .leading, spacing: 8.0) {
+                                Text("Import.Section.Photos")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .textCase(.uppercase)
+                                    .foregroundStyle(.secondary)
+                                Text("Import.Section.Photos.Description")
+                                    .font(.footnote)
+                                    .foregroundStyle(.tertiary)
+                                Group {
+                                    PhotosPicker(selection: $selectedPhotoItems,
+                                                 matching: .images,
+                                                 photoLibrary: .shared()) {
+                                        Text("Import.SelectPhotos")
+                                            .bold()
+                                            .padding(4.0)
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    Button {
+                                        navigationPath.append("albumPicker")
+                                    } label: {
+                                        Text("Import.BrowseAlbums")
+                                            .bold()
+                                            .padding(4.0)
+                                            .frame(maxWidth: .infinity)
+                                    }
                                 }
-                                Button {
-                                    navigationPath.append("albumPicker")
-                                } label: {
-                                    Text("Import.BrowseAlbums")
-                                        .bold()
-                                        .padding(4.0)
-                                        .frame(maxWidth: .infinity)
-                                }
+                                .buttonStyle(.borderedProminent)
+                                .buttonBorderShape(.capsule)
+                                .disabled(isImporting)
+                            }
+                            Divider()
+                            VStack(alignment: .leading, spacing: 8.0) {
+                                Text("Import.Section.Files")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .textCase(.uppercase)
+                                    .foregroundStyle(.secondary)
+                                Text("Import.Section.Files.Description")
+                                    .font(.footnote)
+                                    .foregroundStyle(.tertiary)
                                 Button {
                                     isFileImporterPresented = true
                                 } label: {
@@ -64,10 +88,10 @@ struct ImporterView: View {
                                         .padding(4.0)
                                         .frame(maxWidth: .infinity)
                                 }
+                                .buttonStyle(.borderedProminent)
+                                .buttonBorderShape(.capsule)
+                                .disabled(isImporting)
                             }
-                            .buttonStyle(.borderedProminent)
-                            .buttonBorderShape(.capsule)
-                            .disabled(isImporting)
                         } else {
                             StatusView(type: .inProgress, title: "Import.Importing",
                                        currentCount: importCurrentCount, totalCount: importTotalCount)
