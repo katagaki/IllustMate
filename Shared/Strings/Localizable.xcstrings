@@ -257,21 +257,6 @@
         }
       }
     },
-    "Backup.Export.Completed" : {
-
-    },
-    "Backup.Exporting" : {
-
-    },
-    "Backup.Restore.Completed" : {
-
-    },
-    "Backup.Restore.Error" : {
-
-    },
-    "Backup.Restoring" : {
-
-    },
     "Command.NextPic" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -354,12 +339,6 @@
         }
       }
     },
-    "Duplicates.Scanning.Comparing" : {
-
-    },
-    "Duplicates.Scanning.ComputingHashes" : {
-
-    },
     "Experiments.ShowCloudStatusEverywhere" : {
       "localizations" : {
         "de" : {
@@ -400,20 +379,8 @@
         }
       }
     },
-    "Import.Completed.Text.%lld" : {
-
-    },
-    "Import.Importing" : {
-
-    },
     "katagaki/IllustMate" : {
       "shouldTranslate" : false
-    },
-    "More.Troubleshooting.FreeUpSpace.Freeing" : {
-
-    },
-    "More.Troubleshooting.RebuildThumbnails.Rebuilding" : {
-
     },
     "Shared.AddToAlbum" : {
       "extractionState" : "manual",

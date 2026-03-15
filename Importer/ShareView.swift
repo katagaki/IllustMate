@@ -20,10 +20,17 @@ struct ShareView: View {
     @AppStorage(wrappedValue: false, "ShareSheetQuickImport",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var quickImport: Bool
+    @AppStorage(wrappedValue: "", "ShareSheetDefaultAlbum",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var defaultAlbumID: String
+
+    var hasDefaultAlbum: Bool {
+        quickImport && !defaultAlbumID.isEmpty
+    }
 
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
-            if isImporting {
+            if isImporting || hasDefaultAlbum {
                 Group {
                     if !isCompleted {
                         VStack(alignment: .center, spacing: 16.0) {
@@ -70,53 +77,55 @@ struct ShareView: View {
                 }
             }
             if !isImporting || (isCompleted && itemsManager.failedItemCount > 0) {
-                VStack(alignment: .center, spacing: 16.0) {
-                    HStack(alignment: .top, spacing: 4.0) {
-                        Group {
-                            Image(systemName: "info.circle")
-                            Text("Importer.Note", tableName: "Import")
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                if !hasDefaultAlbum || isCompleted {
+                    VStack(alignment: .center, spacing: 16.0) {
+                        HStack(alignment: .top, spacing: 4.0) {
+                            Group {
+                                Image(systemName: "info.circle")
+                                Text("Importer.Note", tableName: "Import")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
                         }
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                    }
-                    .padding(10.0)
-                    .background(.regularMaterial)
-                    .clipShape(.rect(cornerRadius: 16.0))
+                        .padding(10.0)
+                        .background(.regularMaterial)
+                        .clipShape(.rect(cornerRadius: 16.0))
 
-                    Button {
-                        if isCompleted {
-                            close()
-                        } else {
-                            total = Float(itemsManager.items.count)
-                            withAnimation(.smooth.speed(2)) {
-                                isImporting = true
-                            } completion: {
-                                Task {
-                                    importItems()
+                        Button {
+                            if isCompleted {
+                                close()
+                            } else {
+                                total = Float(itemsManager.items.count)
+                                withAnimation(.smooth.speed(2)) {
+                                    isImporting = true
+                                } completion: {
+                                    Task {
+                                        importItems()
+                                    }
                                 }
                             }
+                        } label: {
+                            if isCompleted {
+                                Text("Shared.OK")
+                                    .bold()
+                                    .padding(4.0)
+                                    .frame(maxWidth: .infinity)
+                            } else {
+                                Text("Import.ImportHere", tableName: "Import")
+                                    .bold()
+                                    .padding(4.0)
+                                    .frame(maxWidth: .infinity)
+                            }
                         }
-                    } label: {
-                        if isCompleted {
-                            Text("Shared.OK")
-                                .bold()
-                                .padding(4.0)
-                                .frame(maxWidth: .infinity)
-                        } else {
-                            Text("Import.ImportHere", tableName: "Import")
-                                .bold()
-                                .padding(4.0)
-                                .frame(maxWidth: .infinity)
-                        }
+                        .tint(.green)
+                        .buttonStyle(.borderedProminent)
+                        .buttonBorderShape(.capsule)
+                        .disabled(!itemsManager.isLoaded || itemsManager.items.isEmpty
+                                 || (isSearching && viewPath.isEmpty))
                     }
-                    .tint(.green)
-                    .buttonStyle(.borderedProminent)
-                    .buttonBorderShape(.capsule)
-                    .disabled(!itemsManager.isLoaded || itemsManager.items.isEmpty
-                             || (isSearching && viewPath.isEmpty))
+                    .padding(20.0)
                 }
-                .padding(20.0)
             }
         }
         .background(Color(uiColor: .systemBackground))
@@ -135,6 +144,11 @@ struct ShareView: View {
                case .album(let album) = last,
                album.albumCount() == 0 {
                 startImport(to: album.id)
+            }
+        }
+        .onChange(of: itemsManager.isLoaded) { _, isLoaded in
+            if isLoaded, hasDefaultAlbum, !itemsManager.items.isEmpty {
+                startImport(to: defaultAlbumID)
             }
         }
     }

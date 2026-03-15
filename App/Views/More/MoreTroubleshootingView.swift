@@ -62,13 +62,13 @@ struct MoreTroubleshootingView: View {
         .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isRebuildingThumbnails) {
-            StatusView(type: .inProgress, title: "More.Troubleshooting.RebuildThumbnails.Rebuilding",
-                       tableName: "More", currentCount: rebuildProgress, totalCount: rebuildTotal)
+            StatusView(type: .inProgress, title: .troubleshootingRebuildingThumbnails,
+                       currentCount: rebuildProgress, totalCount: rebuildTotal)
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
         .sheet(isPresented: $isFreeingUpSpace) {
-            StatusView(type: .inProgress, title: "More.Troubleshooting.FreeUpSpace.Freeing", tableName: "More")
+            StatusView(type: .inProgress, title: .troubleshootingFreeingUpSpace)
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }

@@ -26,8 +26,7 @@ struct PhotosAssetGridView: View {
     var body: some View {
         VStack(spacing: 0) {
             if isImportCompleted {
-                StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)",
-                           tableName: "Import")
+                StatusView(type: .success, title: .importCompleted(count: importCompletedCount))
                 Button {
                     onDismiss()
                 } label: {
@@ -40,8 +39,7 @@ struct PhotosAssetGridView: View {
                 .buttonBorderShape(.capsule)
                 .padding(20.0)
             } else if isImporting {
-                StatusView(type: .inProgress, title: "Import.Importing",
-                           tableName: "Import",
+                StatusView(type: .inProgress, title: .importImporting,
                            currentCount: importCurrentCount, totalCount: importTotalCount)
             } else {
                 ScrollView {

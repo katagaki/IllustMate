@@ -20,11 +20,11 @@ struct MoreBackupView: View {
         NavigationStack {
             ScrollView(.vertical) {
                 if isExporting {
-                    StatusView(type: .inProgress, title: "Backup.Exporting", tableName: "More")
+                    StatusView(type: .inProgress, title: .backupExporting)
                 } else if isCompleted {
-                    StatusView(type: .success, title: "Backup.Export.Completed", tableName: "More")
+                    StatusView(type: .success, title: .backupExportCompleted)
                 } else if let error {
-                    StatusView(type: .error, title: LocalizedStringKey(error))
+                    StatusView(type: .error, title: .custom(LocalizedStringKey(error)))
                 }
             }
             .navigationTitle("ViewTitle.Backup")

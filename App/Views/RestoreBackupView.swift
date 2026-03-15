@@ -23,11 +23,11 @@ struct RestoreBackupView: View {
         NavigationStack {
             ScrollView(.vertical) {
                 if isImporting {
-                    StatusView(type: .inProgress, title: "Backup.Restoring", tableName: "More")
+                    StatusView(type: .inProgress, title: .backupRestoring)
                 } else if isCompleted {
-                    StatusView(type: .success, title: "Backup.Restore.Completed", tableName: "More")
+                    StatusView(type: .success, title: .backupRestoreCompleted)
                 } else if isError {
-                    StatusView(type: .error, title: "Backup.Restore.Error", tableName: "More")
+                    StatusView(type: .error, title: .backupRestoreError)
                 } else {
                     VStack(alignment: .center, spacing: 16.0) {
                         VStack(alignment: .leading, spacing: 16.0) {

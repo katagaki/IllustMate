@@ -93,13 +93,11 @@ struct ImporterView: View {
                                 .disabled(isImporting)
                             }
                         } else {
-                            StatusView(type: .inProgress, title: "Import.Importing",
-                                       tableName: "Import",
+                            StatusView(type: .inProgress, title: .importImporting,
                                        currentCount: importCurrentCount, totalCount: importTotalCount)
                         }
                     } else {
-                        StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)",
-                                   tableName: "Import")
+                        StatusView(type: .success, title: .importCompleted(count: importCompletedCount))
                     }
                 }
                 .padding(20.0)

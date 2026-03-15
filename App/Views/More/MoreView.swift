@@ -34,6 +34,10 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var showAnimationWhenSaving: Bool = true
     @AppStorage("ShareSheetQuickImport",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var quickImport: Bool = false
+    @AppStorage("ShareSheetDefaultAlbum",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var defaultAlbumID: String = ""
+
+    @State var allAlbums: [Album] = []
 
     private var listContent: some View {
         List {
@@ -68,10 +72,24 @@ struct MoreView: View {
                 Toggle(String(localized: "More.ShareSheet.OpenSearch", table: "More"), isOn: $openSearchWhenSharing)
                 Toggle(String(localized: "More.ShareSheet.ShowAnimation", table: "More"), isOn: $showAnimationWhenSaving)
                 Toggle(String(localized: "More.ShareSheet.QuickImport", table: "More"), isOn: $quickImport)
+                if quickImport {
+                    Picker(String(localized: "More.ShareSheet.DefaultAlbum", table: "More"),
+                           selection: $defaultAlbumID) {
+                        Text("More.ShareSheet.DefaultAlbum.None", tableName: "More")
+                            .tag("")
+                        ForEach(allAlbums) { album in
+                            Text(album.name).tag(album.id)
+                        }
+                    }
+                }
             } header: {
                 Text("More.ShareSheet", tableName: "More")
             } footer: {
-                Text("More.ShareSheet.QuickImport.Description", tableName: "More")
+                if quickImport && !defaultAlbumID.isEmpty {
+                    Text("More.ShareSheet.DefaultAlbum.Description", tableName: "More")
+                } else {
+                    Text("More.ShareSheet.QuickImport.Description", tableName: "More")
+                }
             }
             Section {
                 Button(String(localized: "More.DuplicateChecker", table: "More")) {
@@ -168,6 +186,7 @@ struct MoreView: View {
         }
         .task {
             await loadCounts()
+            await loadAlbums()
         }
         .onChange(of: navigation.dataVersion) { _, _ in
             dismiss()
@@ -197,6 +216,17 @@ struct MoreView: View {
         await MainActor.run {
             albumCount = albums
             picCount = pics
+        }
+    }
+
+    func loadAlbums() async {
+        do {
+            let albums = try await DataActor.shared.albumsWithCounts(sortedBy: .nameAscending)
+            await MainActor.run {
+                allAlbums = albums
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 }

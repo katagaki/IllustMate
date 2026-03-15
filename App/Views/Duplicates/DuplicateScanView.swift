@@ -96,14 +96,12 @@ struct DuplicateScanView: View {
         VStack {
             if scanManager.scanPhase == .computingHashes {
                 StatusView(type: .inProgress,
-                           title: "Duplicates.Scanning.ComputingHashes",
-                           tableName: "Photos",
+                           title: .duplicatesScanningComputingHashes,
                            currentCount: scanManager.scanProgress,
                            totalCount: scanManager.scanTotal)
             } else {
                 StatusView(type: .inProgress,
-                           title: "Duplicates.Scanning.Comparing",
-                           tableName: "Photos")
+                           title: .duplicatesScanningComparing)
             }
         }
     }
