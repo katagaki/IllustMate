@@ -28,6 +28,10 @@ struct ShareView: View {
         quickImport && !defaultAlbumID.isEmpty
     }
 
+    var resolvedDefaultAlbumID: String? {
+        defaultAlbumID == "__collection__" ? nil : defaultAlbumID
+    }
+
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             if isImporting || hasDefaultAlbum {
@@ -148,7 +152,7 @@ struct ShareView: View {
         }
         .onChange(of: itemsManager.isLoaded) { _, isLoaded in
             if isLoaded, hasDefaultAlbum, !itemsManager.items.isEmpty {
-                startImport(to: defaultAlbumID)
+                startImport(to: resolvedDefaultAlbumID)
             }
         }
     }
@@ -165,7 +169,7 @@ struct ShareView: View {
         return nil
     }
 
-    func startImport(to albumID: String) {
+    func startImport(to albumID: String?) {
         total = Float(itemsManager.items.count)
         withAnimation(.smooth.speed(2)) {
             isImporting = true

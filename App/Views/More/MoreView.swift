@@ -77,6 +77,8 @@ struct MoreView: View {
                            selection: $defaultAlbumID) {
                         Text("More.ShareSheet.DefaultAlbum.None", tableName: "More")
                             .tag("")
+                        Text("More.ShareSheet.DefaultAlbum.Collection", tableName: "More")
+                            .tag("__collection__")
                         ForEach(allAlbums) { album in
                             Text(album.name).tag(album.id)
                         }
@@ -86,7 +88,11 @@ struct MoreView: View {
                 Text("More.ShareSheet", tableName: "More")
             } footer: {
                 if quickImport && !defaultAlbumID.isEmpty {
-                    Text("More.ShareSheet.DefaultAlbum.Description", tableName: "More")
+                    if defaultAlbumID == "__collection__" {
+                        Text("More.ShareSheet.DefaultAlbum.Collection.Description", tableName: "More")
+                    } else {
+                        Text("More.ShareSheet.DefaultAlbum.Description", tableName: "More")
+                    }
                 } else {
                     Text("More.ShareSheet.QuickImport.Description", tableName: "More")
                 }
