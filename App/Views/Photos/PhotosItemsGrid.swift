@@ -87,7 +87,7 @@ struct PhotosAlbumsSection: View {
             switch item {
             case .album(let collection):
                 if let onMoveToFolder {
-                    Button("Photos.MoveToFolder", systemImage: "folder") {
+                    Button(String(localized: "Photos.MoveToFolder", table: "Photos"), systemImage: "folder") {
                         onMoveToFolder(collection)
                     }
                 }
@@ -177,7 +177,7 @@ struct PhotosAlbumGridLabel: View {
             AlbumCover.AsyncPhotosAlbumCover(collection: collection, length: length,
                                              refreshID: coverRefreshID)
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
-            Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+            Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Title", in: namespace)
                 .font(.caption)
                 .foregroundStyle(.primary)
@@ -200,7 +200,7 @@ struct PhotosFolderGridLabel: View {
         VStack(alignment: .leading, spacing: 8.0) {
             AlbumCover.AsyncPhotosFolderCover(folder: folder, length: length)
                 .matchedGeometryEffect(id: "\(folder.localIdentifier).Image", in: namespace)
-            Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+            Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
                 .matchedGeometryEffect(id: "\(folder.localIdentifier).Title", in: namespace)
                 .font(.caption)
                 .foregroundStyle(.primary)
@@ -227,7 +227,7 @@ struct PhotosAlbumListRow: View {
                                              refreshID: coverRefreshID)
                 .matchedGeometryEffect(id: "\(collection.localIdentifier).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
-                Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
                     .matchedGeometryEffect(id: "\(collection.localIdentifier).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
@@ -269,7 +269,7 @@ struct PhotosFolderListRow: View {
             AlbumCover.AsyncPhotosFolderCover(folder: folder, length: 48.0)
                 .matchedGeometryEffect(id: "\(folder.localIdentifier).Image", in: namespace)
             VStack(alignment: .leading, spacing: 2.0) {
-                Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
                     .matchedGeometryEffect(id: "\(folder.localIdentifier).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)

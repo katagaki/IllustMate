@@ -26,7 +26,8 @@ struct PhotosAssetGridView: View {
     var body: some View {
         VStack(spacing: 0) {
             if isImportCompleted {
-                StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)")
+                StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)",
+                           tableName: "Import")
                 Button {
                     onDismiss()
                 } label: {
@@ -40,6 +41,7 @@ struct PhotosAssetGridView: View {
                 .padding(20.0)
             } else if isImporting {
                 StatusView(type: .inProgress, title: "Import.Importing",
+                           tableName: "Import",
                            currentCount: importCurrentCount, totalCount: importTotalCount)
             } else {
                 ScrollView {
@@ -58,13 +60,13 @@ struct PhotosAssetGridView: View {
 
                 // Bottom bar
                 VStack(alignment: .center, spacing: 16.0) {
-                    Text("Import.SelectedPhotos.\(selectedAssets.count)")
+                    Text("Import.SelectedPhotos.\(selectedAssets.count)", tableName: "Import")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Button {
                         startImport()
                     } label: {
-                        Text("Import.StartImport")
+                        Text("Import.StartImport", tableName: "Import")
                             .bold()
                             .padding(4.0)
                             .frame(maxWidth: .infinity)
@@ -78,7 +80,7 @@ struct PhotosAssetGridView: View {
                 .padding(20.0)
             }
         }
-        .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+        .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isImporting || isImportCompleted)
         .toolbar {
@@ -92,7 +94,7 @@ struct PhotosAssetGridView: View {
                         }
                     } label: {
                         Text(selectedAssets.count == assets.count ?
-                             "Import.DeselectAll" : "Import.SelectAll")
+                             String(localized: "Import.DeselectAll", table: "Import") : String(localized: "Import.SelectAll", table: "Import"))
                     }
                 }
             }

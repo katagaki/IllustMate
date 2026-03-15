@@ -24,7 +24,7 @@ struct AlbumListRow: View {
                     .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                Text("Albums.Detail.\(album.picCount()),\(album.albumCount())")
+                Text("Albums.Detail.\(album.picCount()),\(album.albumCount())", tableName: "Albums")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

@@ -27,9 +27,9 @@ struct PhotosDuplicateResultsView: View {
     var body: some View {
         if scanManager.duplicateGroups.isEmpty {
             ContentUnavailableView {
-                Label("Duplicates.NoDuplicatesFound", systemImage: "checkmark.circle")
+                Label(String(localized: "Duplicates.NoDuplicatesFound", table: "Photos"), systemImage: "checkmark.circle")
             } description: {
-                Text("Duplicates.NoDuplicatesFound.Message")
+                Text("Duplicates.NoDuplicatesFound.Message", tableName: "Photos")
             }
         } else {
             List {
@@ -51,7 +51,7 @@ struct PhotosDuplicateResultsView: View {
             .toolbar {
                 if groupsWithSelections > 1 {
                     ToolbarItem(placement: .bottomBar) {
-                        Button("Duplicates.DeleteAllSelected.\(allSelectedIDs.count)",
+                        Button(String(localized: "Duplicates.DeleteAllSelected.\(allSelectedIDs.count)", table: "Photos"),
                                role: .destructive) {
                             isConfirmingDeleteAll = true
                         }
@@ -120,13 +120,13 @@ struct PhotosDuplicateGroupSection: View {
             }
             .listRowInsets(EdgeInsets(top: 14.0, leading: 0, bottom: 14.0, trailing: 0))
             if !selectedForDeletion.isEmpty {
-                Button("Duplicates.DeleteSelected.\(selectedForDeletion.count)",
+                Button(String(localized: "Duplicates.DeleteSelected.\(selectedForDeletion.count)", table: "Photos"),
                        role: .destructive) {
                     isConfirmingDelete = true
                 }
             }
         } header: {
-            Text("Duplicates.GroupCount.\(group.assets.count)")
+            Text("Duplicates.GroupCount.\(group.assets.count)", tableName: "Photos")
         }
         .alert(
             "Shared.DeleteConfirmation.Photo.\(selectedForDeletion.count)",

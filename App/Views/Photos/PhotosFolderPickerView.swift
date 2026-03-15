@@ -22,7 +22,7 @@ struct PhotosFolderPickerView: View {
         List {
             if hasFetched {
                 if folders.isEmpty {
-                    Text("Photos.NoFolders")
+                    Text("Photos.NoFolders", tableName: "Photos")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(folders, id: \.localIdentifier) { folder in
@@ -38,7 +38,7 @@ struct PhotosFolderPickerView: View {
                                 }
                             }
                         } label: {
-                            Label(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"),
+                            Label(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"),
                                   systemImage: "folder")
                         }
                     }

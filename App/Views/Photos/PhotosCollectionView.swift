@@ -64,7 +64,7 @@ struct PhotosCollectionView: View {
             }
         }
         .navigationTitle(String(localized: "ViewTitle.Photos"))
-        .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
+        .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
         .onChange(of: searchText) { _, newValue in
             withAnimation(.smooth.speed(2.0)) {
                 if newValue.isEmpty {
@@ -133,15 +133,15 @@ struct PhotosCollectionView: View {
     @ViewBuilder
     private var photosFilterMenu: some View {
         Menu {
-            Section("Albums.Albums") {
-                Picker("Albums.Style",
+            Section(String(localized: "Albums.Albums", table: "Albums")) {
+                Picker(String(localized: "Albums.Style", table: "Albums"),
                        systemImage: "paintbrush",
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
-                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                    Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
-                    Label("Albums.Style.List", systemImage: "list.bullet")
+                    Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
                         .tag(ViewStyle.list)
-                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
                         .tag(ViewStyle.carousel)
                 }
                        .pickerStyle(.menu)
@@ -159,7 +159,7 @@ struct PhotosCollectionView: View {
                     .pickerStyle(.menu)
                 }
             }
-            Section("Albums.Pics") {
+            Section(String(localized: "Albums.Pics", table: "Albums")) {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
                        selection: $picColumnCount.animation(.smooth.speed(2.0))) {

@@ -23,11 +23,11 @@ struct RestoreBackupView: View {
         NavigationStack {
             ScrollView(.vertical) {
                 if isImporting {
-                    StatusView(type: .inProgress, title: "Backup.Restoring")
+                    StatusView(type: .inProgress, title: "Backup.Restoring", tableName: "More")
                 } else if isCompleted {
-                    StatusView(type: .success, title: "Backup.Restore.Completed")
+                    StatusView(type: .success, title: "Backup.Restore.Completed", tableName: "More")
                 } else if isError {
-                    StatusView(type: .error, title: "Backup.Restore.Error")
+                    StatusView(type: .error, title: "Backup.Restore.Error", tableName: "More")
                 } else {
                     VStack(alignment: .center, spacing: 16.0) {
                         VStack(alignment: .leading, spacing: 16.0) {
@@ -74,7 +74,7 @@ struct RestoreBackupView: View {
                         Button {
                             startImport(targetAlbumID: nil)
                         } label: {
-                            Text("Backup.Restore.Merge")
+                            Text("Backup.Restore.Merge", tableName: "More")
                                 .bold()
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
@@ -82,7 +82,7 @@ struct RestoreBackupView: View {
                         .buttonStyle(.borderedProminent)
                         .buttonBorderShape(.capsule)
 
-                        Text("Backup.Restore.Merge.Description")
+                        Text("Backup.Restore.Merge.Description", tableName: "More")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .padding(.bottom, 8.0)
@@ -96,7 +96,7 @@ struct RestoreBackupView: View {
                                 }
                             }
                         } label: {
-                            Text("Backup.Restore.ToAlbum")
+                            Text("Backup.Restore.ToAlbum", tableName: "More")
                                 .bold()
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
@@ -104,7 +104,7 @@ struct RestoreBackupView: View {
                         .buttonStyle(.borderedProminent)
                         .buttonBorderShape(.capsule)
 
-                        Text("Backup.Restore.ToAlbum.Description")
+                        Text("Backup.Restore.ToAlbum.Description", tableName: "More")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

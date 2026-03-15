@@ -12,15 +12,15 @@ extension AlbumView {
         Group {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    SectionHeader(title: "Albums.Albums", count: displayedAlbums.count)
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: displayedAlbums.count)
                 } else {
-                    SectionHeader(title: "Albums.Albums", count: displayedAlbums.count) {
-                        Picker("Albums.Style", selection: ($albumStyleState.animation(.smooth.speed(2)))) {
-                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: displayedAlbums.count) {
+                        Picker(String(localized: "Albums.Style", table: "Albums"), selection: ($albumStyleState.animation(.smooth.speed(2)))) {
+                            Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)
-                            Label("Albums.Style.List", systemImage: "list.bullet")
+                            Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
                                 .tag(ViewStyle.list)
-                            Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                            Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
                                 .tag(ViewStyle.carousel)
                         }
                         Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
@@ -64,7 +64,7 @@ extension AlbumView {
                     }
                 }
             } else if searchText.isEmpty {
-                Text("Albums.NoAlbums")
+                Text("Albums.NoAlbums", tableName: "Albums")
                     .foregroundStyle(.secondary)
                     .padding(20.0)
             }
@@ -75,10 +75,10 @@ extension AlbumView {
         Group {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    SectionHeader(title: "Albums.Pics", count: hasFetchedPicCount ? picCount : pics.count)
+                    SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: hasFetchedPicCount ? picCount : pics.count)
                 } else {
-                    SectionHeader(title: "Albums.Pics", count: hasFetchedPicCount ? picCount : pics.count) {
-                        Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
+                    SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: hasFetchedPicCount ? picCount : pics.count) {
+                        Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"), systemImage: "photo.stack") {
                             isDuplicateCheckerPresented = true
                         }
                         Divider()
@@ -135,7 +135,7 @@ extension AlbumView {
                     .frame(maxWidth: .infinity)
                     .padding(20.0)
             } else if picCount == 0 {
-                Text("Albums.NoPics")
+                Text("Albums.NoPics", tableName: "Albums")
                     .foregroundStyle(.secondary)
                     .padding(20.0)
             }

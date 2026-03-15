@@ -53,23 +53,23 @@ struct DuplicateScanView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 8.0) {
-                    Text("Duplicates.Sensitivity")
+                    Text("Duplicates.Sensitivity", tableName: "Photos")
                     Slider(value: .init(
                         get: { Double(scanManager.hammingThreshold) },
                         set: { scanManager.hammingThreshold = Int($0) }
                     ), in: 1...15, step: 1)
                     HStack {
-                        Text("Duplicates.Sensitivity.Strict")
+                        Text("Duplicates.Sensitivity.Strict", tableName: "Photos")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Spacer()
-                        Text("Duplicates.Sensitivity.Loose")
+                        Text("Duplicates.Sensitivity.Loose", tableName: "Photos")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
             } header: {
-                Text("Duplicates.Settings")
+                Text("Duplicates.Settings", tableName: "Photos")
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -79,7 +79,7 @@ struct DuplicateScanView: View {
                         await scanManager.scan(scope: scanScope)
                     }
                 } label: {
-                    Text("Duplicates.StartScan")
+                    Text("Duplicates.StartScan", tableName: "Photos")
                         .bold()
                         .padding(4.0)
                         .frame(maxWidth: .infinity)
@@ -97,11 +97,13 @@ struct DuplicateScanView: View {
             if scanManager.scanPhase == .computingHashes {
                 StatusView(type: .inProgress,
                            title: "Duplicates.Scanning.ComputingHashes",
+                           tableName: "Photos",
                            currentCount: scanManager.scanProgress,
                            totalCount: scanManager.scanTotal)
             } else {
                 StatusView(type: .inProgress,
-                           title: "Duplicates.Scanning.Comparing")
+                           title: "Duplicates.Scanning.Comparing",
+                           tableName: "Photos")
             }
         }
     }

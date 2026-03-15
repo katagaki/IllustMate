@@ -13,14 +13,14 @@ import SwiftUI
 extension PhotosFolderView {
     var albumsSection: some View {
         Group {
-            SectionHeader(title: "Albums.Albums", count: filteredItems.count) {
-                Picker("Albums.Style",
+            SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: filteredItems.count) {
+                Picker(String(localized: "Albums.Style", table: "Albums"),
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
-                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                    Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
-                    Label("Albums.Style.List", systemImage: "list.bullet")
+                    Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
                         .tag(ViewStyle.list)
-                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
                         .tag(ViewStyle.carousel)
                 }
                 if albumStyleState == .grid {
@@ -62,7 +62,7 @@ extension PhotosFolderView {
 
     func picsSection(fetchResult: PHFetchResult<PHAsset>) -> some View {
         Group {
-            SectionHeader(title: "Albums.Pics", count: fetchResult.count) {
+            SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: fetchResult.count) {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
                        selection: $picColumnCount.animation(.smooth.speed(2.0))) {

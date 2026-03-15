@@ -43,16 +43,16 @@ extension PhotosCollectionView {
         Group {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    SectionHeader(title: "Albums.Albums", count: filteredItems.count)
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: filteredItems.count)
                 } else {
-                    SectionHeader(title: "Albums.Albums", count: filteredItems.count) {
-                        Picker("Albums.Style",
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: filteredItems.count) {
+                        Picker(String(localized: "Albums.Style", table: "Albums"),
                                selection: $albumStyleState.animation(.smooth.speed(2))) {
-                            Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                            Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)
-                            Label("Albums.Style.List", systemImage: "list.bullet")
+                            Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
                                 .tag(ViewStyle.list)
-                            Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                            Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
                                 .tag(ViewStyle.carousel)
                         }
                         if albumStyleState == .grid {
@@ -94,7 +94,7 @@ extension PhotosCollectionView {
                                     coverRefreshID: coverRefreshID)
             } else if hasFetchedCollections {
                 if searchText.isEmpty {
-                    Text("Albums.NoAlbums")
+                    Text("Albums.NoAlbums", tableName: "Albums")
                         .foregroundStyle(.secondary)
                         .padding(20.0)
                 }
@@ -105,7 +105,7 @@ extension PhotosCollectionView {
     var photosPicsSection: some View {
         Group {
             if !hasFetchedRootAssets {
-                SectionHeader(title: "Albums.Pics", count: 0)
+                SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: 0)
                     .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
                 ProgressView()
                     .frame(maxWidth: .infinity)
@@ -113,9 +113,9 @@ extension PhotosCollectionView {
             } else if !rootAssets.isEmpty {
                 Group {
                     if UIDevice.current.userInterfaceIdiom == .phone {
-                        SectionHeader(title: "Albums.Pics", count: rootAssets.count)
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: rootAssets.count)
                     } else {
-                        SectionHeader(title: "Albums.Pics", count: rootAssets.count) {
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: rootAssets.count) {
                             Picker("Shared.GridSize",
                                    systemImage: "square.grid.2x2",
                                    selection: $picColumnCount.animation(.smooth.speed(2.0))) {
@@ -147,10 +147,10 @@ extension PhotosCollectionView {
                 .scaledToFit()
                 .frame(width: 64.0, height: 64.0)
                 .foregroundStyle(.secondary)
-            Text("Import.PhotosAccessDenied")
+            Text("Import.PhotosAccessDenied", tableName: "Import")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
-            Button("Import.OpenSettings") {
+            Button(String(localized: "Import.OpenSettings", table: "Import")) {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }

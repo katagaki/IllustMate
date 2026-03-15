@@ -19,7 +19,7 @@ struct NewAlbumView: View {
         NavigationStack {
             List {
                 Section {
-                    TextField("Albums.Create.Placeholder", text: $newAlbumName)
+                    TextField(String(localized: "Albums.Create.Placeholder", table: "Albums"), text: $newAlbumName)
                         .textInputAutocapitalization(.words)
                         .focused($focusedField, equals: .newAlbumName)
                 }

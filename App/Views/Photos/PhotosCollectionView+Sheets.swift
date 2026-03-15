@@ -15,7 +15,7 @@ extension PhotosCollectionView {
         NavigationStack {
             List {
                 Section {
-                    TextField("Albums.Create.Placeholder", text: $newAlbumName)
+                    TextField(String(localized: "Albums.Create.Placeholder", table: "Albums"), text: $newAlbumName)
                         .textInputAutocapitalization(.words)
                 }
             }
@@ -116,7 +116,7 @@ extension PhotosCollectionView {
                     }
                 }
             }
-            .navigationTitle("Photos.MoveToFolder")
+            .navigationTitle(String(localized: "Photos.MoveToFolder", table: "Photos"))
             .navigationBarTitleDisplayMode(.inline)
         }
         .phonePresentationDetents([.medium, .large])

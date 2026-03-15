@@ -38,8 +38,8 @@ struct PhotosAlbumPickerView: View {
         }
         .navigationTitle(
             folder == nil
-            ? String(localized: "Import.Albums")
-            : (folder?.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+            ? String(localized: "Import.Albums", table: "Import")
+            : (folder?.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
         )
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: PHAssetCollectionWrapper.self) { wrapper in
@@ -63,7 +63,7 @@ struct PhotosAlbumPickerView: View {
     private var albumListView: some View {
         List {
             if folder != nil && items.isEmpty && hasFetched {
-                ContentUnavailableView("Import.Folder.Empty", systemImage: "folder")
+                ContentUnavailableView(String(localized: "Import.Folder.Empty", table: "Import"), systemImage: "folder")
             } else {
                 ForEach(items) { item in
                     switch item {
@@ -89,7 +89,7 @@ struct PhotosAlbumPickerView: View {
             HStack(spacing: 12.0) {
                 albumThumbnail(for: collection)
                 VStack(alignment: .leading, spacing: 2.0) {
-                    Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                    Text(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
                     Text("\(imageCount(in: collection))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -111,7 +111,7 @@ struct PhotosAlbumPickerView: View {
                         Image(systemName: "folder")
                             .foregroundStyle(.secondary)
                     }
-                Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+                Text(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
                 Spacer()
             }
         }
@@ -144,10 +144,10 @@ struct PhotosAlbumPickerView: View {
                 .scaledToFit()
                 .frame(width: 64.0, height: 64.0)
                 .foregroundStyle(.secondary)
-            Text("Import.PhotosAccessDenied")
+            Text("Import.PhotosAccessDenied", tableName: "Import")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
-            Button("Import.OpenSettings") {
+            Button(String(localized: "Import.OpenSettings", table: "Import")) {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }

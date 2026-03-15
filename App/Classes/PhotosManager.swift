@@ -240,8 +240,8 @@ enum PhotosManagerError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .albumCreationFailed: return String(localized: "Photos.Error.AlbumCreationFailed")
-        case .folderCreationFailed: return String(localized: "Photos.Error.FolderCreationFailed")
+        case .albumCreationFailed: return String(localized: "Photos.Error.AlbumCreationFailed", table: "Photos")
+        case .folderCreationFailed: return String(localized: "Photos.Error.FolderCreationFailed", table: "Photos")
         }
     }
 }

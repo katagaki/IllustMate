@@ -11,6 +11,7 @@ struct StatusView: View {
 
     var type: StatusType
     var title: LocalizedStringKey
+    var tableName: String?
     var message: LocalizedStringKey?
     var currentCount: Int?
     var totalCount: Int?
@@ -28,7 +29,7 @@ struct StatusView: View {
             case .inProgress:
                 if let currentCount, let totalCount {
                     VStack(alignment: .center, spacing: 16.0) {
-                        Text(title)
+                        Text(title, tableName: tableName)
                             .bold()
                             .frame(maxWidth: .infinity)
                         ProgressView(value: Float(currentCount), total: Float(totalCount))
@@ -38,7 +39,7 @@ struct StatusView: View {
                     VStack(alignment: .center, spacing: 16.0) {
                         ProgressView()
                             .progressViewStyle(.circular)
-                        Text(title)
+                        Text(title, tableName: tableName)
                             .bold()
                             .frame(maxWidth: .infinity)
                     }
@@ -50,7 +51,7 @@ struct StatusView: View {
                         .scaledToFit()
                         .frame(width: 64.0, height: 64.0)
                         .symbolRenderingMode(.multicolor)
-                    Text(title)
+                    Text(title, tableName: tableName)
                         .bold()
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
@@ -68,7 +69,7 @@ struct StatusView: View {
                         .scaledToFit()
                         .frame(width: 64.0, height: 64.0)
                         .symbolRenderingMode(.multicolor)
-                    Text(title)
+                    Text(title, tableName: tableName)
                         .bold()
                         .foregroundStyle(.red)
                         .multilineTextAlignment(.center)

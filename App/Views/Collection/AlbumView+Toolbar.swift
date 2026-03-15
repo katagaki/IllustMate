@@ -89,18 +89,18 @@ extension AlbumView {
     @ViewBuilder
     var filterMenu: some View {
         Menu {
-            Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
+            Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"), systemImage: "photo.stack") {
                 isDuplicateCheckerPresented = true
             }
-            Section("Albums.Albums") {
-                Picker("Albums.Style",
+            Section(String(localized: "Albums.Albums", table: "Albums")) {
+                Picker(String(localized: "Albums.Style", table: "Albums"),
                        systemImage: "paintbrush",
                        selection: ($albumStyleState.animation(.smooth.speed(2)))) {
-                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                    Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
-                    Label("Albums.Style.List", systemImage: "list.bullet")
+                    Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
                         .tag(ViewStyle.list)
-                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
                         .tag(ViewStyle.carousel)
                 }
                 .pickerStyle(.menu)
@@ -129,7 +129,7 @@ extension AlbumView {
                 }
                 .pickerStyle(.menu)
             }
-            Section("Albums.Pics") {
+            Section(String(localized: "Albums.Pics", table: "Albums")) {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
                        selection: $columnCount.animation(.smooth.speed(2.0))) {
@@ -165,18 +165,18 @@ extension AlbumView {
             Button {
                 isPhotosPickerPresented = true
             } label: {
-                Label("Import.SelectPhotos", systemImage: "photo.on.rectangle.angled")
+                Label(String(localized: "Import.SelectPhotos", table: "Import"), systemImage: "photo.on.rectangle.angled")
             }
             Button {
                 isBrowsingAlbums = true
             } label: {
-                Label("Import.BrowseAlbums", systemImage: "rectangle.stack")
+                Label(String(localized: "Import.BrowseAlbums", table: "Import"), systemImage: "rectangle.stack")
             }
             Divider()
             Button {
                 isFileImporterPresented = true
             } label: {
-                Label("Import.SelectFromFiles", systemImage: "folder")
+                Label(String(localized: "Import.SelectFromFiles", table: "Import"), systemImage: "folder")
             }
         }
     }

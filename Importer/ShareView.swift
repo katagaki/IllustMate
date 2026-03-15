@@ -27,7 +27,7 @@ struct ShareView: View {
                 Group {
                     if !isCompleted {
                         VStack(alignment: .center, spacing: 16.0) {
-                            Text("Import.Importing")
+                            Text("Import.Importing", tableName: "Import")
                             ProgressView(value: min(progress, total), total: total)
                                 .progressViewStyle(.linear)
                         }
@@ -39,14 +39,14 @@ struct ShareView: View {
                                     .scaledToFit()
                                     .frame(width: 64.0, height: 64.0)
                                     .symbolRenderingMode(.multicolor)
-                                Text("Import.Completed.Text.\(Int(total))")
+                                Text("Import.Completed.Text.\(Int(total))", tableName: "Import")
                             } else {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 64.0, height: 64.0)
                                     .symbolRenderingMode(.multicolor)
-                                Text("Importer.DoneText.WithError.\(itemsManager.failedItemCount)")
+                                Text("Importer.DoneText.WithError.\(itemsManager.failedItemCount)", tableName: "Import")
                             }
                         }
                     }
@@ -74,7 +74,7 @@ struct ShareView: View {
                     HStack(alignment: .top, spacing: 4.0) {
                         Group {
                             Image(systemName: "info.circle")
-                            Text("Importer.Note")
+                            Text("Importer.Note", tableName: "Import")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .font(.callout)
@@ -104,7 +104,7 @@ struct ShareView: View {
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         } else {
-                            Text("Import.ImportHere")
+                            Text("Import.ImportHere", tableName: "Import")
                                 .bold()
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)

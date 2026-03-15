@@ -34,11 +34,11 @@ struct AlbumsScrollView: View {
             if isAlbumsLoaded {
                 if displayedAlbums.isEmpty {
                     if searchResults != nil && !searchText.isEmpty {
-                        Text("Albums.NoSearchResults")
+                        Text("Albums.NoSearchResults", tableName: "Albums")
                             .foregroundStyle(.secondary)
                             .padding(20.0)
                     } else {
-                        Text("Albums.NoMoreAlbums")
+                        Text("Albums.NoMoreAlbums", tableName: "Albums")
                             .foregroundStyle(.secondary)
                             .padding(20.0)
                     }
@@ -101,7 +101,7 @@ struct AlbumsScrollView: View {
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, isPresented: $isSearchPresented,
                     placement: .navigationBarDrawer(displayMode: .always),
-                    prompt: "Albums.Search.Prompt")
+                    prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
     }
 
     func close() {

@@ -40,19 +40,19 @@ struct ImporterView: View {
                     if !isImportCompleted {
                         if !isImporting {
                             VStack(alignment: .leading, spacing: 8.0) {
-                                Text("Import.Section.Photos")
+                                Text("Import.Section.Photos", tableName: "Import")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .textCase(.uppercase)
                                     .foregroundStyle(.secondary)
-                                Text("Import.Section.Photos.Description")
+                                Text("Import.Section.Photos.Description", tableName: "Import")
                                     .font(.footnote)
                                     .foregroundStyle(.tertiary)
                                 Group {
                                     PhotosPicker(selection: $selectedPhotoItems,
                                                  matching: .images,
                                                  photoLibrary: .shared()) {
-                                        Text("Import.SelectPhotos")
+                                        Text("Import.SelectPhotos", tableName: "Import")
                                             .bold()
                                             .padding(4.0)
                                             .frame(maxWidth: .infinity)
@@ -60,7 +60,7 @@ struct ImporterView: View {
                                     Button {
                                         navigationPath.append("albumPicker")
                                     } label: {
-                                        Text("Import.BrowseAlbums")
+                                        Text("Import.BrowseAlbums", tableName: "Import")
                                             .bold()
                                             .padding(4.0)
                                             .frame(maxWidth: .infinity)
@@ -72,18 +72,18 @@ struct ImporterView: View {
                             }
                             Divider()
                             VStack(alignment: .leading, spacing: 8.0) {
-                                Text("Import.Section.Files")
+                                Text("Import.Section.Files", tableName: "Import")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .textCase(.uppercase)
                                     .foregroundStyle(.secondary)
-                                Text("Import.Section.Files.Description")
+                                Text("Import.Section.Files.Description", tableName: "Import")
                                     .font(.footnote)
                                     .foregroundStyle(.tertiary)
                                 Button {
                                     isFileImporterPresented = true
                                 } label: {
-                                    Text("Import.SelectFromFiles")
+                                    Text("Import.SelectFromFiles", tableName: "Import")
                                         .bold()
                                         .padding(4.0)
                                         .frame(maxWidth: .infinity)
@@ -94,10 +94,12 @@ struct ImporterView: View {
                             }
                         } else {
                             StatusView(type: .inProgress, title: "Import.Importing",
+                                       tableName: "Import",
                                        currentCount: importCurrentCount, totalCount: importTotalCount)
                         }
                     } else {
-                        StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)")
+                        StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)",
+                                   tableName: "Import")
                     }
                 }
                 .padding(20.0)
@@ -105,7 +107,7 @@ struct ImporterView: View {
             .safeAreaInset(edge: .bottom) {
                 VStack(alignment: .center, spacing: 16.0) {
                     if !isImportCompleted {
-                        Text("Import.SelectedPhotos.\(selectedItemCount)")
+                        Text("Import.SelectedPhotos.\(selectedItemCount)", tableName: "Import")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Button {
@@ -113,7 +115,7 @@ struct ImporterView: View {
                             importTotalCount = selectedItemCount
                             importPhotosAndFiles()
                         } label: {
-                            Text("Import.StartImport")
+                            Text("Import.StartImport", tableName: "Import")
                                 .bold()
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)

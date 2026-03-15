@@ -26,9 +26,9 @@ struct DuplicateResultsView: View {
     var body: some View {
         if scanManager.duplicateGroups.isEmpty {
             ContentUnavailableView {
-                Label("Duplicates.NoDuplicatesFound", systemImage: "checkmark.circle")
+                Label(String(localized: "Duplicates.NoDuplicatesFound", table: "Photos"), systemImage: "checkmark.circle")
             } description: {
-                Text("Duplicates.NoDuplicatesFound.Message")
+                Text("Duplicates.NoDuplicatesFound.Message", tableName: "Photos")
             }
         } else {
             List {
@@ -50,7 +50,7 @@ struct DuplicateResultsView: View {
             .toolbar {
                 if groupsWithSelections > 1 {
                     ToolbarItem(placement: .bottomBar) {
-                        Button("Duplicates.DeleteAllSelected.\(allSelectedIDs.count)",
+                        Button(String(localized: "Duplicates.DeleteAllSelected.\(allSelectedIDs.count)", table: "Photos"),
                                role: .destructive) {
                             isConfirmingDeleteAll = true
                         }
@@ -119,20 +119,20 @@ struct DuplicateGroupSection: View {
                 .padding(.horizontal, 18.0)
             }
             .listRowInsets(EdgeInsets(top: 14.0, leading: 0, bottom: 14.0, trailing: 0))
-            Button("Duplicates.CompareInCarousel") {
+            Button(String(localized: "Duplicates.CompareInCarousel", table: "Photos")) {
                 let firstPic = group.pics[0]
                 comparisonViewerManager.setDisplay(firstPic, in: group.pics) {
                     isShowingComparison = true
                 }
             }
             if !selectedForDeletion.isEmpty {
-                Button("Duplicates.DeleteSelected.\(selectedForDeletion.count)",
+                Button(String(localized: "Duplicates.DeleteSelected.\(selectedForDeletion.count)", table: "Photos"),
                        role: .destructive) {
                     isConfirmingDelete = true
                 }
             }
         } header: {
-            Text("Duplicates.GroupCount.\(group.pics.count)")
+            Text("Duplicates.GroupCount.\(group.pics.count)", tableName: "Photos")
         }
         .alert(
             "Shared.DeleteConfirmation.Pic.\(selectedForDeletion.count)",

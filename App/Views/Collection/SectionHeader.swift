@@ -10,13 +10,13 @@ import SwiftUI
 
 struct SectionHeader<Buttons: View, Content: View>: View {
 
-    var title: LocalizedStringKey
+    var title: String
     var count: Int
     @ViewBuilder var buttons: () -> Buttons
     @ViewBuilder var trailingViews: () -> Content
 
     init(
-        title: LocalizedStringKey, count: Int
+        title: String, count: Int
     ) where Buttons == EmptyView, Content == EmptyView {
         self.title = title
         self.count = count
@@ -25,7 +25,7 @@ struct SectionHeader<Buttons: View, Content: View>: View {
     }
 
     init(
-        title: LocalizedStringKey, count: Int,
+        title: String, count: Int,
         @ViewBuilder trailingViews: @escaping () -> Content
     ) where Buttons == EmptyView {
         self.title = title
@@ -35,7 +35,7 @@ struct SectionHeader<Buttons: View, Content: View>: View {
     }
 
     init(
-        title: LocalizedStringKey, count: Int,
+        title: String, count: Int,
         @ViewBuilder buttons: @escaping () -> Buttons,
         @ViewBuilder trailingViews: @escaping () -> Content
     ) {

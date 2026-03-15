@@ -23,25 +23,25 @@ struct MoreTroubleshootingView: View {
     var body: some View {
         List {
             Section {
-                Button("More.Troubleshooting.RebuildThumbnails") {
+                Button(String(localized: "More.Troubleshooting.RebuildThumbnails", table: "More")) {
                     Task { await rebuildThumbnails() }
                 }
-                Button("More.Troubleshooting.FreeUpSpace") {
+                Button(String(localized: "More.Troubleshooting.FreeUpSpace", table: "More")) {
                     Task { await freeUpSpace() }
                 }
-                Button("More.Troubleshooting.ClearHashCache") {
+                Button(String(localized: "More.Troubleshooting.ClearHashCache", table: "More")) {
                     Task { await HashActor.shared.deleteAllHashes() }
                 }
-                Button("More.Troubleshooting.ClearColorCache") {
+                Button(String(localized: "More.Troubleshooting.ClearColorCache", table: "More")) {
                     Task { await PColorActor.shared.deleteAllColors() }
                 }
             } header: {
-                Text("More.Troubleshooting.DataManagement")
+                Text("More.Troubleshooting.DataManagement", tableName: "More")
             } footer: {
-                Text("More.Troubleshooting.DataManagement.Description")
+                Text("More.Troubleshooting.DataManagement.Description", tableName: "More")
             }
             Section {
-                Button("More.Troubleshooting.DeleteAll", role: .destructive) {
+                Button(String(localized: "More.Troubleshooting.DeleteAll", table: "More"), role: .destructive) {
                     isDeleteConfirming = true
                 }
             }
@@ -63,12 +63,12 @@ struct MoreTroubleshootingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isRebuildingThumbnails) {
             StatusView(type: .inProgress, title: "More.Troubleshooting.RebuildThumbnails.Rebuilding",
-                       currentCount: rebuildProgress, totalCount: rebuildTotal)
+                       tableName: "More", currentCount: rebuildProgress, totalCount: rebuildTotal)
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
         .sheet(isPresented: $isFreeingUpSpace) {
-            StatusView(type: .inProgress, title: "More.Troubleshooting.FreeUpSpace.Freeing")
+            StatusView(type: .inProgress, title: "More.Troubleshooting.FreeUpSpace.Freeing", tableName: "More")
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }

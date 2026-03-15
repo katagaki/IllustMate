@@ -22,12 +22,12 @@ struct MoreExperimentsView: View {
                             .scaledToFit()
                             .frame(width: 24.0, height: 24.0)
                             .foregroundStyle(.white)
-                        Text("More.Debug.Warning.Title")
+                        Text("More.Debug.Warning.Title", tableName: "More")
                             .font(.title3)
                             .bold()
                             .foregroundStyle(.white)
                     }
-                    Text("More.Debug.Warning.Text")
+                    Text("More.Debug.Warning.Text", tableName: "More")
                         .foregroundStyle(.white)
                 }
                 .padding(20.0)

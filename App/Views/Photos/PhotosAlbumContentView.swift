@@ -31,7 +31,7 @@ struct PhotosAlbumContentView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                SectionHeader(title: "Albums.Pics", count: assetCount) {
+                SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount) {
                     Picker("Shared.GridSize",
                            systemImage: "square.grid.2x2",
                            selection: $columnCount.animation(.smooth.speed(2.0))) {
@@ -55,14 +55,14 @@ struct PhotosAlbumContentView: View {
                 } else if let fetchResult, fetchResult.count > 0 {
                     PhotosFetchResultAssetsGrid(namespace: namespace, fetchResult: fetchResult)
                 } else {
-                    Text("Albums.NoPics")
+                    Text("Albums.NoPics", tableName: "Albums")
                         .foregroundStyle(.secondary)
                         .padding(20.0)
                 }
             }
             .padding([.top], 20.0)
         }
-        .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+        .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
         .toolbar {
             if UIDevice.current.userInterfaceIdiom == .phone {
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -92,10 +92,10 @@ struct PhotosAlbumContentView: View {
     @ViewBuilder
     private var photosFilterMenu: some View {
         Menu {
-            Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
+            Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"), systemImage: "photo.stack") {
                 isDuplicateCheckerPresented = true
             }
-            Section("Albums.Pics") {
+            Section(String(localized: "Albums.Pics", table: "Albums")) {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
                        selection: $columnCount.animation(.smooth.speed(2.0))) {

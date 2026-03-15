@@ -38,46 +38,46 @@ struct MoreView: View {
     private var listContent: some View {
         List {
             Section {
-                Toggle("More.PhotosMode", isOn: $isPhotosModeEnabled)
+                Toggle(String(localized: "More.PhotosMode", table: "More"), isOn: $isPhotosModeEnabled)
                 if isPhotosModeEnabled {
-                    Toggle("More.Experiments.NestedAlbums", isOn: $isNestedAlbumsEnabled)
-                    Button("More.Experiments.NestedAlbums.CopyPrefix") {
+                    Toggle(String(localized: "More.Experiments.NestedAlbums", table: "More"), isOn: $isNestedAlbumsEnabled)
+                    Button(String(localized: "More.Experiments.NestedAlbums.CopyPrefix", table: "More")) {
                         UIPasteboard.general.string = "▶︎ "
                     }
                     .tint(.primary)
                     .disabled(!isNestedAlbumsEnabled)
                 }
             } header: {
-                Text("More.PhotosMode.Header")
+                Text("More.PhotosMode.Header", tableName: "More")
             } footer: {
                 if isPhotosModeEnabled {
-                    Text("More.Experiments.NestedAlbums.Description")
+                    Text("More.Experiments.NestedAlbums.Description", tableName: "More")
                 } else {
-                    Text("More.PhotosMode.Description")
+                    Text("More.PhotosMode.Description", tableName: "More")
                 }
             }
             Section {
-                Toggle("More.AppLock", isOn: $isAppLockEnabled)
+                Toggle(String(localized: "More.AppLock", table: "More"), isOn: $isAppLockEnabled)
                     .disabled(auth.biometryType == .none)
             } header: {
-                Text("More.Security")
+                Text("More.Security", tableName: "More")
             } footer: {
-                Text("More.AppLock.Description")
+                Text("More.AppLock.Description", tableName: "More")
             }
             Section {
-                Toggle("More.ShareSheet.OpenSearch", isOn: $openSearchWhenSharing)
-                Toggle("More.ShareSheet.ShowAnimation", isOn: $showAnimationWhenSaving)
-                Toggle("More.ShareSheet.QuickImport", isOn: $quickImport)
+                Toggle(String(localized: "More.ShareSheet.OpenSearch", table: "More"), isOn: $openSearchWhenSharing)
+                Toggle(String(localized: "More.ShareSheet.ShowAnimation", table: "More"), isOn: $showAnimationWhenSaving)
+                Toggle(String(localized: "More.ShareSheet.QuickImport", table: "More"), isOn: $quickImport)
             } header: {
-                Text("More.ShareSheet")
+                Text("More.ShareSheet", tableName: "More")
             } footer: {
-                Text("More.ShareSheet.QuickImport.Description")
+                Text("More.ShareSheet.QuickImport.Description", tableName: "More")
             }
             Section {
-                Button("More.DuplicateChecker") {
+                Button(String(localized: "More.DuplicateChecker", table: "More")) {
                     isDuplicateCheckerPresented = true
                 }
-                Button("More.Backup") {
+                Button(String(localized: "More.Backup", table: "More")) {
                     isPickingBackupFolder = true
                 }
                 Button("Shared.OpenFilesApp") {
@@ -95,7 +95,7 @@ struct MoreView: View {
 #endif
                 }
             } header: {
-                Text("More.Tools")
+                Text("More.Tools", tableName: "More")
             }
             Section {
                 HStack(alignment: .top) {
@@ -121,26 +121,26 @@ struct MoreView: View {
                     .frame(maxWidth: .infinity)
                 }
             } header: {
-                Text("More.Stats")
+                Text("More.Stats", tableName: "More")
             } footer: {
-                Text("More.Stats.Footer")
+                Text("More.Stats.Footer", tableName: "More")
             }
             Section {
-                NavigationLink("More.Troubleshooting", value: ViewPath.moreTroubleshooting)
+                NavigationLink(String(localized: "More.Troubleshooting", table: "More"), value: ViewPath.moreTroubleshooting)
             } header: {
-                Text("More.Advanced")
+                Text("More.Advanced", tableName: "More")
             }
             Section {
                 Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
                     HStack {
-                        Text(String(localized: "More.GitHub"))
+                        Text(String(localized: "More.GitHub", table: "More"))
                         Spacer()
                         Text("katagaki/IllustMate")
                             .foregroundStyle(.secondary)
                     }
                 }
                 .tint(.primary)
-                NavigationLink("More.Attributions", value: ViewPath.moreAttributions)
+                NavigationLink(String(localized: "More.Attributions", table: "More"), value: ViewPath.moreAttributions)
             }
         }
         .navigationTitle("ViewTitle.More")

@@ -177,7 +177,7 @@ struct AlbumView: View {
                 }
             }
             .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
-            .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
+            .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
     }
 
     var mainContent: some View {
@@ -199,7 +199,7 @@ struct AlbumView: View {
                         albumSection
                         if !searchText.isEmpty {
                             if displayedAlbums.isEmpty {
-                                Text("Albums.NoSearchResults")
+                                Text("Albums.NoSearchResults", tableName: "Albums")
                                     .foregroundStyle(.secondary)
                                     .padding(20.0)
                             }

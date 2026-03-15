@@ -22,9 +22,11 @@ struct ImportProgressView: View {
             VStack(alignment: .center, spacing: 16.0) {
                 if !isImportCompleted {
                     StatusView(type: .inProgress, title: "Import.Importing",
+                               tableName: "Import",
                                currentCount: importCurrentCount, totalCount: importTotalCount)
                 } else {
-                    StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)")
+                    StatusView(type: .success, title: "Import.Completed.Text.\(importCompletedCount)",
+                               tableName: "Import")
                     Button {
                         dismiss()
                     } label: {

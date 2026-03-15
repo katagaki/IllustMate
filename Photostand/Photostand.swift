@@ -127,7 +127,7 @@ extension UIImage {
 // MARK: - App Entity for Album Selection
 
 struct AlbumEntity: AppEntity {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Photostand.Entity.Album"
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: LocalizedStringResource("Photostand.Entity.Album", table: "Widgets"))
     static var defaultQuery = AlbumEntityQuery()
 
     var id: String
@@ -161,12 +161,12 @@ enum RefreshInterval: String, CaseIterable, AppEnum {
     case twelveHours = "12h"
     case twentyFourHours = "24h"
 
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Photostand.Entity.RefreshInterval"
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: LocalizedStringResource("Photostand.Entity.RefreshInterval", table: "Widgets"))
     static var caseDisplayRepresentations: [RefreshInterval: DisplayRepresentation] = [
-        .threeHours: "Photostand.RefreshInterval.3Hours",
-        .sixHours: "Photostand.RefreshInterval.6Hours",
-        .twelveHours: "Photostand.RefreshInterval.12Hours",
-        .twentyFourHours: "Photostand.RefreshInterval.24Hours"
+        .threeHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.3Hours", table: "Widgets")),
+        .sixHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.6Hours", table: "Widgets")),
+        .twelveHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.12Hours", table: "Widgets")),
+        .twentyFourHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.24Hours", table: "Widgets"))
     ]
 
     var seconds: TimeInterval {
@@ -186,13 +186,13 @@ enum RefreshInterval: String, CaseIterable, AppEnum {
 // MARK: - Widget Configuration Intent
 
 struct SelectAlbumIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "Photostand.Intent.Title"
-    static var description: IntentDescription = "Photostand.Intent.Description"
+    static var title: LocalizedStringResource = LocalizedStringResource("Photostand.Intent.Title", table: "Widgets")
+    static var description = IntentDescription(LocalizedStringResource("Photostand.Intent.Description", table: "Widgets"))
 
-    @Parameter(title: "Photostand.Intent.Album")
+    @Parameter(title: LocalizedStringResource("Photostand.Intent.Album", table: "Widgets"))
     var album: AlbumEntity?
 
-    @Parameter(title: "Photostand.Intent.RefreshInterval", default: .threeHours)
+    @Parameter(title: LocalizedStringResource("Photostand.Intent.RefreshInterval", table: "Widgets"), default: .threeHours)
     var refreshInterval: RefreshInterval
 }
 
@@ -287,11 +287,11 @@ struct PhotostandEntryView: SwiftUI.View {
                     .font(.largeTitle)
                     .foregroundStyle(.secondary)
                 if entry.albumID == nil {
-                    Text("Photostand.Placeholder.SelectAlbum")
+                    Text("Photostand.Placeholder.SelectAlbum", tableName: "Widgets")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("Photostand.Placeholder.NoPics")
+                    Text("Photostand.Placeholder.NoPics", tableName: "Widgets")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -317,8 +317,8 @@ struct Photostand: Widget {
                 }
                 .widgetURL(widgetURL(for: entry))
         }
-        .configurationDisplayName("Photostand.DisplayName")
-        .description("Photostand.Description")
+        .configurationDisplayName(Text("Photostand.DisplayName", tableName: "Widgets"))
+        .description(Text("Photostand.Description", tableName: "Widgets"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
     }
@@ -332,10 +332,10 @@ struct Photostand: Widget {
 // MARK: - Photo Grid Widget Configuration Intent
 
 struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "PhotoGrid.Intent.Title"
-    static var description: IntentDescription = "PhotoGrid.Intent.Description"
+    static var title: LocalizedStringResource = LocalizedStringResource("PhotoGrid.Intent.Title", table: "Widgets")
+    static var description = IntentDescription(LocalizedStringResource("PhotoGrid.Intent.Description", table: "Widgets"))
 
-    @Parameter(title: "PhotoGrid.Intent.Album")
+    @Parameter(title: LocalizedStringResource("PhotoGrid.Intent.Album", table: "Widgets"))
     var album: AlbumEntity?
 }
 
@@ -465,11 +465,11 @@ struct PhotoGridEntryView: SwiftUI.View {
                     .font(.largeTitle)
                     .foregroundStyle(.secondary)
                 if entry.albumID == nil {
-                    Text("PhotoGrid.Placeholder.SelectAlbum")
+                    Text("PhotoGrid.Placeholder.SelectAlbum", tableName: "Widgets")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("PhotoGrid.Placeholder.NoPics")
+                    Text("PhotoGrid.Placeholder.NoPics", tableName: "Widgets")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -495,8 +495,8 @@ struct PhotoGrid: Widget {
                 }
                 .widgetURL(widgetURL(for: entry))
         }
-        .configurationDisplayName("PhotoGrid.DisplayName")
-        .description("PhotoGrid.Description")
+        .configurationDisplayName(Text("PhotoGrid.DisplayName", tableName: "Widgets"))
+        .description(Text("PhotoGrid.Description", tableName: "Widgets"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
     }
