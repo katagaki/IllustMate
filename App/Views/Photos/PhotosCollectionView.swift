@@ -133,8 +133,9 @@ struct PhotosCollectionView: View {
     @ViewBuilder
     private var photosFilterMenu: some View {
         Menu {
-            ControlGroup {
+            Section("Albums.Albums") {
                 Picker("Albums.Style",
+                       systemImage: "paintbrush",
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
                     Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
@@ -143,8 +144,7 @@ struct PhotosCollectionView: View {
                     Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
                         .tag(ViewStyle.carousel)
                 }
-            }
-            Section("Albums.Albums") {
+                       .pickerStyle(.menu)
                 if albumStyleState == .grid {
                     Picker("Shared.GridSize",
                            systemImage: "square.grid.2x2",
