@@ -22,7 +22,7 @@ struct MoreLicensesView: View {
             }
         }
         .listStyle(.grouped)
-        .navigationTitle(String(localized: "More.Attributions", table: "More"))
+        .navigationTitle(String(localized: "Attributions", table: "More"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

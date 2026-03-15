@@ -23,25 +23,25 @@ struct MoreTroubleshootingView: View {
     var body: some View {
         List {
             Section {
-                Button(String(localized: "More.Troubleshooting.RebuildThumbnails", table: "More")) {
+                Button(String(localized: "Troubleshooting.RebuildThumbnails", table: "More")) {
                     Task { await rebuildThumbnails() }
                 }
-                Button(String(localized: "More.Troubleshooting.FreeUpSpace", table: "More")) {
+                Button(String(localized: "Troubleshooting.FreeUpSpace", table: "More")) {
                     Task { await freeUpSpace() }
                 }
-                Button(String(localized: "More.Troubleshooting.ClearHashCache", table: "More")) {
+                Button(String(localized: "Troubleshooting.ClearHashCache", table: "More")) {
                     Task { await HashActor.shared.deleteAllHashes() }
                 }
-                Button(String(localized: "More.Troubleshooting.ClearColorCache", table: "More")) {
+                Button(String(localized: "Troubleshooting.ClearColorCache", table: "More")) {
                     Task { await PColorActor.shared.deleteAllColors() }
                 }
             } header: {
-                Text("More.Troubleshooting.DataManagement", tableName: "More")
+                Text("Troubleshooting.DataManagement", tableName: "More")
             } footer: {
-                Text("More.Troubleshooting.DataManagement.Description", tableName: "More")
+                Text("Troubleshooting.DataManagement.Description", tableName: "More")
             }
             Section {
-                Button(String(localized: "More.Troubleshooting.DeleteAll", table: "More"), role: .destructive) {
+                Button(String(localized: "Troubleshooting.DeleteAll", table: "More"), role: .destructive) {
                     isDeleteConfirming = true
                 }
             }

@@ -57,9 +57,9 @@ struct StatusView: View {
             case .backupExportCompleted:
                 Text("Backup.Export.Completed", tableName: "More")
             case .troubleshootingRebuildingThumbnails:
-                Text("More.Troubleshooting.RebuildThumbnails.Rebuilding", tableName: "More")
+                Text("Troubleshooting.RebuildThumbnails.Rebuilding", tableName: "More")
             case .troubleshootingFreeingUpSpace:
-                Text("More.Troubleshooting.FreeUpSpace.Freeing", tableName: "More")
+                Text("Troubleshooting.FreeUpSpace.Freeing", tableName: "More")
             case .backupRestoring:
                 Text("Backup.Restoring", tableName: "More")
             case .backupRestoreCompleted:

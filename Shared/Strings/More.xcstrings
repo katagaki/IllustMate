@@ -366,7 +366,7 @@
         }
       }
     },
-    "More.Advanced" : {
+    "Advanced" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -407,7 +407,7 @@
         }
       }
     },
-    "More.AppLock" : {
+    "AppLock" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -448,7 +448,7 @@
         }
       }
     },
-    "More.AppLock.Description" : {
+    "AppLock.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -489,7 +489,7 @@
         }
       }
     },
-    "More.Attributions" : {
+    "Attributions" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -529,7 +529,7 @@
         }
       }
     },
-    "More.Backup" : {
+    "Backup" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -570,7 +570,7 @@
         }
       }
     },
-    "More.Debug" : {
+    "Debug" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -611,7 +611,7 @@
         }
       }
     },
-    "More.Debug.Warning.Text" : {
+    "Debug.Warning.Text" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -651,7 +651,7 @@
         }
       }
     },
-    "More.Debug.Warning.Title" : {
+    "Debug.Warning.Title" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -691,7 +691,7 @@
         }
       }
     },
-    "More.DuplicateChecker" : {
+    "DuplicateChecker" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -732,7 +732,7 @@
         }
       }
     },
-    "More.Experiments" : {
+    "Experiments" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -773,7 +773,7 @@
         }
       }
     },
-    "More.Experiments.NestedAlbums" : {
+    "Experiments.NestedAlbums" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -814,7 +814,7 @@
         }
       }
     },
-    "More.Experiments.NestedAlbums.CopyPrefix" : {
+    "Experiments.NestedAlbums.CopyPrefix" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -855,7 +855,7 @@
         }
       }
     },
-    "More.Experiments.NestedAlbums.Description" : {
+    "Experiments.NestedAlbums.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -896,7 +896,7 @@
         }
       }
     },
-    "More.GitHub" : {
+    "GitHub" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -936,7 +936,7 @@
         }
       }
     },
-    "More.PhotosMode" : {
+    "PhotosMode" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -977,7 +977,7 @@
         }
       }
     },
-    "More.PhotosMode.Description" : {
+    "PhotosMode.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1018,7 +1018,7 @@
         }
       }
     },
-    "More.PhotosMode.Header" : {
+    "PhotosMode.Header" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1059,7 +1059,7 @@
         }
       }
     },
-    "More.Security" : {
+    "Security" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1100,7 +1100,7 @@
         }
       }
     },
-    "More.ShareSheet" : {
+    "ShareSheet" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1141,7 +1141,7 @@
         }
       }
     },
-    "More.ShareSheet.DefaultAlbum" : {
+    "ShareSheet.DefaultAlbum" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1182,7 +1182,7 @@
         }
       }
     },
-    "More.ShareSheet.DefaultAlbum.Description" : {
+    "ShareSheet.DefaultAlbum.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1223,7 +1223,7 @@
         }
       }
     },
-    "More.ShareSheet.DefaultAlbum.Collection" : {
+    "ShareSheet.DefaultAlbum.Collection" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1264,7 +1264,7 @@
         }
       }
     },
-    "More.ShareSheet.DefaultAlbum.Collection.Description" : {
+    "ShareSheet.DefaultAlbum.Collection.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1305,7 +1305,7 @@
         }
       }
     },
-    "More.ShareSheet.DefaultAlbum.None" : {
+    "ShareSheet.DefaultAlbum.None" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1346,7 +1346,7 @@
         }
       }
     },
-    "More.ShareSheet.OpenSearch" : {
+    "ShareSheet.OpenSearch" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1387,7 +1387,7 @@
         }
       }
     },
-    "More.ShareSheet.QuickImport" : {
+    "ShareSheet.QuickImport" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1428,7 +1428,7 @@
         }
       }
     },
-    "More.ShareSheet.QuickImport.Description" : {
+    "ShareSheet.QuickImport.Description" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1469,7 +1469,7 @@
         }
       }
     },
-    "More.ShareSheet.ShowAnimation" : {
+    "ShareSheet.ShowAnimation" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1510,7 +1510,7 @@
         }
       }
     },
-    "More.Stats" : {
+    "Stats" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1551,7 +1551,7 @@
         }
       }
     },
-    "More.Stats.Footer" : {
+    "Stats.Footer" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1592,7 +1592,7 @@
         }
       }
     },
-    "More.Tools" : {
+    "Tools" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1633,7 +1633,7 @@
         }
       }
     },
-    "More.Troubleshooting" : {
+    "Troubleshooting" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1674,7 +1674,7 @@
         }
       }
     },
-    "More.Troubleshooting.ClearColorCache" : {
+    "Troubleshooting.ClearColorCache" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1714,7 +1714,7 @@
         }
       }
     },
-    "More.Troubleshooting.ClearHashCache" : {
+    "Troubleshooting.ClearHashCache" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1755,7 +1755,7 @@
         }
       }
     },
-    "More.Troubleshooting.DataManagement" : {
+    "Troubleshooting.DataManagement" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1796,7 +1796,7 @@
         }
       }
     },
-    "More.Troubleshooting.DataManagement.Description" : {
+    "Troubleshooting.DataManagement.Description" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1836,7 +1836,7 @@
         }
       }
     },
-    "More.Troubleshooting.DeleteAll" : {
+    "Troubleshooting.DeleteAll" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1877,7 +1877,7 @@
         }
       }
     },
-    "More.Troubleshooting.FreeUpSpace" : {
+    "Troubleshooting.FreeUpSpace" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1917,7 +1917,7 @@
         }
       }
     },
-    "More.Troubleshooting.FreeUpSpace.Freeing" : {
+    "Troubleshooting.FreeUpSpace.Freeing" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1958,7 +1958,7 @@
         }
       }
     },
-    "More.Troubleshooting.RebuildThumbnails" : {
+    "Troubleshooting.RebuildThumbnails" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -1999,7 +1999,7 @@
         }
       }
     },
-    "More.Troubleshooting.RebuildThumbnails.Rebuilding" : {
+    "Troubleshooting.RebuildThumbnails.Rebuilding" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
