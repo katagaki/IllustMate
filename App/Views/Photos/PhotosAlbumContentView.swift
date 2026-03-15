@@ -61,11 +61,43 @@ struct PhotosAlbumContentView: View {
             .padding([.top], 20.0)
         }
         .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
+        .toolbar {
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    photosFilterMenu
+                }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+            }
+        }
         .onAppear {
             if !hasFetched {
                 fetchResult = photosManager.fetchAssets(in: collection)
                 hasFetched = true
             }
         }
+    }
+
+    @ViewBuilder
+    private var photosFilterMenu: some View {
+        Menu {
+            Section("Albums.Pics") {
+                Picker("Shared.GridSize",
+                       systemImage: "square.grid.2x2",
+                       selection: $columnCount.animation(.smooth.speed(2.0))) {
+                    Text("Shared.GridSize.3")
+                        .tag(3)
+                    Text("Shared.GridSize.4")
+                        .tag(4)
+                    Text("Shared.GridSize.5")
+                        .tag(5)
+                    Text("Shared.GridSize.8")
+                        .tag(8)
+                }
+                .pickerStyle(.menu)
+            }
+        } label: {
+            Label("Shared.Filter", systemImage: "line.3.horizontal.decrease")
+        }
+        .menuActionDismissBehavior(.disabled)
     }
 }

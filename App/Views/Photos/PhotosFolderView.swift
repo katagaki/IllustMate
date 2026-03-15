@@ -71,7 +71,7 @@ struct PhotosFolderView: View {
             .padding([.top], 20.0)
         }
         .navigationTitle(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
-        .searchable(text: $searchText)
+        .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
         .onChange(of: searchText) { _, newValue in
             withAnimation(.smooth.speed(2.0)) {
                 if newValue.isEmpty {
@@ -86,6 +86,13 @@ struct PhotosFolderView: View {
                 Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
                     isAddingAlbum = true
                 }
+            }
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    photosFilterMenu
+                }
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
             }
         }
         .onAppear {
@@ -130,5 +137,55 @@ struct PhotosFolderView: View {
                 folderToDelete = nil
             }
         }
+    }
+
+    @ViewBuilder
+    private var photosFilterMenu: some View {
+        Menu {
+            ControlGroup {
+                Picker("Albums.Style",
+                       selection: $albumStyleState.animation(.smooth.speed(2))) {
+                    Label("Albums.Style.Grid", systemImage: "square.grid.2x2")
+                        .tag(ViewStyle.grid)
+                    Label("Albums.Style.List", systemImage: "list.bullet")
+                        .tag(ViewStyle.list)
+                    Label("Albums.Style.Carousel", systemImage: "rectangle.on.rectangle")
+                        .tag(ViewStyle.carousel)
+                }
+            }
+            Section("Albums.Albums") {
+                if albumStyleState == .grid {
+                    Picker("Shared.GridSize",
+                           systemImage: "square.grid.2x2",
+                           selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
+                        Text("Shared.GridSize.2")
+                            .tag(2)
+                        Text("Shared.GridSize.3")
+                            .tag(3)
+                        Text("Shared.GridSize.4")
+                            .tag(4)
+                    }
+                    .pickerStyle(.menu)
+                }
+            }
+            Section("Albums.Pics") {
+                Picker("Shared.GridSize",
+                       systemImage: "square.grid.2x2",
+                       selection: $picColumnCount.animation(.smooth.speed(2.0))) {
+                    Text("Shared.GridSize.3")
+                        .tag(3)
+                    Text("Shared.GridSize.4")
+                        .tag(4)
+                    Text("Shared.GridSize.5")
+                        .tag(5)
+                    Text("Shared.GridSize.8")
+                        .tag(8)
+                }
+                .pickerStyle(.menu)
+            }
+        } label: {
+            Label("Shared.Filter", systemImage: "line.3.horizontal.decrease")
+        }
+        .menuActionDismissBehavior(.disabled)
     }
 }
