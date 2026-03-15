@@ -49,6 +49,9 @@ extension AlbumView {
                     await PColorActor.shared.deleteColor(forPicWithID: picPendingDeletion.id)
                 }
             }
+            if let currentAlbum {
+                AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
+            }
             self.selectedPics.removeAll()
             refreshPicsAndSet()
         }
@@ -90,6 +93,10 @@ extension AlbumView {
 
     func movePicToAlbum(_ picID: String, to album: Album) async {
         await DataActor.shared.addPic(withID: picID, toAlbumWithID: album.id)
+        if let currentAlbum {
+            AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
+        }
+        AlbumCoverCache.shared.removeImages(forAlbumID: album.id)
     }
 
     func moveAlbumToAlbum(_ albumID: String, to album: Album) async {
