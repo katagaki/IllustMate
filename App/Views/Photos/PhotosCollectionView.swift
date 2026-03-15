@@ -64,7 +64,7 @@ struct PhotosCollectionView: View {
             }
         }
         .navigationTitle(String(localized: "ViewTitle.Photos"))
-        .searchable(text: $searchText)
+        .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
         .onChange(of: searchText) { _, newValue in
             withAnimation(.smooth.speed(2.0)) {
                 if newValue.isEmpty {

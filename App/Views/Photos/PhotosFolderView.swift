@@ -71,7 +71,7 @@ struct PhotosFolderView: View {
             .padding([.top], 20.0)
         }
         .navigationTitle(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled"))
-        .searchable(text: $searchText)
+        .searchable(text: $searchText, prompt: "Albums.Search.Prompt")
         .onChange(of: searchText) { _, newValue in
             withAnimation(.smooth.speed(2.0)) {
                 if newValue.isEmpty {
