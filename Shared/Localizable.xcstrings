@@ -43,6 +43,16 @@
       },
       "shouldTranslate" : false
     },
+    "%lld × %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld × %2$lld"
+          }
+        }
+      }
+    },
     "Albums.Albums" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4528,6 +4538,46 @@
         }
       }
     },
+    "More.Troubleshooting.ClearColorCache" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbsortierungs-Cache leeren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Color Sort Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーソートキャッシュを消去"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "색상 정렬 캐시 지우기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除颜色排序缓存"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除顏色排序快取"
+          }
+        }
+      }
+    },
     "More.Troubleshooting.ClearHashCache" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4565,46 +4615,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "清除重複掃描快取"
-          }
-        }
-      }
-    },
-    "More.Troubleshooting.ClearColorCache" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Farbsortierungs-Cache leeren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear Color Sort Cache"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カラーソートキャッシュを消去"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "색상 정렬 캐시 지우기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "清除颜色排序缓存"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "清除顏色排序快取"
           }
         }
       }
@@ -6410,6 +6420,101 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已刪除相簿中的項目將被移至其上層相簿。"
+          }
+        }
+      }
+    },
+    "Shared.DeleteConfirmation.Photo.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Möchten Sie das ausgewählte Foto wirklich löschen?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Möchten Sie die ausgewählten %lld Fotos wirklich löschen?"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete the selected photo?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete the selected %lld photos?"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した写真を削除してもよろしいですか？"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した%lld枚の写真を削除してもよろしいですか？"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "선택한 %lld장의 사진을 삭제하시겠습니까?"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "确定要删除已选中的 %lld 张照片吗？"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "確定要刪除已選取的 %lld 張照片嗎？"
+                }
+              }
+            }
           }
         }
       }

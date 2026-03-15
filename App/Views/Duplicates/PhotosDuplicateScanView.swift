@@ -1,0 +1,108 @@
+//
+//  PhotosDuplicateScanView.swift
+//  PicMate
+//
+//  Created on 2026/03/15.
+//
+
+import Komponents
+import Photos
+import SwiftUI
+
+struct PhotosDuplicateScanView: View {
+
+    @Environment(\.dismiss) var dismiss
+
+    @State var scanManager = PhotosDuplicateScanManager()
+
+    let collection: PHAssetCollection
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if scanManager.isScanning {
+                    scanProgressContent
+                } else if scanManager.scanPhase == .done {
+                    PhotosDuplicateResultsView(scanManager: scanManager)
+                } else {
+                    scanConfigContent
+                }
+            }
+            .navigationTitle("ViewTitle.DuplicateChecker")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !scanManager.isScanning {
+                        Button(role: .close) {
+                            dismiss()
+                        }
+                    }
+                }
+            }
+        }
+        .interactiveDismissDisabled(scanManager.isScanning)
+        .onChange(of: scanManager.isScanning) { _, isScanning in
+            UIApplication.shared.isIdleTimerDisabled = isScanning
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    private var scanConfigContent: some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 8.0) {
+                    Text("Duplicates.Sensitivity")
+                    Slider(value: .init(
+                        get: { Double(scanManager.hammingThreshold) },
+                        set: { scanManager.hammingThreshold = Int($0) }
+                    ), in: 1...15, step: 1)
+                    HStack {
+                        Text("Duplicates.Sensitivity.Strict")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("Duplicates.Sensitivity.Loose")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                Text("Duplicates.Settings")
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            VStack(alignment: .center, spacing: 16.0) {
+                Button {
+                    Task {
+                        await scanManager.scan(in: collection)
+                    }
+                } label: {
+                    Text("Duplicates.StartScan")
+                        .bold()
+                        .padding(4.0)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(20.0)
+        }
+    }
+
+    private var scanProgressContent: some View {
+        VStack {
+            if scanManager.scanPhase == .computingHashes {
+                StatusView(type: .inProgress,
+                           title: "Duplicates.Scanning.ComputingHashes",
+                           currentCount: scanManager.scanProgress,
+                           totalCount: scanManager.scanTotal)
+            } else {
+                StatusView(type: .inProgress,
+                           title: "Duplicates.Scanning.Comparing")
+            }
+        }
+    }
+}

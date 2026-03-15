@@ -57,43 +57,43 @@ actor PColorActor {
 
     // MARK: - Read
 
-    func cachedColor(forPicWithID picID: String) -> (r: Int, g: Int, b: Int)? {
+    func cachedColor(forPicWithID picID: String) -> RGBColor? {
         let query = picColorsTable.filter(colorPicId == picID)
             .select(colorRed, colorGreen, colorBlue)
         guard let row = try? database.pluck(query),
               let red = try? row.get(colorRed),
               let green = try? row.get(colorGreen),
               let blue = try? row.get(colorBlue) else { return nil }
-        return (red, green, blue)
+        return RGBColor(red: red, green: green, blue: blue)
     }
 
-    func allCachedColors() -> [String: (r: Int, g: Int, b: Int)] {
+    func allCachedColors() -> [String: RGBColor] {
         let query = picColorsTable.select(colorPicId, colorRed, colorGreen, colorBlue)
         guard let rows = try? database.prepare(query) else { return [:] }
-        var result: [String: (r: Int, g: Int, b: Int)] = [:]
+        var result: [String: RGBColor] = [:]
         for row in rows {
             guard let picID = try? row.get(colorPicId),
                   let red = try? row.get(colorRed),
                   let green = try? row.get(colorGreen),
                   let blue = try? row.get(colorBlue) else { continue }
-            result[picID] = (red, green, blue)
+            result[picID] = RGBColor(red: red, green: green, blue: blue)
         }
         return result
     }
 
-    func cachedColors(forPicIDs picIDs: [String]) -> [String: (r: Int, g: Int, b: Int)] {
+    func cachedColors(forPicIDs picIDs: [String]) -> [String: RGBColor] {
         guard !picIDs.isEmpty else { return [:] }
         let placeholders = picIDs.map { _ in "?" }.joined(separator: ", ")
         let sql = "SELECT pic_id, red, green, blue FROM pic_colors WHERE pic_id IN (\(placeholders))"
         let bindings: [Binding?] = picIDs.map { $0 as Binding? }
         guard let stmt = try? database.prepare(sql, bindings) else { return [:] }
-        var result: [String: (r: Int, g: Int, b: Int)] = [:]
+        var result: [String: RGBColor] = [:]
         for row in stmt {
             if let picID = row[0] as? String,
                let red = row[1] as? Int64,
                let green = row[2] as? Int64,
                let blue = row[3] as? Int64 {
-                result[picID] = (r: Int(red), g: Int(green), b: Int(blue))
+                result[picID] = RGBColor(red: Int(red), green: Int(green), blue: Int(blue))
             }
         }
         return result
@@ -122,15 +122,15 @@ actor PColorActor {
         ))
     }
 
-    func storeColors(_ colors: [(picID: String, r: Int, g: Int, b: Int)]) {
+    func storeColors(_ colors: [(picID: String, color: RGBColor)]) {
         guard !colors.isEmpty else { return }
         _ = try? database.transaction {
-            for color in colors {
+            for entry in colors {
                 _ = try? database.run(picColorsTable.insert(or: .replace,
-                    colorPicId <- color.picID,
-                    colorRed <- color.r,
-                    colorGreen <- color.g,
-                    colorBlue <- color.b
+                    colorPicId <- entry.picID,
+                    colorRed <- entry.color.red,
+                    colorGreen <- entry.color.green,
+                    colorBlue <- entry.color.blue
                 ))
             }
         }

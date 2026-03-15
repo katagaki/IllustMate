@@ -121,6 +121,10 @@ struct PhotosFetchResultAssetsGrid: View {
                 loadMoreAssets()
             }
         }
+        .onChange(of: fetchResult) {
+            displayedAssets = []
+            loadMoreAssets()
+        }
     }
 
     private func loadMoreAssets() {

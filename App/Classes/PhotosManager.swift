@@ -125,7 +125,7 @@ class PhotosManager {
     /// Returns (ownPicsAlbum, childAlbums, childFolders)
     func resolveNestedAlbums(
         in folder: PHCollectionList
-    ) -> (ownPicsCollection: PHAssetCollection?, albums: [PHAssetCollection], folders: [PHCollectionList]) {
+    ) -> ResolvedNestedAlbums {
         let folderName = folder.localizedTitle ?? ""
         let markerName = "▶︎ \(folderName)"
         var ownPicsCollection: PHAssetCollection?
@@ -152,7 +152,7 @@ class PhotosManager {
             ($0.localizedTitle ?? "").localizedCaseInsensitiveCompare($1.localizedTitle ?? "") == .orderedAscending
         }
 
-        return (ownPicsCollection, albums, folders)
+        return ResolvedNestedAlbums(ownPicsCollection: ownPicsCollection, albums: albums, folders: folders)
     }
 
     // MARK: - Album Management

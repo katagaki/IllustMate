@@ -77,6 +77,11 @@ struct AlbumView: View {
                 .phonePresentationDetents([.medium, .large])
                 .interactiveDismissDisabled()
             }
+            .onChange(of: isDuplicateCheckerPresented) { _, isPresented in
+                if !isPresented {
+                    refreshPicsAndSet()
+                }
+            }
             .modifier(AlbumViewDialogs(
                 isConfirmingDeleteAlbum: $isConfirmingDeleteAlbum,
                 isConfirmingDeletePic: $isConfirmingDeletePic,

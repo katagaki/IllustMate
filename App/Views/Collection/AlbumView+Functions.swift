@@ -221,9 +221,9 @@ extension AlbumView {
 
         // Compute colors concurrently
         if !uncachedPics.isEmpty {
-            let newColors: [(picID: String, r: Int, g: Int, b: Int)] = await withTaskGroup(
-                of: (String, (r: Int, g: Int, b: Int)?).self,
-                returning: [(picID: String, r: Int, g: Int, b: Int)].self
+            let newColors: [(picID: String, color: RGBColor)] = await withTaskGroup(
+                of: (String, RGBColor?).self,
+                returning: [(picID: String, color: RGBColor)].self
             ) { group in
                 for pic in uncachedPics {
                     group.addTask {
@@ -232,28 +232,28 @@ extension AlbumView {
                         return (pic.id, color)
                     }
                 }
-                var results: [(picID: String, r: Int, g: Int, b: Int)] = []
+                var results: [(picID: String, color: RGBColor)] = []
                 for await (picID, color) in group {
                     if let color {
-                        results.append((picID: picID, r: color.r, g: color.g, b: color.b))
+                        results.append((picID: picID, color: color))
                     }
                 }
                 return results
             }
             for entry in newColors {
-                colorsMap[entry.picID] = (r: entry.r, g: entry.g, b: entry.b)
+                colorsMap[entry.picID] = entry.color
             }
             await PColorActor.shared.storeColors(newColors)
         }
 
         // Sort by R, then G, then B
-        let defaultColor = (r: 128, g: 128, b: 128)
+        let defaultColor = RGBColor(red: 128, green: 128, blue: 128)
         return pics.sorted { lhs, rhs in
             let colorA = colorsMap[lhs.id] ?? defaultColor
             let colorB = colorsMap[rhs.id] ?? defaultColor
-            if colorA.r != colorB.r { return colorA.r < colorB.r }
-            if colorA.g != colorB.g { return colorA.g < colorB.g }
-            return colorA.b < colorB.b
+            if colorA.red != colorB.red { return colorA.red < colorB.red }
+            if colorA.green != colorB.green { return colorA.green < colorB.green }
+            return colorA.blue < colorB.blue
         }
     }
 

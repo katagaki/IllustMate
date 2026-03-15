@@ -12,7 +12,7 @@ enum ProminentColor {
     /// Calculates the most prominent color from thumbnail image data.
     /// White, black, and near-gray pixels are ignored.
     /// Returns the average color of the most common color bucket.
-    static func calculate(from thumbnailData: Data) -> (r: Int, g: Int, b: Int)? {
+    static func calculate(from thumbnailData: Data) -> RGBColor? {
         guard let image = UIImage(data: thumbnailData),
               let cgImage = image.cgImage else { return nil }
 
@@ -92,7 +92,7 @@ enum ProminentColor {
         }
 
         guard bestBucket >= 0, bestCount > 0 else {
-            return (r: 128, g: 128, b: 128)
+            return RGBColor(red: 128, green: 128, blue: 128)
         }
 
         // Average color of the most common bucket
@@ -100,6 +100,6 @@ enum ProminentColor {
         let avgG = bucketSumG[bestBucket] / bestCount
         let avgB = bucketSumB[bestBucket] / bestCount
 
-        return (r: avgR, g: avgG, b: avgB)
+        return RGBColor(red: avgR, green: avgG, blue: avgB)
     }
 }

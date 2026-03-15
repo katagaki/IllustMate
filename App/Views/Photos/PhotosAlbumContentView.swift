@@ -22,6 +22,8 @@ struct PhotosAlbumContentView: View {
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
+    @State private var isDuplicateCheckerPresented: Bool = false
+
     private var assetCount: Int {
         fetchResult?.count ?? 0
     }
@@ -69,6 +71,16 @@ struct PhotosAlbumContentView: View {
                 ToolbarSpacer(.flexible, placement: .bottomBar)
             }
         }
+        .sheet(isPresented: $isDuplicateCheckerPresented) {
+            PhotosDuplicateScanView(collection: collection)
+                .phonePresentationDetents([.medium, .large])
+                .interactiveDismissDisabled()
+        }
+        .onChange(of: isDuplicateCheckerPresented) { _, isPresented in
+            if !isPresented {
+                fetchResult = photosManager.fetchAssets(in: collection)
+            }
+        }
         .onAppear {
             if !hasFetched {
                 fetchResult = photosManager.fetchAssets(in: collection)
@@ -80,6 +92,9 @@ struct PhotosAlbumContentView: View {
     @ViewBuilder
     private var photosFilterMenu: some View {
         Menu {
+            Button("Duplicates.FindDuplicates", systemImage: "photo.stack") {
+                isDuplicateCheckerPresented = true
+            }
             Section("Albums.Pics") {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
