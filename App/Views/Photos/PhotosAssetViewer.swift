@@ -58,62 +58,7 @@ struct PhotosAssetViewer: View {
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 0.0) {
-            ZStack(alignment: .bottomLeading) {
-                ZStack {
-                    // Show thumbnail as placeholder
-                    if let thumbnail {
-                        Image(uiImage: thumbnail)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(.rect(cornerRadius: 8.0))
-                            .opacity(isFullImageLoaded ? 0 : 1)
-                    }
-                    // Crossfade to full image when loaded
-                    if let fullImage, isFullImageLoaded {
-                        Image(uiImage: fullImage)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(.rect(cornerRadius: 8.0))
-                            .transition(.opacity)
-                    }
-                }
-
-                // Image size overlay
-                if showImageSize, let displayedImage = fullImage {
-                    HStack(alignment: .center, spacing: 2.0) {
-                        Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
-                        Text(verbatim: "×")
-                        Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
-                    }
-                    .font(.caption)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.bar, in: .capsule)
-                    .padding(8)
-                    .transition(.opacity)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.vertical, 20)
-            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-            .zIndex(1)
-            .offset(displayOffset)
-            .scaleEffect(CGSize(width: magnification, height: magnification),
-                         anchor: magnificationAnchor)
-            .onTapGesture {
-                withAnimation(.smooth.speed(2)) {
-                    showImageSize.toggle()
-                }
-            }
-
-            // Carousel strip for navigating between photos
-            if photosViewer.allAssets.count > 1 {
-                PhotosAssetCarouselStrip()
-                    .padding(.horizontal, -20.0)
-            }
-        }
-        .padding(20.0)
+        mainContent
         .frame(maxHeight: .infinity)
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
@@ -144,36 +89,63 @@ struct PhotosAssetViewer: View {
                         .lineLimit(1)
                 }
             }
-            if pipManager.isPossible {
-                ToolbarItem(placement: .bottomBar) {
-                    Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                        startPictureInPicture()
+            if isLandscape {
+                // Landscape: show actions in top trailing bar
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if pipManager.isPossible {
+                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                            startPictureInPicture()
+                        }
+                        .disabled(currentImage == nil)
                     }
+                    Button("Shared.Copy", systemImage: "doc.on.doc") {
+                        if let image = currentImage {
+                            UIPasteboard.general.image = image
+                        }
+                    }
+                    .disabled(currentImage == nil)
+                    ShareLink(
+                        "Shared.Share",
+                        item: shareImage,
+                        preview: SharePreview(
+                            displayName,
+                            image: shareImage
+                        )
+                    )
+                    .disabled(currentImage == nil)
+                }
+            } else {
+                // Portrait: show actions in bottom bar
+                if pipManager.isPossible {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                            startPictureInPicture()
+                        }
+                        .disabled(currentImage == nil)
+                    }
+                }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button("Shared.Copy", systemImage: "doc.on.doc") {
+                        if let image = currentImage {
+                            UIPasteboard.general.image = image
+                        }
+                    }
+                    .disabled(currentImage == nil)
+                    ShareLink(
+                        "Shared.Share",
+                        item: shareImage,
+                        preview: SharePreview(
+                            displayName,
+                            image: shareImage
+                        )
+                    )
                     .disabled(currentImage == nil)
                 }
             }
-            ToolbarSpacer(.flexible, placement: .bottomBar)
-            ToolbarItemGroup(placement: .bottomBar) {
-                Button("Shared.Copy", systemImage: "doc.on.doc") {
-                    if let image = currentImage {
-                        UIPasteboard.general.image = image
-                    }
-                }
-                .disabled(currentImage == nil)
-                ShareLink(
-                    "Shared.Share",
-                    item: shareImage,
-                    preview: SharePreview(
-                        displayName,
-                        image: shareImage
-                    )
-                )
-                .disabled(currentImage == nil)
-            }
         }
+        .toolbar(isLandscape ? .hidden : .automatic, for: .bottomBar)
         .task(id: currentAsset.localIdentifier) {
-            thumbnail = nil
-            fullImage = nil
             isFullImageLoaded = false
             loadThumbnail()
             await loadFullImage()
@@ -213,6 +185,87 @@ struct PhotosAssetViewer: View {
                 }
         )
 #endif
+    }
+
+    // MARK: - Image Content
+
+    private var imageContent: some View {
+        ZStack(alignment: .bottomLeading) {
+            ZStack {
+                // Show thumbnail as placeholder
+                if let thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                        .opacity(isFullImageLoaded ? 0 : 1)
+                }
+                // Show full image when loaded
+                if let fullImage, isFullImageLoaded {
+                    Image(uiImage: fullImage)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
+            }
+
+            // Image size overlay
+            if showImageSize, let displayedImage = fullImage {
+                HStack(alignment: .center, spacing: 2.0) {
+                    Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                    Text(verbatim: "×")
+                    Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
+                }
+                .font(.caption)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.bar, in: .capsule)
+                .padding(8)
+                .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, isLandscape ? 4 : 20)
+        .padding(.bottom, isLandscape ? 0 : 20)
+        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+        .zIndex(1)
+        .offset(displayOffset)
+        .scaleEffect(CGSize(width: magnification, height: magnification),
+                     anchor: magnificationAnchor)
+        .onTapGesture {
+            withAnimation(.smooth.speed(2)) {
+                showImageSize.toggle()
+            }
+        }
+    }
+
+    // MARK: - Main Content
+
+    @ViewBuilder
+    private var mainContent: some View {
+        if isLandscape {
+            // Landscape: vertical carousel on the left, image fills remaining space
+            HStack(spacing: 0.0) {
+                if photosViewer.allAssets.count > 1 {
+                    PhotosAssetCarouselStripVertical()
+                        .padding(.vertical, -8.0)
+                }
+                imageContent
+            }
+            .padding(8.0)
+            .padding(.leading, 40.0)
+        } else {
+            // Portrait: image on top, horizontal carousel at bottom
+            VStack(alignment: .center, spacing: 0.0) {
+                imageContent
+
+                if photosViewer.allAssets.count > 1 {
+                    PhotosAssetCarouselStrip()
+                        .padding(.horizontal, -20.0)
+                }
+            }
+            .padding(20.0)
+        }
     }
 
     // MARK: - Picture in Picture
@@ -265,10 +318,8 @@ struct PhotosAssetViewer: View {
                                  contentMode: .default, options: options) { result, _ in
                 if let result {
                     DispatchQueue.main.async {
-                        withAnimation(.smooth.speed(2)) {
-                            self.fullImage = result
-                            self.isFullImageLoaded = true
-                        }
+                        self.fullImage = result
+                        self.isFullImageLoaded = true
                     }
                 }
                 continuation.resume()
@@ -306,6 +357,51 @@ private struct PhotosAssetCarouselStrip: View {
                 .padding(.horizontal, 20.0)
             }
             .frame(height: 56.0)
+            .onChange(of: photosViewer.currentIndex) { _, _ in
+                if let asset = photosViewer.displayedAsset {
+                    withAnimation(.smooth) {
+                        proxy.scrollTo(asset.localIdentifier, anchor: .center)
+                    }
+                }
+            }
+            .onAppear {
+                if let asset = photosViewer.displayedAsset {
+                    proxy.scrollTo(asset.localIdentifier, anchor: .center)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Vertical Carousel Strip (Landscape)
+
+private struct PhotosAssetCarouselStripVertical: View {
+
+    @Environment(PhotosViewerManager.self) var photosViewer
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(spacing: 4.0) {
+                    ForEach(Array(photosViewer.allAssets.enumerated()),
+                            id: \.element.localIdentifier) { index, asset in
+                        Button {
+                            withAnimation(.smooth.speed(2)) {
+                                photosViewer.navigateTo(index: index)
+                            }
+                        } label: {
+                            PhotosCarouselThumbnail(
+                                asset: asset,
+                                isSelected: index == photosViewer.currentIndex
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .id(asset.localIdentifier)
+                    }
+                }
+                .padding(.vertical, 8.0)
+            }
+            .frame(width: 56.0)
             .onChange(of: photosViewer.currentIndex) { _, _ in
                 if let asset = photosViewer.displayedAsset {
                     withAnimation(.smooth) {
