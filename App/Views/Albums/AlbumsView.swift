@@ -63,6 +63,8 @@ struct AlbumsView: View {
         Task.detached(priority: .userInitiated) {
             do {
                 let albums = try await DataActor.shared.albumsWithCounts(sortedBy: .nameAscending)
+                // Pre-warm cover cache for all albums in a single batch query
+                await Self.prefetchAlbumCovers(for: albums)
                 await MainActor.run {
                     doWithAnimation {
                         self.albums = albums
@@ -70,6 +72,53 @@ struct AlbumsView: View {
                 }
             } catch {
                 debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
+    /// Batch-fetches and caches album cover thumbnails for albums not already in cache.
+    private static func prefetchAlbumCovers(for albums: [Album]) async {
+        let uncachedIDs = albums.compactMap { album -> String? in
+            AlbumCoverCache.shared.images(forAlbumID: album.id) == nil ? album.id : nil
+        }
+        guard !uncachedIDs.isEmpty else { return }
+
+        let albumsByID = Dictionary(uniqueKeysWithValues: albums.map { ($0.id, $0) })
+        let batchThumbnails = await DataActor.shared.batchRepresentativeThumbnails(
+            forAlbumIDs: uncachedIDs
+        )
+
+        await withTaskGroup(of: Void.self) { group in
+            for albumID in uncachedIDs {
+                let album = albumsByID[albumID]
+                let thumbnailDatas = batchThumbnails[albumID] ?? []
+                group.addTask {
+                    let hasCoverPhoto = album?.coverPhoto != nil
+                    var images: [Image?] = []
+
+                    if hasCoverPhoto, let coverData = album?.coverPhoto,
+                       let uiImage = UIImage(data: coverData),
+                       let prepared = await uiImage.byPreparingForDisplay() {
+                        images.append(Image(uiImage: prepared))
+                    }
+
+                    for data in thumbnailDatas {
+                        if let uiImage = UIImage(data: data),
+                           let prepared = await uiImage.byPreparingForDisplay() {
+                            images.append(Image(uiImage: prepared))
+                        }
+                    }
+                    while images.count < 3 { images.append(nil) }
+
+                    AlbumCoverCache.shared.setImages(
+                        AlbumCoverCache.CoverImages(
+                            primary: images[0],
+                            secondary: images[1],
+                            tertiary: images[2]
+                        ),
+                        forAlbumID: albumID
+                    )
+                }
             }
         }
     }

@@ -180,10 +180,66 @@ extension AlbumView {
     func fetchAlbums() async -> [Album] {
         do {
             let albums = try await DataActor.shared.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
+            // Pre-warm album cover cache: batch-fetch thumbnails for all child albums
+            // in a single SQL query instead of 1 query per album when covers appear on screen.
+            await prefetchAlbumCovers(for: albums)
             return albums
         } catch {
             debugPrint(error.localizedDescription)
             return []
+        }
+    }
+
+    /// Batch-fetches representative thumbnails for albums that aren't already cached,
+    /// decodes images off the main thread, and populates the AlbumCoverCache.
+    private func prefetchAlbumCovers(for albums: [Album]) async {
+        // Only fetch for albums not already in the cache
+        let uncachedIDs = albums.compactMap { album -> String? in
+            AlbumCoverCache.shared.images(forAlbumID: album.id) == nil ? album.id : nil
+        }
+        guard !uncachedIDs.isEmpty else { return }
+
+        let albumsByID = Dictionary(uniqueKeysWithValues: albums.map { ($0.id, $0) })
+        let batchThumbnails = await DataActor.shared.batchRepresentativeThumbnails(
+            forAlbumIDs: uncachedIDs
+        )
+
+        // Decode all images concurrently with bounded parallelism
+        await withTaskGroup(of: Void.self) { group in
+            for albumID in uncachedIDs {
+                let album = albumsByID[albumID]
+                let thumbnailDatas = batchThumbnails[albumID] ?? []
+                group.addTask {
+                    let hasCoverPhoto = album?.coverPhoto != nil
+
+                    var images: [Image?] = []
+
+                    // If album has a custom cover photo, decode it first
+                    if hasCoverPhoto, let coverData = album?.coverPhoto,
+                       let uiImage = UIImage(data: coverData),
+                       let prepared = await uiImage.byPreparingForDisplay() {
+                        images.append(Image(uiImage: prepared))
+                    }
+
+                    // Decode DB thumbnails
+                    for data in thumbnailDatas {
+                        if let uiImage = UIImage(data: data),
+                           let prepared = await uiImage.byPreparingForDisplay() {
+                            images.append(Image(uiImage: prepared))
+                        }
+                    }
+                    while images.count < 3 { images.append(nil) }
+
+                    AlbumCoverCache.shared.setImages(
+                        AlbumCoverCache.CoverImages(
+                            primary: images[0],
+                            secondary: images[1],
+                            tertiary: images[2]
+                        ),
+                        forAlbumID: albumID
+                    )
+                }
+            }
         }
     }
 

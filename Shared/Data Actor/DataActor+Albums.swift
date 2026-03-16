@@ -95,6 +95,48 @@ extension DataActor {
         return try? row.get(picThumbnailData)
     }
 
+    /// Batch-fetches up to `limit` representative thumbnails for each album ID in a single query.
+    /// Uses a window function (ROW_NUMBER) to rank pics per album by date_added DESC,
+    /// then filters to keep only the top N per album. This replaces N separate queries with one.
+    func batchRepresentativeThumbnails(
+        forAlbumIDs albumIDs: [String], limit: Int = 3
+    ) -> [String: [Data]] {
+        guard !albumIDs.isEmpty else { return [:] }
+
+        let bindings: [Binding?] = albumIDs.map { $0 as Binding? }
+        let placeholders = albumIDs.map { _ in "?" }.joined(separator: ", ")
+
+        // Use ROW_NUMBER() to rank pics within each album, then take top `limit` per album
+        let sql = """
+            SELECT containing_album_id, thumbnail_data
+            FROM (
+                SELECT containing_album_id, thumbnail_data,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY containing_album_id
+                           ORDER BY date_added DESC
+                       ) AS rn
+                FROM pics
+                WHERE containing_album_id IN (\(placeholders))
+                  AND thumbnail_data IS NOT NULL
+            )
+            WHERE rn <= ?
+            ORDER BY containing_album_id, rn
+            """
+
+        var allBindings = bindings
+        allBindings.append(limit as Binding?)
+
+        var result: [String: [Data]] = [:]
+        guard let stmt = try? database.prepare(sql, allBindings) else { return result }
+        for row in stmt {
+            if let albumId = row[0] as? String,
+               let thumbData = row[1] as? Data {
+                result[albumId, default: []].append(thumbData)
+            }
+        }
+        return result
+    }
+
     func album(for id: String) -> Album? {
         let query = albumsTable.filter(albumId == id)
         return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: false) }

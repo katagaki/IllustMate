@@ -187,34 +187,30 @@ struct AlbumCover: View {
             let hasCoverPhoto = album.coverPhoto != nil
             let neededFromDB = hasCoverPhoto ? 2 : 3
 
-            // Fetch representative thumbnails concurrently at background priority
-            // so pic thumbnail fetches (at default priority) take precedence.
-            let fetched: [Image?] = await withTaskGroup(
-                of: (Int, Image?).self,
-                returning: [Image?].self
-            ) { group in
-                for offset in 0..<neededFromDB {
-                    group.addTask(priority: .background) {
-                        guard let data = await DataActor.shared
-                                .representativeThumbnail(forAlbumWithID: album.id, at: offset),
-                              let uiImage = UIImage(data: data) else {
-                            return (offset, nil)
-                        }
-                        return (offset, Image(uiImage: uiImage))
-                    }
+            // Single query to fetch all needed thumbnails at once, instead of
+            // one query per offset which serializes on the DataActor.
+            let thumbnailDatas = await DataActor.shared
+                .representativeThumbnails(forAlbumWithID: album.id, limit: neededFromDB)
+
+            // Decode images off the main thread with byPreparingForDisplay()
+            // to avoid main-thread JPEG decoding jank when scrolling.
+            var fetched: [Image?] = []
+            for data in thumbnailDatas {
+                if let uiImage = UIImage(data: data),
+                   let prepared = await uiImage.byPreparingForDisplay() {
+                    fetched.append(Image(uiImage: prepared))
+                } else {
+                    fetched.append(nil)
                 }
-                var results = [Image?](repeating: nil, count: neededFromDB)
-                for await (offset, image) in group {
-                    results[offset] = image
-                }
-                return results
             }
+            while fetched.count < neededFromDB { fetched.append(nil) }
 
             // Assemble: cover photo first (if set), then DB thumbnails
             var assembled: [Image?] = []
             if hasCoverPhoto, let coverData = album.coverPhoto,
-               let uiImage = UIImage(data: coverData) {
-                assembled.append(Image(uiImage: uiImage))
+               let uiImage = UIImage(data: coverData),
+               let prepared = await uiImage.byPreparingForDisplay() {
+                assembled.append(Image(uiImage: prepared))
             }
             assembled.append(contentsOf: fetched)
             while assembled.count < 3 { assembled.append(nil) }
