@@ -28,7 +28,7 @@ class PhotosDuplicateScanManager {
     var duplicateGroups: [PhotosDuplicateGroup] = []
 
     // Configuration
-    var hammingThreshold: Int = 10
+    var hammingThreshold: Int = 8
 
     enum ScanPhase {
         case idle

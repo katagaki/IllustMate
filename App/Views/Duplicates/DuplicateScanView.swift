@@ -31,14 +31,27 @@ struct DuplicateScanView: View {
             .navigationTitle("ViewTitle.DuplicateChecker")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     if !scanManager.isScanning {
                         Button(role: .close) {
                             dismiss()
                         }
                     }
                 }
-            }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !scanManager.isScanning && scanManager.scanPhase == .idle {
+                        Button {
+                            Task {
+                                await scanManager.scan(scope: scanScope)
+                            }
+                        } label: {
+                            Label(
+                                String(localized: "Duplicates.StartScan", table: "Photos"),
+                                systemImage: "arrow.right"
+                            )
+                        }
+                    }
+                }            }
         }
         .interactiveDismissDisabled(scanManager.isScanning)
         .onChange(of: scanManager.isScanning) { _, isScanning in
@@ -71,24 +84,6 @@ struct DuplicateScanView: View {
             } header: {
                 Text("Duplicates.Settings", tableName: "Photos")
             }
-        }
-        .safeAreaInset(edge: .bottom) {
-            VStack(alignment: .center, spacing: 16.0) {
-                Button {
-                    Task {
-                        await scanManager.scan(scope: scanScope)
-                    }
-                } label: {
-                    Text("Duplicates.StartScan", tableName: "Photos")
-                        .bold()
-                        .padding(4.0)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(20.0)
         }
     }
 

@@ -35,7 +35,7 @@ struct PhotosAssetGridView: View {
                         .padding(4.0)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .buttonBorderShape(.capsule)
                 .padding(20.0)
             } else if isImporting {
@@ -69,8 +69,8 @@ struct PhotosAssetGridView: View {
                             .padding(4.0)
                             .frame(maxWidth: .infinity)
                     }
-                    .tint(.green)
-                    .buttonStyle(.borderedProminent)
+                    .tint(.accent)
+                    .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
                     .disabled(selectedAssets.isEmpty)
                 }

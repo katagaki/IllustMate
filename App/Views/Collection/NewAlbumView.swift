@@ -55,7 +55,7 @@ struct NewAlbumView: View {
             focusedField = .newAlbumName
         }
 #endif
-        .phonePresentationDetents([.height(200.0), .medium])
+        .phonePresentationDetents([.height(200.0)])
         .interactiveDismissDisabled()
     }
 

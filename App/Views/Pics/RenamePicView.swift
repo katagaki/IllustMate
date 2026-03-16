@@ -38,7 +38,7 @@ struct RenamePicView: View {
                         .padding(4.0)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .buttonBorderShape(.capsule)
                 .disabled(newPicName.trimmingCharacters(in: .whitespaces) == "")
                 .frame(maxWidth: .infinity)

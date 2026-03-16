@@ -24,32 +24,23 @@ struct RenameAlbumView: View {
                         .focused($focusedField, equals: .newAlbumName)
                 }
             }
-            .safeAreaInset(edge: .bottom) {
-                Button {
-                    Task {
-                        await DataActor.shared.renameAlbum(withID: album.id, to: newAlbumName)
-                        await MainActor.run {
-                            dismiss()
-                        }
-                    }
-                } label: {
-                    Text("Shared.Rename")
-                        .bold()
-                        .padding(4.0)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
-                .frame(maxWidth: .infinity)
-                .padding(20.0)
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(role: .cancel) {
                         newAlbumName = ""
                         dismiss()
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(role: .confirm) {
+                        Task {
+                            await DataActor.shared.renameAlbum(withID: album.id, to: newAlbumName)
+                            await MainActor.run {
+                                dismiss()
+                            }
+                        }
+                    }
+                    .disabled(newAlbumName.trimmingCharacters(in: .whitespaces) == "")
                 }
             }
             .navigationTitle("ViewTitle.Albums.Rename")
@@ -65,7 +56,7 @@ struct RenameAlbumView: View {
         .task {
             newAlbumName = album.name
         }
-        .phonePresentationDetents([.medium])
+        .phonePresentationDetents([.height(200.0)])
         .interactiveDismissDisabled()
     }
 

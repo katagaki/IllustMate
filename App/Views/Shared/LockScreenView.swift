@@ -29,7 +29,7 @@ struct LockScreenView: View {
                         .padding(.horizontal, 8.0)
                         .padding(.vertical, 4.0)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .controlSize(.large)
                 .disabled(auth.isAuthenticating)
             }

@@ -48,13 +48,12 @@ struct PicViewer: View {
                             .clipShape(.rect(cornerRadius: 8.0))
                             .opacity(viewer.isFullImageLoaded ? 0 : 1)
                     }
-                    // Crossfade to full image when loaded
+                    // Show full image when loaded
                     if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
                         Image(uiImage: fullImage)
                             .resizable()
                             .scaledToFit()
                             .clipShape(.rect(cornerRadius: 8.0))
-                            .transition(.opacity)
                     }
                 }
 
@@ -219,9 +218,7 @@ private struct PicCarouselStrip: View {
                 LazyHStack(spacing: 4.0) {
                     ForEach(Array(viewer.allPics.enumerated()), id: \.element.id) { index, pic in
                         Button {
-                            withAnimation(.smooth.speed(2)) {
-                                viewer.navigateTo(index: index)
-                            }
+                            viewer.navigateTo(index: index)
                         } label: {
                             CarouselThumbnail(pic: pic, isSelected: index == viewer.currentIndex)
                         }
@@ -273,13 +270,15 @@ private struct CarouselThumbnail: View {
             .overlay {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 4.0)
-                        .stroke(Color.accentColor, lineWidth: 2.0)
+                        .stroke(.accent, lineWidth: 2.0)
                 }
             }
             .opacity(isSelected ? 1.0 : 0.6)
+            .animation(.smooth.speed(2), value: isSelected)
             .task(id: pic.identifiableString()) {
+                let picID = pic.id
                 // Check in-memory cache first
-                if let cached = ThumbnailCache.shared.image(forKey: pic.id) {
+                if let cached = ThumbnailCache.shared.image(forKey: picID) {
                     thumbnail = cached
                     return
                 }
@@ -288,11 +287,12 @@ private struct CarouselThumbnail: View {
                 if let data = pic.thumbnailData {
                     thumbData = data
                 } else {
-                    thumbData = await DataActor.shared.thumbnailData(forPicWithID: pic.id)
+                    thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID)
                 }
                 if let thumbData, let uiImage = UIImage(data: thumbData),
                    let prepared = await uiImage.byPreparingForDisplay() {
-                    ThumbnailCache.shared.setImage(prepared, forKey: pic.id)
+                    guard !Task.isCancelled else { return }
+                    ThumbnailCache.shared.setImage(prepared, forKey: picID)
                     thumbnail = prepared
                 }
             }

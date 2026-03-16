@@ -122,8 +122,7 @@ struct ShareView: View {
                                     .frame(maxWidth: .infinity)
                             }
                         }
-                        .tint(.green)
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                         .buttonBorderShape(.capsule)
                         .disabled(!itemsManager.isLoaded || itemsManager.items.isEmpty
                                  || (isSearching && viewPath.isEmpty))

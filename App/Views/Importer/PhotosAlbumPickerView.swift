@@ -152,7 +152,7 @@ struct PhotosAlbumPickerView: View {
                     UIApplication.shared.open(url)
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.glassProminent)
             .buttonBorderShape(.capsule)
         }
         .padding(40.0)

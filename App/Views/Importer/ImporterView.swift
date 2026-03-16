@@ -66,7 +66,7 @@ struct ImporterView: View {
                                             .frame(maxWidth: .infinity)
                                     }
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .buttonStyle(.glassProminent)
                                 .buttonBorderShape(.capsule)
                                 .disabled(isImporting)
                             }
@@ -88,7 +88,7 @@ struct ImporterView: View {
                                         .padding(4.0)
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .buttonStyle(.glassProminent)
                                 .buttonBorderShape(.capsule)
                                 .disabled(isImporting)
                             }
@@ -118,8 +118,8 @@ struct ImporterView: View {
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         }
-                        .tint(.green)
-                        .buttonStyle(.borderedProminent)
+                        .tint(.accent)
+                        .buttonStyle(.glassProminent)
                         .buttonBorderShape(.capsule)
                         .disabled(isImporting || selectedItemCount == 0)
                     } else {
@@ -131,7 +131,7 @@ struct ImporterView: View {
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                         .buttonBorderShape(.capsule)
                     }
                 }

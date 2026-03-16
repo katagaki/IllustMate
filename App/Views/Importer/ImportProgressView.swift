@@ -33,7 +33,7 @@ struct ImportProgressView: View {
                             .padding(4.0)
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
                     .padding(.horizontal, 20.0)
                 }

@@ -29,6 +29,41 @@ class ViewerManager {
     /// Maximum number of full-resolution images to keep cached around the current index.
     private let cacheWindow = 5
 
+    func clearDisplay() {
+        displayedPicID = ""
+        displayedPic = nil
+        displayedThumbnail = nil
+        displayedImage = nil
+        isFullImageLoaded = false
+        allPics = []
+        currentIndex = 0
+        for task in prefetchTasks.values {
+            task.cancel()
+        }
+        prefetchTasks.removeAll()
+        imageCache.removeAll()
+    }
+
+    func removePics(withIDs deletedIDs: Set<String>) {
+        // If the currently displayed pic was deleted, clear the display
+        if deletedIDs.contains(displayedPicID) {
+            clearDisplay()
+            return
+        }
+        // Otherwise, remove deleted pics from the navigation list
+        allPics.removeAll { deletedIDs.contains($0.id) }
+        // Recompute currentIndex for the displayed pic
+        if let displayedPic,
+           let newIndex = allPics.firstIndex(where: { $0.id == displayedPic.id }) {
+            currentIndex = newIndex
+        }
+        // Evict deleted entries from caches
+        for id in deletedIDs {
+            imageCache.removeValue(forKey: id)
+            prefetchTasks.removeValue(forKey: id)?.cancel()
+        }
+    }
+
     func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
         // Show thumbnail immediately to open viewer without delay
         let thumbnail: UIImage? = ThumbnailCache.shared.image(forKey: pic.id)
@@ -105,9 +140,7 @@ class ViewerManager {
             self.imageCache[picID] = loadedImage
             if self.displayedPicID == picID {
                 self.displayedImage = loadedImage
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    self.isFullImageLoaded = true
-                }
+                self.isFullImageLoaded = true
                 // Prefetch adjacent images after current one loads
                 prefetchAdjacentImages()
                 // Evict images far from the current position

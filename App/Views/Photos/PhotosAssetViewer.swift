@@ -345,7 +345,7 @@ private struct PhotosCarouselThumbnail: View {
             .overlay {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 4.0)
-                        .stroke(Color.accentColor, lineWidth: 2.0)
+                        .stroke(.accent, lineWidth: 2.0)
                 }
             }
             .opacity(isSelected ? 1.0 : 0.6)

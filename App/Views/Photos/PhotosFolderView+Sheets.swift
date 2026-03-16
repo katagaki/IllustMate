@@ -82,7 +82,7 @@ extension PhotosFolderView {
                         .padding(4.0)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .buttonBorderShape(.capsule)
                 .disabled(renameText.trimmingCharacters(in: .whitespaces).isEmpty)
                 .frame(maxWidth: .infinity)

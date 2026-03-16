@@ -58,16 +58,17 @@ struct PicLabel: View {
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 4.0))
             .task(id: pic.identifiableString()) {
-                if let cached = ThumbnailCache.shared.image(forKey: pic.id) {
+                let picID = pic.id
+                if let cached = ThumbnailCache.shared.image(forKey: picID) {
                     thumbnail = Image(uiImage: cached)
                     isThumbnailReadyToPresent = true
                     return
                 }
-                if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: pic.id),
+                if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID),
                    let uiImage = UIImage(data: thumbData),
                    let prepared = await uiImage.byPreparingForDisplay() {
-                    ThumbnailCache.shared.setImage(prepared, forKey: pic.id)
-                    pic.thumbnailData = thumbData
+                    guard !Task.isCancelled else { return }
+                    ThumbnailCache.shared.setImage(prepared, forKey: picID)
                     thumbnail = Image(uiImage: prepared)
                 }
                 isThumbnailReadyToPresent = true

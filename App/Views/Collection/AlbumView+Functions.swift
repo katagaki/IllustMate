@@ -38,20 +38,25 @@ extension AlbumView {
 
     func confirmDeletePic() {
         Task { [isSelectingPics, selectedPics] in
+            var deletedIDs = Set<String>()
             if isSelectingPics {
                 for pic in selectedPics {
                     await DataActor.shared.deletePic(withID: pic.id)
                     await PColorActor.shared.deleteColor(forPicWithID: pic.id)
+                    deletedIDs.insert(pic.id)
                 }
             } else {
                 if let picPendingDeletion = picPendingDeletion {
                     await DataActor.shared.deletePic(withID: picPendingDeletion.id)
                     await PColorActor.shared.deleteColor(forPicWithID: picPendingDeletion.id)
+                    deletedIDs.insert(picPendingDeletion.id)
                 }
             }
             if let currentAlbum {
                 AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
             }
+            // Clear viewer state for deleted pics to prevent rendering stale data
+            viewer.removePics(withIDs: deletedIDs)
             self.selectedPics.removeAll()
             refreshPicsAndSet()
         }

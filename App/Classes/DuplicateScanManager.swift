@@ -27,7 +27,7 @@ class DuplicateScanManager {
     var duplicateGroups: [DuplicateGroup] = []
 
     // Configuration
-    var hammingThreshold: Int = 10
+    var hammingThreshold: Int = 8
 
     enum ScanPhase {
         case idle

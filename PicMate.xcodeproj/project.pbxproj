@@ -118,7 +118,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Strings/Albums.xcstrings,
-				Strings/Localizable.xcstrings,
 				Strings/More.xcstrings,
 				Strings/Photos.xcstrings,
 			);
@@ -142,6 +141,7 @@
 				"Data Models/Album.swift",
 				"Data Models/Pic.swift",
 				Strings/Import.xcstrings,
+				Strings/Localizable.xcstrings,
 			);
 			target = E4D6F05D2F4D4DF1006965BD /* Save to PicMate */;
 		};

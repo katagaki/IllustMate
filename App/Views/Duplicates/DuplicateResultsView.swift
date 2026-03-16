@@ -48,13 +48,19 @@ struct DuplicateResultsView: View {
             .listStyle(.insetGrouped)
             .listSectionSpacing(.compact)
             .toolbar {
-                if groupsWithSelections > 1 {
-                    ToolbarItem(placement: .bottomBar) {
-                        Button(String(localized: "Duplicates.DeleteAllSelected.\(allSelectedIDs.count)", table: "Photos"),
-                               role: .destructive) {
-                            isConfirmingDeleteAll = true
-                        }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(
+                        String(
+                            localized: "Duplicates.DeleteAllSelected.\(allSelectedIDs.count)",
+                            table: "Photos"
+                        ),
+                        systemImage: "trash",
+                        role: .destructive
+                    ) {
+                        isConfirmingDeleteAll = true
                     }
+                    .tint(.red)
+                    .disabled(groupsWithSelections == 0)
                 }
             }
             .alert(

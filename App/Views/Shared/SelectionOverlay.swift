@@ -18,7 +18,7 @@ struct SelectionOverlay: View {
         ZStack {
             if isSelected {
                 Circle()
-                    .fill(Color.accentColor)
+                    .fill(.accent)
                     .strokeBorder(Color.white, lineWidth: 2)
                     .frame(width: 24, height: 24)
                     .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
