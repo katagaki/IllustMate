@@ -44,9 +44,9 @@ extension AlbumView {
                     selectOrDeselectAllPics()
                 } label: {
                     if pics.count == selectedPics.count {
-                        Label("Shared.DeselectAll", systemImage: "rectangle.stack")
+                        Label("Shared.DeselectAll", image: "checkmark.circle.slash")
                     } else {
-                        Label("Shared.SelectAll", systemImage: "checkmark.rectangle.stack")
+                        Label("Shared.SelectAll", systemImage: "checkmark.circle")
                     }
                 }
             }
