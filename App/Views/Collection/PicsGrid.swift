@@ -31,26 +31,24 @@ struct PicsGrid<Content: View>: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
                   spacing: 2.0) {
             ForEach(pics) { pic in
-                Button {
-                    onSelect(pic)
-                } label: {
-                    PicLabel(pic: pic)
-                        .overlay {
-                            if isSelecting {
-                                if let isSelected {
-                                    ZStack(alignment: .bottomTrailing) {
-                                        SelectionOverlay(isSelected(pic))
-                                        Color.clear
-                                    }
+                PicLabel(pic: pic)
+                    .overlay {
+                        if isSelecting {
+                            if let isSelected {
+                                ZStack(alignment: .bottomTrailing) {
+                                    SelectionOverlay(isSelected(pic))
+                                    Color.clear
                                 }
                             }
                         }
-                }
-                .if(!isSelecting) {
-                    $0.draggable(PicTransferable(id: pic.id))
-                }
-                .matchedTransitionSource(id: pic.id, in: namespace)
-                .contextMenu {
+                    }
+                    .contentShape(.rect)
+                    .onTapGesture {
+                        onSelect(pic)
+                    }
+                    .draggable(PicTransferable(id: pic.id))
+                    .matchedTransitionSource(id: pic.id, in: namespace)
+                    .contextMenu {
                     if !isSelecting {
                         if enableSelection {
                             Button("Shared.Select", systemImage: "checkmark.circle") {
@@ -102,10 +100,7 @@ struct PicsGrid<Content: View>: View {
                     PicPreview(picID: pic.id)
                 }
 #if targetEnvironment(macCatalyst)
-                .buttonStyle(.borderless)
                 .hoverEffect(.highlight)
-#else
-                .buttonStyle(.plain)
 #endif
             }
             if placeholderCount > 0 {
