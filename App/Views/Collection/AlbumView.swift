@@ -222,6 +222,13 @@ struct AlbumView: View {
                 }
                 .padding([.top], 20.0)
             }
+            .dropDestination(for: Drop.self) { items, _ in
+                guard let currentAlbum else { return false }
+                for item in items {
+                    moveDropToAlbum(item, to: currentAlbum)
+                }
+                return true
+            }
         }
     }
 }
