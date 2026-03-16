@@ -31,6 +31,7 @@ struct LockScreenView: View {
                 }
                 .buttonStyle(.glassProminent)
                 .controlSize(.large)
+                .tint(.accent)
                 .disabled(auth.isAuthenticating)
             }
         }

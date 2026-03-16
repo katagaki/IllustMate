@@ -22,16 +22,16 @@ struct MoreView: View {
     @State var backupFolderURL: URL?
     @State var isDuplicateCheckerPresented: Bool = false
 
-    @AppStorage("PhotosModeEnabled",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
-    @AppStorage("AppLockEnabled",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
-    @AppStorage("PhotosNestedAlbumsEnabled",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isNestedAlbumsEnabled: Bool = false
-    @AppStorage("ShareSheetOpenSearch",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openSearchWhenSharing: Bool = false
-    @AppStorage("ShareSheetShowAnimation",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var showAnimationWhenSaving: Bool = true
+    @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isPhotosModeEnabled: Bool = false
+    @AppStorage("AppLockEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isAppLockEnabled: Bool = false
+    @AppStorage("PhotosNestedAlbumsEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isNestedAlbumsEnabled: Bool = false
+    @AppStorage("ShareSheetOpenSearch", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var openSearchWhenSharing: Bool = false
+    @AppStorage("ShareSheetShowAnimation", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var showAnimationWhenSaving: Bool = true
     @AppStorage("ShareSheetQuickImport",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var quickImport: Bool = false
     @AppStorage("ShareSheetDefaultAlbum",
@@ -169,6 +169,7 @@ struct MoreView: View {
                 NavigationLink(String(localized: "Attributions", table: "More"), value: ViewPath.moreAttributions)
             }
         }
+        .tint(.accent)
         .navigationTitle("ViewTitle.More")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: ViewPath.self) { viewPath in

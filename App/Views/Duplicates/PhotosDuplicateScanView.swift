@@ -72,6 +72,7 @@ struct PhotosDuplicateScanView: View {
                         get: { Double(scanManager.hammingThreshold) },
                         set: { scanManager.hammingThreshold = Int($0) }
                     ), in: 1...15, step: 1)
+                    .tint(.accent)
                     HStack {
                         Text("Duplicates.Sensitivity.Strict", tableName: "Photos")
                             .font(.caption)

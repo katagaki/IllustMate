@@ -31,20 +31,26 @@ struct PhotosAlbumContentView: View {
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0.0) {
-                SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount) {
-                    Picker("Shared.GridSize",
-                           systemImage: "square.grid.2x2",
-                           selection: $columnCount.animation(.smooth.speed(2.0))) {
-                        Text("Shared.GridSize.3")
-                            .tag(3)
-                        Text("Shared.GridSize.4")
-                            .tag(4)
-                        Text("Shared.GridSize.5")
-                            .tag(5)
-                        Text("Shared.GridSize.8")
-                            .tag(8)
+                Group {
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount)
+                    } else {
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount) {
+                            Picker("Shared.GridSize",
+                                   systemImage: "square.grid.2x2",
+                                   selection: $columnCount.animation(.smooth.speed(2.0))) {
+                                Text("Shared.GridSize.3")
+                                    .tag(3)
+                                Text("Shared.GridSize.4")
+                                    .tag(4)
+                                Text("Shared.GridSize.5")
+                                    .tag(5)
+                                Text("Shared.GridSize.8")
+                                    .tag(8)
+                            }
+                            .pickerStyle(.menu)
+                        }
                     }
-                    .pickerStyle(.menu)
                 }
                 .padding(EdgeInsets(top: 0.0, leading: 20.0, bottom: 6.0, trailing: 20.0))
 

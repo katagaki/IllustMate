@@ -131,6 +131,7 @@ struct DuplicateGroupSection: View {
                     isShowingComparison = true
                 }
             }
+            .tint(.accent)
             if !selectedForDeletion.isEmpty {
                 Button(String(localized: "Duplicates.DeleteSelected.\(selectedForDeletion.count)", table: "Photos"),
                        role: .destructive) {

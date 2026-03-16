@@ -14,6 +14,8 @@ struct PhotosDuplicateGroupSection: View {
     @Binding var selectedForDeletion: Set<String>
     var onDelete: (Set<String>) -> Void
 
+    @State var comparisonViewerManager = PhotosViewerManager()
+    @State var isShowingComparison: Bool = false
     @State var isConfirmingDelete: Bool = false
 
     var body: some View {
@@ -41,6 +43,12 @@ struct PhotosDuplicateGroupSection: View {
                 .padding(.horizontal, 18.0)
             }
             .listRowInsets(EdgeInsets(top: 14.0, leading: 0, bottom: 14.0, trailing: 0))
+            Button(String(localized: "Duplicates.CompareInCarousel", table: "Photos")) {
+                let firstAsset = group.assets[0]
+                comparisonViewerManager.setDisplay(firstAsset, in: group.assets)
+                isShowingComparison = true
+            }
+            .tint(.accent)
             if !selectedForDeletion.isEmpty {
                 Button(String(localized: "Duplicates.DeleteSelected.\(selectedForDeletion.count)", table: "Photos"),
                        role: .destructive) {
@@ -71,6 +79,10 @@ struct PhotosDuplicateGroupSection: View {
                 }
             }
             Button("Shared.No", role: .cancel) {}
+        }
+        .navigationDestination(isPresented: $isShowingComparison) {
+            PhotosAssetViewer(asset: group.assets[0])
+                .environment(comparisonViewerManager)
         }
     }
 }

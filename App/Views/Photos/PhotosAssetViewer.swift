@@ -264,7 +264,7 @@ struct PhotosAssetViewer: View {
                         .padding(.horizontal, -20.0)
                 }
             }
-            .padding(20.0)
+            .padding([.top, .horizontal], 20.0)
         }
     }
 
