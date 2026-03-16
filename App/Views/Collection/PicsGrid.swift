@@ -45,14 +45,7 @@ struct PicsGrid<Content: View>: View {
                                 }
                             }
                         }
-                        .draggable(PicTransferable(id: pic.id)) {
-                            if let image = pic.thumbnail() {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100.0, height: 100.0)
-                            }
-                        }
+                        .draggable(PicTransferable(id: pic.id))
                 }
                 .matchedTransitionSource(id: pic.id, in: namespace)
                 .contextMenu {
