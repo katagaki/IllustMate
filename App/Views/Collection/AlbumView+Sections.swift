@@ -123,7 +123,8 @@ extension AlbumView {
             if hasFetchedPicCount && picCount > 0 {
                 PicsGrid(namespace: namespace, pics: pics,
                          placeholderCount: max(picCount - pics.count, 0),
-                         isSelecting: $isSelectingPics) { pic in
+                         isSelecting: $isSelectingPics,
+                         selectedPicIDs: selectedPics.map(\.id)) { pic in
                     selectedPics.contains(pic)
                 } onSelect: { pic in
                     selectOrDeselectPic(pic)

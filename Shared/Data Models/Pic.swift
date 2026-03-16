@@ -60,7 +60,7 @@ final class Pic: Identifiable, Hashable, @unchecked Sendable {
     }
 }
 
-struct PicTransferable: Codable, Transferable {
+struct PicTransferable: Codable, Identifiable, Transferable {
 
     var id: String
 
@@ -69,6 +69,16 @@ struct PicTransferable: Codable, Transferable {
     }
 }
 
+struct PicCollectionTransferable: Codable, Transferable {
+
+    var ids: [String]
+
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(for: PicCollectionTransferable.self, contentType: .pictureCollection)
+    }
+}
+
 extension UTType {
     static var picture: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.Pic") }
+    static var pictureCollection: UTType { UTType(exportedAs: "com.tsubuzaki.IllustMate.PicCollection") }
 }

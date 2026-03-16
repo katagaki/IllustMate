@@ -83,7 +83,11 @@ extension AlbumView {
 
     func moveDropToAlbum(_ drop: Drop, to album: Album) {
         Task {
-            if let transferable = drop.pic {
+            if let transferable = drop.pics {
+                for picID in transferable.ids {
+                    await movePicToAlbum(picID, to: album)
+                }
+            } else if let transferable = drop.pic {
                 await movePicToAlbum(transferable.id, to: album)
             } else if let transferable = drop.album {
                 if transferable.id != album.id {
