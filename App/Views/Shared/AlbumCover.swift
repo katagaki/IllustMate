@@ -43,52 +43,93 @@ final class AlbumCoverCache {
 
     func removeImages(forAlbumID id: String) {
         cache.removeObject(forKey: id as NSString)
+        pendingDiskDeletions.insert(id)
         version += 1
+        Task {
+            await CoverCacheActor.shared.deleteCover(forAlbumWithID: id)
+            await MainActor.run {
+                pendingDiskDeletions.remove(id)
+            }
+        }
     }
 
+    /// Album IDs whose disk cache entries are being deleted asynchronously.
+    /// `loadCover` skips the disk cache for these to avoid reloading stale data.
+    private var pendingDiskDeletions: Set<String> = []
+
     /// Loads cover images for a single album into the cache.
-    /// Fetches representative thumbnails (and custom cover if set) from the DB,
-    /// decodes them off the main thread, then caches and notifies.
+    /// Checks the on-disk cache first, then falls back to the main database.
+    /// Results are decoded off the main thread, then cached and notified.
     nonisolated func loadCover(for album: Album) async {
-        // Skip if already cached
+        // Skip if already in NSCache
         guard images(forAlbumID: album.id) == nil else { return }
 
         let albumID = album.id
         let hasCover = album.hasCoverPhoto
+        let versionKey = album.identifiableString()
 
-        // Fetch thumbnail data from DB (single actor call for 3 thumbnails)
+        // --- Layer 2: Disk cache ---
+        let skipDiskCache = await MainActor.run { pendingDiskDeletions.contains(albumID) }
+        if !skipDiskCache,
+           let cached = await CoverCacheActor.shared.cachedCover(
+            forAlbumWithID: albumID, versionKey: versionKey
+        ) {
+            let coverImages = decodeCoverImages(
+                primary: cached.primary,
+                secondary: cached.secondary,
+                tertiary: cached.tertiary
+            )
+            setImages(coverImages, forAlbumID: albumID)
+            await MainActor.run { version += 1 }
+            return
+        }
+
+        // --- Layer 3: Main database ---
         let thumbnails = await DataActor.shared.representativeThumbnails(
             forAlbumWithID: albumID, limit: 3
         )
 
-        // Fetch custom cover if set
         var coverData: Data?
         if hasCover {
             coverData = await DataActor.shared.albumCoverData(forAlbumWithID: albumID)
         }
 
-        // Decode images off main thread
-        var assembled: [Image?] = []
-        if hasCover, let coverData, let uiImage = UIImage(data: coverData) {
-            assembled.append(Image(uiImage: uiImage))
+        // Assemble raw data blobs in display order
+        var dataBlobs: [Data?] = []
+        if hasCover, let coverData {
+            dataBlobs.append(coverData)
         }
         for data in thumbnails {
-            if assembled.count >= 3 { break }
-            if let uiImage = UIImage(data: data) {
-                assembled.append(Image(uiImage: uiImage))
-            }
+            if dataBlobs.count >= 3 { break }
+            dataBlobs.append(data)
         }
-        while assembled.count < 3 { assembled.append(nil) }
+        while dataBlobs.count < 3 { dataBlobs.append(nil) }
 
-        let coverImages = CoverImages(
-            primary: assembled[0], secondary: assembled[1], tertiary: assembled[2]
+        // Store in disk cache for next launch
+        await CoverCacheActor.shared.storeCover(
+            primary: dataBlobs[0], secondary: dataBlobs[1], tertiary: dataBlobs[2],
+            forAlbumWithID: albumID, versionKey: versionKey
         )
 
-        // Cache and notify
+        // Decode and store in NSCache
+        let coverImages = decodeCoverImages(
+            primary: dataBlobs[0], secondary: dataBlobs[1], tertiary: dataBlobs[2]
+        )
         setImages(coverImages, forAlbumID: albumID)
         await MainActor.run {
             version += 1
         }
+    }
+
+    /// Decodes raw JPEG Data blobs into SwiftUI Images.
+    private nonisolated func decodeCoverImages(
+        primary: Data?, secondary: Data?, tertiary: Data?
+    ) -> CoverImages {
+        CoverImages(
+            primary: primary.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) },
+            secondary: secondary.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) },
+            tertiary: tertiary.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) }
+        )
     }
 }
 
@@ -225,7 +266,19 @@ struct AlbumCover: View {
                        secondaryImage: secondaryImage,
                        tertiaryImage: tertiaryImage)
             .onChange(of: AlbumCoverCache.shared.version) {
-                loadFromCache()
+                // If NSCache no longer has our entry, reset so we reload
+                if AlbumCoverCache.shared.images(forAlbumID: album.id) == nil {
+                    guard isLoaded else { return }
+                    isLoaded = false
+                    primaryImage = nil
+                    secondaryImage = nil
+                    tertiaryImage = nil
+                    Task {
+                        await AlbumCoverCache.shared.loadCover(for: album)
+                    }
+                } else {
+                    loadFromCache()
+                }
             }
             .onChange(of: album.identifiableString()) {
                 isLoaded = false

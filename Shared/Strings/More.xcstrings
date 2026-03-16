@@ -1714,6 +1714,22 @@
         }
       }
     },
+    "Troubleshooting.ClearAlbumCoverCache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Album Cover Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムカバーキャッシュを消去"
+          }
+        }
+      }
+    },
     "Troubleshooting.ClearHashCache" : {
       "extractionState" : "manual",
       "localizations" : {

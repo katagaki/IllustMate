@@ -136,6 +136,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Assets.xcassets,
+				"Data Actor/CoverCacheActor.swift",
 				"Data Actor/DataActor.swift",
 				"Data Actor/DataActor+Albums.swift",
 				"Data Actor/DataActor+Pics.swift",

@@ -35,6 +35,9 @@ struct MoreTroubleshootingView: View {
                 Button(String(localized: "Troubleshooting.ClearColorCache", table: "More")) {
                     Task { await PColorActor.shared.deleteAllColors() }
                 }
+                Button(String(localized: "Troubleshooting.ClearAlbumCoverCache", table: "More")) {
+                    Task { await CoverCacheActor.shared.deleteAllCovers() }
+                }
             } header: {
                 Text("Troubleshooting.DataManagement", tableName: "More")
             } footer: {
