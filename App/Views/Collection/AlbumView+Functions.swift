@@ -159,6 +159,7 @@ extension AlbumView {
                         self.albums = albums
                     }
                 }
+                await AlbumCoverCache.shared.loadCovers(for: albums)
             }
             group.addTask {
                 // Fetch count first for immediate placeholder layout
@@ -196,6 +197,7 @@ extension AlbumView {
                     self.albums = albums
                 }
             }
+            await AlbumCoverCache.shared.loadCovers(for: albums)
         }
     }
 

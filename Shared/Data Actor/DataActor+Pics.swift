@@ -40,8 +40,7 @@ extension DataActor {
         }
         let orderedQuery = (order == .reverse ? baseQuery.order(picDateAdded.desc) :
                                                 baseQuery.order(picDateAdded.asc))
-            .select(picId, picName, picAlbumId,
-                    picDateAdded, picThumbnailData)
+            .select(picId, picName, picAlbumId, picDateAdded)
         return try database.prepare(orderedQuery).map { picFrom(row: $0) }
     }
 

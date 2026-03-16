@@ -24,6 +24,10 @@ final class AlbumCoverCache {
     /// Incremented each time new images are cached, causing observing views to re-check.
     private(set) var version: Int = 0
 
+    /// Coalesces rapid version increments so SwiftUI doesn't re-evaluate every
+    /// observing view once per loaded cover.
+    private var versionBumpPending = false
+
     init() {
         cache.countLimit = 200
     }
@@ -38,7 +42,19 @@ final class AlbumCoverCache {
 
     func setImagesAndNotify(_ images: CoverImages, forAlbumID id: String) {
         cache.setObject(CoverImagesBox(images), forKey: id as NSString)
-        version += 1
+        scheduleVersionBump()
+    }
+
+    /// Coalesces multiple version bumps into a single update, reducing the number of
+    /// SwiftUI view re-evaluations when many covers finish loading close together.
+    private func scheduleVersionBump() {
+        guard !versionBumpPending else { return }
+        versionBumpPending = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(50))
+            self.versionBumpPending = false
+            self.version += 1
+        }
     }
 
     func removeImages(forAlbumID id: String) {
@@ -80,7 +96,7 @@ final class AlbumCoverCache {
                 tertiary: cached.tertiary
             )
             setImages(coverImages, forAlbumID: albumID)
-            await MainActor.run { version += 1 }
+            await MainActor.run { scheduleVersionBump() }
             return
         }
 
@@ -117,19 +133,61 @@ final class AlbumCoverCache {
         )
         setImages(coverImages, forAlbumID: albumID)
         await MainActor.run {
-            version += 1
+            scheduleVersionBump()
+        }
+    }
+
+    /// Loads covers for a list of albums progressively, processing them in small
+    /// batches to avoid saturating the database actors and main thread.
+    nonisolated func loadCovers(for albums: [Album]) async {
+        let maxConcurrent = 4
+        await withTaskGroup(of: Void.self) { group in
+            var iterator = albums.makeIterator()
+
+            // Seed with initial batch
+            for _ in 0..<min(maxConcurrent, albums.count) {
+                guard let album = iterator.next() else { break }
+                group.addTask {
+                    await self.loadCover(for: album)
+                }
+            }
+
+            // As each finishes, start the next
+            for await _ in group {
+                if let album = iterator.next() {
+                    group.addTask {
+                        await self.loadCover(for: album)
+                    }
+                }
+            }
         }
     }
 
     /// Decodes raw JPEG Data blobs into SwiftUI Images.
+    /// Forces pixel decompression off the main thread so the render pass doesn't stall.
     private nonisolated func decodeCoverImages(
         primary: Data?, secondary: Data?, tertiary: Data?
     ) -> CoverImages {
         CoverImages(
-            primary: primary.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) },
-            secondary: secondary.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) },
-            tertiary: tertiary.flatMap { UIImage(data: $0) }.map { Image(uiImage: $0) }
+            primary: primary.flatMap { Self.decodedImage(from: $0) },
+            secondary: secondary.flatMap { Self.decodedImage(from: $0) },
+            tertiary: tertiary.flatMap { Self.decodedImage(from: $0) }
         )
+    }
+
+    /// Decodes JPEG data into a SwiftUI Image with pixels fully decompressed.
+    /// By drawing through UIGraphicsImageRenderer, the backing CGImage is forced
+    /// to decode immediately rather than lazily during the first render on the main thread.
+    private nonisolated static func decodedImage(from data: Data) -> Image? {
+        guard let uiImage = UIImage(data: data) else { return nil }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = uiImage.scale
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: uiImage.size, format: format)
+        let decoded = renderer.image { _ in
+            uiImage.draw(at: .zero)
+        }
+        return Image(uiImage: decoded)
     }
 }
 
@@ -241,6 +299,7 @@ struct AlbumCover: View {
             }
             .transition(.opacity.animation(.smooth.speed(2)))
         }
+        .drawingGroup()
         .scaledToFit()
         .frame(width: length, height: length)
     }
@@ -266,13 +325,13 @@ struct AlbumCover: View {
                        secondaryImage: secondaryImage,
                        tertiaryImage: tertiaryImage)
             .onChange(of: AlbumCoverCache.shared.version) {
-                // If NSCache no longer has our entry, reset so we reload
                 if AlbumCoverCache.shared.images(forAlbumID: album.id) == nil {
                     guard isLoaded else { return }
                     isLoaded = false
                     primaryImage = nil
                     secondaryImage = nil
                     tertiaryImage = nil
+                    // Reload this single cover (e.g. after eviction or invalidation)
                     Task {
                         await AlbumCoverCache.shared.loadCover(for: album)
                     }
@@ -284,11 +343,8 @@ struct AlbumCover: View {
                 isLoaded = false
                 loadFromCache()
             }
-            .task(id: album.identifiableString()) {
-                // Check cache first
-                if loadFromCache() { return }
-                // Load this album's cover on demand
-                await AlbumCoverCache.shared.loadCover(for: album)
+            .onAppear {
+                loadFromCache()
             }
         }
 

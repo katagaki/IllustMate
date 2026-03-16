@@ -68,6 +68,7 @@ struct AlbumsView: View {
                         self.albums = albums
                     }
                 }
+                await AlbumCoverCache.shared.loadCovers(for: albums)
             } catch {
                 debugPrint(error.localizedDescription)
             }
