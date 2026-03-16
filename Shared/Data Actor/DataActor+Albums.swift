@@ -19,15 +19,26 @@ extension DataActor {
     }
 
     func albumsWithCounts(in album: Album?, sortedBy sortType: SortType) throws -> [Album] {
-        let query: QueryType
+        let sql: String
+        let bindings: [Binding?]
         if let albumID = album?.id {
-            query = albumsTable.filter(albumParentId == albumID)
+            // swiftlint:disable:next line_length
+            sql = "SELECT id, name, cover_photo IS NOT NULL, parent_album_id, date_created FROM albums WHERE parent_album_id = ?"
+            bindings = [albumID as Binding?]
         } else {
-            query = albumsTable.filter(albumParentId == nil)
+            // swiftlint:disable:next line_length
+            sql = "SELECT id, name, cover_photo IS NOT NULL, parent_album_id, date_created FROM albums WHERE parent_album_id IS NULL"
+            bindings = []
         }
-        let rows = try database.prepare(query)
-        let albums = rows.map { row -> Album in
-            albumFrom(row: row, loadChildren: false)
+        let stmt = try database.prepare(sql, bindings)
+        let albums = stmt.map { row -> Album in
+            let id = row[0] as? String ?? ""
+            let name = row[1] as? String ?? ""
+            let hasCover = (row[2] as? Int64 ?? 0) != 0
+            let parentId = row[3] as? String
+            let dateCreated = Date(timeIntervalSince1970: row[4] as? Double ?? 0)
+            return Album(id: id, name: name, hasCoverPhoto: hasCover,
+                         parentAlbumID: parentId, dateCreated: dateCreated)
         }
         populateCounts(for: albums)
         return sortAlbum(albums, sortedBy: sortType)
@@ -93,6 +104,30 @@ extension DataActor {
             .limit(1, offset: offset)
         guard let row = try? database.pluck(query) else { return nil }
         return try? row.get(picThumbnailData)
+    }
+
+    /// Batch-fetches up to `limit` representative thumbnails for each album ID.
+    /// Executes one small indexed query per album inside a single actor call,
+    /// avoiding both actor serialization overhead and expensive window functions.
+    func batchRepresentativeThumbnails(
+        forAlbumIDs albumIDs: [String], limit: Int = 3
+    ) -> [String: [Data]] {
+        guard !albumIDs.isEmpty else { return [:] }
+
+        var result: [String: [Data]] = [:]
+        for albumID in albumIDs {
+            let query = picsTable
+                .filter(picAlbumId == albumID)
+                .select(picThumbnailData)
+                .order(picDateAdded.desc)
+                .limit(limit)
+            guard let rows = try? database.prepare(query) else { continue }
+            let thumbnails = rows.compactMap { try? $0.get(picThumbnailData) }
+            if !thumbnails.isEmpty {
+                result[albumID] = thumbnails
+            }
+        }
+        return result
     }
 
     func album(for id: String) -> Album? {

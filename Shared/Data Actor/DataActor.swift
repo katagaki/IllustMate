@@ -98,6 +98,27 @@ actor DataActor {
         return album
     }
 
+    /// Fetches the cover photo data for a single album by ID.
+    func albumCoverData(forAlbumWithID albumID: String) -> Data? {
+        let query = albumsTable.filter(albumId == albumID).select(albumCoverPhoto)
+        guard let row = try? database.pluck(query) else { return nil }
+        return try? row.get(albumCoverPhoto)
+    }
+
+    /// Fetches cover photo data for multiple albums in a single actor call.
+    func batchAlbumCoverData(forAlbumIDs albumIDs: [String]) -> [String: Data] {
+        guard !albumIDs.isEmpty else { return [:] }
+        var result: [String: Data] = [:]
+        for albumID in albumIDs {
+            let query = albumsTable.filter(albumId == albumID).select(albumId, albumCoverPhoto)
+            if let row = try? database.pluck(query),
+               let data = try? row.get(albumCoverPhoto) {
+                result[albumID] = data
+            }
+        }
+        return result
+    }
+
     func picFrom(row: Row) -> Pic {
         let id = (try? row.get(picId)) ?? ""
         let name = (try? row.get(picName)) ?? ""

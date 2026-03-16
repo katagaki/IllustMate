@@ -66,7 +66,11 @@ struct PicLabel: View {
                     isThumbnailReadyToPresent = true
                     return
                 }
-                if let thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID),
+                var thumbData = pic.thumbnailData
+                if thumbData == nil {
+                    thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID)
+                }
+                if let thumbData,
                    let uiImage = UIImage(data: thumbData),
                    let prepared = await uiImage.byPreparingForDisplay() {
                     guard !Task.isCancelled else { return }

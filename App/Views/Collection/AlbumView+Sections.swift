@@ -116,6 +116,8 @@ extension AlbumView {
                 }
             }
             .disabled(isSelectingPics)
+            .opacity(isSelectingPics ? 0.5 : 1.0)
+            .animation(.smooth.speed(2.0), value: isSelectingPics)
             .padding(EdgeInsets(top: 0.0,
                                 leading: 20.0,
                                 bottom: 6.0,

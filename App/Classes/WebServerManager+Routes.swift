@@ -79,7 +79,7 @@ extension WebServerManager {
             let json: [String: Any] = [
                 "id": album.id,
                 "name": album.name,
-                "hasCover": album.coverPhoto != nil,
+                "hasCover": album.hasCoverPhoto,
                 "albums": childAlbums.map { Self.albumToJSON($0) },
                 "pics": pics.map { Self.picToJSON($0) }
             ]
@@ -178,7 +178,7 @@ extension WebServerManager {
     // MARK: - JSON Helpers
 
     private static func albumToJSON(_ album: Album) -> [String: Any] {
-        let hasCoverOrPics = album.coverPhoto != nil || album.picCount() > 0
+        let hasCoverOrPics = album.hasCoverPhoto || album.picCount() > 0
         return [
             "id": album.id,
             "name": album.name,

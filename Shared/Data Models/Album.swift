@@ -15,6 +15,7 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     var id: String
     var name: String
     var coverPhoto: Data?
+    var hasCoverPhoto: Bool
     var parentAlbumID: String?
     var dateCreated: Date
 
@@ -27,26 +28,28 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     var childPicCount: Int?
 
     init(id: String = UUID().uuidString, name: String, coverPhoto: Data? = nil,
+         hasCoverPhoto: Bool? = nil,
          parentAlbumID: String? = nil, dateCreated: Date = Date.now) {
         self.id = id
         self.name = name
         self.coverPhoto = coverPhoto
+        self.hasCoverPhoto = hasCoverPhoto ?? (coverPhoto != nil)
         self.parentAlbumID = parentAlbumID
         self.dateCreated = dateCreated
     }
 
     static func == (lhs: Album, rhs: Album) -> Bool {
-        lhs.id == rhs.id && lhs.name == rhs.name && lhs.coverPhoto?.count == rhs.coverPhoto?.count
+        lhs.id == rhs.id && lhs.name == rhs.name && lhs.hasCoverPhoto == rhs.hasCoverPhoto
     }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(name)
-        hasher.combine(coverPhoto?.count)
+        hasher.combine(hasCoverPhoto)
     }
 
     func identifiableString() -> String {
-        "\(id)-\(coverPhoto?.count ?? 0)-\(childAlbumCount ?? 0)-\(childPicCount ?? 0)"
+        "\(id)-\(hasCoverPhoto)-\(childAlbumCount ?? 0)-\(childPicCount ?? 0)"
     }
 
     func albumCount() -> Int {

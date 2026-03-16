@@ -39,6 +39,7 @@ struct PicsGrid<Content: View>: View {
                                     SelectionOverlay(isSelected(pic))
                                     Color.clear
                                 }
+                                .transition(.opacity.animation(.smooth.speed(2.0)))
                             }
                         }
                     }

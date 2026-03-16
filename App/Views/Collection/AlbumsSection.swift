@@ -98,7 +98,7 @@ struct AlbumsSection<Content: View>: View {
     func contextMenu(_ album: Album) -> some View {
         if enablesContextMenu {
             moveMenu(album)
-            if album.coverPhoto != nil {
+            if album.hasCoverPhoto {
                 Divider()
                 Button("Shared.ResetCover", systemImage: "photo") {
                     Task {

@@ -190,7 +190,8 @@ struct AlbumView: View {
 
     var mainContent: some View {
         ZStack {
-            if let currentAlbum, let coverPhoto = currentAlbum.coverPhoto, let uiImage = UIImage(data: coverPhoto) {
+            if let currentAlbum, currentAlbum.hasCoverPhoto, let coverPhoto = currentAlbum.coverPhoto,
+               let uiImage = UIImage(data: coverPhoto) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
@@ -204,17 +205,20 @@ struct AlbumView: View {
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 0.0) {
                     if !isSelectingPics {
-                        albumSection
-                        if !searchText.isEmpty {
-                            if displayedAlbums.isEmpty {
-                                Text("Albums.NoSearchResults", tableName: "Albums")
-                                    .foregroundStyle(.secondary)
-                                    .padding(20.0)
+                        VStack(alignment: .leading, spacing: 0.0) {
+                            albumSection
+                            if !searchText.isEmpty {
+                                if displayedAlbums.isEmpty {
+                                    Text("Albums.NoSearchResults", tableName: "Albums")
+                                        .foregroundStyle(.secondary)
+                                        .padding(20.0)
+                                }
+                            } else {
+                                Spacer()
+                                    .frame(height: 20.0)
                             }
-                        } else {
-                            Spacer()
-                                .frame(height: 20.0)
                         }
+                        .transition(.opacity.animation(.smooth.speed(2.0)))
                     }
                     if searchText.isEmpty {
                         picsSection

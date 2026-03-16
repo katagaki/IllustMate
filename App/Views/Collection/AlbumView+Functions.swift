@@ -170,7 +170,9 @@ extension AlbumView {
                 // Then fetch all skeletons (lightweight — no blob data)
                 let pics = await self.fetchPics()
                 await MainActor.run {
-                    self.pics = pics
+                    withAnimation(.smooth.speed(2.0)) {
+                        self.pics = pics
+                    }
                     self.hasFetchedPics = true
                 }
             }
@@ -179,8 +181,7 @@ extension AlbumView {
 
     func fetchAlbums() async -> [Album] {
         do {
-            let albums = try await DataActor.shared.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
-            return albums
+            return try await DataActor.shared.albumsWithCounts(in: currentAlbum, sortedBy: albumSort)
         } catch {
             debugPrint(error.localizedDescription)
             return []
