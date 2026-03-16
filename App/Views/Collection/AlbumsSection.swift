@@ -48,7 +48,8 @@ struct AlbumsSection<Content: View>: View {
                         .buttonStyleAdaptive()
                     }
                 }
-                .padding(20.0)
+                .padding([.horizontal, .top], 20.0)
+                .padding(.bottom, 10.0)
                 .animation(.smooth, value: columnCount)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {

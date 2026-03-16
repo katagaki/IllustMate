@@ -12,9 +12,11 @@ extension AlbumView {
         Group {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: displayedAlbums.count)
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"),
+                                  count: displayedAlbums.count)
                 } else {
-                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: displayedAlbums.count) {
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"),
+                                  count: displayedAlbums.count) {
                         Picker(String(localized: "Albums.Style", table: "Albums"), selection: ($albumStyleState.animation(.smooth.speed(2)))) {
                             Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)

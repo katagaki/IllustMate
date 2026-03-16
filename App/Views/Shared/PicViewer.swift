@@ -11,6 +11,7 @@ import SwiftUI
 struct PicViewer: View {
 
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(ViewerManager.self) var viewer
     @EnvironmentObject var navigation: NavigationManager
     @Environment(PictureInPictureManager.self) var pipManager
@@ -22,6 +23,10 @@ struct PicViewer: View {
     @State var magnificationAnchor: UnitPoint = .center
     @State var containingAlbumName: String?
     @State var showImageSize: Bool = true
+
+    private var isLandscape: Bool {
+        verticalSizeClass == .compact
+    }
 
     var currentImage: UIImage? {
         viewer.displayedImage ?? viewer.displayedThumbnail
@@ -36,62 +41,7 @@ struct PicViewer: View {
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 0.0) {
-            // Image with size overlay - fills available space
-            ZStack(alignment: .bottomLeading) {
-                ZStack {
-                    // Show thumbnail as placeholder
-                    if let thumbnail = viewer.displayedThumbnail {
-                        Image(uiImage: thumbnail)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(.rect(cornerRadius: 8.0))
-                            .opacity(viewer.isFullImageLoaded ? 0 : 1)
-                    }
-                    // Show full image when loaded
-                    if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
-                        Image(uiImage: fullImage)
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(.rect(cornerRadius: 8.0))
-                    }
-                }
-
-                // Image size overlay (bottom-left of image)
-                if showImageSize, let displayedImage = viewer.displayedImage {
-                    HStack(alignment: .center, spacing: 2.0) {
-                        Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
-                        Text(verbatim: "×")
-                        Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
-                    }
-                    .font(.caption)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.bar, in: .capsule)
-                    .padding(8)
-                    .transition(.opacity)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.vertical, 20)
-            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-            .zIndex(1)
-            .offset(displayOffset)
-            .scaleEffect(CGSize(width: magnification, height: magnification),
-                         anchor: magnificationAnchor)
-            .onTapGesture {
-                withAnimation(.smooth.speed(2)) {
-                    showImageSize.toggle()
-                }
-            }
-
-            // Carousel strip for navigating between pics
-            if viewer.allPics.count > 1 {
-                PicCarouselStrip()
-                    .padding(.horizontal, -20.0)
-            }
-        }
-        .padding(20.0)
+        mainContent
         .frame(maxHeight: .infinity)
         .background {
             // Blurred image background
@@ -118,33 +68,62 @@ struct PicViewer: View {
                         .lineLimit(1)
                 }
             }
-            if pipManager.isPossible {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                        startPictureInPicture()
+            if isLandscape {
+                // Landscape: show actions in top trailing bar
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    if pipManager.isPossible {
+                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                            startPictureInPicture()
+                        }
+                        .disabled(currentImage == nil)
                     }
+                    Button("Shared.Copy", systemImage: "doc.on.doc") {
+                        if let image = currentImage {
+                            UIPasteboard.general.image = image
+                        }
+                    }
+                    .disabled(currentImage == nil)
+                    ShareLink(
+                        "Shared.Share",
+                        item: shareImage,
+                        preview: SharePreview(
+                            viewer.displayedPic?.name ?? pic.name,
+                            image: shareImage
+                        )
+                    )
+                    .disabled(currentImage == nil)
+                }
+            } else {
+                // Portrait: show actions in bottom bar
+                if pipManager.isPossible {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                            startPictureInPicture()
+                        }
+                        .disabled(currentImage == nil)
+                    }
+                }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button("Shared.Copy", systemImage: "doc.on.doc") {
+                        if let image = currentImage {
+                            UIPasteboard.general.image = image
+                        }
+                    }
+                    .disabled(currentImage == nil)
+                    ShareLink(
+                        "Shared.Share",
+                        item: shareImage,
+                        preview: SharePreview(
+                            viewer.displayedPic?.name ?? pic.name,
+                            image: shareImage
+                        )
+                    )
                     .disabled(currentImage == nil)
                 }
             }
-            ToolbarSpacer(.flexible, placement: .bottomBar)
-            ToolbarItemGroup(placement: .bottomBar) {
-                Button("Shared.Copy", systemImage: "doc.on.doc") {
-                    if let image = currentImage {
-                        UIPasteboard.general.image = image
-                    }
-                }
-                .disabled(currentImage == nil)
-                ShareLink(
-                    "Shared.Share",
-                    item: shareImage,
-                    preview: SharePreview(
-                        viewer.displayedPic?.name ?? pic.name,
-                        image: shareImage
-                    )
-                )
-                .disabled(currentImage == nil)
-            }
         }
+        .toolbar(isLandscape ? .hidden : .automatic, for: .bottomBar)
         .task(id: viewer.displayedPicID) {
             containingAlbumName = nil
             if let albumID = viewer.displayedPic?.containingAlbumID ?? pic.containingAlbumID {
@@ -189,6 +168,84 @@ struct PicViewer: View {
 #endif
     }
 
+    private var imageContent: some View {
+        // Image with size overlay - fills available space
+        ZStack(alignment: .bottomLeading) {
+            ZStack {
+                // Show thumbnail as placeholder
+                if let thumbnail = viewer.displayedThumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                        .opacity(viewer.isFullImageLoaded ? 0 : 1)
+                }
+                // Show full image when loaded
+                if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
+                    Image(uiImage: fullImage)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
+            }
+
+            // Image size overlay (bottom-left of image)
+            if showImageSize, let displayedImage = viewer.displayedImage {
+                HStack(alignment: .center, spacing: 2.0) {
+                    Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
+                    Text(verbatim: "×")
+                    Text(verbatim: "\(Int(displayedImage.size.height * displayedImage.scale))")
+                }
+                .font(.caption)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.bar, in: .capsule)
+                .padding(8)
+                .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, isLandscape ? 4 : 20)
+        .padding(.bottom, isLandscape ? 0 : 20)
+        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+        .zIndex(1)
+        .offset(displayOffset)
+        .scaleEffect(CGSize(width: magnification, height: magnification),
+                     anchor: magnificationAnchor)
+        .onTapGesture {
+            withAnimation(.smooth.speed(2)) {
+                showImageSize.toggle()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainContent: some View {
+        if isLandscape {
+            // Landscape: vertical carousel on the left, image fills remaining space
+            HStack(spacing: 0.0) {
+                if viewer.allPics.count > 1 {
+                    PicCarouselStripVertical()
+                        .padding(.vertical, -8.0)
+                }
+                imageContent
+            }
+            .padding(8.0)
+            .padding(.leading, 40.0)
+        } else {
+            // Portrait: image on top, horizontal carousel at bottom
+            VStack(alignment: .center, spacing: 0.0) {
+                imageContent
+
+                if viewer.allPics.count > 1 {
+                    PicCarouselStrip()
+                        .padding(.horizontal, -20.0)
+                }
+            }
+            .padding(20.0)
+        }
+    }
+
     private func startPictureInPicture() {
         guard let image = currentImage else { return }
 
@@ -229,6 +286,45 @@ private struct PicCarouselStrip: View {
                 .padding(.horizontal, 20.0)
             }
             .frame(height: 56.0)
+            .onChange(of: viewer.currentIndex) { _, _ in
+                if let pic = viewer.displayedPic {
+                    withAnimation(.smooth) {
+                        proxy.scrollTo(pic.id, anchor: .center)
+                    }
+                }
+            }
+            .onAppear {
+                if let pic = viewer.displayedPic {
+                    proxy.scrollTo(pic.id, anchor: .center)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Vertical Carousel Strip (Landscape)
+
+private struct PicCarouselStripVertical: View {
+
+    @Environment(ViewerManager.self) var viewer
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(spacing: 4.0) {
+                    ForEach(Array(viewer.allPics.enumerated()), id: \.element.id) { index, pic in
+                        Button {
+                            viewer.navigateTo(index: index)
+                        } label: {
+                            CarouselThumbnail(pic: pic, isSelected: index == viewer.currentIndex)
+                        }
+                        .buttonStyle(.plain)
+                        .id(pic.id)
+                    }
+                }
+                .padding(.vertical, 8.0)
+            }
+            .frame(width: 56.0)
             .onChange(of: viewer.currentIndex) { _, _ in
                 if let pic = viewer.displayedPic {
                     withAnimation(.smooth) {

@@ -12,6 +12,7 @@ import SwiftUI
 struct PhotosAssetViewer: View {
 
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(PhotosViewerManager.self) var photosViewer
     @EnvironmentObject var navigation: NavigationManager
     @Environment(PictureInPictureManager.self) var pipManager
@@ -28,6 +29,10 @@ struct PhotosAssetViewer: View {
     @State private var magnificationAnchor: UnitPoint = .center
     @State private var displayOffset: CGSize = .zero
     @State private var viewSize: CGSize = .zero
+
+    private var isLandscape: Bool {
+        verticalSizeClass == .compact
+    }
 
     private var currentAsset: PHAsset {
         photosViewer.displayedAsset ?? asset
