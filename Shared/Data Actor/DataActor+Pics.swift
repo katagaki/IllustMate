@@ -131,6 +131,12 @@ extension DataActor {
         _ = try? database.run(query.delete())
     }
 
+    func deletePics(withIDs picIDs: [String]) {
+        guard !picIDs.isEmpty else { return }
+        let query = picsTable.filter(picIDs.contains(picId))
+        _ = try? database.run(query.delete())
+    }
+
     // MARK: - Thumbnails
 
     func deleteAllThumbnails() {

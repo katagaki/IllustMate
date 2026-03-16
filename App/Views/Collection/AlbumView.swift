@@ -58,8 +58,10 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
 
+    @State var lastRefreshTime: Date = .distantPast
     @State var searchText: String = ""
     @State var searchResults: [Album]?
+    @State var searchTask: Task<Void, Never>?
     @State var isDuplicateCheckerPresented: Bool = false
 
     var displayedAlbums: [Album] {
@@ -157,6 +159,9 @@ struct AlbumView: View {
             }
             .onChange(of: scenePhase) { _, newValue in
                 if newValue == .active {
+                    let now = Date.now
+                    guard now.timeIntervalSince(lastRefreshTime) > 5.0 else { return }
+                    lastRefreshTime = now
                     Task.detached(priority: .userInitiated) {
                         await refreshData()
                     }
@@ -168,10 +173,13 @@ struct AlbumView: View {
                 }
             }
             .onChange(of: searchText) { _, newValue in
+                searchTask?.cancel()
                 if newValue.isEmpty {
                     searchResults = nil
                 } else {
-                    Task.detached(priority: .userInitiated) {
+                    searchTask = Task.detached(priority: .userInitiated) {
+                        try? await Task.sleep(for: .milliseconds(300))
+                        guard !Task.isCancelled else { return }
                         await searchAlbums(matching: newValue)
                     }
                 }

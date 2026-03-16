@@ -130,15 +130,11 @@ extension DataActor {
         case .nameAscending: return albums.sorted(by: { $0.name < $1.name })
         case .nameDescending: return albums.sorted(by: { $0.name > $1.name })
         case .sizeAscending:
-            return albums.sorted(by: {
-                $0.albumCount() + $0.picCount() <
-                    $1.albumCount() + $1.picCount()
-            })
+            let decorated = albums.map { ($0, $0.albumCount() + $0.picCount()) }
+            return decorated.sorted(by: { $0.1 < $1.1 }).map(\.0)
         case .sizeDescending:
-            return albums.sorted(by: {
-                $0.albumCount() + $0.picCount() >
-                $1.albumCount() + $1.picCount()
-            })
+            let decorated = albums.map { ($0, $0.albumCount() + $0.picCount()) }
+            return decorated.sorted(by: { $0.1 > $1.1 }).map(\.0)
         }
     }
 
@@ -174,35 +170,24 @@ extension DataActor {
         let parentID = parentAlbumID(forAlbumWithID: albumID)
 
         // Move direct pics to parent album, or orphan them
-        let illustQuery = picsTable.filter(picAlbumId == albumID)
+        let picsQuery = picsTable.filter(picAlbumId == albumID)
         if let parentID = parentID {
-            _ = try? database.run(illustQuery.update(picAlbumId <- parentID))
+            _ = try? database.run(picsQuery.update(picAlbumId <- parentID))
         } else {
-            _ = try? database.run(illustQuery.update(picAlbumId <- nil))
+            _ = try? database.run(picsQuery.update(picAlbumId <- nil))
         }
 
-        // Recursively delete child albums
-        deleteAlbumCascade(withID: albumID)
-    }
-
-    func deleteAlbumCascade(withID albumID: String) {
-        // Orphan all pics in this album
-        let illustQuery = picsTable.filter(picAlbumId == albumID)
-        _ = try? database.run(illustQuery.update(picAlbumId <- nil))
-
-        // Recurse into child albums
-        let childQuery = albumsTable.filter(albumParentId == albumID)
-        if let rows = try? database.prepare(childQuery) {
-            for row in rows {
-                if let childID = try? row.get(albumId) {
-                    deleteAlbumCascade(withID: childID)
-                }
-            }
+        // Move child albums to parent album, or orphan them
+        let childAlbumsQuery = albumsTable.filter(albumParentId == albumID)
+        if let parentID = parentID {
+            _ = try? database.run(childAlbumsQuery.update(albumParentId <- parentID))
+        } else {
+            _ = try? database.run(childAlbumsQuery.update(albumParentId <- nil))
         }
 
-        // Delete the album
-        let album = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(album.delete())
+        // Delete the album itself
+        let albumQuery = albumsTable.filter(albumId == albumID)
+        _ = try? database.run(albumQuery.delete())
     }
 
     func parentAlbumID(forAlbumWithID albumID: String) -> String? {

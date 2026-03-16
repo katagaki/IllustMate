@@ -143,6 +143,12 @@ actor PColorActor {
         _ = try? database.run(query.delete())
     }
 
+    func deleteColors(forPicIDs picIDs: [String]) {
+        guard !picIDs.isEmpty else { return }
+        let query = picColorsTable.filter(picIDs.contains(colorPicId))
+        _ = try? database.run(query.delete())
+    }
+
     func deleteAllColors() {
         _ = try? database.run(picColorsTable.delete())
     }

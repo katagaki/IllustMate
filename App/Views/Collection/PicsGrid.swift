@@ -104,7 +104,8 @@ struct PicsGrid<Content: View>: View {
 #endif
             }
             if placeholderCount > 0 {
-                ForEach(0..<placeholderCount, id: \.self) { _ in
+                let visiblePlaceholders = min(placeholderCount, columnCount * 10)
+                ForEach(0..<visiblePlaceholders, id: \.self) { _ in
                     Rectangle()
                         .fill(.primary.opacity(0.05))
                         .aspectRatio(1.0, contentMode: .fit)

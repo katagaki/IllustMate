@@ -40,11 +40,10 @@ extension AlbumView {
         Task { [isSelectingPics, selectedPics] in
             var deletedIDs = Set<String>()
             if isSelectingPics {
-                for pic in selectedPics {
-                    await DataActor.shared.deletePic(withID: pic.id)
-                    await PColorActor.shared.deleteColor(forPicWithID: pic.id)
-                    deletedIDs.insert(pic.id)
-                }
+                let picIDs = selectedPics.map(\.id)
+                deletedIDs = Set(picIDs)
+                await DataActor.shared.deletePics(withIDs: picIDs)
+                await PColorActor.shared.deleteColors(forPicIDs: picIDs)
             } else {
                 if let picPendingDeletion = picPendingDeletion {
                     await DataActor.shared.deletePic(withID: picPendingDeletion.id)
@@ -231,23 +230,37 @@ extension AlbumView {
         var colorsMap = cachedColors
         let uncachedPics = pics.filter { colorsMap[$0.id] == nil && $0.thumbnailData != nil }
 
-        // Compute colors concurrently
+        // Compute colors concurrently with bounded parallelism
         if !uncachedPics.isEmpty {
+            let maxConcurrent = 8
             let newColors: [(picID: String, color: RGBColor)] = await withTaskGroup(
                 of: (String, RGBColor?).self,
                 returning: [(picID: String, color: RGBColor)].self
             ) { group in
-                for pic in uncachedPics {
+                var iterator = uncachedPics.makeIterator()
+
+                // Seed the group with initial batch
+                for _ in 0..<min(maxConcurrent, uncachedPics.count) {
+                    guard let pic = iterator.next() else { break }
                     group.addTask {
                         guard let thumbnailData = pic.thumbnailData else { return (pic.id, nil) }
                         let color = ProminentColor.calculate(from: thumbnailData)
                         return (pic.id, color)
                     }
                 }
+
+                // As each task completes, add the next one
                 var results: [(picID: String, color: RGBColor)] = []
                 for await (picID, color) in group {
                     if let color {
                         results.append((picID: picID, color: color))
+                    }
+                    if let pic = iterator.next() {
+                        group.addTask {
+                            guard let thumbnailData = pic.thumbnailData else { return (pic.id, nil) }
+                            let color = ProminentColor.calculate(from: thumbnailData)
+                            return (pic.id, color)
+                        }
                     }
                 }
                 return results

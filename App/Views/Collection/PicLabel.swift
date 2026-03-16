@@ -13,6 +13,7 @@ final class ThumbnailCache: @unchecked Sendable {
 
     init() {
         cache.countLimit = 500
+        cache.totalCostLimit = 100 * 1024 * 1024 // 100 MB
     }
 
     func image(forKey key: String) -> UIImage? {
@@ -20,7 +21,8 @@ final class ThumbnailCache: @unchecked Sendable {
     }
 
     func setImage(_ image: UIImage, forKey key: String) {
-        cache.setObject(image, forKey: key as NSString)
+        let cost = image.cgImage.map { $0.bytesPerRow * $0.height } ?? 0
+        cache.setObject(image, forKey: key as NSString, cost: cost)
     }
 }
 
@@ -57,7 +59,7 @@ struct PicLabel: View {
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 4.0))
-            .task(id: pic.identifiableString()) {
+            .task(id: pic.id) {
                 let picID = pic.id
                 if let cached = ThumbnailCache.shared.image(forKey: picID) {
                     thumbnail = Image(uiImage: cached)

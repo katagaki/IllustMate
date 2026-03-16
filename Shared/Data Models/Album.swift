@@ -36,18 +36,17 @@ final class Album: Identifiable, Hashable, @unchecked Sendable {
     }
 
     static func == (lhs: Album, rhs: Album) -> Bool {
-        lhs.id == rhs.id && lhs.name == rhs.name && lhs.coverPhoto == rhs.coverPhoto
+        lhs.id == rhs.id && lhs.name == rhs.name && lhs.coverPhoto?.count == rhs.coverPhoto?.count
     }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(name)
-        hasher.combine(coverPhoto)
+        hasher.combine(coverPhoto?.count)
     }
 
     func identifiableString() -> String {
-        let coverSize = coverPhoto?.count ?? 0
-        return "\(id)-\(coverSize)-\(albumCount())-\(picCount())"
+        "\(id)-\(coverPhoto?.count ?? 0)-\(childAlbumCount ?? 0)-\(childPicCount ?? 0)"
     }
 
     func albumCount() -> Int {
