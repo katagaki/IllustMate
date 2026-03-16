@@ -17,7 +17,6 @@ struct PicsGrid<Content: View>: View {
     var placeholderCount: Int = 0
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
-    var selectedPicIDs: [String] = []
     var isSelected: ((Pic) -> Bool)?
     var onSelect: (Pic) -> Void
     var selectedCount: () -> Int
@@ -46,7 +45,9 @@ struct PicsGrid<Content: View>: View {
                                 }
                             }
                         }
-                        .draggable(draggablePayload(for: pic))
+                }
+                .if(!isSelecting) {
+                    $0.draggable(PicTransferable(id: pic.id))
                 }
                 .matchedTransitionSource(id: pic.id, in: namespace)
                 .contextMenu {
@@ -117,13 +118,6 @@ struct PicsGrid<Content: View>: View {
             }
         }
         .animation(.smooth, value: columnCount)
-    }
-
-    private func draggablePayload(for pic: Pic) -> PicCollectionTransferable {
-        if isSelecting, selectedPicIDs.contains(pic.id) {
-            return PicCollectionTransferable(ids: selectedPicIDs)
-        }
-        return PicCollectionTransferable(ids: [pic.id])
     }
 }
 
