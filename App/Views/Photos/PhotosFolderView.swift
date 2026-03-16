@@ -14,8 +14,8 @@ struct PhotosFolderView: View {
 
     let folder: PHCollectionList
 
-    @AppStorage("PhotosNestedAlbumsEnabled",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isNestedAlbumsEnabled: Bool = false
+    @AppStorage("PhotosNestedAlbumsEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isNestedAlbumsEnabled: Bool = false
 
     @Namespace var namespace
 
@@ -145,11 +145,14 @@ struct PhotosFolderView: View {
             ControlGroup {
                 Picker(String(localized: "Albums.Style", table: "Albums"),
                        selection: $albumStyleState.animation(.smooth.speed(2))) {
-                    Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
+                    Label(String(localized: "Albums.Style.Grid", table: "Albums"),
+                          systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
-                    Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
+                    Label(String(localized: "Albums.Style.List", table: "Albums"),
+                          systemImage: "list.bullet")
                         .tag(ViewStyle.list)
-                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
+                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"),
+                          systemImage: "rectangle.on.rectangle")
                         .tag(ViewStyle.carousel)
                 }
             }

@@ -27,7 +27,6 @@ struct MoreLicensesView: View {
     }
 }
 
-// swiftlint:disable type_body_length
 private struct Dependency: Identifiable {
     let id: String
     let name: String
@@ -66,4 +65,3 @@ private struct Dependency: Identifiable {
         )
     ]
 }
-// swiftlint:enable type_body_length

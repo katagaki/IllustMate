@@ -7,6 +7,7 @@
 
 import Foundation
 import Network
+import UIKit
 
 @MainActor @Observable
 class WebServerManager {
@@ -15,8 +16,13 @@ class WebServerManager {
 
     var isRunning: Bool = false
     var localIPAddress: String?
-    var port: UInt16 = 8080
+    var port: UInt16 = 1693
     var connectionCount: Int = 0
+    var keepScreenOn: Bool = false {
+        didSet {
+            updateIdleTimer()
+        }
+    }
 
     // MARK: - Private
 
@@ -46,6 +52,7 @@ class WebServerManager {
                     case .ready:
                         self.isRunning = true
                         self.refreshIPAddress()
+                        self.updateIdleTimer()
                     case .failed:
                         self.stop()
                     case .cancelled:
@@ -73,6 +80,13 @@ class WebServerManager {
         isRunning = false
         connectionCount = 0
         localIPAddress = nil
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    // MARK: - Idle Timer
+
+    private func updateIdleTimer() {
+        UIApplication.shared.isIdleTimerDisabled = isRunning && keepScreenOn
     }
 
     // MARK: - Connection Handling
@@ -161,14 +175,6 @@ class WebServerManager {
         bodyBuffer: Data,
         expectedLength: Int
     ) {
-        // Enforce max upload size of 50 MB
-        let maxSize = 50 * 1024 * 1024
-        guard expectedLength <= maxSize else {
-            let response = HTTPResponse.badRequest("Upload too large (max 50 MB)")
-            sendResponse(response, on: connection)
-            return
-        }
-
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, _, error in
             guard let self, let data, error == nil else {
                 connection.cancel()
@@ -230,7 +236,8 @@ class WebServerManager {
                         nil, 0,
                         NI_NUMERICHOST
                     )
-                    address = String(decoding: hostname.map { UInt8(bitPattern: $0) }.prefix(while: { $0 != 0 }), as: UTF8.self)
+                    address = String(decoding: hostname.map { UInt8(bitPattern: $0) }.prefix(while: { $0 != 0 }),
+                                     as: UTF8.self)
                 }
             }
         }

@@ -92,7 +92,8 @@ struct PhotosAssetGridView: View {
                         }
                     } label: {
                         Text(selectedAssets.count == assets.count ?
-                             String(localized: "Import.DeselectAll", table: "Import") : String(localized: "Import.SelectAll", table: "Import"))
+                             String(localized: "Import.DeselectAll", table: "Import") :
+                                String(localized: "Import.SelectAll", table: "Import"))
                     }
                 }
             }

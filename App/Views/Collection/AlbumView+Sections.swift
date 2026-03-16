@@ -17,12 +17,16 @@ extension AlbumView {
                 } else {
                     SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"),
                                   count: displayedAlbums.count) {
-                        Picker(String(localized: "Albums.Style", table: "Albums"), selection: ($albumStyleState.animation(.smooth.speed(2)))) {
-                            Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
+                        Picker(String(localized: "Albums.Style", table: "Albums"),
+                               selection: ($albumStyleState.animation(.smooth.speed(2)))) {
+                            Label(String(localized: "Albums.Style.Grid", table: "Albums"),
+                                  systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)
-                            Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
+                            Label(String(localized: "Albums.Style.List", table: "Albums"),
+                                  systemImage: "list.bullet")
                                 .tag(ViewStyle.list)
-                            Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
+                            Label(String(localized: "Albums.Style.Carousel", table: "Albums"),
+                                  systemImage: "rectangle.on.rectangle")
                                 .tag(ViewStyle.carousel)
                         }
                         Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
@@ -77,9 +81,11 @@ extension AlbumView {
         Group {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: hasFetchedPicCount ? picCount : pics.count)
+                    SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
+                                  count: hasFetchedPicCount ? picCount : pics.count)
                 } else {
-                    SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: hasFetchedPicCount ? picCount : pics.count) {
+                    SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
+                                  count: hasFetchedPicCount ? picCount : pics.count) {
                         Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"), systemImage: "photo.stack") {
                             isDuplicateCheckerPresented = true
                         }

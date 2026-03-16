@@ -21,6 +21,7 @@ struct IllustMateApp: App {
     @State var photosViewer = PhotosViewerManager()
     @State var auth = AuthenticationManager()
     @State var pipManager = PictureInPictureManager()
+    @State var webServer = WebServerManager()
     @State var isImportingBackup: Bool = false
     @State var importedURL: URL?
     @State var showLockCover: Bool = false
@@ -45,6 +46,7 @@ struct IllustMateApp: App {
         .environment(photosViewer)
         .environment(auth)
         .environment(pipManager)
+        .environment(webServer)
         .overlay(alignment: .bottomLeading) {
             PictureInPictureLayerView(pipManager: pipManager)
                 .frame(width: 1, height: 1)
@@ -105,6 +107,7 @@ struct IllustMateApp: App {
                     WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
                     WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
                     scheduleWidgetRefresh()
+                    webServer.stop()
                 }
                 if isAppLockEnabled {
                     switch newValue {

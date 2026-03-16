@@ -82,8 +82,11 @@ struct PhotostandDatabase {
         }
     }
 
-    static func fetchRandomPicDataMultiple(inAlbumWithID albumID: String, count: Int,
-                                              maxDimension: CGFloat = 800) -> [Data] {
+    static func fetchRandomPicDataMultiple(
+        inAlbumWithID albumID: String,
+        count: Int,
+        maxDimension: CGFloat = 800
+    ) -> [Data] {
         guard let database = openDatabase() else { return [] }
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
@@ -127,7 +130,9 @@ extension UIImage {
 // MARK: - App Entity for Album Selection
 
 struct AlbumEntity: AppEntity {
-    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: LocalizedStringResource("Photostand.Entity.Album", table: "Widgets"))
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(
+        name: LocalizedStringResource("Photostand.Entity.Album", table: "Widgets")
+    )
     static var defaultQuery = AlbumEntityQuery()
 
     var id: String
@@ -161,12 +166,25 @@ enum RefreshInterval: String, CaseIterable, AppEnum {
     case twelveHours = "12h"
     case twentyFourHours = "24h"
 
-    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: LocalizedStringResource("Photostand.Entity.RefreshInterval", table: "Widgets"))
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(
+        name: LocalizedStringResource(
+            "Photostand.Entity.RefreshInterval",
+            table: "Widgets"
+        )
+    )
     static var caseDisplayRepresentations: [RefreshInterval: DisplayRepresentation] = [
-        .threeHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.3Hours", table: "Widgets")),
-        .sixHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.6Hours", table: "Widgets")),
-        .twelveHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.12Hours", table: "Widgets")),
-        .twentyFourHours: DisplayRepresentation(title: LocalizedStringResource("Photostand.RefreshInterval.24Hours", table: "Widgets"))
+        .threeHours: DisplayRepresentation(
+            title: LocalizedStringResource("Photostand.RefreshInterval.3Hours", table: "Widgets")
+        ),
+        .sixHours: DisplayRepresentation(
+            title: LocalizedStringResource("Photostand.RefreshInterval.6Hours", table: "Widgets")
+        ),
+        .twelveHours: DisplayRepresentation(
+            title: LocalizedStringResource("Photostand.RefreshInterval.12Hours", table: "Widgets")
+        ),
+        .twentyFourHours: DisplayRepresentation(
+            title: LocalizedStringResource("Photostand.RefreshInterval.24Hours", table: "Widgets")
+        )
     ]
 
     var seconds: TimeInterval {
@@ -187,12 +205,17 @@ enum RefreshInterval: String, CaseIterable, AppEnum {
 
 struct SelectAlbumIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = LocalizedStringResource("Photostand.Intent.Title", table: "Widgets")
-    static var description = IntentDescription(LocalizedStringResource("Photostand.Intent.Description", table: "Widgets"))
+    static var description = IntentDescription(
+        LocalizedStringResource("Photostand.Intent.Description", table: "Widgets")
+    )
 
     @Parameter(title: LocalizedStringResource("Photostand.Intent.Album", table: "Widgets"))
     var album: AlbumEntity?
 
-    @Parameter(title: LocalizedStringResource("Photostand.Intent.RefreshInterval", table: "Widgets"), default: .threeHours)
+    @Parameter(
+        title: LocalizedStringResource("Photostand.Intent.RefreshInterval", table: "Widgets"),
+        default: .threeHours
+    )
     var refreshInterval: RefreshInterval
 }
 
@@ -333,7 +356,9 @@ struct Photostand: Widget {
 
 struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = LocalizedStringResource("PhotoGrid.Intent.Title", table: "Widgets")
-    static var description = IntentDescription(LocalizedStringResource("PhotoGrid.Intent.Description", table: "Widgets"))
+    static var description = IntentDescription(
+        LocalizedStringResource("PhotoGrid.Intent.Description", table: "Widgets")
+    )
 
     @Parameter(title: LocalizedStringResource("PhotoGrid.Intent.Album", table: "Widgets"))
     var album: AlbumEntity?
@@ -367,13 +392,27 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
         let images = PhotostandDatabase.fetchRandomPicDataMultiple(
             inAlbumWithID: album.id, count: count, maxDimension: 400
         )
-        return PhotoGridEntry(date: .now, albumID: album.id, albumName: album.name, images: images, columns: columns, rows: rows)
+        return PhotoGridEntry(
+            date: .now,
+            albumID: album.id,
+            albumName: album.name,
+            images: images,
+            columns: columns,
+            rows: rows
+        )
     }
 
     func timeline(for configuration: SelectAlbumForGridIntent, in context: Context) async -> Timeline<PhotoGridEntry> {
         let (columns, rows) = gridSize(for: context.family)
         guard let album = configuration.album else {
-            let entry = PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: columns, rows: rows)
+            let entry = PhotoGridEntry(
+                date: .now,
+                albumID: nil,
+                albumName: nil,
+                images: [],
+                columns: columns,
+                rows: rows
+            )
             return Timeline(entries: [entry], policy: .never)
         }
 

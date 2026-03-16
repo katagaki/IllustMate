@@ -43,6 +43,7 @@ extension DataActor {
 
         // Batch album counts
         var albumCounts: [String: Int] = [:]
+        // swiftlint:disable:next line_length
         let albumCountSQL = "SELECT parent_album_id, COUNT(*) FROM albums WHERE parent_album_id IN (\(placeholders)) GROUP BY parent_album_id"
         if let stmt = try? database.prepare(albumCountSQL, bindings) {
             for row in stmt {
@@ -55,6 +56,7 @@ extension DataActor {
 
         // Batch pic counts
         var picCounts: [String: Int] = [:]
+        // swiftlint:disable:next line_length
         let picCountSQL = "SELECT containing_album_id, COUNT(*) FROM pics WHERE containing_album_id IN (\(placeholders)) GROUP BY containing_album_id"
         if let stmt = try? database.prepare(picCountSQL, bindings) {
             for row in stmt {

@@ -99,6 +99,7 @@ struct MoreView: View {
                     Text("ShareSheet.QuickImport.Description", tableName: "More")
                 }
             }
+            WebServerView()
             Section {
                 Button(String(localized: "DuplicateChecker", table: "More")) {
                     isDuplicateCheckerPresented = true

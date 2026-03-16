@@ -24,13 +24,16 @@ extension WebServerManager {
             if components.count == 3 && components[0] == "api" && components[1] == "albums" {
                 return await handleGetAlbum(id: components[2])
             }
-            if components.count == 4 && components[0] == "api" && components[1] == "albums" && components[3] == "cover" {
+            if components.count == 4 && components[0] == "api" &&
+                components[1] == "albums" && components[3] == "cover" {
                 return await handleGetAlbumCover(id: components[2])
             }
-            if components.count == 4 && components[0] == "api" && components[1] == "pics" && components[3] == "thumbnail" {
+            if components.count == 4 && components[0] == "api" &&
+                components[1] == "pics" && components[3] == "thumbnail" {
                 return await handleGetPicThumbnail(id: components[2])
             }
-            if components.count == 4 && components[0] == "api" && components[1] == "pics" && components[3] == "image" {
+            if components.count == 4 && components[0] == "api" &&
+                components[1] == "pics" && components[3] == "image" {
                 return await handleGetPicImage(id: components[2])
             }
         }
@@ -39,7 +42,8 @@ extension WebServerManager {
             if components == ["api", "upload"] {
                 return await handleUploadToRoot(request: request)
             }
-            if components.count == 4 && components[0] == "api" && components[1] == "albums" && components[3] == "upload" {
+            if components.count == 4 && components[0] == "api" &&
+                components[1] == "albums" && components[3] == "upload" {
                 return await handleUploadToAlbum(id: components[2], request: request)
             }
         }
@@ -89,11 +93,17 @@ extension WebServerManager {
     // MARK: - Image Routes
 
     private func handleGetAlbumCover(id: String) async -> HTTPResponse {
-        guard let album = await DataActor.shared.album(for: id),
-              let coverData = album.coverPhoto else {
+        guard let album = await DataActor.shared.album(for: id) else {
             return .notFound()
         }
-        return .ok(imageData: coverData, contentType: "image/jpeg")
+        if let coverData = album.coverPhoto {
+            return .ok(imageData: coverData, contentType: "image/jpeg")
+        }
+        // Fall back to the latest pic's thumbnail
+        if let thumbnail = await DataActor.shared.representativeThumbnail(forAlbumWithID: id, at: 0) {
+            return .ok(imageData: thumbnail, contentType: "image/jpeg")
+        }
+        return .notFound()
     }
 
     private func handleGetPicThumbnail(id: String) async -> HTTPResponse {
@@ -168,10 +178,11 @@ extension WebServerManager {
     // MARK: - JSON Helpers
 
     private static func albumToJSON(_ album: Album) -> [String: Any] {
-        [
+        let hasCoverOrPics = album.coverPhoto != nil || album.picCount() > 0
+        return [
             "id": album.id,
             "name": album.name,
-            "hasCover": album.coverPhoto != nil,
+            "hasCover": hasCoverOrPics,
             "albumCount": album.albumCount(),
             "picCount": album.picCount()
         ]

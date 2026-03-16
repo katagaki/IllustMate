@@ -89,18 +89,22 @@ extension AlbumView {
     @ViewBuilder
     var filterMenu: some View {
         Menu {
-            Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"), systemImage: "photo.stack") {
+            Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"),
+                   systemImage: "photo.stack") {
                 isDuplicateCheckerPresented = true
             }
             Section(String(localized: "Albums.Albums", table: "Albums")) {
                 Picker(String(localized: "Albums.Style", table: "Albums"),
                        systemImage: "paintbrush",
                        selection: ($albumStyleState.animation(.smooth.speed(2)))) {
-                    Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
+                    Label(String(localized: "Albums.Style.Grid", table: "Albums"),
+                          systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
-                    Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
+                    Label(String(localized: "Albums.Style.List", table: "Albums"),
+                          systemImage: "list.bullet")
                         .tag(ViewStyle.list)
-                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
+                    Label(String(localized: "Albums.Style.Carousel", table: "Albums"),
+                          systemImage: "rectangle.on.rectangle")
                         .tag(ViewStyle.carousel)
                 }
                 .pickerStyle(.menu)
@@ -165,7 +169,8 @@ extension AlbumView {
             Button {
                 isPhotosPickerPresented = true
             } label: {
-                Label(String(localized: "Import.SelectPhotos", table: "Import"), systemImage: "photo.on.rectangle.angled")
+                Label(String(localized: "Import.SelectPhotos", table: "Import"),
+                      systemImage: "photo.on.rectangle.angled")
             }
             Button {
                 isBrowsingAlbums = true

@@ -26,7 +26,8 @@ struct DuplicateResultsView: View {
     var body: some View {
         if scanManager.duplicateGroups.isEmpty {
             ContentUnavailableView {
-                Label(String(localized: "Duplicates.NoDuplicatesFound", table: "Photos"), systemImage: "checkmark.circle")
+                Label(String(localized: "Duplicates.NoDuplicatesFound", table: "Photos"),
+                      systemImage: "checkmark.circle")
             } description: {
                 Text("Duplicates.NoDuplicatesFound.Message", tableName: "Photos")
             }

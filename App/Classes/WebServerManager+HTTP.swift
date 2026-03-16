@@ -128,10 +128,10 @@ enum HTTPRequestParser {
             path = String(rawPath[rawPath.startIndex..<questionIndex])
             let queryString = String(rawPath[rawPath.index(after: questionIndex)...])
             for pair in queryString.split(separator: "&") {
-                let kv = pair.split(separator: "=", maxSplits: 1)
-                if kv.count == 2 {
-                    let key = String(kv[0]).removingPercentEncoding ?? String(kv[0])
-                    let value = String(kv[1]).removingPercentEncoding ?? String(kv[1])
+                let keyValue = pair.split(separator: "=", maxSplits: 1)
+                if keyValue.count == 2 {
+                    let key = String(keyValue[0]).removingPercentEncoding ?? String(keyValue[0])
+                    let value = String(keyValue[1]).removingPercentEncoding ?? String(keyValue[1])
                     queryParameters[key] = value
                 }
             }
@@ -188,11 +188,11 @@ enum HTTPRequestParser {
             searchStart = range.upperBound
         }
 
-        for i in 0..<parts.count {
-            let partStart = parts[i].upperBound
+        for idx in 0..<parts.count {
+            let partStart = parts[idx].upperBound
             let partEnd: Data.Index
-            if i + 1 < parts.count {
-                partEnd = parts[i + 1].lowerBound
+            if idx + 1 < parts.count {
+                partEnd = parts[idx + 1].lowerBound
             } else {
                 partEnd = body.endIndex
             }

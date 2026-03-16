@@ -120,6 +120,7 @@
 				Strings/Albums.xcstrings,
 				Strings/More.xcstrings,
 				Strings/Photos.xcstrings,
+				Strings/WebServer.xcstrings,
 			);
 			target = E4614CFB2ACA86EC00D751FB /* Share with PicMate */;
 		};
@@ -501,7 +502,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n\nif which periphery > /dev/null; then\n  periphery scan --skip-build --disable-update-check\nelse\n  echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\nfi\n";
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

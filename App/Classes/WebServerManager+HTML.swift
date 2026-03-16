@@ -9,6 +9,7 @@ import Foundation
 
 extension WebServerManager {
 
+    // swiftlint:disable line_length
     static let mainPageHTML: String = """
     <!DOCTYPE html>
     <html lang="en">
@@ -22,9 +23,10 @@ extension WebServerManager {
                 --card-bg: #ffffff;
                 --text: #1c1c1e;
                 --text-secondary: #8e8e93;
-                --accent: #007aff;
+                --accent: #515BFE;
                 --border: #d1d1d6;
                 --hover: #e5e5ea;
+                --header-bg: #ffffff;
                 --shadow: rgba(0,0,0,0.08);
                 --modal-bg: rgba(0,0,0,0.6);
             }
@@ -34,14 +36,15 @@ extension WebServerManager {
                     --card-bg: #1c1c1e;
                     --text: #f5f5f7;
                     --text-secondary: #98989d;
-                    --accent: #0a84ff;
+                    --accent: #5E73FF;
                     --border: #38383a;
                     --hover: #2c2c2e;
+                    --header-bg: #000000;
                     --shadow: rgba(0,0,0,0.3);
                     --modal-bg: rgba(0,0,0,0.8);
                 }
             }
-            * { margin: 0; padding: 0; box-sizing: border-box; }
+            * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
             body {
                 font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
                 background: var(--bg);
@@ -52,14 +55,14 @@ extension WebServerManager {
                 position: sticky;
                 top: 0;
                 z-index: 100;
-                background: var(--bg);
+                background: color-mix(in srgb, var(--header-bg) 70%, transparent);
                 border-bottom: 1px solid var(--border);
                 padding: 16px 24px;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
             }
             .header h1 {
                 font-size: 24px;
@@ -72,11 +75,10 @@ extension WebServerManager {
                 gap: 6px;
                 padding: 8px 16px;
                 border: none;
-                border-radius: 8px;
+                border-radius: 9999px;
                 font-size: 14px;
                 font-weight: 600;
-                cursor: pointer;
-                transition: opacity 0.15s;
+                cursor: default;
             }
             .btn:hover { opacity: 0.8; }
             .btn-primary {
@@ -95,7 +97,7 @@ extension WebServerManager {
             .breadcrumb a {
                 color: var(--accent);
                 text-decoration: none;
-                cursor: pointer;
+                cursor: default;
             }
             .breadcrumb a:hover { text-decoration: underline; }
             .breadcrumb .separator { margin: 0 4px; }
@@ -108,19 +110,18 @@ extension WebServerManager {
             .album-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                gap: 16px;
+                gap: 12px;
             }
             .album-card {
                 background: var(--card-bg);
                 border-radius: 12px;
                 overflow: hidden;
-                cursor: pointer;
-                transition: transform 0.15s, box-shadow 0.15s;
+                cursor: default;
+                transition: filter 0.15s;
                 box-shadow: 0 1px 3px var(--shadow);
             }
             .album-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px var(--shadow);
+                filter: brightness(0.85);
             }
             .album-cover {
                 width: 100%;
@@ -135,10 +136,6 @@ extension WebServerManager {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-            }
-            .album-cover .placeholder {
-                font-size: 48px;
-                opacity: 0.3;
             }
             .album-info {
                 padding: 10px 12px;
@@ -158,20 +155,19 @@ extension WebServerManager {
             .pic-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 8px;
+                gap: 4px;
             }
             .pic-thumb {
                 width: 100%;
                 aspect-ratio: 1;
                 object-fit: cover;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: transform 0.15s, opacity 0.15s;
+                border-radius: 4px;
+                cursor: default;
+                transition: filter 0.15s;
                 background: var(--hover);
             }
             .pic-thumb:hover {
-                transform: scale(1.03);
-                opacity: 0.9;
+                filter: brightness(0.85);
             }
             .modal-overlay {
                 position: fixed;
@@ -235,6 +231,7 @@ extension WebServerManager {
                 border-radius: 12px;
                 padding: 40px 20px;
                 text-align: center;
+                line-height: 1.5;
                 color: var(--text-secondary);
                 margin-bottom: 16px;
                 transition: border-color 0.15s, background 0.15s;
@@ -248,7 +245,7 @@ extension WebServerManager {
             }
             .upload-drop-zone label {
                 color: var(--accent);
-                cursor: pointer;
+                cursor: default;
                 font-weight: 600;
             }
             .upload-actions {
@@ -284,7 +281,6 @@ extension WebServerManager {
                 padding: 60px 20px;
                 color: var(--text-secondary);
             }
-            .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
             .empty-state p { font-size: 16px; }
             .loading {
                 text-align: center;
@@ -306,7 +302,7 @@ extension WebServerManager {
             <h1 id="pageTitle">PicMate</h1>
             <div class="header-actions">
                 <button class="btn btn-primary" id="uploadBtn" onclick="openUpload()">
-                    &#x2B; Upload
+                    Upload
                 </button>
             </div>
         </div>
@@ -321,8 +317,8 @@ extension WebServerManager {
                 <img id="viewerImage" src="" alt="">
                 <div class="viewer-name" id="viewerName"></div>
                 <div class="viewer-controls">
-                    <a class="btn" id="downloadLink" download>&#x21E3; Download</a>
-                    <button class="btn" onclick="closeViewer()">&#x2715; Close</button>
+                    <a class="btn" id="downloadLink" download style="text-decoration:none">Download</a>
+                    <button class="btn" onclick="closeViewer()">Close</button>
                 </div>
             </div>
         </div>
@@ -389,11 +385,10 @@ extension WebServerManager {
                 if (index < 0) {
                     loadRoot();
                 } else {
-                    currentPath = currentPath.slice(0, index);
+                    currentPath = currentPath.slice(0, index + 1);
                     const target = currentPath[currentPath.length - 1];
                     if (target) {
                         currentAlbumId = target.id;
-                        // Re-fetch instead of caching
                         currentPath.pop();
                         loadAlbum(target.id, target.name);
                     } else {
@@ -405,77 +400,104 @@ extension WebServerManager {
             // Rendering
             function renderBreadcrumb() {
                 const el = document.getElementById('breadcrumb');
-                let html = '<a onclick="navigateTo(-1)">Collection</a>';
-                currentPath.forEach((item, i) => {
-                    html += '<span class="separator">/</span>';
-                    if (i === currentPath.length - 1) {
-                        html += '<span>' + escapeHtml(item.name) + '</span>';
+                el.innerHTML = '';
+                const rootLink = document.createElement('a');
+                rootLink.textContent = 'Collection';
+                rootLink.addEventListener('click', () => navigateTo(-1));
+                el.appendChild(rootLink);
+                currentPath.forEach((item, idx) => {
+                    const sep = document.createElement('span');
+                    sep.className = 'separator';
+                    sep.textContent = '/';
+                    el.appendChild(sep);
+                    if (idx === currentPath.length - 1) {
+                        const span = document.createElement('span');
+                        span.textContent = item.name;
+                        el.appendChild(span);
                     } else {
-                        html += '<a onclick="navigateTo(' + i + ')">' + escapeHtml(item.name) + '</a>';
+                        const link = document.createElement('a');
+                        link.textContent = item.name;
+                        const navIdx = idx;
+                        link.addEventListener('click', () => navigateTo(navIdx));
+                        el.appendChild(link);
                     }
                 });
-                el.innerHTML = html;
             }
 
             function renderContent(data) {
                 const el = document.getElementById('content');
-                let html = '';
+                el.innerHTML = '';
 
                 const hasAlbums = data.albums && data.albums.length > 0;
                 const hasPics = data.pics && data.pics.length > 0;
 
                 if (!hasAlbums && !hasPics) {
-                    html = '<div class="empty-state"><div class="icon">&#x1F5BC;</div><p>No albums or pics here yet.</p></div>';
-                    el.innerHTML = html;
+                    el.innerHTML = '<div class="empty-state"><p>No albums or pics here yet.</p></div>';
                     return;
                 }
 
                 if (hasAlbums) {
-                    html += '<div class="section-title">Albums</div>';
-                    html += '<div class="album-grid">';
+                    const title = document.createElement('div');
+                    title.className = 'section-title';
+                    title.textContent = 'Albums';
+                    el.appendChild(title);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'album-grid';
                     data.albums.forEach(album => {
-                        const coverUrl = album.hasCover
-                            ? '/api/albums/' + encodeURIComponent(album.id) + '/cover'
-                            : '';
-                        const coverHtml = coverUrl
-                            ? '<img src="' + coverUrl + '" alt="" loading="lazy">'
-                            : '<div class="placeholder">&#x1F4C1;</div>';
+                        const card = document.createElement('div');
+                        card.className = 'album-card';
+                        card.addEventListener('click', () => loadAlbum(album.id, album.name));
+
+                        const cover = document.createElement('div');
+                        cover.className = 'album-cover';
+                        if (album.hasCover) {
+                            const img = document.createElement('img');
+                            img.src = '/api/albums/' + encodeURIComponent(album.id) + '/cover';
+                            img.loading = 'lazy';
+                            cover.appendChild(img);
+                        }
+                        card.appendChild(cover);
+
+                        const info = document.createElement('div');
+                        info.className = 'album-info';
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'album-name';
+                        nameEl.textContent = album.name;
+                        info.appendChild(nameEl);
+                        const metaEl = document.createElement('div');
+                        metaEl.className = 'album-meta';
                         let metaParts = [];
                         if (album.albumCount > 0) metaParts.push(album.albumCount + ' album' + (album.albumCount !== 1 ? 's' : ''));
                         if (album.picCount > 0) metaParts.push(album.picCount + ' pic' + (album.picCount !== 1 ? 's' : ''));
-                        const meta = metaParts.join(', ') || 'Empty';
-                        html += '<div class="album-card" onclick="loadAlbum(\\'';
-                        html += escapeJs(album.id);
-                        html += '\\', \\'';
-                        html += escapeJs(album.name);
-                        html += '\\')">';
-                        html += '<div class="album-cover">' + coverHtml + '</div>';
-                        html += '<div class="album-info">';
-                        html += '<div class="album-name">' + escapeHtml(album.name) + '</div>';
-                        html += '<div class="album-meta">' + escapeHtml(meta) + '</div>';
-                        html += '</div></div>';
+                        metaEl.textContent = metaParts.join(', ') || 'Empty';
+                        info.appendChild(metaEl);
+                        card.appendChild(info);
+
+                        grid.appendChild(card);
                     });
-                    html += '</div>';
+                    el.appendChild(grid);
                 }
 
                 if (hasPics) {
-                    html += '<div class="section-title">Pics</div>';
-                    html += '<div class="pic-grid">';
-                    data.pics.forEach(pic => {
-                        const thumbUrl = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
-                        html += '<img class="pic-thumb" src="' + thumbUrl + '" ';
-                        html += 'alt="' + escapeHtml(pic.name) + '" ';
-                        html += 'loading="lazy" ';
-                        html += 'onclick="openViewer(\\'';
-                        html += escapeJs(pic.id);
-                        html += '\\', \\'';
-                        html += escapeJs(pic.name);
-                        html += '\\')">';
-                    });
-                    html += '</div>';
-                }
+                    const title = document.createElement('div');
+                    title.className = 'section-title';
+                    title.textContent = 'Pics';
+                    el.appendChild(title);
 
-                el.innerHTML = html;
+                    const grid = document.createElement('div');
+                    grid.className = 'pic-grid';
+                    data.pics.forEach(pic => {
+                        const img = document.createElement('img');
+                        img.className = 'pic-thumb';
+                        img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
+                        img.alt = pic.name;
+                        img.loading = 'lazy';
+                        img.addEventListener('click', () => openViewer(pic.id, pic.name));
+                        grid.appendChild(img);
+                    });
+                    el.appendChild(grid);
+                }
             }
 
             // Image Viewer
@@ -531,12 +553,12 @@ extension WebServerManager {
                 e.preventDefault();
                 dropZone.classList.remove('dragover');
                 if (e.dataTransfer.files.length > 0) {
-                    selectedFiles = Array.from(e.dataTransfer.files);
+                    selectedFiles = Array.from(e.dataTransfer.files).slice(0, 50);
                     updateFileList();
                 }
             });
             document.getElementById('fileInput').addEventListener('change', (e) => {
-                selectedFiles = Array.from(e.target.files);
+                selectedFiles = Array.from(e.target.files).slice(0, 50);
                 updateFileList();
             });
 
@@ -546,8 +568,11 @@ extension WebServerManager {
                     el.innerHTML = '';
                     return;
                 }
-                el.innerHTML = '<p style="font-size:14px;color:var(--text-secondary);margin:8px 0">'
-                    + selectedFiles.length + ' file' + (selectedFiles.length !== 1 ? 's' : '') + ' selected</p>';
+                let msg = selectedFiles.length + ' file' + (selectedFiles.length !== 1 ? 's' : '') + ' selected';
+                if (selectedFiles.length === 50) {
+                    msg += ' (maximum 50)';
+                }
+                el.innerHTML = '<p style="font-size:14px;color:var(--text-secondary);margin:8px 0">' + msg + '</p>';
             }
 
             async function submitUpload() {
@@ -593,16 +618,6 @@ extension WebServerManager {
                 }
             }
 
-            // Utilities
-            function escapeHtml(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-            function escapeJs(str) {
-                return str.replace(/\\\\/g, '\\\\\\\\').replace(/'/g, "\\\\'");
-            }
-
             // Keyboard
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
@@ -617,4 +632,5 @@ extension WebServerManager {
     </body>
     </html>
     """
+    // swiftlint:enable line_length
 }

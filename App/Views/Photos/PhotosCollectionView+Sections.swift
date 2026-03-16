@@ -43,16 +43,21 @@ extension PhotosCollectionView {
         Group {
             Group {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: filteredItems.count)
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"),
+                                  count: filteredItems.count)
                 } else {
-                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"), count: filteredItems.count) {
+                    SectionHeader(title: String(localized: "Albums.Albums", table: "Albums"),
+                                  count: filteredItems.count) {
                         Picker(String(localized: "Albums.Style", table: "Albums"),
                                selection: $albumStyleState.animation(.smooth.speed(2))) {
-                            Label(String(localized: "Albums.Style.Grid", table: "Albums"), systemImage: "square.grid.2x2")
+                            Label(String(localized: "Albums.Style.Grid", table: "Albums"),
+                                  systemImage: "square.grid.2x2")
                                 .tag(ViewStyle.grid)
-                            Label(String(localized: "Albums.Style.List", table: "Albums"), systemImage: "list.bullet")
+                            Label(String(localized: "Albums.Style.List", table: "Albums"),
+                                  systemImage: "list.bullet")
                                 .tag(ViewStyle.list)
-                            Label(String(localized: "Albums.Style.Carousel", table: "Albums"), systemImage: "rectangle.on.rectangle")
+                            Label(String(localized: "Albums.Style.Carousel", table: "Albums"),
+                                  systemImage: "rectangle.on.rectangle")
                                 .tag(ViewStyle.carousel)
                         }
                         if albumStyleState == .grid {
@@ -113,9 +118,11 @@ extension PhotosCollectionView {
             } else if !rootAssets.isEmpty {
                 Group {
                     if UIDevice.current.userInterfaceIdiom == .phone {
-                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: rootAssets.count)
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
+                                      count: rootAssets.count)
                     } else {
-                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: rootAssets.count) {
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
+                                      count: rootAssets.count) {
                             Picker("Shared.GridSize",
                                    systemImage: "square.grid.2x2",
                                    selection: $picColumnCount.animation(.smooth.speed(2.0))) {
