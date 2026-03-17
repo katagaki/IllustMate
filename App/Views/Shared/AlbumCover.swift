@@ -229,8 +229,8 @@ struct AlbumCover: View {
     var body: some View {
         Canvas { context, size in
             let itemCountTag = "itemCount"
-            let cardW = size.width * 0.92
-            let cardH = size.height * 0.92
+            let cardW = size.width * 0.86
+            let cardH = size.height * 0.86
             let cornerRadius = size.height * 0.12
             let cardRect = CGRect(
                 x: (size.width - cardW) / 2,
@@ -340,8 +340,7 @@ struct AlbumCover: View {
                 .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
                 .tag("itemCount")
         }
-        .frame(width: length.map { $0 + 16 }, height: length.map { $0 + 16 })
-        .padding(-8)
+        .frame(width: length, height: length)
         .transition(.opacity.animation(.smooth.speed(2)))
     }
 
