@@ -228,6 +228,7 @@ struct AlbumCover: View {
 
     var body: some View {
         Canvas { context, size in
+            let itemCountTag = "itemCount"
             let cardW = size.width * 0.92
             let cardH = size.height * 0.92
             let cornerRadius = size.height * 0.12
@@ -325,18 +326,19 @@ struct AlbumCover: View {
             }
 
             // --- Item count overlay ---
-            if size.width >= 80 {
-                let countView = AlbumItemCount(picCount: picCount, albumCount: albumCount)
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
-                let resolved = context.resolve(countView)
-                let countSize = resolved.size
+            if size.width >= 80,
+               let resolved = context.resolveSymbol(id: itemCountTag) {
                 let countOrigin = CGPoint(
-                    x: (size.width - countSize.width) / 2,
-                    y: size.height - size.height * 0.1 - countSize.height / 2
+                    x: size.width / 2,
+                    y: size.height - size.height * 0.1
                 )
-                context.draw(resolved, at: countOrigin, anchor: .topLeading)
+                context.draw(resolved, at: countOrigin, anchor: .center)
             }
+        } symbols: {
+            AlbumItemCount(picCount: picCount, albumCount: albumCount)
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                .tag("itemCount")
         }
         .transition(.opacity.animation(.smooth.speed(2)))
         .scaledToFit()
