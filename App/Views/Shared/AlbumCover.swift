@@ -229,14 +229,13 @@ struct AlbumCover: View {
     var body: some View {
         Canvas { context, size in
             let itemCountTag = "itemCount"
-            // The canvas is oversized by `overflow` on each side to allow
-            // rotated cards to extend beyond the logical area without clipping.
-            let overflow: CGFloat = size.width * 0.08
-            let logical = CGSize(width: size.width - overflow * 2,
-                                 height: size.height - overflow * 2)
-            let cardW = logical.width * 0.92
-            let cardH = logical.height * 0.92
-            let cornerRadius = logical.height * 0.12
+            // The canvas is physically larger than the layout size (via frame/padding)
+            // to prevent clipping of rotated cards and shadows. Scale factor undoes
+            // the oversizing so cards appear at the intended 92% of layout size.
+            let scale: CGFloat = 1.0 / 1.16
+            let cardW = size.width * 0.92 * scale
+            let cardH = size.height * 0.92 * scale
+            let cornerRadius = size.height * 0.12 * scale
             let cardRect = CGRect(
                 x: (size.width - cardW) / 2,
                 y: (size.height - cardH) / 2,
@@ -249,13 +248,16 @@ struct AlbumCover: View {
                 style: .continuous
             )
 
+            let logicalH = size.height * scale
+            let logicalW = size.width * scale
+
             // --- Tertiary image (back, rotated -12°) ---
             if let tertiaryImage {
                 drawRotatedCard(
                     context: context, size: size, image: tertiaryImage,
                     cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
                     angle: .degrees(-12),
-                    shadowColor: .black.opacity(0.15), shadowRadius: 2, shadowY: logical.height * 0.01
+                    shadowColor: .black.opacity(0.15), shadowRadius: 2, shadowY: logicalH * 0.01
                 )
             }
 
@@ -265,7 +267,7 @@ struct AlbumCover: View {
                     context: context, size: size, image: secondaryImage,
                     cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
                     angle: .degrees(10),
-                    shadowColor: .black.opacity(0.15), shadowRadius: 3, shadowY: logical.height * 0.02
+                    shadowColor: .black.opacity(0.15), shadowRadius: 3, shadowY: logicalH * 0.02
                 )
             }
 
@@ -273,7 +275,7 @@ struct AlbumCover: View {
             if let primaryImage {
                 var front = context
                 front.addFilter(.shadow(
-                    color: .black.opacity(0.25), radius: 2, x: 0, y: logical.height * 0.015
+                    color: .black.opacity(0.25), radius: 2, x: 0, y: logicalH * 0.015
                 ))
                 front.drawLayer { ctx in
                     ctx.clip(to: cardPath)
@@ -293,7 +295,7 @@ struct AlbumCover: View {
                     ctx.draw(resolved, in: drawRect)
 
                     // Darkening gradient at bottom
-                    if logical.width >= 80 {
+                    if logicalW >= 80 {
                         let gradientRect = CGRect(
                             x: cardRect.minX,
                             y: cardRect.midY,
@@ -318,7 +320,7 @@ struct AlbumCover: View {
                 let gradColors = Color.gradient(from: name)
                 var front = context
                 front.addFilter(.shadow(
-                    color: .black.opacity(0.25), radius: 2, x: 0, y: logical.height * 0.015
+                    color: .black.opacity(0.25), radius: 2, x: 0, y: logicalH * 0.015
                 ))
                 front.fill(
                     cardPath,
@@ -331,11 +333,11 @@ struct AlbumCover: View {
             }
 
             // --- Item count overlay ---
-            if logical.width >= 80,
+            if logicalW >= 80,
                let resolved = context.resolveSymbol(id: itemCountTag) {
                 let countOrigin = CGPoint(
                     x: size.width / 2,
-                    y: size.height - size.height * 0.16
+                    y: size.height / 2 + logicalH * (0.5 - 0.16)
                 )
                 context.draw(resolved, at: countOrigin, anchor: .center)
             }
