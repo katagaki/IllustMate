@@ -57,6 +57,8 @@ struct AlbumView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
+    @AppStorage(wrappedValue: false, "HideSectionHeaders",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var hideSectionHeaders: Bool
 
     @State var lastRefreshTime: Date = .distantPast
     @State var searchText: String = ""
@@ -199,7 +201,7 @@ struct AlbumView: View {
                     .ignoresSafeArea()
                     .blur(radius: 20.0)
                     .opacity(0.25)
-                    .transition(.opacity.animation(.smooth))
+                    .transition(.opacity.animation(.smooth.speed(2.0)))
             }
 
             ScrollView(.vertical) {
@@ -213,7 +215,7 @@ struct AlbumView: View {
                                         .foregroundStyle(.secondary)
                                         .padding(20.0)
                                 }
-                            } else {
+                            } else if !hideSectionHeaders || !displayedAlbums.isEmpty {
                                 Spacer()
                                     .frame(height: 20.0)
                             }
@@ -225,6 +227,7 @@ struct AlbumView: View {
                     }
                 }
                 .padding([.top], 20.0)
+                .animation(.smooth.speed(2.0), value: hideSectionHeaders)
             }
         }
     }

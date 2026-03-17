@@ -114,7 +114,7 @@ struct PicsGrid<Content: View>: View {
                 }
             }
         }
-        .animation(.smooth, value: columnCount)
+        .animation(.smooth.speed(2.0), value: columnCount)
     }
 }
 

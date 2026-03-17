@@ -23,6 +23,8 @@ struct AlbumsSection<Content: View>: View {
 
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+    @AppStorage(wrappedValue: false, "HideSectionHeaders",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var hideSectionHeaders: Bool
 
     var body: some View {
         Group {
@@ -49,8 +51,8 @@ struct AlbumsSection<Content: View>: View {
                     }
                 }
                 .padding(.horizontal, 14.0)
-                .padding(.top, 10.0)
-                .animation(.smooth, value: columnCount)
+                .padding(.top, hideSectionHeaders ? 0.0 : 10.0)
+                .animation(.smooth.speed(2.0), value: columnCount)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {
                     ForEach(albums) { album in
