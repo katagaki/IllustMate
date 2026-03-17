@@ -270,7 +270,7 @@ struct AlbumCover: View {
                 front.addFilter(.shadow(
                     color: .black.opacity(0.35), radius: 4, x: 0, y: size.height * 0.03
                 ))
-                front.clipToLayer { ctx in
+                front.drawLayer { ctx in
                     ctx.clip(to: cardPath)
 
                     // Draw image filling the card rect
@@ -370,7 +370,7 @@ struct AlbumCover: View {
         ctx.translateBy(x: center.x, y: center.y)
         ctx.rotate(by: angle)
         ctx.translateBy(x: -center.x, y: -center.y)
-        ctx.clipToLayer { inner in
+        ctx.drawLayer { inner in
             inner.clip(to: cardPath)
             let resolved = inner.resolve(image)
             let srcSize = resolved.size
