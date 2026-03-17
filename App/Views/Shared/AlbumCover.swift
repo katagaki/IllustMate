@@ -229,9 +229,14 @@ struct AlbumCover: View {
     var body: some View {
         Canvas { context, size in
             let itemCountTag = "itemCount"
-            let cardW = size.width * 0.92
-            let cardH = size.height * 0.92
-            let cornerRadius = size.height * 0.12
+            // The canvas is oversized by `overflow` on each side to allow
+            // rotated cards to extend beyond the logical area without clipping.
+            let overflow: CGFloat = size.width * 0.08
+            let logical = CGSize(width: size.width - overflow * 2,
+                                 height: size.height - overflow * 2)
+            let cardW = logical.width * 0.92
+            let cardH = logical.height * 0.92
+            let cornerRadius = logical.height * 0.12
             let cardRect = CGRect(
                 x: (size.width - cardW) / 2,
                 y: (size.height - cardH) / 2,
@@ -246,25 +251,21 @@ struct AlbumCover: View {
 
             // --- Tertiary image (back, rotated -12°) ---
             if let tertiaryImage {
-                let backCardW = size.width * 0.78
-                let backCardH = size.height * 0.78
                 drawRotatedCard(
                     context: context, size: size, image: tertiaryImage,
-                    cardW: backCardW, cardH: backCardH, cornerRadius: cornerRadius,
+                    cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
                     angle: .degrees(-12),
-                    shadowColor: .black.opacity(0.15), shadowRadius: 2, shadowY: size.height * 0.01
+                    shadowColor: .black.opacity(0.15), shadowRadius: 2, shadowY: logical.height * 0.01
                 )
             }
 
             // --- Secondary image (middle, rotated +10°) ---
             if let secondaryImage {
-                let midCardW = size.width * 0.82
-                let midCardH = size.height * 0.82
                 drawRotatedCard(
                     context: context, size: size, image: secondaryImage,
-                    cardW: midCardW, cardH: midCardH, cornerRadius: cornerRadius,
+                    cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
                     angle: .degrees(10),
-                    shadowColor: .black.opacity(0.15), shadowRadius: 3, shadowY: size.height * 0.02
+                    shadowColor: .black.opacity(0.15), shadowRadius: 3, shadowY: logical.height * 0.02
                 )
             }
 
@@ -272,7 +273,7 @@ struct AlbumCover: View {
             if let primaryImage {
                 var front = context
                 front.addFilter(.shadow(
-                    color: .black.opacity(0.25), radius: 2, x: 0, y: size.height * 0.015
+                    color: .black.opacity(0.25), radius: 2, x: 0, y: logical.height * 0.015
                 ))
                 front.drawLayer { ctx in
                     ctx.clip(to: cardPath)
@@ -292,7 +293,7 @@ struct AlbumCover: View {
                     ctx.draw(resolved, in: drawRect)
 
                     // Darkening gradient at bottom
-                    if size.width >= 80 {
+                    if logical.width >= 80 {
                         let gradientRect = CGRect(
                             x: cardRect.minX,
                             y: cardRect.midY,
@@ -317,7 +318,7 @@ struct AlbumCover: View {
                 let gradColors = Color.gradient(from: name)
                 var front = context
                 front.addFilter(.shadow(
-                    color: .black.opacity(0.25), radius: 2, x: 0, y: size.height * 0.015
+                    color: .black.opacity(0.25), radius: 2, x: 0, y: logical.height * 0.015
                 ))
                 front.fill(
                     cardPath,
@@ -330,7 +331,7 @@ struct AlbumCover: View {
             }
 
             // --- Item count overlay ---
-            if size.width >= 80,
+            if logical.width >= 80,
                let resolved = context.resolveSymbol(id: itemCountTag) {
                 let countOrigin = CGPoint(
                     x: size.width / 2,
@@ -345,7 +346,8 @@ struct AlbumCover: View {
                 .tag("itemCount")
         }
         .aspectRatio(1, contentMode: .fit)
-        .frame(width: length, height: length)
+        .frame(width: length.map { $0 * 1.16 }, height: length.map { $0 * 1.16 })
+        .padding(length.map { $0 * -0.08 } ?? 0)
         .transition(.opacity.animation(.smooth.speed(2)))
     }
 
