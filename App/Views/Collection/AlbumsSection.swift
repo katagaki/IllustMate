@@ -28,8 +28,8 @@ struct AlbumsSection<Content: View>: View {
         Group {
             switch style {
             case .grid:
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20.0), count: columnCount),
-                          spacing: 20.0) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10.0), count: columnCount),
+                          spacing: 12.0) {
                     ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             if enablesContextMenu {
@@ -48,8 +48,8 @@ struct AlbumsSection<Content: View>: View {
                         .buttonStyleAdaptive()
                     }
                 }
-                .padding([.horizontal, .top], 20.0)
-                .padding(.bottom, 10.0)
+                .padding(.horizontal, 14.0)
+                .padding(.top, 10.0)
                 .animation(.smooth, value: columnCount)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {

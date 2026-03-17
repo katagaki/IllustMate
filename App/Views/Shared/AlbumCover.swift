@@ -354,11 +354,18 @@ struct AlbumCover: View {
     }
 
     /// Draws a rotated card image into the Canvas context (used for secondary/tertiary stack cards).
+    // swiftlint:disable:next function_parameter_count
     private func drawRotatedCard(
-        context: GraphicsContext, size: CGSize, image: Image,
-        cardW: CGFloat, cardH: CGFloat, cornerRadius: CGFloat,
+        context: GraphicsContext,
+        size: CGSize,
+        image: Image,
+        cardW: CGFloat,
+        cardH: CGFloat,
+        cornerRadius: CGFloat,
         angle: Angle,
-        shadowColor: Color, shadowRadius: CGFloat, shadowY: CGFloat
+        shadowColor: Color,
+        shadowRadius: CGFloat,
+        shadowY: CGFloat
     ) {
         let cardRect = CGRect(
             x: (size.width - cardW) / 2,

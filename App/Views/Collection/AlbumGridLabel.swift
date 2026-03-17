@@ -14,14 +14,17 @@ struct AlbumGridLabel: View {
     var length: CGFloat?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8.0) {
+        VStack(alignment: .center, spacing: 2.0) {
             AlbumCover.AsyncAlbumCover(album: album, length: length)
             .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             Text(album.name)
                 .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
-                .font(.caption)
+                .font(.caption2.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
+                .truncationMode(.middle)
+                .padding(.horizontal, 1.0)
+                .padding(.bottom, 1.0)
         }
         .contentShape(.rect)
         .frame(width: length)
