@@ -15,6 +15,7 @@ struct IllustMateApp: App {
     @Environment(\.scenePhase) var scenePhase
 
     @StateObject var navigation = NavigationManager()
+    @StateObject var collectionManager = CollectionManager()
     @State var viewer = ViewerManager()
     @State var concurrency = ConcurrencyManager()
     @State var photosManager = PhotosManager()
@@ -40,6 +41,7 @@ struct IllustMateApp: App {
             }
         }
         .environmentObject(navigation)
+        .environmentObject(collectionManager)
         .environment(viewer)
         .environment(concurrency)
         .environment(photosManager)
@@ -54,6 +56,9 @@ struct IllustMateApp: App {
         }
         .onAppear {
             pipManager.setup()
+        }
+        .task {
+            await collectionManager.loadCollections()
         }
         .onOpenURL { url in
             if url.pathExtension == "pics" {

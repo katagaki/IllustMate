@@ -12,9 +12,11 @@ import SwiftUI
 struct CollectionView: View {
 
     @EnvironmentObject var navigation: NavigationManager
+    @EnvironmentObject var collectionManager: CollectionManager
     @Environment(ViewerManager.self) var viewer
     @Environment(PhotosViewerManager.self) var photosViewer
     @State var isMoreViewPresenting: Bool = false
+    @State var isCollectionManagerPresented: Bool = false
 
     @AppStorage("PhotosModeEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
@@ -31,10 +33,15 @@ struct CollectionView: View {
             .toolbar {
                 if UIDevice.current.userInterfaceIdiom == .phone {
                     ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            isMoreViewPresenting = true
-                        } label: {
-                            Image(systemName: "ellipsis")
+                        HStack(spacing: 12.0) {
+                            Button {
+                                isMoreViewPresenting = true
+                            } label: {
+                                Image(systemName: "ellipsis")
+                            }
+                            CollectionSwitcherMenu(
+                                isCollectionManagerPresented: $isCollectionManagerPresented
+                            )
                         }
                     }
                 }
@@ -42,6 +49,11 @@ struct CollectionView: View {
             .sheet(isPresented: $isMoreViewPresenting) {
                 MoreView()
                     .phonePresentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $isCollectionManagerPresented) {
+                CollectionManagerSheet()
+                    .environmentObject(collectionManager)
+                    .environmentObject(navigation)
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
               switch viewPath {

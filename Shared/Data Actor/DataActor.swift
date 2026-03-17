@@ -11,7 +11,12 @@ import SwiftUI
 
 actor DataActor {
 
-    static let shared = DataActor()
+    private static var _shared = DataActor(collectionID: Collection.defaultID)
+    static var shared: DataActor { _shared }
+
+    static func switchCollection(to collectionID: String) {
+        _shared = DataActor(collectionID: collectionID)
+    }
 
     let database: Connection
     let databaseURL: URL
@@ -35,14 +40,20 @@ actor DataActor {
     let picData = Expression<Data>("data")
     let picThumbnailData = Expression<Data?>("thumbnail_data")
 
-    init() {
+    init(collectionID: String) {
         let databaseFileName = "Collection.db"
         let fileManager = FileManager.default
 
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            self.databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            if collectionID == Collection.defaultID {
+                self.databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            } else {
+                let folderURL = appGroupURL.appendingPathComponent(collectionID)
+                try? fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                self.databaseURL = folderURL.appendingPathComponent(databaseFileName)
+            }
         } else {
             fatalError()
         }

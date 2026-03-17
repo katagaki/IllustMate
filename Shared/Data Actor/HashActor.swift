@@ -10,7 +10,12 @@ import Foundation
 
 actor HashActor {
 
-    static let shared = HashActor()
+    private static var _shared = HashActor(collectionID: Collection.defaultID)
+    static var shared: HashActor { _shared }
+
+    static func switchCollection(to collectionID: String) {
+        _shared = HashActor(collectionID: collectionID)
+    }
 
     let database: Connection
 
@@ -22,7 +27,7 @@ actor HashActor {
     let hashValue = Expression<Int64>("dhash")
     let hashVersion = Expression<Int>("hash_version")
 
-    init() {
+    init(collectionID: String) {
         let databaseFileName = "Hashes.db"
         let fileManager = FileManager.default
 
@@ -30,7 +35,13 @@ actor HashActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            if collectionID == Collection.defaultID {
+                databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            } else {
+                let folderURL = appGroupURL.appendingPathComponent(collectionID)
+                try? fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                databaseURL = folderURL.appendingPathComponent(databaseFileName)
+            }
         } else {
             fatalError()
         }
