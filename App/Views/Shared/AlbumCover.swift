@@ -229,8 +229,8 @@ struct AlbumCover: View {
     var body: some View {
         Canvas { context, size in
             let itemCountTag = "itemCount"
-            let cardW = size.width * 0.86
-            let cardH = size.height * 0.86
+            let cardW = size.width * 0.92
+            let cardH = size.height * 0.92
             let cornerRadius = size.height * 0.12
             let cardRect = CGRect(
                 x: (size.width - cardW) / 2,
@@ -268,7 +268,7 @@ struct AlbumCover: View {
             if let primaryImage {
                 var front = context
                 front.addFilter(.shadow(
-                    color: .black.opacity(0.35), radius: 4, x: 0, y: size.height * 0.03
+                    color: .black.opacity(0.25), radius: 2, x: 0, y: size.height * 0.015
                 ))
                 front.drawLayer { ctx in
                     ctx.clip(to: cardPath)
@@ -313,7 +313,7 @@ struct AlbumCover: View {
                 let gradColors = Color.gradient(from: name)
                 var front = context
                 front.addFilter(.shadow(
-                    color: .black.opacity(0.35), radius: 4, x: 0, y: size.height * 0.03
+                    color: .black.opacity(0.25), radius: 2, x: 0, y: size.height * 0.015
                 ))
                 front.fill(
                     cardPath,
