@@ -340,9 +340,9 @@ struct AlbumCover: View {
                 .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
                 .tag("itemCount")
         }
-        .transition(.opacity.animation(.smooth.speed(2)))
-        .scaledToFit()
         .frame(width: length, height: length)
+        .aspectRatio(1, contentMode: .fit)
+        .transition(.opacity.animation(.smooth.speed(2)))
     }
 
     /// Draws a rotated card image into the Canvas context (used for secondary/tertiary stack cards).
