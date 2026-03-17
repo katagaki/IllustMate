@@ -227,81 +227,162 @@ struct AlbumCover: View {
     }
 
     var body: some View {
-        ZStack(alignment: .center) {
-            GeometryReader { metrics in
-                ZStack(alignment: .center) {
-                    // Stack
-                    if let tertiaryImage {
-                        tertiaryImage
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: metrics.size.width * 0.92, height: metrics.size.height * 0.92)
-                            .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous))
-                            .rotationEffect(.degrees(-12.0))
-                            .shadow(color: .black.opacity(0.15), radius: 2.0, x: 0.0, y: metrics.size.height * 0.01)
-                            .padding(metrics.size.width * 0.04)
-                    }
-                    if let secondaryImage {
-                        secondaryImage
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: metrics.size.width * 0.92, height: metrics.size.height * 0.92)
-                            .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous))
-                            .rotationEffect(.degrees(10.0))
-                            .shadow(color: .black.opacity(0.15), radius: 3.0, x: 0.0, y: metrics.size.height * 0.02)
-                            .padding(metrics.size.width * 0.04)
-                    }
+        Canvas { context, size in
+            let cardW = size.width * 0.92
+            let cardH = size.height * 0.92
+            let cornerRadius = size.height * 0.12
+            let cardRect = CGRect(
+                x: (size.width - cardW) / 2,
+                y: (size.height - cardH) / 2,
+                width: cardW,
+                height: cardH
+            )
+            let cardPath = Path(
+                roundedRect: cardRect,
+                cornerRadius: cornerRadius,
+                style: .continuous
+            )
 
-                    if let primaryImage {
-                        ZStack(alignment: .bottom) {
-                            primaryImage
-                                .resizable()
-                                .scaledToFill()
-
-                            if metrics.size.width >= 80 {
-                                // Darkening gradient at bottom
-                                LinearGradient(colors: [.clear, .black.opacity(0.65)],
-                                               startPoint: .center,
-                                               endPoint: .bottom)
-                            }
-                        }
-                        .frame(width: metrics.size.width * 0.92, height: metrics.size.height * 0.92)
-                        .clipShape(RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous)
-                                .stroke(Color.primary.opacity(0.15), lineWidth: 0.5)
-                        }
-                        .shadow(color: .black.opacity(0.35), radius: 4.0, x: 0.0, y: metrics.size.height * 0.03)
-                        .padding(metrics.size.width * 0.04)
-                    } else {
-                        // Use color for empty albums
-                        let colors = Color.gradient(from: name)
-                        RoundedRectangle(cornerRadius: metrics.size.height * 0.12, style: .continuous)
-                            .fill(LinearGradient(colors: [colors.primary, colors.secondary],
-                                                 startPoint: .topLeading,
-                                                 endPoint: .bottomTrailing))
-                            .frame(width: metrics.size.width * 0.92, height: metrics.size.height * 0.92)
-                            .shadow(color: .black.opacity(0.35), radius: 4.0, x: 0.0, y: metrics.size.height * 0.03)
-                            .padding(metrics.size.width * 0.04)
-                    }
-                }
-                .overlay(alignment: .bottom) {
-                    if metrics.size.width >= 80 {
-                        AlbumItemCount(picCount: picCount, albumCount: albumCount)
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.5),
-                                    radius: 2.0,
-                                    x: 0.0, y: 1.0)
-                            .padding(.bottom, metrics.size.height * 0.1)
-                            .allowsHitTesting(false)
-                    }
-                }
+            // --- Tertiary image (back, rotated -12°) ---
+            if let tertiaryImage {
+                drawRotatedCard(
+                    context: context, size: size, image: tertiaryImage,
+                    cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
+                    angle: .degrees(-12),
+                    shadowColor: .black.opacity(0.15), shadowRadius: 2, shadowY: size.height * 0.01
+                )
             }
-            .transition(.opacity.animation(.smooth.speed(2)))
+
+            // --- Secondary image (middle, rotated +10°) ---
+            if let secondaryImage {
+                drawRotatedCard(
+                    context: context, size: size, image: secondaryImage,
+                    cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
+                    angle: .degrees(10),
+                    shadowColor: .black.opacity(0.15), shadowRadius: 3, shadowY: size.height * 0.02
+                )
+            }
+
+            // --- Primary image (front) or gradient placeholder ---
+            if let primaryImage {
+                var front = context
+                front.addFilter(.shadow(
+                    color: .black.opacity(0.35), radius: 4, x: 0, y: size.height * 0.03
+                ))
+                front.clipToLayer { ctx in
+                    ctx.clip(to: cardPath)
+
+                    // Draw image filling the card rect
+                    let resolved = ctx.resolve(primaryImage)
+                    let srcSize = resolved.size
+                    let scale = max(cardW / srcSize.width, cardH / srcSize.height)
+                    let drawW = srcSize.width * scale
+                    let drawH = srcSize.height * scale
+                    let drawRect = CGRect(
+                        x: cardRect.midX - drawW / 2,
+                        y: cardRect.midY - drawH / 2,
+                        width: drawW,
+                        height: drawH
+                    )
+                    ctx.draw(resolved, in: drawRect)
+
+                    // Darkening gradient at bottom
+                    if size.width >= 80 {
+                        let gradientRect = CGRect(
+                            x: cardRect.minX,
+                            y: cardRect.midY,
+                            width: cardW,
+                            height: cardH / 2
+                        )
+                        ctx.fill(
+                            Path(gradientRect),
+                            with: .linearGradient(
+                                Gradient(colors: [.clear, .black.opacity(0.65)]),
+                                startPoint: CGPoint(x: gradientRect.midX, y: gradientRect.minY),
+                                endPoint: CGPoint(x: gradientRect.midX, y: gradientRect.maxY)
+                            )
+                        )
+                    }
+
+                    // Thin border stroke
+                    ctx.stroke(cardPath, with: .color(.primary.opacity(0.15)), lineWidth: 0.5)
+                }
+            } else {
+                // Empty album gradient placeholder
+                let gradColors = Color.gradient(from: name)
+                var front = context
+                front.addFilter(.shadow(
+                    color: .black.opacity(0.35), radius: 4, x: 0, y: size.height * 0.03
+                ))
+                front.fill(
+                    cardPath,
+                    with: .linearGradient(
+                        Gradient(colors: [gradColors.primary, gradColors.secondary]),
+                        startPoint: cardRect.origin,
+                        endPoint: CGPoint(x: cardRect.maxX, y: cardRect.maxY)
+                    )
+                )
+            }
+
+            // --- Item count overlay ---
+            if size.width >= 80 {
+                let countView = AlbumItemCount(picCount: picCount, albumCount: albumCount)
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+                let resolved = context.resolve(countView)
+                let countSize = resolved.size
+                let countOrigin = CGPoint(
+                    x: (size.width - countSize.width) / 2,
+                    y: size.height - size.height * 0.1 - countSize.height / 2
+                )
+                context.draw(resolved, at: countOrigin, anchor: .topLeading)
+            }
         }
-        .drawingGroup()
+        .transition(.opacity.animation(.smooth.speed(2)))
         .scaledToFit()
         .frame(width: length, height: length)
+    }
+
+    /// Draws a rotated card image into the Canvas context (used for secondary/tertiary stack cards).
+    private func drawRotatedCard(
+        context: GraphicsContext, size: CGSize, image: Image,
+        cardW: CGFloat, cardH: CGFloat, cornerRadius: CGFloat,
+        angle: Angle,
+        shadowColor: Color, shadowRadius: CGFloat, shadowY: CGFloat
+    ) {
+        let cardRect = CGRect(
+            x: (size.width - cardW) / 2,
+            y: (size.height - cardH) / 2,
+            width: cardW,
+            height: cardH
+        )
+        let cardPath = Path(
+            roundedRect: cardRect,
+            cornerRadius: cornerRadius,
+            style: .continuous
+        )
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+
+        var ctx = context
+        ctx.addFilter(.shadow(color: shadowColor, radius: shadowRadius, x: 0, y: shadowY))
+        ctx.translateBy(x: center.x, y: center.y)
+        ctx.rotate(by: angle)
+        ctx.translateBy(x: -center.x, y: -center.y)
+        ctx.clipToLayer { inner in
+            inner.clip(to: cardPath)
+            let resolved = inner.resolve(image)
+            let srcSize = resolved.size
+            let scale = max(cardW / srcSize.width, cardH / srcSize.height)
+            let drawW = srcSize.width * scale
+            let drawH = srcSize.height * scale
+            let drawRect = CGRect(
+                x: cardRect.midX - drawW / 2,
+                y: cardRect.midY - drawH / 2,
+                width: drawW,
+                height: drawH
+            )
+            inner.draw(resolved, in: drawRect)
+        }
     }
 
     // MARK: - Async Cover (Local Database)
