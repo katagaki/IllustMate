@@ -246,9 +246,11 @@ struct AlbumCover: View {
 
             // --- Tertiary image (back, rotated -12°) ---
             if let tertiaryImage {
+                let backCardW = size.width * 0.78
+                let backCardH = size.height * 0.78
                 drawRotatedCard(
                     context: context, size: size, image: tertiaryImage,
-                    cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
+                    cardW: backCardW, cardH: backCardH, cornerRadius: cornerRadius,
                     angle: .degrees(-12),
                     shadowColor: .black.opacity(0.15), shadowRadius: 2, shadowY: size.height * 0.01
                 )
@@ -256,9 +258,11 @@ struct AlbumCover: View {
 
             // --- Secondary image (middle, rotated +10°) ---
             if let secondaryImage {
+                let midCardW = size.width * 0.82
+                let midCardH = size.height * 0.82
                 drawRotatedCard(
                     context: context, size: size, image: secondaryImage,
-                    cardW: cardW, cardH: cardH, cornerRadius: cornerRadius,
+                    cardW: midCardW, cardH: midCardH, cornerRadius: cornerRadius,
                     angle: .degrees(10),
                     shadowColor: .black.opacity(0.15), shadowRadius: 3, shadowY: size.height * 0.02
                 )
