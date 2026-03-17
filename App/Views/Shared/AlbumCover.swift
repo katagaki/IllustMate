@@ -330,7 +330,7 @@ struct AlbumCover: View {
                let resolved = context.resolveSymbol(id: itemCountTag) {
                 let countOrigin = CGPoint(
                     x: size.width / 2,
-                    y: size.height - size.height * 0.1
+                    y: size.height - size.height * 0.14
                 )
                 context.draw(resolved, at: countOrigin, anchor: .center)
             }
