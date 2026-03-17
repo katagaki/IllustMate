@@ -340,8 +340,8 @@ struct AlbumCover: View {
                 .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
                 .tag("itemCount")
         }
-        .frame(width: length, height: length)
         .aspectRatio(1, contentMode: .fit)
+        .frame(width: length, height: length)
         .transition(.opacity.animation(.smooth.speed(2)))
     }
 
