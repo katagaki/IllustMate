@@ -23,13 +23,15 @@ struct AlbumsSection<Content: View>: View {
 
     @AppStorage(wrappedValue: 3, "AlbumColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+    @AppStorage(wrappedValue: false, "HideSectionHeaders",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var hideSectionHeaders: Bool
 
     var body: some View {
         Group {
             switch style {
             case .grid:
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20.0), count: columnCount),
-                          spacing: 20.0) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10.0), count: columnCount),
+                          spacing: 12.0) {
                     ForEach(albums) { album in
                         NavigationLink(value: ViewPath.album(album: album)) {
                             if enablesContextMenu {
@@ -48,9 +50,9 @@ struct AlbumsSection<Content: View>: View {
                         .buttonStyleAdaptive()
                     }
                 }
-                .padding([.horizontal, .top], 20.0)
-                .padding(.bottom, 10.0)
-                .animation(.smooth, value: columnCount)
+                .padding(.horizontal, 14.0)
+                .padding(.top, hideSectionHeaders ? 0.0 : 10.0)
+                .animation(.smooth.speed(2.0), value: columnCount)
             case .list:
                 LazyVStack(alignment: .leading, spacing: 0.0) {
                     ForEach(albums) { album in

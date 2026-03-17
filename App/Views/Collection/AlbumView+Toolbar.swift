@@ -96,7 +96,7 @@ extension AlbumView {
             Section(String(localized: "Albums.Albums", table: "Albums")) {
                 Picker(String(localized: "Albums.Style", table: "Albums"),
                        systemImage: "paintbrush",
-                       selection: ($albumStyleState.animation(.smooth.speed(2)))) {
+                       selection: ($albumStyleState.animation(.smooth.speed(2.0)))) {
                     Label(String(localized: "Albums.Style.Grid", table: "Albums"),
                           systemImage: "square.grid.2x2")
                         .tag(ViewStyle.grid)
@@ -157,10 +157,15 @@ extension AlbumView {
                 }
                 .pickerStyle(.menu)
             }
+            Section {
+                Toggle(String(localized: "Albums.HideHeaders", table: "Albums"),
+                       isOn: $hideSectionHeaders)
+            }
         } label: {
             Label("Shared.Filter", systemImage: "line.3.horizontal.decrease")
         }
         .menuActionDismissBehavior(.disabled)
+        .menuOrder(.fixed)
     }
 
     @ViewBuilder

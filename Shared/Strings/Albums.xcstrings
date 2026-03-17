@@ -328,6 +328,23 @@
         }
       }
     },
+    "Albums.HideHeaders": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide Headers"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ヘッダーを非表示"
+          }
+        }
+      }
+    },
     "Albums.NoAlbums": {
       "extractionState": "manual",
       "localizations": {
