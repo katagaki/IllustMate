@@ -39,11 +39,13 @@ struct CollectionView: View {
                             Image(systemName: "ellipsis")
                         }
                     }
-                    ToolbarSpacer(.fixed, placement: .topBarLeading)
-                    ToolbarItemGroup(placement: .topBarLeading) {
-                        LibrarySwitcherMenu(
-                            isLibraryManagerPresented: $isLibraryManagerPresented
-                        )
+                    if !isPhotosModeEnabled {
+                        ToolbarSpacer(.fixed, placement: .topBarLeading)
+                        ToolbarItemGroup(placement: .topBarLeading) {
+                            LibrarySwitcherMenu(
+                                isLibraryManagerPresented: $isLibraryManagerPresented
+                            )
+                        }
                     }
                 }
             }
