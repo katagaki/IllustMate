@@ -67,6 +67,7 @@ struct AlbumsScrollView: View {
                         self.albums = albums
                         isAlbumsLoaded = true
                     }
+                    await AlbumCoverCache.shared.loadCovers(for: albums)
                 } catch {
                     debugPrint(error.localizedDescription)
                 }

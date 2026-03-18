@@ -77,8 +77,11 @@ extension AlbumView {
                 Text("Albums.NoAlbums", tableName: "Albums")
                     .foregroundStyle(.secondary)
                     .padding(20.0)
+            } else {
+                Spacer()
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     var picsSection: some View {
