@@ -269,14 +269,20 @@ struct MoreView: View {
             Text("Troubleshooting.ClearCache.Confirm.Message", tableName: "More")
         }
         .sheet(isPresented: $isRebuildingThumbnails) {
-            RebuildThumbnailsProgressView(
-                currentCount: $rebuildProgress, totalCount: $rebuildTotal
+            StatusView(
+                type: .inProgress,
+                title: .troubleshootingRebuildingThumbnails,
+                currentCount: rebuildProgress,
+                totalCount: rebuildTotal
             )
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
         .sheet(isPresented: $isFreeingUpSpace) {
-            StatusView(type: .inProgress, title: .troubleshootingFreeingUpSpace)
+            StatusView(
+                type: .inProgress,
+                title: .troubleshootingFreeingUpSpace
+            )
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
