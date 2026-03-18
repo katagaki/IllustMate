@@ -74,8 +74,9 @@ struct MoreTroubleshootingView: View {
             Text("Troubleshooting.ClearCache.Confirm.Message", tableName: "More")
         }
         .sheet(isPresented: $isRebuildingThumbnails) {
-            StatusView(type: .inProgress, title: .troubleshootingRebuildingThumbnails,
-                       currentCount: rebuildProgress, totalCount: rebuildTotal)
+            RebuildThumbnailsProgressView(
+                currentCount: $rebuildProgress, totalCount: $rebuildTotal
+            )
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
         }
