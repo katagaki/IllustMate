@@ -64,7 +64,7 @@ actor LibrariesActor {
     // MARK: - Read
 
     func allLibraries() -> [PicLibrary] {
-        let query = librariesTable.order(libraryId.asc)
+        let query = librariesTable.order(libraryId.desc)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.compactMap { row in
             guard let id = try? row.get(libraryId),

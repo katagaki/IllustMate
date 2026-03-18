@@ -25,16 +25,16 @@ struct LibraryManagerSheet: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
+                        Button(role: .close) {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             isCreatingLibrary = true
                             newLibraryName = ""
                         } label: {
                             Image(systemName: "plus")
-                        }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(role: .close) {
-                            dismiss()
                         }
                     }
                 }
@@ -58,6 +58,7 @@ struct LibraryManagerSheet: View {
                 libraryRow(for: library)
             }
         }
+        .listStyle(.plain)
     }
 
     private func libraryRow(for library: PicLibrary) -> some View {
@@ -67,10 +68,6 @@ struct LibraryManagerSheet: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2.0) {
                     Text(libraryManager.displayName(for: library))
-                        .fontWeight(
-                            library.id == libraryManager.currentLibrary.id
-                            ? .semibold : .regular
-                        )
                     if library.isDefault {
                         Text("Libraries.Default.Description", tableName: "Libraries")
                             .font(.caption)
@@ -79,8 +76,14 @@ struct LibraryManagerSheet: View {
                 }
                 Spacer()
                 if library.id == libraryManager.currentLibrary.id {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(.accent)
+                    Text("Libraries.Current", tableName: "Libraries")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .textCase(.uppercase)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(.accent, in: Capsule())
                 }
             }
         }

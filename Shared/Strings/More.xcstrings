@@ -1721,37 +1721,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch werden der Duplikatscan-Cache, der Farbsortierungs-Cache und der Albumcover-Cache der aktuellen Bibliothek gelöscht. Sind Sie sicher?"
+            "value" : "Dadurch werden der Duplikatscan-Cache, der Farbsortierungs-Cache und der Albumcover-Cache dieser Bibliothek gelöscht. Sind Sie sicher?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This will clear the duplicate scan cache, color sort cache, and album cover cache for the current library. Are you sure?"
+            "value" : "This will clear the duplicate scan cache, color sort cache, and album cover cache for this library. Are you sure?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "現在のライブラリの重複スキャンキャッシュ、画像カラーキャッシュ、アルバムカバーキャッシュが消去されます。よろしいですか？"
+            "value" : "このライブラリの重複スキャンキャッシュ、画像カラーキャッシュ、アルバムカバーキャッシュが消去されます。よろしいですか？"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "현재 라이브러리의 중복 검사 캐시, 색상 정렬 캐시, 앨범 커버 캐시가 삭제됩니다. 계속하시겠습니까?"
+            "value" : "이 라이브러리의 중복 검사 캐시, 색상 정렬 캐시, 앨범 커버 캐시가 삭제됩니다. 계속하시겠습니까?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这将清除当前资料库的重复扫描缓存、颜色排序缓存和相册封面缓存。确定要继续吗？"
+            "value" : "这将清除此资料库的重复扫描缓存、颜色排序缓存和相册封面缓存。确定要继续吗？"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "這將清除目前資料庫的重複掃描快取、顏色排序快取和相簿封面快取。確定要繼續嗎？"
+            "value" : "這將清除此資料庫的重複掃描快取、顏色排序快取和相簿封面快取。確定要繼續嗎？"
           }
         }
       }
@@ -1880,6 +1880,7 @@
       }
     },
     "Troubleshooting.DataManagement.Description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2006,37 +2007,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die aktuelle Bibliothek wird optimiert, um Speicherplatz freizugeben. Dies kann einige Minuten dauern. Sind Sie sicher?"
+            "value" : "Diese Bibliothek wird optimiert, um Speicherplatz freizugeben. Dies kann einige Minuten dauern. Sind Sie sicher?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This will optimize the current library to free up space, and may take a few minutes to complete. Are you sure?"
+            "value" : "This will optimize this library to free up space, and may take a few minutes to complete. Are you sure?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "現在のライブラリを最適化して空き領域を増やします。完了までに数分かかる場合があります。よろしいですか？"
+            "value" : "このライブラリを最適化して空き領域を増やします。完了までに数分かかる場合があります。よろしいですか？"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "현재 라이브러리를 최적화하여 공간을 확보합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
+            "value" : "이 라이브러리를 최적화하여 공간을 확보합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这将优化当前资料库以释放空间，可能需要几分钟才能完成。确定要继续吗？"
+            "value" : "这将优化此资料库以释放空间，可能需要几分钟才能完成。确定要继续吗？"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "這將優化目前資料庫以釋放空間，可能需要幾分鐘才能完成。確定要繼續嗎？"
+            "value" : "這將優化此資料庫以釋放空間，可能需要幾分鐘才能完成。確定要繼續嗎？"
           }
         }
       }
@@ -2170,37 +2171,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Miniaturbilder der aktuellen Bibliothek werden neu erstellt. Dies kann einige Minuten dauern. Sind Sie sicher?"
+            "value" : "Alle Miniaturbilder dieser Bibliothek werden neu erstellt. Dies kann einige Minuten dauern. Sind Sie sicher?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This will regenerate all thumbnails for the current library, and may take a few minutes to complete. Are you sure?"
+            "value" : "This will regenerate all thumbnails for this library, and may take a few minutes to complete. Are you sure?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "現在のライブラリのすべてのサムネイルを再生成します。完了までに数分かかる場合があります。よろしいですか？"
+            "value" : "このライブラリのすべてのサムネイルを再生成します。完了までに数分かかる場合があります。よろしいですか？"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "현재 라이브러리의 모든 썸네일을 다시 생성합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
+            "value" : "이 라이브러리의 모든 썸네일을 다시 생성합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这将重新生成当前资料库的所有缩略图，可能需要几分钟才能完成。确定要继续吗？"
+            "value" : "这将重新生成此资料库的所有缩略图，可能需要几分钟才能完成。确定要继续吗？"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "這將重新產生目前資料庫的所有縮圖，可能需要幾分鐘才能完成。確定要繼續嗎？"
+            "value" : "這將重新產生此資料庫的所有縮圖，可能需要幾分鐘才能完成。確定要繼續嗎？"
           }
         }
       }

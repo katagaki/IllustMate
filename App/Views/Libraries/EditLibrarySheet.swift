@@ -64,9 +64,13 @@ struct EditLibrarySheet: View {
                         .frame(maxWidth: .infinity)
                     }
                 }
-                Section {
-                    TextField(String(localized: "Libraries.New.Placeholder", table: "Libraries"),
-                              text: $editedName)
+                if !library.isDefault {
+                    Section {
+                        TextField(String(localized: "Libraries.New.Placeholder", table: "Libraries"),
+                                  text: $editedName)
+                    } header: {
+                        Text("Libraries.Edit.Name", tableName: "Libraries")
+                    }
                 }
                 Section {
                     Button(String(localized: "DuplicateChecker", table: "More")) {
@@ -104,7 +108,7 @@ struct EditLibrarySheet: View {
                 }
             }
             .tint(.accent)
-            .navigationTitle(libraryManager.displayName(for: library))
+            .navigationTitle(String(localized: "Libraries.Edit.Title", table: "Libraries"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -208,8 +212,11 @@ struct EditLibrarySheet: View {
             Text("Libraries.Delete.Message \(expectedDeleteCode)", tableName: "Libraries")
         }
         .sheet(isPresented: $isRebuildingThumbnails) {
-            RebuildThumbnailsProgressView(
-                currentCount: $rebuildProgress, totalCount: $rebuildTotal
+            StatusView(
+                type: .inProgress,
+                title: .troubleshootingRebuildingThumbnails,
+                currentCount: rebuildProgress,
+                totalCount: rebuildTotal
             )
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
@@ -222,8 +229,9 @@ struct EditLibrarySheet: View {
     }
 
     func loadCounts() async {
-        let albums = await DataActor.shared.albumCount()
-        let pics = await DataActor.shared.picCount()
+        let dataActor = DataActor(collectionID: library.id)
+        let albums = await dataActor.albumCount()
+        let pics = await dataActor.picCount()
         await MainActor.run {
             albumCount = albums
             picCount = pics
@@ -231,6 +239,7 @@ struct EditLibrarySheet: View {
     }
 
     func rebuildThumbnails() async {
+        let dataActor = DataActor(collectionID: library.id)
         await MainActor.run {
             UIApplication.shared.isIdleTimerDisabled = true
             isRebuildingThumbnails = true
@@ -238,16 +247,16 @@ struct EditLibrarySheet: View {
             rebuildTotal = 0
         }
         do {
-            let pics = try await DataActor.shared.pics()
+            let pics = try await dataActor.pics()
             await MainActor.run {
                 rebuildTotal = pics.count
             }
-            await DataActor.shared.deleteAllThumbnails()
+            await dataActor.deleteAllThumbnails()
             for pic in pics {
-                if let data = await DataActor.shared.imageData(forPicWithID: pic.id) {
+                if let data = await dataActor.imageData(forPicWithID: pic.id) {
                     let thumbnailData = Pic.makeThumbnail(data)
-                    await DataActor.shared.updateThumbnail(forPicWithID: pic.id,
-                                                           thumbnailData: thumbnailData)
+                    await dataActor.updateThumbnail(forPicWithID: pic.id,
+                                                    thumbnailData: thumbnailData)
                 }
                 await MainActor.run {
                     rebuildProgress += 1
@@ -267,11 +276,12 @@ struct EditLibrarySheet: View {
     }
 
     func freeUpSpace() async {
+        let dataActor = DataActor(collectionID: library.id)
         await MainActor.run {
             UIApplication.shared.isIdleTimerDisabled = true
             isFreeingUpSpace = true
         }
-        await DataActor.shared.vacuum()
+        await dataActor.vacuum()
         await MainActor.run {
             isFreeingUpSpace = false
             UIApplication.shared.isIdleTimerDisabled = false
