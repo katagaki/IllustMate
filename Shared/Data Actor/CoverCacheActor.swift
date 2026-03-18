@@ -10,7 +10,12 @@ import Foundation
 
 actor CoverCacheActor {
 
-    static let shared = CoverCacheActor()
+    nonisolated(unsafe) private static var _shared = CoverCacheActor(collectionID: PicLibrary.defaultID)
+    static var shared: CoverCacheActor { _shared }
+
+    static func switchLibrary(to collectionID: String) {
+        _shared = CoverCacheActor(collectionID: collectionID)
+    }
 
     let database: Connection
 
@@ -24,7 +29,7 @@ actor CoverCacheActor {
     let cacheSecondary = Expression<Data?>("secondary_data")
     let cacheTertiary = Expression<Data?>("tertiary_data")
 
-    init() {
+    init(collectionID: String) {
         let databaseFileName = "CoverCache.db"
         let fileManager = FileManager.default
 
@@ -32,7 +37,13 @@ actor CoverCacheActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            if collectionID == PicLibrary.defaultID {
+                databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            } else {
+                let folderURL = appGroupURL.appendingPathComponent(collectionID)
+                try? fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                databaseURL = folderURL.appendingPathComponent(databaseFileName)
+            }
         } else {
             fatalError()
         }

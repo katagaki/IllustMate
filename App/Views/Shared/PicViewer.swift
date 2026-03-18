@@ -44,7 +44,6 @@ struct PicViewer: View {
         mainContent
         .frame(maxHeight: .infinity)
         .background {
-            // Blurred image background
             if let backgroundImage = currentImage {
                 Image(uiImage: backgroundImage)
                     .resizable()

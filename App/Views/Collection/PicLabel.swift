@@ -38,22 +38,22 @@ struct PicLabel: View {
             .fill(.primary.opacity(0.05))
             .aspectRatio(1.0, contentMode: .fit)
             .overlay(alignment: .top) {
-                if isThumbnailReadyToPresent {
-                    Group {
-                        if let thumbnail {
-                            thumbnail
-                                .resizable()
-                                .scaledToFill()
-                        } else {
-                            Image(systemName: "xmark.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24.0, height: 24.0)
-                                .foregroundStyle(.primary)
-                                .symbolRenderingMode(.multicolor)
-                        }
-                    }
-                    .transition(.opacity.animation(.smooth.speed(2.0)))
+                if isThumbnailReadyToPresent, let thumbnail {
+                    thumbnail
+                        .resizable()
+                        .scaledToFill()
+                        .transition(.opacity.animation(.smooth.speed(2.0)))
+                }
+            }
+            .overlay {
+                if isThumbnailReadyToPresent, thumbnail == nil {
+                    Image(systemName: "xmark.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24.0, height: 24.0)
+                        .foregroundStyle(.primary)
+                        .symbolRenderingMode(.multicolor)
+                        .transition(.opacity.animation(.smooth.speed(2.0)))
                 }
             }
             .clipped()

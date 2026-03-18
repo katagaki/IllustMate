@@ -12,9 +12,11 @@ import SwiftUI
 struct CollectionView: View {
 
     @EnvironmentObject var navigation: NavigationManager
+    @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
     @Environment(PhotosViewerManager.self) var photosViewer
     @State var isMoreViewPresenting: Bool = false
+    @State var isLibraryManagerPresented: Bool = false
 
     @AppStorage("PhotosModeEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
@@ -30,11 +32,19 @@ struct CollectionView: View {
             }
             .toolbar {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    ToolbarItem(placement: .topBarLeading) {
+                    ToolbarItemGroup(placement: .topBarLeading) {
                         Button {
                             isMoreViewPresenting = true
                         } label: {
                             Image(systemName: "ellipsis")
+                        }
+                    }
+                    if !isPhotosModeEnabled {
+                        ToolbarSpacer(.fixed, placement: .topBarLeading)
+                        ToolbarItemGroup(placement: .topBarLeading) {
+                            LibrarySwitcherMenu(
+                                isLibraryManagerPresented: $isLibraryManagerPresented
+                            )
                         }
                     }
                 }
@@ -42,6 +52,11 @@ struct CollectionView: View {
             .sheet(isPresented: $isMoreViewPresenting) {
                 MoreView()
                     .phonePresentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $isLibraryManagerPresented) {
+                LibraryManagerSheet()
+                    .environmentObject(libraryManager)
+                    .environmentObject(navigation)
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
               switch viewPath {

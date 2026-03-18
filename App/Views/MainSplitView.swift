@@ -10,16 +10,23 @@ import SwiftUI
 struct MainSplitView: View {
 
     @EnvironmentObject var navigation: NavigationManager
+    @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
     @Namespace var namespace
 
     @State var albums: [Album] = []
     @State var selectedView: ViewPath? = .collection
     @State var isMoreViewPresenting: Bool = false
+    @State var isLibraryManagerPresented: Bool = false
 
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedView) {
+                Section {
+                    LibrarySwitcherMenu(
+                        isLibraryManagerPresented: $isLibraryManagerPresented
+                    )
+                }
                 Section {
                     NavigationLink(value: ViewPath.collection) {
                         Label {
@@ -114,6 +121,11 @@ struct MainSplitView: View {
         }
         .sheet(isPresented: $isMoreViewPresenting) {
             MoreView()
+        }
+        .sheet(isPresented: $isLibraryManagerPresented) {
+            LibraryManagerSheet()
+                .environmentObject(libraryManager)
+                .environmentObject(navigation)
         }
     }
 }

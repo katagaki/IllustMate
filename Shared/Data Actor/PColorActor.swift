@@ -10,7 +10,12 @@ import Foundation
 
 actor PColorActor {
 
-    static let shared = PColorActor()
+    nonisolated(unsafe) private static var _shared = PColorActor(collectionID: PicLibrary.defaultID)
+    static var shared: PColorActor { _shared }
+
+    static func switchLibrary(to collectionID: String) {
+        _shared = PColorActor(collectionID: collectionID)
+    }
 
     let database: Connection
 
@@ -23,7 +28,7 @@ actor PColorActor {
     let colorGreen = Expression<Int>("green")
     let colorBlue = Expression<Int>("blue")
 
-    init() {
+    init(collectionID: String) {
         let databaseFileName = "PColors.db"
         let fileManager = FileManager.default
 
@@ -31,7 +36,13 @@ actor PColorActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            if collectionID == PicLibrary.defaultID {
+                databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+            } else {
+                let folderURL = appGroupURL.appendingPathComponent(collectionID)
+                try? fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                databaseURL = folderURL.appendingPathComponent(databaseFileName)
+            }
         } else {
             fatalError()
         }

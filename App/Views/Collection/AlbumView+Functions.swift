@@ -5,6 +5,8 @@
 //  Created by シン・ジャスティン on 2023/10/15.
 //
 
+import CoreImage
+import CoreImage.CIFilterBuiltins
 import Foundation
 import SwiftUI
 
@@ -315,5 +317,41 @@ extension AlbumView {
         } catch {
             debugPrint(error.localizedDescription)
         }
+    }
+
+    func updateBackgroundImage() async {
+        guard let currentAlbum, currentAlbum.hasCoverPhoto,
+              let coverPhoto = currentAlbum.coverPhoto else {
+            await MainActor.run {
+                backgroundImage = nil
+            }
+            return
+        }
+        let blurred = await Task.detached(priority: .utility) {
+            Self.makeBlurredBackground(from: coverPhoto)
+        }.value
+        guard !Task.isCancelled else { return }
+        await MainActor.run {
+            backgroundImage = blurred
+        }
+    }
+
+    private nonisolated static func makeBlurredBackground(from data: Data) -> UIImage? {
+        guard let sourceImage = UIImage(data: data) else { return nil }
+        // Downscale to a small size since this is just a blurry background
+        let targetSize = CGSize(width: 64, height: 64)
+        let scaledImage = sourceImage.scalePreservingAspectRatio(targetSize: targetSize)
+        guard let ciImage = CIImage(image: scaledImage) else { return nil }
+        let filter = CIFilter.gaussianBlur()
+        filter.inputImage = ciImage
+        filter.radius = 10
+        guard let outputImage = filter.outputImage else { return nil }
+        let context = CIContext()
+        // Crop to original extent since Gaussian blur expands the image
+        let croppedOutput = outputImage.cropped(to: ciImage.extent)
+        guard let cgImage = context.createCGImage(croppedOutput, from: croppedOutput.extent) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
     }
 }

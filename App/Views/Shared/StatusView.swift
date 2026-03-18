@@ -77,7 +77,7 @@ struct StatusView: View {
             Spacer()
             switch type {
             case .inProgress:
-                if let currentCount, let totalCount {
+                if let currentCount, let totalCount, totalCount > 0 {
                     VStack(alignment: .center, spacing: 16.0) {
                         title.text
                             .bold()

@@ -16,6 +16,7 @@ struct AlbumView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var navigation: NavigationManager
+    @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
 
     @Namespace var namespace
@@ -25,7 +26,9 @@ struct AlbumView: View {
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
+    @State var newAlbumName: String = ""
     @State var albumToRename: Album?
+    @State var renameAlbumText: String = ""
     @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumSort: SortType
     @State var albumSortState: SortType = .nameAscending
@@ -60,6 +63,7 @@ struct AlbumView: View {
     @AppStorage(wrappedValue: false, "HideSectionHeaders",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var hideSectionHeaders: Bool
 
+    @State var backgroundImage: UIImage?
     @State var lastRefreshTime: Date = .distantPast
     @State var searchText: String = ""
     @State var searchResults: [Album]?
@@ -75,7 +79,9 @@ struct AlbumView: View {
             .toolbar { toolbarContent }
             .modifier(AlbumViewSheets(
                 isAddingAlbum: $isAddingAlbum,
+                newAlbumName: $newAlbumName,
                 albumToRename: $albumToRename,
+                renameAlbumText: $renameAlbumText,
                 isBrowsingAlbums: $isBrowsingAlbums,
                 isImportingPhotos: $isImportingPhotos,
                 isImportCompleted: $isImportCompleted,
@@ -147,6 +153,9 @@ struct AlbumView: View {
                     await refreshData()
                 }
             }
+            .task(id: currentAlbum.map { "\($0.id)-\($0.hasCoverPhoto)-\($0.coverPhoto != nil)" }) {
+                await updateBackgroundImage()
+            }
             .onChange(of: albumStyleState) { _, newValue in
                 albumStyle = newValue
             }
@@ -187,21 +196,30 @@ struct AlbumView: View {
                 }
             }
             .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
+            .navigationSubtitle(libraryManager.currentLibrary.isDefault
+                                ? Text(verbatim: "")
+                                : Text(libraryManager.currentLibrary.name))
             .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
     }
 
     var mainContent: some View {
         ZStack {
-            if let currentAlbum, currentAlbum.hasCoverPhoto, let coverPhoto = currentAlbum.coverPhoto,
-               let uiImage = UIImage(data: coverPhoto) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                    .ignoresSafeArea()
-                    .blur(radius: 20.0)
-                    .opacity(0.25)
-                    .transition(.opacity.animation(.smooth.speed(2.0)))
+            // Album cover background image (if set)
+            if let backgroundImage {
+                Canvas { context, size in
+                    let image = context.resolve(Image(uiImage: backgroundImage))
+                    let imageSize = image.size
+                    let scale = max(size.width / imageSize.width,
+                                    size.height / imageSize.height)
+                    let drawSize = CGSize(width: imageSize.width * scale,
+                                          height: imageSize.height * scale)
+                    let origin = CGPoint(x: (size.width - drawSize.width) / 2,
+                                         y: (size.height - drawSize.height) / 2)
+                    context.opacity = 0.25
+                    context.draw(image, in: CGRect(origin: origin, size: drawSize))
+                }
+                .ignoresSafeArea()
+                .transition(.opacity.animation(.smooth.speed(2.0)))
             }
 
             ScrollView(.vertical) {
