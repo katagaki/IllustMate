@@ -20,7 +20,7 @@ class LibraryManager: ObservableObject {
 
     func loadLibraries() async {
         let allLibraries = await LibrariesActor.shared.allLibraries()
-        libraries = allLibraries
+        libraries = allLibraries.sorted { library, _ in library.isDefault }
 
         // Restore last selected library
         if let saved = allLibraries.first(where: { $0.id == currentLibraryID }) {
