@@ -160,6 +160,7 @@ extension AlbumView {
                     withAnimation {
                         self.albums = albums
                     }
+                    self.hasFetchedAlbums = true
                 }
                 await AlbumCoverCache.shared.loadCovers(for: albums)
             }

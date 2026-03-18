@@ -23,6 +23,7 @@ struct AlbumView: View {
 
     @State var currentAlbum: Album?
     @State var albums: [Album] = []
+    @State var hasFetchedAlbums: Bool = false
     @State var isConfirmingDeleteAlbum: Bool = false
     @State var albumPendingDeletion: Album?
     @State var isAddingAlbum: Bool = false
@@ -222,30 +223,39 @@ struct AlbumView: View {
                 .transition(.opacity.animation(.smooth.speed(2.0)))
             }
 
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 0.0) {
-                    if !isSelectingPics {
-                        VStack(alignment: .leading, spacing: 0.0) {
-                            albumSection
-                            if !searchText.isEmpty {
-                                if displayedAlbums.isEmpty {
-                                    Text("Albums.NoSearchResults", tableName: "Albums")
-                                        .foregroundStyle(.secondary)
-                                        .padding(20.0)
+            if hideSectionHeaders && searchText.isEmpty
+                && hasFetchedAlbums && displayedAlbums.isEmpty
+                && hasFetchedPicCount && picCount == 0 {
+                ContentUnavailableView(
+                    String(localized: "Albums.Empty", table: "Albums"),
+                    systemImage: "photo.on.rectangle.angled"
+                )
+            } else {
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 0.0) {
+                        if !isSelectingPics {
+                            VStack(alignment: .leading, spacing: 0.0) {
+                                albumSection
+                                if !searchText.isEmpty {
+                                    if displayedAlbums.isEmpty {
+                                        Text("Albums.NoSearchResults", tableName: "Albums")
+                                            .foregroundStyle(.secondary)
+                                            .padding(20.0)
+                                    }
+                                } else if !hideSectionHeaders || !displayedAlbums.isEmpty {
+                                    Spacer()
+                                        .frame(height: 20.0)
                                 }
-                            } else if !hideSectionHeaders || !displayedAlbums.isEmpty {
-                                Spacer()
-                                    .frame(height: 20.0)
                             }
+                            .transition(.opacity.animation(.smooth.speed(2.0)))
                         }
-                        .transition(.opacity.animation(.smooth.speed(2.0)))
+                        if searchText.isEmpty {
+                            picsSection
+                        }
                     }
-                    if searchText.isEmpty {
-                        picsSection
-                    }
+                    .padding(.top, (hideSectionHeaders && displayedAlbums.isEmpty) ? 0.0 : 20.0)
+                    .animation(.smooth.speed(2.0), value: hideSectionHeaders)
                 }
-                .padding(.top, (hideSectionHeaders && displayedAlbums.isEmpty) ? 0.0 : 20.0)
-                .animation(.smooth.speed(2.0), value: hideSectionHeaders)
             }
         }
     }
