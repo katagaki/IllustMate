@@ -117,7 +117,6 @@
 		E4C47BEF2F66BEB200BDF3F8 /* Exceptions for "Shared" folder in "Share with PicMate" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Strings/Albums.xcstrings,
 				Strings/More.xcstrings,
 				Strings/Photos.xcstrings,
 				Strings/WebServer.xcstrings,
@@ -143,6 +142,7 @@
 				"Data Models/Album.swift",
 				"Data Models/Pic.swift",
 				"Data Models/PicLibrary.swift",
+				Strings/Albums.xcstrings,
 				Strings/Import.xcstrings,
 				Strings/Localizable.xcstrings,
 			);
