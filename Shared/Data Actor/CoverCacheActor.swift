@@ -10,10 +10,10 @@ import Foundation
 
 actor CoverCacheActor {
 
-    private static var _shared = CoverCacheActor(collectionID: Collection.defaultID)
+    nonisolated(unsafe) private static var _shared = CoverCacheActor(collectionID: PicLibrary.defaultID)
     static var shared: CoverCacheActor { _shared }
 
-    static func switchCollection(to collectionID: String) {
+    static func switchLibrary(to collectionID: String) {
         _shared = CoverCacheActor(collectionID: collectionID)
     }
 
@@ -37,7 +37,7 @@ actor CoverCacheActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            if collectionID == Collection.defaultID {
+            if collectionID == PicLibrary.defaultID {
                 databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
             } else {
                 let folderURL = appGroupURL.appendingPathComponent(collectionID)

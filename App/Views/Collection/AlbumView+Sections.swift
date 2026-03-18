@@ -62,6 +62,7 @@ extension AlbumView {
             }
             if !displayedAlbums.isEmpty {
                 AlbumsSection(albums: displayedAlbums, style: $albumStyleState) { album in
+                    renameAlbumText = album.name
                     albumToRename = album
                 } onDelete: { album in
                     deleteAlbum(album)

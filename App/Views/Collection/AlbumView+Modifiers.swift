@@ -10,7 +10,9 @@ import SwiftUI
 
 struct AlbumViewSheets: ViewModifier {
     @Binding var isAddingAlbum: Bool
+    @Binding var newAlbumName: String
     @Binding var albumToRename: Album?
+    @Binding var renameAlbumText: String
     @Binding var isBrowsingAlbums: Bool
     @Binding var isImportingPhotos: Bool
     @Binding var isImportCompleted: Bool
@@ -24,15 +26,52 @@ struct AlbumViewSheets: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .sheet(isPresented: $isAddingAlbum) {
-                onAlbumDismiss()
-            } content: {
-                NewAlbumView(albumToAddTo: currentAlbum)
+            .alert("ViewTitle.Albums.Create", isPresented: $isAddingAlbum) {
+                TextField(String(localized: "Albums.Create.Placeholder", table: "Albums"),
+                          text: $newAlbumName)
+                    .textInputAutocapitalization(.words)
+                Button("Shared.Create") {
+                    let name = newAlbumName.trimmingCharacters(in: .whitespaces)
+                    guard !name.isEmpty else { return }
+                    Task {
+                        let newAlbum = await DataActor.shared.createAlbum(name)
+                        if let currentAlbum {
+                            await DataActor.shared.addAlbum(withID: newAlbum.id,
+                                                 toAlbumWithID: currentAlbum.id)
+                        }
+                        await MainActor.run {
+                            newAlbumName = ""
+                            onAlbumDismiss()
+                        }
+                    }
+                }
+                Button("Shared.Cancel", role: .cancel) {
+                    newAlbumName = ""
+                }
             }
-            .sheet(item: $albumToRename) {
-                onAlbumDismiss()
-            } content: { album in
-                RenameAlbumView(album: album)
+            .alert("ViewTitle.Albums.Rename", isPresented: Binding(
+                get: { albumToRename != nil },
+                set: { if !$0 { albumToRename = nil } }
+            )) {
+                TextField(String(localized: "Albums.Create.Placeholder", table: "Albums"),
+                          text: $renameAlbumText)
+                    .textInputAutocapitalization(.words)
+                Button("Shared.Rename") {
+                    let name = renameAlbumText.trimmingCharacters(in: .whitespaces)
+                    guard !name.isEmpty, let album = albumToRename else { return }
+                    Task {
+                        await DataActor.shared.renameAlbum(withID: album.id, to: name)
+                        await MainActor.run {
+                            renameAlbumText = ""
+                            albumToRename = nil
+                            onAlbumDismiss()
+                        }
+                    }
+                }
+                Button("Shared.Cancel", role: .cancel) {
+                    renameAlbumText = ""
+                    albumToRename = nil
+                }
             }
             .sheet(isPresented: $isBrowsingAlbums) {
                 onBrowseAlbumsDismiss()

@@ -55,6 +55,7 @@
       "shouldTranslate" : false
     },
     "Alert.DeleteAll.Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -95,6 +96,7 @@
       }
     },
     "Alert.DeleteAll.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

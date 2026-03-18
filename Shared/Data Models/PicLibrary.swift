@@ -1,5 +1,5 @@
 //
-//  Collection.swift
+//  PicLibrary.swift
 //  PicMate
 //
 //  Created by Claude on 2026/03/17.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Collection: Identifiable, Hashable, @unchecked Sendable {
+final class PicLibrary: Identifiable, Hashable, @unchecked Sendable {
     static let defaultID = "__default__"
 
     var id: String
@@ -15,12 +15,12 @@ final class Collection: Identifiable, Hashable, @unchecked Sendable {
 
     var isDefault: Bool { id == Self.defaultID }
 
-    init(id: String = Self.defaultID, name: String = "") {
+    init(id: String = PicLibrary.defaultID, name: String = "") {
         self.id = id
         self.name = name
     }
 
-    static func == (lhs: Collection, rhs: Collection) -> Bool {
+    static func == (lhs: PicLibrary, rhs: PicLibrary) -> Bool {
         lhs.id == rhs.id && lhs.name == rhs.name
     }
 

@@ -11,10 +11,10 @@ import SwiftUI
 
 actor DataActor {
 
-    private static var _shared = DataActor(collectionID: Collection.defaultID)
+    nonisolated(unsafe) private static var _shared = DataActor(collectionID: PicLibrary.defaultID)
     static var shared: DataActor { _shared }
 
-    static func switchCollection(to collectionID: String) {
+    static func switchLibrary(to collectionID: String) {
         _shared = DataActor(collectionID: collectionID)
     }
 
@@ -47,7 +47,7 @@ actor DataActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            if collectionID == Collection.defaultID {
+            if collectionID == PicLibrary.defaultID {
                 self.databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
             } else {
                 let folderURL = appGroupURL.appendingPathComponent(collectionID)

@@ -10,10 +10,10 @@ import Foundation
 
 actor HashActor {
 
-    private static var _shared = HashActor(collectionID: Collection.defaultID)
+    nonisolated(unsafe) private static var _shared = HashActor(collectionID: PicLibrary.defaultID)
     static var shared: HashActor { _shared }
 
-    static func switchCollection(to collectionID: String) {
+    static func switchLibrary(to collectionID: String) {
         _shared = HashActor(collectionID: collectionID)
     }
 
@@ -35,7 +35,7 @@ actor HashActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            if collectionID == Collection.defaultID {
+            if collectionID == PicLibrary.defaultID {
                 databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
             } else {
                 let folderURL = appGroupURL.appendingPathComponent(collectionID)

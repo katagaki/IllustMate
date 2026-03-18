@@ -28,7 +28,6 @@ struct MoreView: View {
     @State var rebuildProgress: Int = 0
     @State var rebuildTotal: Int = 0
     @State var isFreeingUpSpace: Bool = false
-    @State var isDeleteConfirming: Bool = false
 
     @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var isPhotosModeEnabled: Bool = false
@@ -182,11 +181,6 @@ struct MoreView: View {
                 Text("Troubleshooting.DataManagement.Description", tableName: "More")
             }
             Section {
-                Button(String(localized: "Troubleshooting.DeleteAll", table: "More"), role: .destructive) {
-                    isDeleteConfirming = true
-                }
-            }
-            Section {
                 Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
                     HStack {
                         Text(String(localized: "GitHub", table: "More"))
@@ -245,19 +239,6 @@ struct MoreView: View {
         }
         .sheet(isPresented: $isDuplicateCheckerPresented) {
             DuplicateScanView(scanScope: .entireCollection)
-        }
-        .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
-            Button("Shared.Yes", role: .destructive) {
-                Task {
-                    await DataActor.shared.deleteAll()
-                    navigation.signalDataDeleted()
-                }
-            }
-            Button("Shared.No", role: .cancel) {
-                isDeleteConfirming = false
-            }
-        } message: {
-            Text("Alert.DeleteAll.Text")
         }
         .sheet(isPresented: $isRebuildingThumbnails) {
             StatusView(type: .inProgress, title: .troubleshootingRebuildingThumbnails,

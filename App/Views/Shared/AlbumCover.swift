@@ -57,6 +57,12 @@ final class AlbumCoverCache {
         }
     }
 
+    func removeAllImages() {
+        cache.removeAllObjects()
+        pendingDiskDeletions.removeAll()
+        version += 1
+    }
+
     func removeImages(forAlbumID id: String) {
         cache.removeObject(forKey: id as NSString)
         pendingDiskDeletions.insert(id)

@@ -12,11 +12,11 @@ import SwiftUI
 struct CollectionView: View {
 
     @EnvironmentObject var navigation: NavigationManager
-    @EnvironmentObject var collectionManager: CollectionManager
+    @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
     @Environment(PhotosViewerManager.self) var photosViewer
     @State var isMoreViewPresenting: Bool = false
-    @State var isCollectionManagerPresented: Bool = false
+    @State var isLibraryManagerPresented: Bool = false
 
     @AppStorage("PhotosModeEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
@@ -32,17 +32,18 @@ struct CollectionView: View {
             }
             .toolbar {
                 if UIDevice.current.userInterfaceIdiom == .phone {
-                    ToolbarItem(placement: .topBarLeading) {
-                        HStack(spacing: 12.0) {
-                            Button {
-                                isMoreViewPresenting = true
-                            } label: {
-                                Image(systemName: "ellipsis")
-                            }
-                            CollectionSwitcherMenu(
-                                isCollectionManagerPresented: $isCollectionManagerPresented
-                            )
+                    ToolbarItemGroup(placement: .topBarLeading) {
+                        Button {
+                            isMoreViewPresenting = true
+                        } label: {
+                            Image(systemName: "ellipsis")
                         }
+                    }
+                    ToolbarSpacer(.fixed, placement: .topBarLeading)
+                    ToolbarItemGroup(placement: .topBarLeading) {
+                        LibrarySwitcherMenu(
+                            isLibraryManagerPresented: $isLibraryManagerPresented
+                        )
                     }
                 }
             }
@@ -50,9 +51,9 @@ struct CollectionView: View {
                 MoreView()
                     .phonePresentationDetents([.medium, .large])
             }
-            .sheet(isPresented: $isCollectionManagerPresented) {
-                CollectionManagerSheet()
-                    .environmentObject(collectionManager)
+            .sheet(isPresented: $isLibraryManagerPresented) {
+                LibraryManagerSheet()
+                    .environmentObject(libraryManager)
                     .environmentObject(navigation)
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in

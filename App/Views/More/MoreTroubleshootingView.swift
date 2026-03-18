@@ -14,7 +14,6 @@ struct MoreTroubleshootingView: View {
     @EnvironmentObject var navigation: NavigationManager
     @Environment(ConcurrencyManager.self) var concurrency
 
-    @State var isDeleteConfirming: Bool = false
     @State var isRebuildingThumbnails: Bool = false
     @State var rebuildProgress: Int = 0
     @State var rebuildTotal: Int = 0
@@ -43,24 +42,6 @@ struct MoreTroubleshootingView: View {
             } footer: {
                 Text("Troubleshooting.DataManagement.Description", tableName: "More")
             }
-            Section {
-                Button(String(localized: "Troubleshooting.DeleteAll", table: "More"), role: .destructive) {
-                    isDeleteConfirming = true
-                }
-            }
-        }
-        .alert("Alert.DeleteAll.Title", isPresented: $isDeleteConfirming) {
-            Button("Shared.Yes", role: .destructive) {
-                Task {
-                    await DataActor.shared.deleteAll()
-                    navigation.signalDataDeleted()
-                }
-            }
-            Button("Shared.No", role: .cancel) {
-                isDeleteConfirming = false
-            }
-        } message: {
-            Text("Alert.DeleteAll.Text")
         }
         .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)

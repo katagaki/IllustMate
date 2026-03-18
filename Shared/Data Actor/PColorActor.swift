@@ -10,10 +10,10 @@ import Foundation
 
 actor PColorActor {
 
-    private static var _shared = PColorActor(collectionID: Collection.defaultID)
+    nonisolated(unsafe) private static var _shared = PColorActor(collectionID: PicLibrary.defaultID)
     static var shared: PColorActor { _shared }
 
-    static func switchCollection(to collectionID: String) {
+    static func switchLibrary(to collectionID: String) {
         _shared = PColorActor(collectionID: collectionID)
     }
 
@@ -36,7 +36,7 @@ actor PColorActor {
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
-            if collectionID == Collection.defaultID {
+            if collectionID == PicLibrary.defaultID {
                 databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
             } else {
                 let folderURL = appGroupURL.appendingPathComponent(collectionID)
