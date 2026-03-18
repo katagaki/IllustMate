@@ -42,7 +42,7 @@ struct MoreTroubleshootingView: View {
         }
         .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Troubleshooting.RebuildThumbnails.Confirm.Title", tableName: "More",
+        .alert(Text("Troubleshooting.RebuildThumbnails.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingRebuildThumbnails) {
             Button("Shared.Yes", role: .destructive) {
                 Task { await rebuildThumbnails() }
@@ -51,7 +51,7 @@ struct MoreTroubleshootingView: View {
         } message: {
             Text("Troubleshooting.RebuildThumbnails.Confirm.Message", tableName: "More")
         }
-        .alert("Troubleshooting.FreeUpSpace.Confirm.Title", tableName: "More",
+        .alert(Text("Troubleshooting.FreeUpSpace.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingFreeUpSpace) {
             Button("Shared.Yes", role: .destructive) {
                 Task { await freeUpSpace() }
@@ -60,7 +60,7 @@ struct MoreTroubleshootingView: View {
         } message: {
             Text("Troubleshooting.FreeUpSpace.Confirm.Message", tableName: "More")
         }
-        .alert("Troubleshooting.ClearCache.Confirm.Title", tableName: "More",
+        .alert(Text("Troubleshooting.ClearCache.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingClearCache) {
             Button("Shared.Yes", role: .destructive) {
                 Task {

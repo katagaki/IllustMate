@@ -331,6 +331,12 @@
     "Albums.HideHeaders": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überschriften ausblenden"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
@@ -341,6 +347,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "ヘッダーを非表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "헤더 숨기기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏标题"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱藏標題"
           }
         }
       }
