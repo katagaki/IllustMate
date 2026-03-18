@@ -63,14 +63,18 @@ extension AlbumView {
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
                 importMenu
-                    .popoverTip(ImportTip())
+                    .popoverTip(ImportTip()) { _ in
+                        NewAlbumTip.hasSeenImportTip = true
+                    }
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
                     isAddingAlbum = true
                 }
-                .popoverTip(NewAlbumTip())
+                .popoverTip(NewAlbumTip()) { _ in
+                    LibrariesTip.hasSeenNewAlbumTip = true
+                }
             }
             if UIDevice.current.userInterfaceIdiom == .phone {
                 ToolbarItemGroup(placement: .bottomBar) {

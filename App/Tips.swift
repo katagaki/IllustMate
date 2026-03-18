@@ -20,6 +20,10 @@ struct ImportTip: Tip {
 }
 
 struct NewAlbumTip: Tip {
+
+    @Parameter
+    static var hasSeenImportTip: Bool = false
+
     var title: Text {
         Text("Tips.NewAlbum.Title", tableName: "Tips")
     }
@@ -29,9 +33,16 @@ struct NewAlbumTip: Tip {
     var image: Image? {
         Image(systemName: "rectangle.stack.badge.plus")
     }
+    var rules: [Rule] {
+        #Rule(Self.$hasSeenImportTip) { $0 == true }
+    }
 }
 
 struct LibrariesTip: Tip {
+
+    @Parameter
+    static var hasSeenNewAlbumTip: Bool = false
+
     var title: Text {
         Text("Tips.Libraries.Title", tableName: "Tips")
     }
@@ -40,5 +51,8 @@ struct LibrariesTip: Tip {
     }
     var image: Image? {
         Image(systemName: "square.stack.3d.up")
+    }
+    var rules: [Rule] {
+        #Rule(Self.$hasSeenNewAlbumTip) { $0 == true }
     }
 }
