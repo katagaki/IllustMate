@@ -48,15 +48,26 @@ struct PicViewer: View {
         .frame(maxHeight: .infinity)
         .background {
             if let backgroundImage = currentImage {
-                Image(uiImage: backgroundImage)
-                    .resizable()
-                    .scaledToFill()
-                    .blur(radius: 40)
-                    .overlay {
-                        Color(colorScheme == .dark ? .black : .white)
-                            .opacity(0.3)
-                    }
-                    .ignoresSafeArea()
+                Canvas { context, size in
+                    context.addFilter(.blur(radius: 40))
+                    context.addFilter(.brightness(colorScheme == .dark ? -0.5 : 0.1))
+                    let image = Image(uiImage: backgroundImage)
+                    // Scale to fill the canvas
+                    let imageSize = backgroundImage.size
+                    let scaleX = size.width / imageSize.width
+                    let scaleY = size.height / imageSize.height
+                    let scale = max(scaleX, scaleY)
+                    let drawWidth = imageSize.width * scale
+                    let drawHeight = imageSize.height * scale
+                    let drawRect = CGRect(
+                        x: (size.width - drawWidth) / 2,
+                        y: (size.height - drawHeight) / 2,
+                        width: drawWidth,
+                        height: drawHeight
+                    )
+                    context.draw(image, in: drawRect)
+                }
+                .ignoresSafeArea()
             }
         }
         .navigationTitle(displayedPicName)
