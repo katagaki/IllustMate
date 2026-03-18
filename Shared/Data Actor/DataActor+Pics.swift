@@ -108,6 +108,13 @@ extension DataActor {
         }
     }
 
+    func picName(forPicWithID picID: String) -> String? {
+        let query = picsTable
+            .filter(picId == picID)
+            .select(picName)
+        return try? database.pluck(query).map { $0[picName] }
+    }
+
     func renamePic(withID picID: String, to newName: String) {
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.update(picName <- newName))

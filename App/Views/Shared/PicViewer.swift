@@ -23,6 +23,9 @@ struct PicViewer: View {
     @State var magnificationAnchor: UnitPoint = .center
     @State var containingAlbumName: String?
     @State var showImageSize: Bool = true
+    @State var isRenamePicPresented: Bool = false
+    @State var renamePicText: String = ""
+    @State var displayedPicName: String = ""
 
     private var isLandscape: Bool {
         verticalSizeClass == .compact
@@ -56,15 +59,46 @@ struct PicViewer: View {
                     .ignoresSafeArea()
             }
         }
-        .navigationTitle(viewer.displayedPic?.name ?? pic.name)
+        .navigationTitle(displayedPicName)
         .navigationBarTitleDisplayMode(.inline)
+        .alert("ViewTitle.Pics.Rename", isPresented: $isRenamePicPresented) {
+            TextField(displayedPicName, text: $renamePicText)
+                .textInputAutocapitalization(.words)
+            Button("Shared.Rename") {
+                let newName = renamePicText.trimmingCharacters(in: .whitespaces)
+                guard !newName.isEmpty, let picID = viewer.displayedPic?.id else { return }
+                Task {
+                    await DataActor.shared.renamePic(withID: picID, to: newName)
+                    viewer.displayedPic?.name = newName
+                    if let index = viewer.allPics.firstIndex(where: { $0.id == picID }) {
+                        viewer.allPics[index].name = newName
+                    }
+                    withAnimation(.smooth.speed(2.0)) {
+                        displayedPicName = newName
+                    }
+                }
+            }
+            Button("Shared.Cancel", role: .cancel) { }
+        }
         .toolbar {
-            if let containingAlbumName {
-                ToolbarItem(placement: .subtitle) {
-                    Text(containingAlbumName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+            ToolbarItem(placement: .principal) {
+                VStack(spacing: 2.0) {
+                    Button {
+                        renamePicText = displayedPicName
+                        isRenamePicPresented = true
+                    } label: {
+                        Text(displayedPicName)
+                            .font(.headline)
+                            .lineLimit(1)
+                            .contentTransition(.numericText())
+                    }
+                    .buttonStyle(.plain)
+                    if let containingAlbumName {
+                        Text(containingAlbumName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
             }
             if isLandscape {
@@ -86,7 +120,7 @@ struct PicViewer: View {
                         "Shared.Share",
                         item: shareImage,
                         preview: SharePreview(
-                            viewer.displayedPic?.name ?? pic.name,
+                            displayedPicName,
                             image: shareImage
                         )
                     )
@@ -114,7 +148,7 @@ struct PicViewer: View {
                         "Shared.Share",
                         item: shareImage,
                         preview: SharePreview(
-                            viewer.displayedPic?.name ?? pic.name,
+                            displayedPicName,
                             image: shareImage
                         )
                     )
@@ -124,6 +158,7 @@ struct PicViewer: View {
         }
         .toolbar(isLandscape ? .hidden : .automatic, for: .bottomBar)
         .task(id: viewer.displayedPicID) {
+            displayedPicName = viewer.displayedPic?.name ?? pic.name
             containingAlbumName = nil
             if let albumID = viewer.displayedPic?.containingAlbumID ?? pic.containingAlbumID {
                 let name = await DataActor.shared.album(for: albumID)?.name

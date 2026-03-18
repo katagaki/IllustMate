@@ -91,8 +91,8 @@ struct PhotosCollectionView: View {
                 }
             }
         }
-        .sheet(isPresented: $isAddingAlbum) {
-            photosNewAlbumSheet
+        .alert("ViewTitle.Albums.Create", isPresented: $isAddingAlbum) {
+            photosNewAlbumAlert
         }
         .sheet(isPresented: Binding(
             get: { albumToRename != nil },

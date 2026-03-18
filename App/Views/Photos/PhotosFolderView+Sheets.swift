@@ -11,46 +11,30 @@ import SwiftUI
 // MARK: - Sheets
 
 extension PhotosFolderView {
-    var photosNewAlbumInFolderSheet: some View {
-        NavigationStack {
-            List {
-                Section {
-                    TextField(String(localized: "Albums.Create.Placeholder", table: "Albums"), text: $newAlbumName)
-                        .textInputAutocapitalization(.words)
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(role: .cancel) {
+    @ViewBuilder
+    var photosNewAlbumInFolderAlert: some View {
+        TextField(String(localized: "Albums.Create.Placeholder", table: "Albums"), text: $newAlbumName)
+            .textInputAutocapitalization(.words)
+        Button("Shared.Create") {
+            let name = newAlbumName.trimmingCharacters(in: .whitespaces)
+            guard !name.isEmpty else { return }
+            Task {
+                do {
+                    let newAlbum = try await photosManager.createAlbum(named: name)
+                    try await photosManager.moveAlbum(newAlbum, into: folder)
+                    await MainActor.run {
                         newAlbumName = ""
-                        isAddingAlbum = false
+                        hasFetched = false
+                        fetchContent()
                     }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .confirm) {
-                        Task {
-                            do {
-                                let newAlbum = try await photosManager.createAlbum(named: newAlbumName)
-                                try await photosManager.moveAlbum(newAlbum, into: folder)
-                                await MainActor.run {
-                                    newAlbumName = ""
-                                    isAddingAlbum = false
-                                    hasFetched = false
-                                    fetchContent()
-                                }
-                            } catch {
-                                debugPrint(error.localizedDescription)
-                            }
-                        }
-                    }
-                    .disabled(newAlbumName.trimmingCharacters(in: .whitespaces).isEmpty)
+                } catch {
+                    debugPrint(error.localizedDescription)
                 }
             }
-            .navigationTitle("ViewTitle.Albums.Create")
-            .navigationBarTitleDisplayMode(.inline)
         }
-        .phonePresentationDetents([.height(200.0), .medium])
-        .interactiveDismissDisabled()
+        Button("Shared.Cancel", role: .cancel) {
+            newAlbumName = ""
+        }
     }
 
     func photosRenameAlbumSheet(_ collection: PHAssetCollection) -> some View {

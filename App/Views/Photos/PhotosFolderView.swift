@@ -100,8 +100,8 @@ struct PhotosFolderView: View {
                 fetchContent()
             }
         }
-        .sheet(isPresented: $isAddingAlbum) {
-            photosNewAlbumInFolderSheet
+        .alert("ViewTitle.Albums.Create", isPresented: $isAddingAlbum) {
+            photosNewAlbumInFolderAlert
         }
         .sheet(isPresented: Binding(
             get: { albumToRename != nil },
