@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct LibrarySwitcherMenu: View {
 
@@ -41,5 +42,6 @@ struct LibrarySwitcherMenu: View {
             Label(libraryManager.displayName(for: libraryManager.currentLibrary),
                   systemImage: "square.stack.3d.up")
         }
+        .popoverTip(LibrariesTip())
     }
 }
