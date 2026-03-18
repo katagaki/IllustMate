@@ -14,28 +14,25 @@ struct MoreTroubleshootingView: View {
     @EnvironmentObject var navigation: NavigationManager
     @Environment(ConcurrencyManager.self) var concurrency
 
+    @State var isConfirmingRebuildThumbnails: Bool = false
     @State var isRebuildingThumbnails: Bool = false
     @State var rebuildProgress: Int = 0
     @State var rebuildTotal: Int = 0
+    @State var isConfirmingFreeUpSpace: Bool = false
     @State var isFreeingUpSpace: Bool = false
+    @State var isConfirmingClearCache: Bool = false
 
     var body: some View {
         List {
             Section {
                 Button(String(localized: "Troubleshooting.RebuildThumbnails", table: "More")) {
-                    Task { await rebuildThumbnails() }
+                    isConfirmingRebuildThumbnails = true
                 }
                 Button(String(localized: "Troubleshooting.FreeUpSpace", table: "More")) {
-                    Task { await freeUpSpace() }
+                    isConfirmingFreeUpSpace = true
                 }
-                Button(String(localized: "Troubleshooting.ClearHashCache", table: "More")) {
-                    Task { await HashActor.shared.deleteAllHashes() }
-                }
-                Button(String(localized: "Troubleshooting.ClearColorCache", table: "More")) {
-                    Task { await PColorActor.shared.deleteAllColors() }
-                }
-                Button(String(localized: "Troubleshooting.ClearAlbumCoverCache", table: "More")) {
-                    Task { await CoverCacheActor.shared.deleteAllCovers() }
+                Button(String(localized: "Troubleshooting.ClearCache", table: "More")) {
+                    isConfirmingClearCache = true
                 }
             } header: {
                 Text("Troubleshooting.DataManagement", tableName: "More")
@@ -45,6 +42,37 @@ struct MoreTroubleshootingView: View {
         }
         .navigationTitle("ViewTitle.Troubleshooting")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Troubleshooting.RebuildThumbnails.Confirm.Title", tableName: "More",
+               isPresented: $isConfirmingRebuildThumbnails) {
+            Button("Shared.Yes", role: .destructive) {
+                Task { await rebuildThumbnails() }
+            }
+            Button("Shared.No", role: .cancel) { }
+        } message: {
+            Text("Troubleshooting.RebuildThumbnails.Confirm.Message", tableName: "More")
+        }
+        .alert("Troubleshooting.FreeUpSpace.Confirm.Title", tableName: "More",
+               isPresented: $isConfirmingFreeUpSpace) {
+            Button("Shared.Yes", role: .destructive) {
+                Task { await freeUpSpace() }
+            }
+            Button("Shared.No", role: .cancel) { }
+        } message: {
+            Text("Troubleshooting.FreeUpSpace.Confirm.Message", tableName: "More")
+        }
+        .alert("Troubleshooting.ClearCache.Confirm.Title", tableName: "More",
+               isPresented: $isConfirmingClearCache) {
+            Button("Shared.Yes", role: .destructive) {
+                Task {
+                    await HashActor.shared.deleteAllHashes()
+                    await PColorActor.shared.deleteAllColors()
+                    await CoverCacheActor.shared.deleteAllCovers()
+                }
+            }
+            Button("Shared.No", role: .cancel) { }
+        } message: {
+            Text("Troubleshooting.ClearCache.Confirm.Message", tableName: "More")
+        }
         .sheet(isPresented: $isRebuildingThumbnails) {
             StatusView(type: .inProgress, title: .troubleshootingRebuildingThumbnails,
                        currentCount: rebuildProgress, totalCount: rebuildTotal)

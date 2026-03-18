@@ -1771,6 +1771,125 @@
         }
       }
     },
+    "Troubleshooting.ClearCache" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャッシュを消去"
+          }
+        }
+      }
+    },
+    "Troubleshooting.ClearCache.Confirm.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャッシュを消去"
+          }
+        }
+      }
+    },
+    "Troubleshooting.ClearCache.Confirm.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will clear the duplicate scan cache, color sort cache, and album cover cache for the current library. Are you sure?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のライブラリの重複スキャンキャッシュ、カラーソートキャッシュ、アルバムカバーキャッシュが消去されます。よろしいですか？"
+          }
+        }
+      }
+    },
+    "Troubleshooting.RebuildThumbnails.Confirm.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebuild Thumbnails"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サムネイルを再構築"
+          }
+        }
+      }
+    },
+    "Troubleshooting.RebuildThumbnails.Confirm.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will regenerate all thumbnails for the current library. This may take a while. Are you sure?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のライブラリのすべてのサムネイルが再生成されます。時間がかかる場合があります。よろしいですか？"
+          }
+        }
+      }
+    },
+    "Troubleshooting.FreeUpSpace.Confirm.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free Up Space"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "空き容量を増やす"
+          }
+        }
+      }
+    },
+    "Troubleshooting.FreeUpSpace.Confirm.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will optimize the database for the current library to free up space. Are you sure?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のライブラリのデータベースを最適化して空き容量を増やします。よろしいですか？"
+          }
+        }
+      }
+    },
     "Troubleshooting.DataManagement" : {
       "extractionState" : "manual",
       "localizations" : {
