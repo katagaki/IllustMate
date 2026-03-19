@@ -757,7 +757,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ファイルAppから"
+            "value" : "「ファイル」アプリから"
           }
         },
         "ko" : {
@@ -797,7 +797,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真Appから"
+            "value" : "「写真」アプリから"
           }
         },
         "ko" : {
