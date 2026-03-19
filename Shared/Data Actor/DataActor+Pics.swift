@@ -44,6 +44,19 @@ extension DataActor {
         return try database.prepare(orderedQuery).map { picFrom(row: $0) }
     }
 
+    func picSkeletonsByName(in album: Album?, order: SortOrder) throws -> [Pic] {
+        let baseQuery: SQLite.Table
+        if let albumID = album?.id {
+            baseQuery = picsTable.filter(picAlbumId == albumID)
+        } else {
+            baseQuery = picsTable.filter(picAlbumId == nil)
+        }
+        let orderedQuery = (order == .reverse ? baseQuery.order(picName.desc) :
+                                                baseQuery.order(picName.asc))
+            .select(picId, picName, picAlbumId, picDateAdded)
+        return try database.prepare(orderedQuery).map { picFrom(row: $0) }
+    }
+
     func picCount(in album: Album?) -> Int {
         let query: SQLite.Table
         if let albumID = album?.id {
