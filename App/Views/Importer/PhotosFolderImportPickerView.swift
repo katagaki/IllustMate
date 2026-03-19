@@ -88,8 +88,8 @@ struct PhotosFolderImportPickerView: View {
             } else {
                 ForEach(items) { item in
                     switch item {
-                    case .album:
-                        EmptyView()
+                    case .album(let collection):
+                        albumRow(for: collection)
                     case .folder(let folder):
                         folderRow(for: folder)
                     }
@@ -147,6 +147,39 @@ struct PhotosFolderImportPickerView: View {
         .tint(.primary)
     }
 
+    @ViewBuilder
+    private func albumRow(for collection: PHAssetCollection) -> some View {
+        HStack(spacing: 12.0) {
+            albumThumbnail(for: collection)
+            VStack(alignment: .leading, spacing: 2.0) {
+                Text(collection.localizedTitle
+                     ?? String(localized: "Import.Albums.Untitled", table: "Import"))
+                Text("\(imageCount(in: collection))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+        .foregroundStyle(.secondary)
+    }
+
+    @ViewBuilder
+    private func albumThumbnail(for collection: PHAssetCollection) -> some View {
+        if let firstAsset = firstAsset(in: collection) {
+            PhotoThumbnailView(asset: firstAsset, size: CGSize(width: 56, height: 56))
+                .frame(width: 32, height: 32)
+                .clipShape(.rect(cornerRadius: 4))
+        } else {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color(.systemGray5))
+                .frame(width: 32, height: 32)
+                .overlay {
+                    Image(systemName: "photo.on.rectangle")
+                        .foregroundStyle(.secondary)
+                }
+        }
+    }
+
     // MARK: - Denied View
 
     private var deniedView: some View {
@@ -188,6 +221,8 @@ struct PhotosFolderImportPickerView: View {
             result.enumerateObjects { collection, _, _ in
                 if let subfolder = collection as? PHCollectionList {
                     collected.append(.folder(subfolder))
+                } else if let album = collection as? PHAssetCollection {
+                    collected.append(.album(album))
                 }
             }
         } else {
@@ -195,6 +230,8 @@ struct PhotosFolderImportPickerView: View {
             topLevelResult.enumerateObjects { collection, _, _ in
                 if let subfolder = collection as? PHCollectionList {
                     collected.append(.folder(subfolder))
+                } else if let album = collection as? PHAssetCollection {
+                    collected.append(.album(album))
                 }
             }
         }
@@ -232,6 +269,19 @@ struct PhotosFolderImportPickerView: View {
             }
         }
         return count
+    }
+
+    private func imageCount(in collection: PHAssetCollection) -> Int {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        return PHAsset.fetchAssets(in: collection, options: fetchOptions).count
+    }
+
+    private func firstAsset(in collection: PHAssetCollection) -> PHAsset? {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.fetchLimit = 1
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        return PHAsset.fetchAssets(in: collection, options: fetchOptions).firstObject
     }
 
     // MARK: - Folder Import
