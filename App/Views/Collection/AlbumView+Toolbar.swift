@@ -63,7 +63,7 @@ extension AlbumView {
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
                 importMenu
-                    .popoverTip(ImportTip()) { _ in
+                    .popoverTip(ImportTip(), arrowEdge: .top) { _ in
                         NewAlbumTip.hasSeenImportTip = true
                     }
             }
@@ -72,7 +72,7 @@ extension AlbumView {
                 Button("Shared.Create", systemImage: "rectangle.stack.badge.plus") {
                     isAddingAlbum = true
                 }
-                .popoverTip(NewAlbumTip()) { _ in
+                .popoverTip(NewAlbumTip(), arrowEdge: .top) { _ in
                     LibrariesTip.hasSeenNewAlbumTip = true
                 }
             }

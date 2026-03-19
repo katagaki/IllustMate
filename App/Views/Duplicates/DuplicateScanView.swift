@@ -13,9 +13,16 @@ struct DuplicateScanView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @State var scanManager = DuplicateScanManager()
-
     var scanScope: DuplicateScanManager.ScanScope
+    var collectionID: String?
+
+    @State var scanManager: DuplicateScanManager
+
+    init(scanScope: DuplicateScanManager.ScanScope, collectionID: String? = nil) {
+        self.scanScope = scanScope
+        self.collectionID = collectionID
+        self._scanManager = State(initialValue: DuplicateScanManager(collectionID: collectionID))
+    }
 
     var body: some View {
         NavigationStack {
@@ -51,8 +58,10 @@ struct DuplicateScanView: View {
                             )
                         }
                     }
-                }            }
+                }
+            }
         }
+        .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled(scanManager.isScanning)
         .onChange(of: scanManager.isScanning) { _, isScanning in
             UIApplication.shared.isIdleTimerDisabled = isScanning

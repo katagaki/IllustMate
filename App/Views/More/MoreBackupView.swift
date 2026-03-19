@@ -35,6 +35,7 @@ struct MoreBackupView: View {
                             .padding(4.0)
                             .frame(maxWidth: .infinity)
                     }
+                    .tint(.accent)
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
                 }

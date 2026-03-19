@@ -129,7 +129,7 @@ struct EditLibrarySheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled()
         .onAppear {
             editedName = library.isDefault ? "" : library.name
@@ -152,7 +152,7 @@ struct EditLibrarySheet: View {
             }
         }
         .sheet(isPresented: $isDuplicateCheckerPresented) {
-            DuplicateScanView(scanScope: .entireCollection)
+            DuplicateScanView(scanScope: .entireCollection, collectionID: library.id)
         }
         .alert(Text("Troubleshooting.RebuildThumbnails.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingRebuildThumbnails) {
@@ -205,6 +205,7 @@ struct EditLibrarySheet: View {
                 libraryToDelete = nil
                 dismiss()
             }
+            .disabled(deleteConfirmationCode != expectedDeleteCode)
             Button("Shared.Cancel", role: .cancel) {
                 libraryToDelete = nil
             }

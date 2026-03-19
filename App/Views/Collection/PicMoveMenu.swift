@@ -16,35 +16,37 @@ struct PicMoveMenu: View {
     @State var rootAlbums: [Album] = []
 
     var body: some View {
-        if containingAlbum != nil {
-            Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                Task {
-                    await DataActor.shared.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
-                    if let containingAlbum {
-                        AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
+        Section {
+            if containingAlbum != nil {
+                Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
+                    Task {
+                        await DataActor.shared.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
+                        if let containingAlbum {
+                            AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
+                        }
+                        onMoved()
                     }
-                    onMoved()
                 }
+                Divider()
             }
         }
-        Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
+        Section {
             if rootAlbums.isEmpty {
                 Text(verbatim: "")
-            } else {
-                ForEach(rootAlbums) { album in
-                    AlbumHierarchyMenuItem(
-                        targetAlbum: album,
-                        excludingAlbumID: containingAlbum?.id ?? ""
-                    ) { destinationAlbum in
-                        Task {
-                            await DataActor.shared.addPics(withIDs: pics.map { $0.id },
-                                                         toAlbumWithID: destinationAlbum.id)
-                            if let containingAlbum {
-                                AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
-                            }
-                            AlbumCoverCache.shared.removeImages(forAlbumID: destinationAlbum.id)
-                            onMoved()
+            }
+            ForEach(rootAlbums) { album in
+                AlbumHierarchyMenuItem(
+                    targetAlbum: album,
+                    excludingAlbumID: containingAlbum?.id ?? ""
+                ) { destinationAlbum in
+                    Task {
+                        await DataActor.shared.addPics(withIDs: pics.map { $0.id },
+                                                       toAlbumWithID: destinationAlbum.id)
+                        if let containingAlbum {
+                            AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
                         }
+                        AlbumCoverCache.shared.removeImages(forAlbumID: destinationAlbum.id)
+                        onMoved()
                     }
                 }
             }

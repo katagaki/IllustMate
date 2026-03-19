@@ -54,6 +54,7 @@ struct PhotosDuplicateScanView: View {
                 }
             }
         }
+        .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled(scanManager.isScanning)
         .onChange(of: scanManager.isScanning) { _, isScanning in
             UIApplication.shared.isIdleTimerDisabled = isScanning

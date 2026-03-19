@@ -48,7 +48,7 @@ struct LibraryManagerSheet: View {
                         .environmentObject(navigation)
                 }
         }
-        .presentationDetents([.medium])
+        .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled()
     }
 

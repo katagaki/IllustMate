@@ -42,6 +42,6 @@ struct LibrarySwitcherMenu: View {
             Label(libraryManager.displayName(for: libraryManager.currentLibrary),
                   systemImage: "square.stack.3d.up")
         }
-        .popoverTip(LibrariesTip())
+        .popoverTip(LibrariesTip(), arrowEdge: .top)
     }
 }

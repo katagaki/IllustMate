@@ -36,6 +36,7 @@ struct DuplicateResultsView: View {
                 ForEach(scanManager.duplicateGroups) { group in
                     DuplicateGroupSection(
                         group: group,
+                        dataActor: scanManager.dataActor,
                         selectedForDeletion: Binding(
                             get: { selectedForDeletion[group.id] ?? [] },
                             set: { selectedForDeletion[group.id] = $0 }
@@ -71,8 +72,9 @@ struct DuplicateResultsView: View {
                 Button("Shared.Yes", role: .destructive) {
                     Task {
                         let idsToDelete = allSelectedIDs
+                        let dataActor = scanManager.dataActor
                         for picID in idsToDelete {
-                            await DataActor.shared.deletePic(withID: picID)
+                            await dataActor.deletePic(withID: picID)
                             await HashActor.shared.deleteHash(forPicWithID: picID)
                         }
                         await MainActor.run {
@@ -94,6 +96,7 @@ struct DuplicateResultsView: View {
 struct DuplicateGroupSection: View {
 
     let group: DuplicateGroup
+    var dataActor: DataActor
     @Binding var selectedForDeletion: Set<String>
     var onDelete: (Set<String>) -> Void
 
@@ -108,6 +111,7 @@ struct DuplicateGroupSection: View {
                     ForEach(group.pics) { pic in
                         DuplicateDetailCard(
                             pic: pic,
+                            dataActor: dataActor,
                             isSelectedForDeletion: selectedForDeletion.contains(pic.id)
                         ) {
                             withAnimation(.smooth.speed(2.0)) {
@@ -149,7 +153,7 @@ struct DuplicateGroupSection: View {
             Button("Shared.Yes", role: .destructive) {
                 Task {
                     for picID in selectedForDeletion {
-                        await DataActor.shared.deletePic(withID: picID)
+                        await dataActor.deletePic(withID: picID)
                         await HashActor.shared.deleteHash(forPicWithID: picID)
                     }
                     await MainActor.run {

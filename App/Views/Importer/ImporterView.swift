@@ -137,6 +137,7 @@ struct ImporterView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(20.0)
+                .tint(.accent)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

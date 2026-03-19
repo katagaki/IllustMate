@@ -10,6 +10,7 @@ import SwiftUI
 struct DuplicateDetailCard: View {
 
     let pic: Pic
+    var dataActor: DataActor
     let isSelectedForDeletion: Bool
     let onToggle: () -> Void
 
@@ -49,7 +50,7 @@ struct DuplicateDetailCard: View {
         }
         .buttonStyle(.plain)
         .task {
-            if let data = await DataActor.shared.imageData(forPicWithID: pic.id) {
+            if let data = await dataActor.imageData(forPicWithID: pic.id) {
                 let byteCount = data.count
                 let formatter = ByteCountFormatter()
                 formatter.allowedUnits = [.useKB, .useMB]

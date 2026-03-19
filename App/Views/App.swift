@@ -59,9 +59,16 @@ struct IllustMateApp: App {
             pipManager.setup()
         }
         .task {
-            try? Tips.configure([
-                .displayFrequency(.daily)
-            ])
+            do {
+                // TODO: Tips are broken in iOS 26 thanks to SwiftUI bug
+                //       Will include everything for now until Apple fixes it
+                try Tips.configure([
+                    .displayFrequency(.immediate),
+                    .datastoreLocation(.applicationDefault)
+                ])
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
             await libraryManager.loadLibraries()
         }
         .onOpenURL { url in

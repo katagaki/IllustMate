@@ -88,7 +88,7 @@ struct AlbumViewSheets: ViewModifier {
                         }
                     }
                 }
-                .phonePresentationDetents([.medium, .large])
+                .phonePresentationDetents([.large])
                 .interactiveDismissDisabled()
             }
             .sheet(isPresented: $isImportingPhotos) {

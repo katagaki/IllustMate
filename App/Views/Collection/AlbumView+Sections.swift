@@ -144,10 +144,12 @@ extension AlbumView {
                 } onDelete: { pic in
                     deletePic(pic)
                 } moveMenu: { pic in
-                    PicMoveMenu(pics: isSelectingPics ?
-                                selectedPics : [pic],
-                                containingAlbum: currentAlbum) {
-                        refreshDataAfterPicMoved()
+                    Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
+                        PicMoveMenu(pics: isSelectingPics ?
+                                    selectedPics : [pic],
+                                    containingAlbum: currentAlbum) {
+                            refreshDataAfterPicMoved()
+                        }
                     }
                 }
             } else if !hasFetchedPicCount {

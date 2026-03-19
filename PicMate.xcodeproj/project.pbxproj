@@ -119,6 +119,7 @@
 			membershipExceptions = (
 				Strings/More.xcstrings,
 				Strings/Photos.xcstrings,
+				Strings/Tips.xcstrings,
 				Strings/WebServer.xcstrings,
 			);
 			target = E4614CFB2ACA86EC00D751FB /* Share with PicMate */;

@@ -29,6 +29,20 @@ class DuplicateScanManager {
     // Configuration
     var hammingThreshold: Int = 8
 
+    // Data access
+    let collectionID: String?
+
+    var dataActor: DataActor {
+        if let collectionID {
+            return DataActor(collectionID: collectionID)
+        }
+        return DataActor.shared
+    }
+
+    init(collectionID: String? = nil) {
+        self.collectionID = collectionID
+    }
+
     enum ScanPhase {
         case idle
         case computingHashes
@@ -51,14 +65,15 @@ class DuplicateScanManager {
         duplicateGroups = []
 
         // Get all pic IDs in scope
+        let dataActor = self.dataActor
         let allScopedIDs: [String]
         switch scope {
         case .entireCollection:
-            allScopedIDs = await DataActor.shared.allPicIDs()
+            allScopedIDs = await dataActor.allPicIDs()
         case .picsNotInAlbums:
-            allScopedIDs = await DataActor.shared.picIDsNotInAnyAlbum()
+            allScopedIDs = await dataActor.picIDsNotInAnyAlbum()
         case .album(let album):
-            allScopedIDs = await DataActor.shared.picIDs(inAlbumWithID: album.id)
+            allScopedIDs = await dataActor.picIDs(inAlbumWithID: album.id)
         }
 
         // Find which ones don't have cached hashes
@@ -69,7 +84,7 @@ class DuplicateScanManager {
 
         // Phase 1: Compute hashes for uncached pics
         for picID in uncachedIDs {
-            if let data = await DataActor.shared.imageData(forPicWithID: picID),
+            if let data = await dataActor.imageData(forPicWithID: picID),
                let image = UIImage(data: data),
                let hash = DHash.compute(from: image) {
                 await HashActor.shared.storeHash(hash, forPicWithID: picID)
@@ -91,7 +106,7 @@ class DuplicateScanManager {
         for group in groups where group.count >= 2 {
             var pics: [Pic] = []
             for (picID, _) in group {
-                if let pic = await DataActor.shared.pic(forID: picID) {
+                if let pic = await dataActor.pic(forID: picID) {
                     pics.append(pic)
                 }
             }

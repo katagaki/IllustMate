@@ -29,31 +29,25 @@ struct RestoreBackupView: View {
                 } else if isError {
                     StatusView(type: .error, title: .backupRestoreError)
                 } else {
-                    VStack(alignment: .center, spacing: 16.0) {
-                        VStack(alignment: .leading, spacing: 16.0) {
-                            VStack(alignment: .leading, spacing: 8.0) {
-                                HStack(alignment: .top) {
-                                    Text("Shared.FileName")
-                                    Spacer()
-                                    Text(backupURL.lastPathComponent)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
-                                        .truncationMode(.middle)
-                                }
-                                if let fileSize {
-                                    HStack {
-                                        Text("Shared.FileSize")
-                                        Spacer()
-                                        Text(fileSize)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
+                    VStack(alignment: .leading, spacing: 20.0) {
+                        HStack(alignment: .top) {
+                            Text("Shared.FileName")
+                            Spacer()
+                            Text(backupURL.lastPathComponent)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                        }
+                        if let fileSize {
+                            HStack {
+                                Text("Shared.FileSize")
+                                Spacer()
+                                Text(fileSize)
+                                    .foregroundStyle(.secondary)
                             }
-                            .padding(16.0)
-                            .background(.regularMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 16.0))
                         }
                     }
+                    .padding(20.0)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -66,6 +60,7 @@ struct RestoreBackupView: View {
                             .padding(4.0)
                             .frame(maxWidth: .infinity)
                     }
+                    .tint(.accent)
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
                     .padding(20.0)
@@ -79,6 +74,7 @@ struct RestoreBackupView: View {
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         }
+                        .tint(.accent)
                         .buttonStyle(.glassProminent)
                         .buttonBorderShape(.capsule)
 
@@ -101,6 +97,7 @@ struct RestoreBackupView: View {
                                 .padding(4.0)
                                 .frame(maxWidth: .infinity)
                         }
+                        .tint(.accent)
                         .buttonStyle(.glassProminent)
                         .buttonBorderShape(.capsule)
 
