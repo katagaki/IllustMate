@@ -40,28 +40,14 @@ struct EditLibrarySheet: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack(alignment: .top) {
-                        VStack(spacing: 8.0) {
-                            Text("\(picCount)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Shared.Pics")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
+                if library.id != libraryManager.currentLibrary.id {
+                    Section {
+                        Button(String(localized: "Libraries.SetActive", table: "Libraries")) {
+                            withAnimation(.smooth.speed(2.0)) {
+                                libraryManager.switchLibrary(to: library)
+                                navigation.signalDataDeleted()
+                            }
                         }
-                        .frame(maxWidth: .infinity)
-                        VStack(spacing: 8.0) {
-                            Text("\(albumCount)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Shared.Albums")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
                     }
                 }
                 if !library.isDefault {
@@ -94,6 +80,30 @@ struct EditLibrarySheet: View {
                     }
                 } header: {
                     Text("Troubleshooting.DataManagement", tableName: "More")
+                }
+                Section {
+                    HStack(alignment: .top) {
+                        VStack(spacing: 8.0) {
+                            Text("\(picCount)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text("Shared.Pics")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        VStack(spacing: 8.0) {
+                            Text("\(albumCount)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                            Text("Shared.Albums")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
                 }
                 if !library.isDefault {
                     Section {

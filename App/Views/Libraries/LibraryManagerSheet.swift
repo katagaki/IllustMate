@@ -49,7 +49,6 @@ struct LibraryManagerSheet: View {
                 }
         }
         .phonePresentationDetents([.medium, .large])
-        .interactiveDismissDisabled()
     }
 
     private var libraryList: some View {
@@ -76,18 +75,34 @@ struct LibraryManagerSheet: View {
                 }
                 Spacer()
                 if library.id == libraryManager.currentLibrary.id {
-                    Text("Libraries.Current", tableName: "Libraries")
+                    Text("Libraries.Active", tableName: "Libraries")
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .textCase(.uppercase)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(.accent, in: Capsule())
+                        .background(.accent, in: .capsule)
                 }
             }
         }
         .tint(.primary)
+        .swipeActions(edge: .leading) {
+            if library.id != libraryManager.currentLibrary.id {
+                Button {
+                    setLibraryActive(library)
+                } label: {
+                    Label(String(localized: "Libraries.SetActive.Short", table: "Libraries"),
+                          systemImage: "checkmark.circle")
+                }
+                .tint(.accent)
+            }
+        }
+    }
+
+    private func setLibraryActive(_ library: PicLibrary) {
+        libraryManager.switchLibrary(to: library)
+        navigation.signalDataDeleted()
     }
 
     @ViewBuilder

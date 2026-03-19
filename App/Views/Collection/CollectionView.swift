@@ -17,6 +17,7 @@ struct CollectionView: View {
     @Environment(PhotosViewerManager.self) var photosViewer
     @State var isMoreViewPresenting: Bool = false
     @State var isLibraryManagerPresented: Bool = false
+    @Namespace var sheetNamespace
 
     @AppStorage("PhotosModeEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
@@ -38,13 +39,18 @@ struct CollectionView: View {
                         } label: {
                             Image(systemName: "ellipsis")
                         }
+                        .matchedTransitionSource(id: "moreView", in: sheetNamespace)
                     }
                     if !isPhotosModeEnabled {
                         ToolbarSpacer(.fixed, placement: .topBarLeading)
                         ToolbarItemGroup(placement: .topBarLeading) {
-                            LibrarySwitcherMenu(
-                                isLibraryManagerPresented: $isLibraryManagerPresented
-                            )
+                            Button {
+                                isLibraryManagerPresented = true
+                            } label: {
+                                Label(libraryManager.displayName(for: libraryManager.currentLibrary),
+                                      systemImage: "square.stack.3d.up")
+                            }
+                            .matchedTransitionSource(id: "libraryManager", in: sheetNamespace)
                         }
                     }
                 }
@@ -52,11 +58,13 @@ struct CollectionView: View {
             .sheet(isPresented: $isMoreViewPresenting) {
                 MoreView()
                     .phonePresentationDetents([.medium, .large])
+                    .navigationTransition(.zoom(sourceID: "moreView", in: sheetNamespace))
             }
             .sheet(isPresented: $isLibraryManagerPresented) {
                 LibraryManagerSheet()
                     .environmentObject(libraryManager)
                     .environmentObject(navigation)
+                    .navigationTransition(.zoom(sourceID: "libraryManager", in: sheetNamespace))
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in
               switch viewPath {
