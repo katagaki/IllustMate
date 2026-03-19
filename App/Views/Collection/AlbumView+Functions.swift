@@ -215,6 +215,14 @@ extension AlbumView {
                 return try await DataActor.shared.picSkeletons(
                     in: currentAlbum, order: .reverse
                 )
+            case .nameAscending:
+                return try await DataActor.shared.picSkeletonsByName(
+                    in: currentAlbum, order: .forward
+                )
+            case .nameDescending:
+                return try await DataActor.shared.picSkeletonsByName(
+                    in: currentAlbum, order: .reverse
+                )
             case .prominentColor:
                 let pics = try await DataActor.shared.pics(
                     in: currentAlbum, order: .reverse

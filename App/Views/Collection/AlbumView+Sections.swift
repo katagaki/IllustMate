@@ -103,6 +103,10 @@ extension AlbumView {
                                     .tag(PicSortType.dateAddedAscending)
                                 Text("Shared.Sort.DateAdded.Descending")
                                     .tag(PicSortType.dateAddedDescending)
+                                Text("Shared.Sort.Name.Ascending")
+                                    .tag(PicSortType.nameAscending)
+                                Text("Shared.Sort.Name.Descending")
+                                    .tag(PicSortType.nameDescending)
                                 Text("Shared.Sort.ProminentColor")
                                     .tag(PicSortType.prominentColor)
                             }
