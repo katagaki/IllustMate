@@ -199,7 +199,7 @@ extension AlbumView {
                     isBrowsingFolders = true
                 } label: {
                     Label(String(localized: "Import.SelectFolder", table: "Import"),
-                          systemImage: "folder.circle")
+                          systemImage: "folder")
                 }
             }
             Section(String(localized: "Import.Section.FromFilesApp", table: "Import")) {
