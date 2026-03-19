@@ -7,6 +7,7 @@
 
 import BackgroundTasks
 import SwiftUI
+import TipKit
 import WidgetKit
 
 @main
@@ -58,6 +59,9 @@ struct IllustMateApp: App {
             pipManager.setup()
         }
         .task {
+            try? Tips.configure([
+                .displayFrequency(.daily)
+            ])
             await libraryManager.loadLibraries()
         }
         .onOpenURL { url in
