@@ -35,7 +35,6 @@ struct ImportProgressView: View {
                     }
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
-                    .padding(.horizontal, 20.0)
                 }
             }
             .padding(20.0)

@@ -18,7 +18,7 @@ struct MoreBackupView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical) {
+            VStack(alignment: .center, spacing: 16.0) {
                 if isExporting {
                     StatusView(type: .inProgress, title: .backupExporting)
                 } else if isCompleted {
@@ -26,10 +26,6 @@ struct MoreBackupView: View {
                 } else if let error {
                     StatusView(type: .error, title: .custom(LocalizedStringKey(error)))
                 }
-            }
-            .navigationTitle("ViewTitle.Backup")
-            .navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
                 if isCompleted || error != nil {
                     Button {
                         dismiss()
@@ -41,9 +37,11 @@ struct MoreBackupView: View {
                     }
                     .buttonStyle(.glassProminent)
                     .buttonBorderShape(.capsule)
-                    .padding(20.0)
                 }
             }
+            .padding(20.0)
+            .navigationTitle("ViewTitle.Backup")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .task {
             do {
@@ -66,6 +64,6 @@ struct MoreBackupView: View {
             }
         }
         .phonePresentationDetents([.medium])
-        .interactiveDismissDisabled()
+        .interactiveDismissDisabled(!isCompleted)
     }
 }
