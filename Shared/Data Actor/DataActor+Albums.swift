@@ -135,16 +135,16 @@ extension DataActor {
         return try? database.pluck(query).map { albumFrom(row: $0, loadChildren: false) }
     }
 
-    func createAlbum(_ name: String) -> Album {
+    func createAlbum(_ name: String, parentAlbumID: String? = nil) -> Album {
         let id = UUID().uuidString
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
         let now = Date.now
-        let album = Album(id: id, name: trimmedName, dateCreated: now)
+        let album = Album(id: id, name: trimmedName, parentAlbumID: parentAlbumID, dateCreated: now)
         _ = try? database.run(albumsTable.insert(
             albumId <- id,
             albumName <- trimmedName,
             albumCoverPhoto <- nil,
-            albumParentId <- nil,
+            albumParentId <- parentAlbumID,
             albumDateCreated <- now.timeIntervalSince1970
         ))
         return album
