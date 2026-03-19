@@ -193,6 +193,11 @@ extension AlbumView {
             } label: {
                 Label(String(localized: "Import.BrowseAlbums", table: "Import"), systemImage: "rectangle.stack")
             }
+            Button {
+                isBrowsingFolders = true
+            } label: {
+                Label(String(localized: "Import.SelectFolder", table: "Import"), systemImage: "folder.circle")
+            }
             Divider()
             Button {
                 isFileImporterPresented = true
