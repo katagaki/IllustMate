@@ -170,6 +170,9 @@ struct PhotosAssetGridView: View {
             }
 
             await MainActor.run {
+                if let selectedAlbum {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: selectedAlbum.id)
+                }
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = assetsToImport.count
                 UINotificationFeedbackGenerator().notificationOccurred(.success)

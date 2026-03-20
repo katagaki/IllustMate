@@ -26,6 +26,9 @@ extension PhotosFolderImportPickerView {
             await importFolderRecursively(folder, parentAlbumID: rootAlbum.id)
 
             await MainActor.run {
+                if let selectedAlbum {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: selectedAlbum.id)
+                }
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = importCurrentCount
                 UINotificationFeedbackGenerator().notificationOccurred(.success)

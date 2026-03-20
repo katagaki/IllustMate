@@ -38,6 +38,9 @@ extension AlbumView {
                 }
             }
             await MainActor.run {
+                if let currentAlbum {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
+                }
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = items.count
                 selectedPhotoItems = []
@@ -63,6 +66,9 @@ extension AlbumView {
                 }
             }
             await MainActor.run {
+                if let currentAlbum {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
+                }
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = files.count
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -100,6 +106,9 @@ extension AlbumView {
                 }
             }
             await MainActor.run {
+                if let currentAlbum {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
+                }
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = loadedFiles.count
                 UINotificationFeedbackGenerator().notificationOccurred(.success)

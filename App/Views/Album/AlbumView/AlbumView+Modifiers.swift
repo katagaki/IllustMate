@@ -40,6 +40,7 @@ struct AlbumViewSheets: ViewModifier {
                         if let currentAlbum {
                             await DataActor.shared.addAlbum(withID: newAlbum.id,
                                                  toAlbumWithID: currentAlbum.id)
+                            AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
                         }
                         await MainActor.run {
                             newAlbumName = ""
