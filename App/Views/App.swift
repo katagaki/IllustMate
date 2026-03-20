@@ -118,9 +118,11 @@ struct IllustMateApp: App {
         let hasAlbumStyle = defaults.object(forKey: "AlbumViewStyle") != nil
         let hasAlbumColumnCount = defaults.object(forKey: "AlbumColumnCount") != nil
         let hasPicColumnCount = defaults.object(forKey: "PicColumnCount") != nil
+        let hasHideSectionHeaders = defaults.object(forKey: "HideSectionHeaders") != nil
 
         guard hasAlbumSort || hasPicSort || hasAlbumStyle
-                || hasAlbumColumnCount || hasPicColumnCount else {
+                || hasAlbumColumnCount || hasPicColumnCount
+                || hasHideSectionHeaders else {
             return
         }
 
@@ -133,6 +135,9 @@ struct IllustMateApp: App {
         let picColumnCount = hasPicColumnCount
             ? defaults.integer(forKey: "PicColumnCount")
             : AlbumPreferences.defaults.picColumnCount
+        let hideSectionHeaders = hasHideSectionHeaders
+            ? defaults.bool(forKey: "HideSectionHeaders")
+            : AlbumPreferences.defaults.hideSectionHeaders
 
         var albumIDs = await DataActor.shared.allAlbumIDs()
         albumIDs.insert("__root__", at: 0)
@@ -143,7 +148,8 @@ struct IllustMateApp: App {
                 albumViewStyle: albumViewStyle,
                 albumColumnCount: albumColumnCount,
                 picSort: picSort,
-                picColumnCount: picColumnCount
+                picColumnCount: picColumnCount,
+                hideSectionHeaders: hideSectionHeaders
             )
             await DataActor.shared.insertPreferencesForMigration(prefs)
         }
@@ -153,6 +159,7 @@ struct IllustMateApp: App {
         defaults.removeObject(forKey: "AlbumViewStyle")
         defaults.removeObject(forKey: "AlbumColumnCount")
         defaults.removeObject(forKey: "PicColumnCount")
+        defaults.removeObject(forKey: "HideSectionHeaders")
     }
 
     nonisolated func scheduleWidgetRefresh() {

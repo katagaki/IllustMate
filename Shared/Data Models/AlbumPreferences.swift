@@ -14,6 +14,7 @@ struct AlbumPreferences: Sendable {
     var albumColumnCount: Int
     var picSort: String
     var picColumnCount: Int
+    var hideSectionHeaders: Bool
 
     static let defaults = AlbumPreferences(
         albumID: "",
@@ -21,6 +22,7 @@ struct AlbumPreferences: Sendable {
         albumViewStyle: "grid",
         albumColumnCount: 4,
         picSort: "dateAddedDescending",
-        picColumnCount: 4
+        picColumnCount: 4,
+        hideSectionHeaders: false
     )
 }

@@ -188,6 +188,10 @@ struct AlbumView: View {
                 guard hasCompletedInitialLoad else { return }
                 savePreference()
             }
+            .onChange(of: hideSectionHeaders) { _, _ in
+                guard hasCompletedInitialLoad else { return }
+                savePreference()
+            }
             .onChange(of: scenePhase) { _, newValue in
                 if newValue == .active {
                     let now = Date.now

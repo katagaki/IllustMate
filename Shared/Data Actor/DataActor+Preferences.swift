@@ -21,7 +21,8 @@ extension DataActor {
             albumViewStyle: (try? row.get(prefAlbumViewStyle)) ?? AlbumPreferences.defaults.albumViewStyle,
             albumColumnCount: (try? row.get(prefAlbumColumnCount)) ?? AlbumPreferences.defaults.albumColumnCount,
             picSort: (try? row.get(prefPicSort)) ?? AlbumPreferences.defaults.picSort,
-            picColumnCount: (try? row.get(prefPicColumnCount)) ?? AlbumPreferences.defaults.picColumnCount
+            picColumnCount: (try? row.get(prefPicColumnCount)) ?? AlbumPreferences.defaults.picColumnCount,
+            hideSectionHeaders: (try? row.get(prefHideSectionHeaders)) ?? AlbumPreferences.defaults.hideSectionHeaders
         )
     }
 
@@ -33,7 +34,8 @@ extension DataActor {
                 prefAlbumViewStyle <- prefs.albumViewStyle,
                 prefAlbumColumnCount <- prefs.albumColumnCount,
                 prefPicSort <- prefs.picSort,
-                prefPicColumnCount <- prefs.picColumnCount
+                prefPicColumnCount <- prefs.picColumnCount,
+                prefHideSectionHeaders <- prefs.hideSectionHeaders
             ))
         } else {
             _ = try? database.run(preferencesTable.insert(
@@ -42,7 +44,8 @@ extension DataActor {
                 prefAlbumViewStyle <- prefs.albumViewStyle,
                 prefAlbumColumnCount <- prefs.albumColumnCount,
                 prefPicSort <- prefs.picSort,
-                prefPicColumnCount <- prefs.picColumnCount
+                prefPicColumnCount <- prefs.picColumnCount,
+                prefHideSectionHeaders <- prefs.hideSectionHeaders
             ))
         }
     }
@@ -65,7 +68,8 @@ extension DataActor {
             prefAlbumViewStyle <- prefs.albumViewStyle,
             prefAlbumColumnCount <- prefs.albumColumnCount,
             prefPicSort <- prefs.picSort,
-            prefPicColumnCount <- prefs.picColumnCount
+            prefPicColumnCount <- prefs.picColumnCount,
+            prefHideSectionHeaders <- prefs.hideSectionHeaders
         ))
     }
 }

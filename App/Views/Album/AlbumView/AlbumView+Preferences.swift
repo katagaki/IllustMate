@@ -18,6 +18,7 @@ extension AlbumView {
         albumColumnCount = prefs.albumColumnCount
         picSortType = PicSortType(rawValue: prefs.picSort) ?? .dateAddedDescending
         columnCount = prefs.picColumnCount
+        hideSectionHeaders = prefs.hideSectionHeaders
         albumSortState = albumSort
         albumStyleState = albumStyle
     }
@@ -29,7 +30,8 @@ extension AlbumView {
             albumViewStyle: albumStyle.rawValue,
             albumColumnCount: albumColumnCount,
             picSort: picSortType.rawValue,
-            picColumnCount: columnCount
+            picColumnCount: columnCount,
+            hideSectionHeaders: hideSectionHeaders
         )
         Task {
             await DataActor.shared.savePreferences(prefs)

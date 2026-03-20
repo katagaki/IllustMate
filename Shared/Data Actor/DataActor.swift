@@ -48,6 +48,7 @@ actor DataActor {
     let prefAlbumColumnCount = Expression<Int>("album_column_count")
     let prefPicSort = Expression<String>("pic_sort")
     let prefPicColumnCount = Expression<Int>("pic_column_count")
+    let prefHideSectionHeaders = Expression<Bool>("hide_section_headers")
 
     // swiftlint:disable:next function_body_length
     init(collectionID: String) {
@@ -98,7 +99,10 @@ actor DataActor {
                 table.column(prefAlbumColumnCount, defaultValue: 4)
                 table.column(prefPicSort, defaultValue: "dateAddedDescending")
                 table.column(prefPicColumnCount, defaultValue: 4)
+                table.column(prefHideSectionHeaders, defaultValue: false)
             })
+            // TODO: Remove this migration after test devices received correct schema
+            _ = try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
         } catch {
