@@ -103,13 +103,19 @@ struct AlbumView: View {
                 importCompletedCount: importCompletedCount,
                 currentAlbum: currentAlbum,
                 onAlbumDismiss: { refreshAlbumsAndSet() },
-                onBrowseAlbumsDismiss: { refreshPicsAndSet() },
+                onBrowseAlbumsDismiss: {
+                    Task.detached(priority: .userInitiated) {
+                        await refreshData()
+                    }
+                },
                 onImportDismiss: {
                     isImportCompleted = false
                     importCurrentCount = 0
                     importTotalCount = 0
                     importCompletedCount = 0
-                    refreshPicsAndSet()
+                    Task.detached(priority: .userInitiated) {
+                        await refreshData()
+                    }
                 }
             ))
             .photosPicker(isPresented: $isPhotosPickerPresented,
@@ -204,7 +210,7 @@ struct AlbumView: View {
             }
             .onChange(of: navigation.dataVersion) { _, _ in
                 Task.detached(priority: .userInitiated) {
-                    await refreshData()
+                    await reloadPreferencesAndRefreshData()
                 }
             }
             .onChange(of: searchText) { _, newValue in

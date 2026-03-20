@@ -12,6 +12,15 @@ import SwiftUI
 
 extension AlbumView {
 
+    func reloadPreferencesAndRefreshData() async {
+        await loadPreferences()
+        await MainActor.run {
+            albumStyleState = albumStyle
+            albumSortState = albumSort
+        }
+        await refreshData()
+    }
+
     func refreshData() async {
         await withTaskGroup(of: Void.self) { group in
             if let currentAlbum {
