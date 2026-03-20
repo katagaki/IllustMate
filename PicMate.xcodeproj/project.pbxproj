@@ -13,12 +13,12 @@
 		E4614D1A2ACAB6AD00D751FB /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4614D192ACAB6AD00D751FB /* Komponents */; };
 		E46712E12ADC2B6E006CB15D /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E46712E02ADC2B6E006CB15D /* Komponents */; };
 		E4D6F0602F4D4DF1006965BD /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4D6F05F2F4D4DF1006965BD /* UniformTypeIdentifiers.framework */; };
-		E4D6F06C2F4D4DF1006965BD /* Save to PicMate.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4D6F05E2F4D4DF1006965BD /* Save to PicMate.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E4D6F06C2F4D4DF1006965BD /* Save to PicMate.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4D6F05E2F4D4DF1006965BD /* Save to PicMate.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4D6F0822F4D5C13006965BD /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E4D6F0812F4D5C13006965BD /* SQLite */; };
 		E4D6F0912F4D6041006965BD /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E4D6F0902F4D6041006965BD /* Komponents */; };
 		E4E717BE2F5F09CA000C13CB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4E717BD2F5F09CA000C13CB /* WidgetKit.framework */; };
 		E4E717C02F5F09CA000C13CB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4E717BF2F5F09CA000C13CB /* SwiftUI.framework */; };
-		E4E717CB2F5F09CB000C13CB /* Photostand.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4E717BC2F5F09CA000C13CB /* Photostand.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E4E717CB2F5F09CB000C13CB /* Photostand.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E4E717BC2F5F09CA000C13CB /* Photostand.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4E717D22F5F0DC6000C13CB /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E4E717D12F5F0DC6000C13CB /* SQLite */; };
 /* End PBXBuildFile section */
 
@@ -548,11 +548,13 @@
 		};
 		E4D6F06B2F4D4DF1006965BD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = E4D6F05D2F4D4DF1006965BD /* Save to PicMate */;
 			targetProxy = E4D6F06A2F4D4DF1006965BD /* PBXContainerItemProxy */;
 		};
 		E4E717CA2F5F09CB000C13CB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = E4E717BB2F5F09CA000C13CB /* Photostand */;
 			targetProxy = E4E717C92F5F09CB000C13CB /* PBXContainerItemProxy */;
 		};
@@ -719,7 +721,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.IllustMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -763,7 +765,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.IllustMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -796,7 +798,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -829,7 +831,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;

@@ -4,6 +4,12 @@
     "CFBundleDisplayName" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In PicMate sichern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -26,12 +32,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存到 PicMate"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In PicMate sichern"
           }
         },
         "zh-Hant" : {
@@ -46,10 +46,16 @@
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In PicMate sichern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save to PicMate"
+            "value" : "Share with PicMate"
           }
         },
         "ja" : {
@@ -70,12 +76,6 @@
             "value" : "保存到 PicMate"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In PicMate sichern"
-          }
-        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -88,6 +88,12 @@
       "comment" : "Copyright (human-readable)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -107,12 +113,6 @@
           }
         },
         "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
