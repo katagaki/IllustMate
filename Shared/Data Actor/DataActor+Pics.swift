@@ -51,10 +51,12 @@ extension DataActor {
         } else {
             baseQuery = picsTable.filter(picAlbumId == nil)
         }
-        let orderedQuery = (order == .reverse ? baseQuery.order(picName.desc) :
-                                                baseQuery.order(picName.asc))
-            .select(picId, picName, picAlbumId, picDateAdded)
-        return try database.prepare(orderedQuery).map { picFrom(row: $0) }
+        let query = baseQuery.select(picId, picName, picAlbumId, picDateAdded)
+        let pics = try database.prepare(query).map { picFrom(row: $0) }
+        return pics.sorted { lhs, rhs in
+            let result = lhs.name.localizedStandardCompare(rhs.name)
+            return order == .reverse ? result == .orderedDescending : result == .orderedAscending
+        }
     }
 
     func picCount(in album: Album?) -> Int {
