@@ -223,6 +223,10 @@ extension DataActor {
         // Delete the album itself
         let albumQuery = albumsTable.filter(albumId == albumID)
         _ = try? database.run(albumQuery.delete())
+
+        // Delete album preferences
+        let prefQuery = preferencesTable.filter(prefAlbumId == albumID)
+        _ = try? database.run(prefQuery.delete())
     }
 
     func parentAlbumID(forAlbumWithID albumID: String) -> String? {

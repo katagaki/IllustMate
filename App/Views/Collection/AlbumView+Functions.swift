@@ -11,6 +11,40 @@ import Foundation
 import SwiftUI
 
 extension AlbumView {
+
+    var preferencesAlbumID: String {
+        currentAlbum?.id ?? "__root__"
+    }
+
+    func loadPreferences() {
+        Task {
+            let prefs = await DataActor.shared.preferences(forAlbumWithID: preferencesAlbumID)
+            await MainActor.run {
+                albumSort = SortType(rawValue: prefs.albumSort) ?? .nameAscending
+                albumStyle = ViewStyle(rawValue: prefs.albumViewStyle) ?? .grid
+                albumColumnCount = prefs.albumColumnCount
+                picSortType = PicSortType(rawValue: prefs.picSort) ?? .dateAddedDescending
+                columnCount = prefs.picColumnCount
+                albumSortState = albumSort
+                albumStyleState = albumStyle
+            }
+        }
+    }
+
+    func savePreference() {
+        let prefs = AlbumPreferences(
+            albumID: preferencesAlbumID,
+            albumSort: albumSort.rawValue,
+            albumViewStyle: albumStyle.rawValue,
+            albumColumnCount: albumColumnCount,
+            picSort: picSortType.rawValue,
+            picColumnCount: columnCount
+        )
+        Task {
+            await DataActor.shared.savePreferences(prefs)
+        }
+    }
+
     func presentFileImporter() {
         #if targetEnvironment(macCatalyst)
         isFileImportSheetPresented = true

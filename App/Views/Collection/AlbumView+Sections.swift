@@ -51,6 +51,8 @@ extension AlbumView {
                                         .tag(3)
                                     Text("Shared.GridSize.4")
                                         .tag(4)
+                                    Text("Shared.GridSize.5")
+                                        .tag(5)
                                 }
                                 .pickerStyle(.menu)
                             }
@@ -61,7 +63,9 @@ extension AlbumView {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
             if !displayedAlbums.isEmpty {
-                AlbumsSection(albums: displayedAlbums, style: $albumStyleState) { album in
+                AlbumsSection(albums: displayedAlbums, style: $albumStyleState,
+                             columnCount: albumColumnCount,
+                             hideSectionHeaders: hideSectionHeaders) { album in
                     renameAlbumText = album.name
                     albumToRename = album
                 } onDelete: { album in
@@ -114,6 +118,8 @@ extension AlbumView {
                             Picker("Shared.GridSize",
                                    systemImage: "square.grid.2x2",
                                    selection: $columnCount.animation(.smooth.speed(2.0))) {
+                                Text("Shared.GridSize.2")
+                                    .tag(2)
                                 Text("Shared.GridSize.3")
                                     .tag(3)
                                 Text("Shared.GridSize.4")
@@ -139,7 +145,8 @@ extension AlbumView {
             if hasFetchedPicCount && picCount > 0 {
                 PicsGrid(namespace: namespace, pics: pics,
                          placeholderCount: max(picCount - pics.count, 0),
-                         isSelecting: $isSelectingPics) { pic in
+                         isSelecting: $isSelectingPics,
+                         columnCount: columnCount) { pic in
                     selectedPics.contains(pic)
                 } onSelect: { pic in
                     selectOrDeselectPic(pic)

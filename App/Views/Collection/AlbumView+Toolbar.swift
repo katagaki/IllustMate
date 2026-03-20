@@ -125,6 +125,8 @@ extension AlbumView {
                             .tag(3)
                         Text("Shared.GridSize.4")
                             .tag(4)
+                        Text("Shared.GridSize.5")
+                            .tag(5)
                     }
                     .pickerStyle(.menu)
                 }
@@ -144,6 +146,8 @@ extension AlbumView {
                 Picker("Shared.GridSize",
                        systemImage: "square.grid.2x2",
                        selection: $columnCount.animation(.smooth.speed(2.0))) {
+                    Text("Shared.GridSize.2")
+                        .tag(2)
                     Text("Shared.GridSize.3")
                         .tag(3)
                     Text("Shared.GridSize.4")

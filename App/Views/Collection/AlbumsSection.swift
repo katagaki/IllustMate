@@ -16,15 +16,12 @@ struct AlbumsSection<Content: View>: View {
     var albums: [Album]
     @Binding var style: ViewStyle
     var enablesContextMenu: Bool = true
+    var columnCount: Int = 3
+    var hideSectionHeaders: Bool = false
     var onRename: ((Album) -> Void)?
     var onDelete: ((Album) -> Void)?
     var onDrop: ((Drop, Album) -> Void)?
     @ViewBuilder var moveMenu: (Album) -> Content
-
-    @AppStorage(wrappedValue: 3, "AlbumColumnCount",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
-    @AppStorage(wrappedValue: false, "HideSectionHeaders",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var hideSectionHeaders: Bool
 
     var body: some View {
         Group {

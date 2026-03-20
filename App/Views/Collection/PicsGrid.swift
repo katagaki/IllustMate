@@ -17,15 +17,13 @@ struct PicsGrid<Content: View>: View {
     var placeholderCount: Int = 0
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
+    var columnCount: Int = 4
     var isSelected: ((Pic) -> Bool)?
     var onSelect: (Pic) -> Void
     var selectedCount: () -> Int
     var onRename: ((Pic) -> Void)?
     var onDelete: ((Pic) -> Void)?
     @ViewBuilder var moveMenu: (Pic) -> Content
-
-    @AppStorage(wrappedValue: 4, "PicColumnCount",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
 
     var body: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),

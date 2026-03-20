@@ -30,11 +30,9 @@ struct AlbumView: View {
     @State var newAlbumName: String = ""
     @State var albumToRename: Album?
     @State var renameAlbumText: String = ""
-    @AppStorage(wrappedValue: SortType.nameAscending, "AlbumSort",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumSort: SortType
+    @State var albumSort: SortType = .nameAscending
     @State var albumSortState: SortType = .nameAscending
-    @AppStorage(wrappedValue: ViewStyle.grid, "AlbumViewStyle",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumStyle: ViewStyle
+    @State var albumStyle: ViewStyle = .grid
     @State var albumStyleState: ViewStyle = .grid
 
     @State var pics: [Pic] = []
@@ -57,14 +55,10 @@ struct AlbumView: View {
     @State var importTotalCount: Int = 0
     @State var importCompletedCount: Int = 0
     @State var isImportCompleted: Bool = false
-    @AppStorage(wrappedValue: PicSortType.dateAddedDescending, "PicSortType",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var picSortType: PicSortType
-    @AppStorage(wrappedValue: 4, "PicColumnCount",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
-    @AppStorage(wrappedValue: 3, "AlbumColumnCount",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var albumColumnCount: Int
-    @AppStorage(wrappedValue: false, "HideSectionHeaders",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var hideSectionHeaders: Bool
+    @State var picSortType: PicSortType = .dateAddedDescending
+    @State var columnCount: Int = 4
+    @State var albumColumnCount: Int = 4
+    @State var hideSectionHeaders: Bool = false
 
     @State var backgroundImage: UIImage?
     @State var lastRefreshTime: Date = .distantPast
@@ -90,7 +84,9 @@ struct AlbumView: View {
 
     var body: some View {
         mainContent
-            .toolbar { toolbarContent }
+            .toolbar {
+                toolbarContent
+            }
             .modifier(AlbumViewSheets(
                 isAddingAlbum: $isAddingAlbum,
                 newAlbumName: $newAlbumName,
@@ -155,6 +151,7 @@ struct AlbumView: View {
                 onConfirmDeletePic: { confirmDeletePic() }
             ))
             .onAppear {
+                loadPreferences()
                 albumStyleState = albumStyle
                 albumSortState = albumSort
                 Task.detached(priority: .userInitiated) {
@@ -166,15 +163,24 @@ struct AlbumView: View {
             }
             .onChange(of: albumStyleState) { _, newValue in
                 albumStyle = newValue
+                savePreference()
             }
             .onChange(of: albumSortState) { _, newValue in
                 albumSort = newValue
             }
             .onChange(of: albumSort) { _, _ in
+                savePreference()
                 refreshAlbumsAndSet()
             }
             .onChange(of: picSortType) { _, _ in
+                savePreference()
                 refreshPicsAndSet()
+            }
+            .onChange(of: columnCount) { _, _ in
+                savePreference()
+            }
+            .onChange(of: albumColumnCount) { _, _ in
+                savePreference()
             }
             .onChange(of: scenePhase) { _, newValue in
                 if newValue == .active {

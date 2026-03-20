@@ -24,6 +24,7 @@ actor DataActor {
     // Tables
     let albumsTable = Table("albums")
     let picsTable = Table("pics")
+    let preferencesTable = Table("album_preferences")
 
     // Album columns
     let albumId = Expression<String>("id")
@@ -39,6 +40,14 @@ actor DataActor {
     let picDateAdded = Expression<Double>("date_added")
     let picData = Expression<Data>("data")
     let picThumbnailData = Expression<Data?>("thumbnail_data")
+
+    // Preferences columns
+    let prefAlbumId = Expression<String>("album_id")
+    let prefAlbumSort = Expression<String>("album_sort")
+    let prefAlbumViewStyle = Expression<String>("album_view_style")
+    let prefAlbumColumnCount = Expression<Int>("album_column_count")
+    let prefPicSort = Expression<String>("pic_sort")
+    let prefPicColumnCount = Expression<Int>("pic_column_count")
 
     init(collectionID: String) {
         let databaseFileName = "Collection.db"
@@ -80,6 +89,14 @@ actor DataActor {
                 table.column(picDateAdded)
                 table.column(picData)
                 table.column(picThumbnailData)
+            })
+            try database.run(preferencesTable.create(ifNotExists: true) { table in
+                table.column(prefAlbumId, primaryKey: true)
+                table.column(prefAlbumSort, defaultValue: "nameAscending")
+                table.column(prefAlbumViewStyle, defaultValue: "grid")
+                table.column(prefAlbumColumnCount, defaultValue: 4)
+                table.column(prefPicSort, defaultValue: "dateAddedDescending")
+                table.column(prefPicColumnCount, defaultValue: 4)
             })
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
