@@ -6,6 +6,7 @@
 //
 
 import BackgroundTasks
+import StoreKit
 import SwiftUI
 import TipKit
 import WidgetKit
@@ -14,6 +15,7 @@ import WidgetKit
 struct IllustMateApp: App {
 
     @Environment(\.scenePhase) var scenePhase
+    @Environment(\.requestReview) var requestReview
 
     @StateObject var navigation = NavigationManager()
     @StateObject var libraryManager = LibraryManager()
@@ -30,6 +32,10 @@ struct IllustMateApp: App {
 
     @AppStorage("AppLockEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
+    @AppStorage(
+        "LastVersionPromptedForReview",
+        store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+    ) var lastVersionPromptedForReview: String = ""
 
     static let widgetRefreshTaskID = "com.tsubuzaki.IllustMate.widgetRefresh"
 
@@ -124,6 +130,16 @@ struct IllustMateApp: App {
                     WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
                     scheduleWidgetRefresh()
                     webServer.stop()
+                }
+                if newValue == .active {
+                    let currentVersion = Bundle.main.object(
+                        forInfoDictionaryKey: "CFBundleShortVersionString"
+                    ) as? String ?? ""
+                    if ViewerManager.picOpenCount >= 6,
+                       currentVersion != lastVersionPromptedForReview {
+                        lastVersionPromptedForReview = currentVersion
+                        requestReview()
+                    }
                 }
                 if isAppLockEnabled {
                     switch newValue {

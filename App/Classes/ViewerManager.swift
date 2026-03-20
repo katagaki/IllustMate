@@ -6,10 +6,13 @@
 //
 
 import Foundation
+import StoreKit
 import SwiftUI
 
 @MainActor @Observable
 class ViewerManager {
+
+    static let picOpenCountKey = "PicOpenCount"
 
     var displayedPicID: String = ""
     var displayedPic: Pic?
@@ -65,6 +68,9 @@ class ViewerManager {
     }
 
     func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
+        // Track pic opens for review prompt
+        Self.incrementPicOpenCount()
+
         // Show thumbnail immediately to open viewer without delay
         let thumbnail: UIImage? = ThumbnailCache.shared.image(forKey: pic.id)
             ?? pic.thumbnailData.flatMap { UIImage(data: $0) }
@@ -202,5 +208,15 @@ class ViewerManager {
         for key in imageCache.keys where !keepIDs.contains(key) {
             imageCache.removeValue(forKey: key)
         }
+    }
+
+    static func incrementPicOpenCount() {
+        let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+        let count = (defaults?.integer(forKey: picOpenCountKey) ?? 0) + 1
+        defaults?.set(count, forKey: picOpenCountKey)
+    }
+
+    static var picOpenCount: Int {
+        UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")?.integer(forKey: picOpenCountKey) ?? 0
     }
 }

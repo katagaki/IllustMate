@@ -54,6 +54,16 @@
       },
       "shouldTranslate" : false
     },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
     "Auth.Locked" : {
       "extractionState" : "manual",
       "localizations" : {
