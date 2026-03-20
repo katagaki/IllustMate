@@ -13,7 +13,7 @@ import SwiftUI
 extension AlbumView {
     func presentFileImporter() {
         #if targetEnvironment(macCatalyst)
-        isCatalystFileImportSheetPresented = true
+        isFileImportSheetPresented = true
         #else
         isFileImporterPresented = true
         #endif

@@ -27,7 +27,7 @@ struct ImporterView: View {
     @State var importCompletedCount: Int = 0
 
     @State var isFileImporterPresented: Bool = false
-    @State var isCatalystFileImportSheetPresented: Bool = false
+    @State var isFileImportSheetPresented: Bool = false
 
     @State var navigationPath = NavigationPath()
 
@@ -173,7 +173,7 @@ struct ImporterView: View {
             }
             .modifier(FileImportModifier(
                 isFileImporterPresented: $isFileImporterPresented,
-                isCatalystFileImportSheetPresented: $isCatalystFileImportSheetPresented,
+                isFileImportSheetPresented: $isFileImportSheetPresented,
                 onFilesImported: { files in selectedLoadedFiles = files }
             ))
         }
@@ -183,7 +183,7 @@ struct ImporterView: View {
 
     func presentFileImporter() {
         #if targetEnvironment(macCatalyst)
-        isCatalystFileImportSheetPresented = true
+        isFileImportSheetPresented = true
         #else
         isFileImporterPresented = true
         #endif

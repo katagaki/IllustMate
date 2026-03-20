@@ -1,5 +1,5 @@
 //
-//  CatalystFileImportSheet.swift
+//  FileImportSheet.swift
 //  PicMate
 //
 //  Created by シン・ジャスティン on 2026/03/20.
@@ -10,14 +10,14 @@ import UniformTypeIdentifiers
 
 struct FileImportModifier: ViewModifier {
     @Binding var isFileImporterPresented: Bool
-    @Binding var isCatalystFileImportSheetPresented: Bool
+    @Binding var isFileImportSheetPresented: Bool
     var onFilesImported: ([(filename: String, data: Data)]) -> Void
 
     func body(content: Content) -> some View {
         content
             #if targetEnvironment(macCatalyst)
-            .sheet(isPresented: $isCatalystFileImportSheetPresented) {
-                CatalystFileImportSheet(allowedContentTypes: [.image],
+            .sheet(isPresented: $isFileImportSheetPresented) {
+                FileImportSheet(allowedContentTypes: [.image],
                                         onFilesImported: onFilesImported)
             }
             #else
@@ -49,7 +49,7 @@ struct FileImportModifier: ViewModifier {
 
 #if targetEnvironment(macCatalyst)
 
-struct CatalystFileImportSheet: View {
+struct FileImportSheet: View {
 
     @Environment(\.dismiss) var dismiss
 
@@ -84,6 +84,7 @@ struct CatalystFileImportSheet: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(20.0)
             }
             .safeAreaInset(edge: .bottom) {

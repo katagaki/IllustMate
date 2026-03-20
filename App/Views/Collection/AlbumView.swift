@@ -49,7 +49,7 @@ struct AlbumView: View {
     @State var isBrowsingAlbums: Bool = false
     @State var isBrowsingFolders: Bool = false
     @State var isFileImporterPresented: Bool = false
-    @State var isCatalystFileImportSheetPresented: Bool = false
+    @State var isFileImportSheetPresented: Bool = false
     @State var isPhotosPickerPresented: Bool = false
     @State var selectedPhotoItems: [PhotosPickerItem] = []
     @State var isImportingPhotos: Bool = false
@@ -120,7 +120,7 @@ struct AlbumView: View {
                           photoLibrary: .shared())
             .modifier(FileImportModifier(
                 isFileImporterPresented: $isFileImporterPresented,
-                isCatalystFileImportSheetPresented: $isCatalystFileImportSheetPresented,
+                isFileImportSheetPresented: $isFileImportSheetPresented,
                 onFilesImported: { files in importLoadedFiles(files) }
             ))
             .onChange(of: selectedPhotoItems) { _, newValue in
