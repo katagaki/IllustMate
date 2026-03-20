@@ -158,7 +158,11 @@ struct EditLibrarySheet: View {
         }
         .sheet(isPresented: $isBackupSheetPresented) {
             if let backupFolderURL {
-                MoreBackupView(destinationURL: backupFolderURL)
+                MoreBackupView(destinationURL: backupFolderURL,
+                              collectionID: library.id,
+                              libraryName: library.isDefault
+                                  ? String(localized: "Collection.Default", table: "Libraries")
+                                  : library.name)
             }
         }
         .sheet(isPresented: $isDuplicateCheckerPresented) {

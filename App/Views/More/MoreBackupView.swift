@@ -11,6 +11,8 @@ struct MoreBackupView: View {
 
     @Environment(\.dismiss) var dismiss
     var destinationURL: URL
+    var collectionID: String
+    var libraryName: String
 
     @State var isExporting: Bool = true
     @State var isCompleted: Bool = false
@@ -46,7 +48,8 @@ struct MoreBackupView: View {
         }
         .task {
             do {
-                try await DataActor.shared.backupDatabase(to: destinationURL)
+                let dataActor = DataActor(collectionID: collectionID)
+                try await dataActor.backupDatabase(to: destinationURL, libraryName: libraryName)
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
                         isExporting = false

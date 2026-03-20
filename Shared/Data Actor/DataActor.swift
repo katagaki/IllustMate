@@ -156,14 +156,21 @@ actor DataActor {
         return (try? database.prepare(query).map { picFrom(row: $0) }) ?? []
     }
 
-    func backupDatabase(to destinationDirectoryURL: URL) throws {
+    func backupDatabase(to destinationDirectoryURL: URL, libraryName: String) throws {
         if destinationDirectoryURL.startAccessingSecurityScopedResource() {
             defer { destinationDirectoryURL.stopAccessingSecurityScopedResource() }
             let fileManager = FileManager.default
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
             let timestamp = dateFormatter.string(from: Date())
-            let backupFileName = "Backup-\(timestamp).pics"
+            let sanitizedName = libraryName.map { char -> Character in
+                let invalidChars = CharacterSet(charactersIn: "/\\:*?\"<>|")
+                if String(char).unicodeScalars.allSatisfy({ invalidChars.contains($0) }) {
+                    return "_"
+                }
+                return char
+            }
+            let backupFileName = "Backup-\(String(sanitizedName))-\(timestamp).pics"
 
             if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
                 try fileManager.createDirectory(
