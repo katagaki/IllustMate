@@ -47,6 +47,7 @@ struct AlbumView: View {
     @State var isSelectingPics: Bool = false
     @State var selectedPics: [Pic] = []
     @State var isBrowsingAlbums: Bool = false
+    @State var isBrowsingFolders: Bool = false
     @State var isFileImporterPresented: Bool = false
     @State var isPhotosPickerPresented: Bool = false
     @State var selectedPhotoItems: [PhotosPickerItem] = []
@@ -84,6 +85,7 @@ struct AlbumView: View {
                 albumToRename: $albumToRename,
                 renameAlbumText: $renameAlbumText,
                 isBrowsingAlbums: $isBrowsingAlbums,
+                isBrowsingFolders: $isBrowsingFolders,
                 isImportingPhotos: $isImportingPhotos,
                 isImportCompleted: $isImportCompleted,
                 importCurrentCount: importCurrentCount,

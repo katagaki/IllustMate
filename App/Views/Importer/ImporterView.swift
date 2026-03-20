@@ -40,7 +40,7 @@ struct ImporterView: View {
                     if !isImportCompleted {
                         if !isImporting {
                             VStack(alignment: .leading, spacing: 8.0) {
-                                Text("Import.Section.Photos", tableName: "Import")
+                                Text("Import.Section.FromPhotosApp", tableName: "Import")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .textCase(.uppercase)
@@ -65,6 +65,14 @@ struct ImporterView: View {
                                             .padding(4.0)
                                             .frame(maxWidth: .infinity)
                                     }
+                                    Button {
+                                        navigationPath.append("folderPicker")
+                                    } label: {
+                                        Text("Import.SelectFolder", tableName: "Import")
+                                            .bold()
+                                            .padding(4.0)
+                                            .frame(maxWidth: .infinity)
+                                    }
                                 }
                                 .buttonStyle(.glassProminent)
                                 .buttonBorderShape(.capsule)
@@ -72,7 +80,7 @@ struct ImporterView: View {
                             }
                             Divider()
                             VStack(alignment: .leading, spacing: 8.0) {
-                                Text("Import.Section.Files", tableName: "Import")
+                                Text("Import.Section.FromFilesApp", tableName: "Import")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .textCase(.uppercase)
@@ -153,6 +161,10 @@ struct ImporterView: View {
             .navigationDestination(for: String.self) { destination in
                 if destination == "albumPicker" {
                     PhotosAlbumPickerView(selectedAlbum: selectedAlbum) {
+                        dismiss()
+                    }
+                } else if destination == "folderPicker" {
+                    PhotosFolderImportPickerView(selectedAlbum: selectedAlbum) {
                         dismiss()
                     }
                 }

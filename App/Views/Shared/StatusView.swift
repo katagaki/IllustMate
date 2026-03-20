@@ -84,6 +84,10 @@ struct StatusView: View {
                             .frame(maxWidth: .infinity)
                         ProgressView(value: Float(currentCount), total: Float(totalCount))
                             .progressViewStyle(.linear)
+                        Text("\(currentCount)/\(totalCount)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
                     }
                 } else {
                     VStack(alignment: .center, spacing: 16.0) {

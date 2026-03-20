@@ -14,6 +14,7 @@ struct AlbumViewSheets: ViewModifier {
     @Binding var albumToRename: Album?
     @Binding var renameAlbumText: String
     @Binding var isBrowsingAlbums: Bool
+    @Binding var isBrowsingFolders: Bool
     @Binding var isImportingPhotos: Bool
     @Binding var isImportCompleted: Bool
     let importCurrentCount: Int
@@ -84,6 +85,24 @@ struct AlbumViewSheets: ViewModifier {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button(role: .cancel) {
                                 isBrowsingAlbums = false
+                            }
+                        }
+                    }
+                }
+                .phonePresentationDetents([.large])
+                .interactiveDismissDisabled()
+            }
+            .sheet(isPresented: $isBrowsingFolders) {
+                onBrowseAlbumsDismiss()
+            } content: {
+                NavigationStack {
+                    PhotosFolderImportPickerView(selectedAlbum: currentAlbum) {
+                        isBrowsingFolders = false
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(role: .cancel) {
+                                isBrowsingFolders = false
                             }
                         }
                     }
