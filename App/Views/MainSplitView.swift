@@ -61,15 +61,7 @@ struct MainSplitView: View {
                             Label {
                                 Text(album.name)
                             } icon: {
-                                Image(uiImage: album.cover())
-                                    .resizable()
-#if targetEnvironment(macCatalyst)
-                                    .frame(width: 16.0, height: 16.0)
-                                    .clipShape(.rect(cornerRadius: 3.0))
-#else
-                                    .frame(width: 28.0, height: 28.0)
-                                    .clipShape(.rect(cornerRadius: 6.0))
-#endif
+                                SidebarAlbumIcon(album: album)
                             }
                         }
                     }
@@ -100,6 +92,7 @@ struct MainSplitView: View {
         .task {
             do {
                 albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                await AlbumCoverCache.shared.loadCovers(for: albums)
             } catch {
                 debugPrint(error.localizedDescription)
             }
@@ -114,6 +107,7 @@ struct MainSplitView: View {
             Task {
                 do {
                     albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                    await AlbumCoverCache.shared.loadCovers(for: albums)
                 } catch {
                     debugPrint(error.localizedDescription)
                 }
@@ -129,3 +123,42 @@ struct MainSplitView: View {
         }
     }
 }
+struct SidebarAlbumIcon: View {
+
+    var album: Album
+
+    @State private var coverImage: Image?
+
+    var body: some View {
+        Group {
+            if let coverImage {
+                coverImage
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                Image(uiImage: UIImage(named: "Album.Generic")!)
+                    .resizable()
+            }
+        }
+#if targetEnvironment(macCatalyst)
+        .frame(width: 16.0, height: 16.0)
+        .clipShape(.rect(cornerRadius: 3.0))
+#else
+        .frame(width: 28.0, height: 28.0)
+        .clipShape(.rect(cornerRadius: 6.0))
+#endif
+        .onAppear {
+            loadFromCache()
+        }
+        .onChange(of: AlbumCoverCache.shared.version) {
+            loadFromCache()
+        }
+    }
+
+    private func loadFromCache() {
+        if let cached = AlbumCoverCache.shared.images(forAlbumID: album.id) {
+            coverImage = cached.primary
+        }
+    }
+}
+
