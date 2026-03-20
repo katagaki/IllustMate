@@ -101,8 +101,6 @@ actor DataActor {
                 table.column(prefPicColumnCount, defaultValue: 4)
                 table.column(prefHideSectionHeaders, defaultValue: false)
             })
-            // TODO: Remove this migration after test devices received correct schema
-            _ = try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
         } catch {
