@@ -93,6 +93,7 @@
 		E4A15DF92F49EE8F00CD6892 /* Exceptions for "App" folder in "Share with PicMate" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Classes/AlbumCoverCache.swift,
 				Enums/Drop.swift,
 				Enums/PHCollectionItem.swift,
 				Enums/SortType.swift,
@@ -110,7 +111,11 @@
 				Views/Collection/AlbumGridLabel.swift,
 				Views/Collection/AlbumListRow.swift,
 				Views/Collection/AlbumsSection.swift,
-				Views/Shared/AlbumCover.swift,
+				Views/Shared/AlbumCover/AlbumCover.swift,
+				Views/Shared/AlbumCover/AlbumItemCount.swift,
+				Views/Shared/AlbumCover/AsyncAlbumCover.swift,
+				Views/Shared/AlbumCover/AsyncPhotosAlbumCover.swift,
+				Views/Shared/AlbumCover/AsyncPhotosFolderCover.swift,
 			);
 			target = E4614CFB2ACA86EC00D751FB /* Share with PicMate */;
 		};
@@ -152,6 +157,7 @@
 		E4D6F07F2F4D5BEF006965BD /* Exceptions for "App" folder in "Save to PicMate" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Classes/AlbumCoverCache.swift,
 				Enums/Drop.swift,
 				Enums/SortType.swift,
 				Enums/ViewPath.swift,
@@ -167,7 +173,11 @@
 				Views/Collection/AlbumGridLabel.swift,
 				Views/Collection/AlbumListRow.swift,
 				Views/Collection/AlbumsSection.swift,
-				Views/Shared/AlbumCover.swift,
+				Views/Shared/AlbumCover/AlbumCover.swift,
+				Views/Shared/AlbumCover/AlbumItemCount.swift,
+				Views/Shared/AlbumCover/AsyncAlbumCover.swift,
+				Views/Shared/AlbumCover/AsyncPhotosAlbumCover.swift,
+				Views/Shared/AlbumCover/AsyncPhotosFolderCover.swift,
 			);
 			target = E4D6F05D2F4D4DF1006965BD /* Save to PicMate */;
 		};

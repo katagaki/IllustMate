@@ -236,8 +236,10 @@ class WebServerManager {
                         nil, 0,
                         NI_NUMERICHOST
                     )
-                    address = String(decoding: hostname.map { UInt8(bitPattern: $0) }.prefix(while: { $0 != 0 }),
-                                     as: UTF8.self)
+                    address = String(
+                        decoding: hostname.map { UInt8(bitPattern: $0) }.prefix(while: { $0 != 0 }),
+                        as: UTF8.self
+                    )
                 }
             }
         }

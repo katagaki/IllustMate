@@ -98,7 +98,10 @@ extension AlbumView {
                     } else {
                         SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
                                       count: hasFetchedPicCount ? picCount : pics.count) {
-                            Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"), systemImage: "photo.stack") {
+                            Button(
+                                String(localized: "Duplicates.FindDuplicates", table: "Photos"),
+                                systemImage: "photo.stack"
+                            ) {
                                 isDuplicateCheckerPresented = true
                             }
                             Divider()

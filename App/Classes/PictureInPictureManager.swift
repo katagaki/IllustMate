@@ -50,6 +50,7 @@ class PictureInPictureManager: NSObject {
         pipController?.setValue(1, forKey: "controlsStyle")
     }
 
+    // swiftlint:disable:next function_body_length
     func start(with image: UIImage, restore: @escaping @MainActor () -> Void) {
         guard pipController != nil, player != nil else { return }
 

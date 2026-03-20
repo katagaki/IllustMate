@@ -56,6 +56,7 @@ class DuplicateScanManager {
         case album(Album)
     }
 
+    // swiftlint:disable:next function_body_length
     func scan(scope: ScanScope) async {
         withAnimation(.smooth.speed(2.0)) {
             isScanning = true

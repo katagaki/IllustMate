@@ -40,5 +40,4 @@ class NavigationManager: ObservableObject {
             moreTabPath.append(viewPath)
         }
     }
-
 }

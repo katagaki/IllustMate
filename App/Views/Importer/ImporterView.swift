@@ -189,6 +189,7 @@ struct ImporterView: View {
         #endif
     }
 
+    // swiftlint:disable:next function_body_length
     func importPhotosAndFiles() {
         UIApplication.shared.isIdleTimerDisabled = true
         Task {

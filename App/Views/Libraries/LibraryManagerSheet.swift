@@ -117,5 +117,4 @@ struct LibraryManagerSheet: View {
         }
         Button("Shared.Cancel", role: .cancel) { }
     }
-
 }

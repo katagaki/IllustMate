@@ -146,5 +146,4 @@ struct MoreView: View {
             debugPrint(error.localizedDescription)
         }
     }
-
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+// swiftlint:disable file_length
 extension WebServerManager {
 
     // swiftlint:disable line_length
@@ -634,3 +635,4 @@ extension WebServerManager {
     """
     // swiftlint:enable line_length
 }
+// swiftlint:enable file_length

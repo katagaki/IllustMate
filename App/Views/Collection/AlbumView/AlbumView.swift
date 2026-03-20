@@ -11,6 +11,7 @@ import PhotosUI
 import SwiftUI
 import UniformTypeIdentifiers
 
+// swiftlint:disable:next type_body_length
 struct AlbumView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -66,6 +67,7 @@ struct AlbumView: View {
     @State var searchResults: [Album]?
     @State var searchTask: Task<Void, Never>?
     @State var isDuplicateCheckerPresented: Bool = false
+    @State var hasCompletedInitialLoad: Bool = false
 
     var displayedAlbums: [Album] {
         searchResults ?? albums
@@ -150,36 +152,40 @@ struct AlbumView: View {
                 onConfirmDeleteAlbum: { confirmDeleteAlbum() },
                 onConfirmDeletePic: { confirmDeletePic() }
             ))
-            .onAppear {
-                loadPreferences()
+            .task {
+                await loadPreferences()
                 albumStyleState = albumStyle
                 albumSortState = albumSort
-                Task.detached(priority: .userInitiated) {
-                    await refreshData()
-                }
+                await refreshData()
+                hasCompletedInitialLoad = true
             }
             .task(id: currentAlbum.map { "\($0.id)-\($0.hasCoverPhoto)-\($0.coverPhoto != nil)" }) {
                 await updateBackgroundImage()
             }
             .onChange(of: albumStyleState) { _, newValue in
                 albumStyle = newValue
+                guard hasCompletedInitialLoad else { return }
                 savePreference()
             }
             .onChange(of: albumSortState) { _, newValue in
                 albumSort = newValue
             }
             .onChange(of: albumSort) { _, _ in
+                guard hasCompletedInitialLoad else { return }
                 savePreference()
                 refreshAlbumsAndSet()
             }
             .onChange(of: picSortType) { _, _ in
+                guard hasCompletedInitialLoad else { return }
                 savePreference()
                 refreshPicsAndSet()
             }
             .onChange(of: columnCount) { _, _ in
+                guard hasCompletedInitialLoad else { return }
                 savePreference()
             }
             .onChange(of: albumColumnCount) { _, _ in
+                guard hasCompletedInitialLoad else { return }
                 savePreference()
             }
             .onChange(of: scenePhase) { _, newValue in

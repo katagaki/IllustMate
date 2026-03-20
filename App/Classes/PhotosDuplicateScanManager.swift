@@ -37,6 +37,7 @@ class PhotosDuplicateScanManager {
         case done
     }
 
+    // swiftlint:disable:next function_body_length
     func scan(in collection: PHAssetCollection) async {
         withAnimation(.smooth.speed(2.0)) {
             isScanning = true

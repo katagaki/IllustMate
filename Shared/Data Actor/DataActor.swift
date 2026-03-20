@@ -49,6 +49,7 @@ actor DataActor {
     let prefPicSort = Expression<String>("pic_sort")
     let prefPicColumnCount = Expression<Int>("pic_column_count")
 
+    // swiftlint:disable:next function_body_length
     init(collectionID: String) {
         let databaseFileName = "Collection.db"
         let fileManager = FileManager.default

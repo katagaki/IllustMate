@@ -37,7 +37,7 @@ struct IllustMateApp: App {
         store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
     ) var lastVersionPromptedForReview: String = ""
 
-    static let widgetRefreshTaskID = "com.tsubuzaki.IllustMate.widgetRefresh"
+    nonisolated static let widgetRefreshTaskID = "com.tsubuzaki.IllustMate.widgetRefresh"
 
     private var mainContent: some View {
         Group {

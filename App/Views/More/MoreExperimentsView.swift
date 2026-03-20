@@ -41,5 +41,4 @@ struct MoreExperimentsView: View {
         .navigationTitle("ViewTitle.Debug")
         .navigationBarTitleDisplayMode(.inline)
     }
-
 }

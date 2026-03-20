@@ -9,6 +9,7 @@ import UIKit
 
 enum ProminentColor {
 
+    // swiftlint:disable function_body_length
     /// Calculates the most prominent color from thumbnail image data.
     /// White, black, and near-gray pixels are ignored.
     /// Returns the average color of the most common color bucket.
@@ -84,11 +85,9 @@ enum ProminentColor {
         // Find the bucket with the most pixels
         var bestBucket = -1
         var bestCount = 0
-        for idx in 0..<bucketCount {
-            if bucketCounts[idx] > bestCount {
-                bestCount = bucketCounts[idx]
-                bestBucket = idx
-            }
+        for idx in 0..<bucketCount where bucketCounts[idx] > bestCount {
+            bestCount = bucketCounts[idx]
+            bestBucket = idx
         }
 
         guard bestBucket >= 0, bestCount > 0 else {
@@ -102,4 +101,5 @@ enum ProminentColor {
 
         return RGBColor(red: avgR, green: avgG, blue: avgB)
     }
+    // swiftlint:enable function_body_length
 }
