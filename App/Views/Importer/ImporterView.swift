@@ -17,6 +17,7 @@ struct ImporterView: View {
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
     @State var selectedFileURLs: [URL] = []
+    @State var selectedLoadedFiles: [(filename: String, data: Data)] = []
     @State var selectedAlbum: Album?
 
     @State var isImporting: Bool = false
@@ -26,11 +27,12 @@ struct ImporterView: View {
     @State var importCompletedCount: Int = 0
 
     @State var isFileImporterPresented: Bool = false
+    @State var isCatalystFileImportSheetPresented: Bool = false
 
     @State var navigationPath = NavigationPath()
 
     var selectedItemCount: Int {
-        selectedPhotoItems.count + selectedFileURLs.count
+        selectedPhotoItems.count + selectedFileURLs.count + selectedLoadedFiles.count
     }
 
     var body: some View {
@@ -89,7 +91,7 @@ struct ImporterView: View {
                                     .font(.footnote)
                                     .foregroundStyle(.tertiary)
                                 Button {
-                                    isFileImporterPresented = true
+                                    presentFileImporter()
                                 } label: {
                                     Text("Import.SelectFromFiles", tableName: "Import")
                                         .bold()
@@ -169,21 +171,22 @@ struct ImporterView: View {
                     }
                 }
             }
-            .fileImporter(
-                isPresented: $isFileImporterPresented,
-                allowedContentTypes: [.image],
-                allowsMultipleSelection: true
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    selectedFileURLs = urls
-                case .failure:
-                    break
-                }
-            }
+            .modifier(FileImportModifier(
+                isFileImporterPresented: $isFileImporterPresented,
+                isCatalystFileImportSheetPresented: $isCatalystFileImportSheetPresented,
+                onFilesImported: { files in selectedLoadedFiles = files }
+            ))
         }
         .phonePresentationDetents([.medium, .large])
         .interactiveDismissDisabled()
+    }
+
+    func presentFileImporter() {
+        #if targetEnvironment(macCatalyst)
+        isCatalystFileImportSheetPresented = true
+        #else
+        isFileImporterPresented = true
+        #endif
     }
 
     func importPhotosAndFiles() {
@@ -209,19 +212,30 @@ struct ImporterView: View {
                     importCurrentCount += 1
                 }
             }
+            // Read file data synchronously while security-scoped access is valid,
+            // then perform async database work separately
+            var loadedFiles: [(filename: String, data: Data)] = []
             for fileURL in selectedFileURLs {
                 let didStartAccessing = fileURL.startAccessingSecurityScopedResource()
-                defer {
-                    if didStartAccessing {
-                        fileURL.stopAccessingSecurityScopedResource()
-                    }
-                }
                 if let data = try? Data(contentsOf: fileURL),
                    UIImage(data: data) != nil {
-                    let filename = fileURL.lastPathComponent
-                    await DataActor.shared.createPic(filename, data: data,
-                                                   inAlbumWithID: selectedAlbum?.id)
+                    loadedFiles.append((filename: fileURL.lastPathComponent, data: data))
                 }
+                if didStartAccessing {
+                    fileURL.stopAccessingSecurityScopedResource()
+                }
+            }
+            for file in loadedFiles {
+                await DataActor.shared.createPic(file.filename, data: file.data,
+                                               inAlbumWithID: selectedAlbum?.id)
+                await MainActor.run {
+                    importCurrentCount += 1
+                }
+            }
+            // Import pre-loaded files (from Catalyst file import sheet)
+            for file in selectedLoadedFiles {
+                await DataActor.shared.createPic(file.filename, data: file.data,
+                                               inAlbumWithID: selectedAlbum?.id)
                 await MainActor.run {
                     importCurrentCount += 1
                 }

@@ -30,8 +30,8 @@ struct PhotosAlbumPickerView: View {
                     deniedView
                 default:
                     ProgressView()
-                        .onAppear {
-                            requestAuthorization()
+                        .task {
+                            await requestAuthorization()
                         }
                 }
             }
@@ -160,12 +160,9 @@ struct PhotosAlbumPickerView: View {
 
     // MARK: - Helpers
 
-    private func requestAuthorization() {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-            DispatchQueue.main.async {
-                authorizationStatus = status
-            }
-        }
+    private func requestAuthorization() async {
+        let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+        authorizationStatus = status
     }
 
     private func fetchAlbums() {

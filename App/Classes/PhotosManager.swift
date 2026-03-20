@@ -14,12 +14,9 @@ class PhotosManager {
 
     var authorizationStatus: PHAuthorizationStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
 
-    func requestAuthorization() {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-            DispatchQueue.main.async {
-                self.authorizationStatus = status
-            }
-        }
+    func requestAuthorization() async {
+        let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+        self.authorizationStatus = status
     }
 
     // MARK: - Fetch Top-Level Collections

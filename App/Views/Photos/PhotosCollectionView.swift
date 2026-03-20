@@ -58,8 +58,8 @@ struct PhotosCollectionView: View {
                 photosAccessDeniedView
             default:
                 ProgressView()
-                    .onAppear {
-                        photosManager.requestAuthorization()
+                    .task {
+                        await photosManager.requestAuthorization()
                     }
             }
         }

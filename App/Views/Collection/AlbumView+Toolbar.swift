@@ -204,7 +204,7 @@ extension AlbumView {
             }
             Section(String(localized: "Import.Section.FromFilesApp", table: "Import")) {
                 Button {
-                    isFileImporterPresented = true
+                    presentFileImporter()
                 } label: {
                     Label(String(localized: "Import.SelectFromFiles", table: "Import"),
                           systemImage: "document")

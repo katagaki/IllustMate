@@ -49,6 +49,7 @@ struct AlbumView: View {
     @State var isBrowsingAlbums: Bool = false
     @State var isBrowsingFolders: Bool = false
     @State var isFileImporterPresented: Bool = false
+    @State var isCatalystFileImportSheetPresented: Bool = false
     @State var isPhotosPickerPresented: Bool = false
     @State var selectedPhotoItems: [PhotosPickerItem] = []
     @State var isImportingPhotos: Bool = false
@@ -117,18 +118,11 @@ struct AlbumView: View {
                           selection: $selectedPhotoItems,
                           matching: .images,
                           photoLibrary: .shared())
-            .fileImporter(
-                isPresented: $isFileImporterPresented,
-                allowedContentTypes: [.image],
-                allowsMultipleSelection: true
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    importFiles(urls)
-                case .failure:
-                    break
-                }
-            }
+            .modifier(FileImportModifier(
+                isFileImporterPresented: $isFileImporterPresented,
+                isCatalystFileImportSheetPresented: $isCatalystFileImportSheetPresented,
+                onFilesImported: { files in importLoadedFiles(files) }
+            ))
             .onChange(of: selectedPhotoItems) { _, newValue in
                 if !newValue.isEmpty {
                     importSelectedPhotos(newValue)

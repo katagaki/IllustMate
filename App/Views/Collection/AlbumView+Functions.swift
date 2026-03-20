@@ -11,6 +11,14 @@ import Foundation
 import SwiftUI
 
 extension AlbumView {
+    func presentFileImporter() {
+        #if targetEnvironment(macCatalyst)
+        isCatalystFileImportSheetPresented = true
+        #else
+        isFileImporterPresented = true
+        #endif
+    }
+
     func deleteAlbum(_ album: Album) {
         isConfirmingDeleteAlbum = true
         albumPendingDeletion = album

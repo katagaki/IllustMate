@@ -101,6 +101,7 @@ struct IllustMateApp: App {
         } content: {
             if let importedURL {
                 RestoreBackupView(backupURL: importedURL)
+                    .environmentObject(navigation)
             } else {
                 ProgressView()
             }
@@ -171,7 +172,6 @@ struct IllustMateApp: App {
             scheduleWidgetRefresh()
         }
 #if targetEnvironment(macCatalyst)
-        .defaultSize(CGSize(width: 880.0, height: 680.0))
         .commands {
             CommandGroup(after: .sidebar) {
                 Button("Command.PreviousPic") {

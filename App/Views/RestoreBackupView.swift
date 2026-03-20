@@ -11,6 +11,7 @@ struct RestoreBackupView: View {
 
     var backupURL: URL
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var navigation: NavigationManager
 
     @State var isImporting: Bool = false
     @State var isCompleted: Bool = false
@@ -145,6 +146,7 @@ struct RestoreBackupView: View {
                     await MainActor.run {
                         isImporting = false
                         isCompleted = true
+                        navigation.dataVersion += 1
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         UIApplication.shared.isIdleTimerDisabled = false
                     }
