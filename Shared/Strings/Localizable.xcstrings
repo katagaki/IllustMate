@@ -62,7 +62,8 @@
             "value" : "%1$lld/%2$lld"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "Auth.Locked" : {
       "extractionState" : "manual",
@@ -2875,37 +2876,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sammlung"
+            "value" : "Bibliothek"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Collection"
+            "value" : "Library"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "コレクション"
+            "value" : "ライブラリ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "컬렉션"
+            "value" : "라이브러리"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "收藏"
+            "value" : "资料库"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "收藏"
+            "value" : "資料庫"
           }
         }
       }

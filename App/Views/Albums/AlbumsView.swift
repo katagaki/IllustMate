@@ -30,6 +30,28 @@ struct AlbumsView: View {
                         // TODO: Move menu support in macOS Albums view
                     }
                 }
+                .navigationDestination(for: ViewPath.self) { viewPath in
+                    switch viewPath {
+                    case .album(let album):
+                        AlbumView(currentAlbum: album)
+                    case .picViewer(let namespace):
+                        if let displayedPic = viewer.displayedPic {
+                            if #available(iOS 18, *) {
+                                PicViewer(pic: displayedPic)
+                                    .navigationTransition(.zoom(
+                                        sourceID: viewer.displayedPicID,
+                                        in: namespace))
+                            } else {
+                                PicViewer(pic: displayedPic)
+                            }
+                        }
+                    case .picViewerRestore:
+                        if let displayedPic = viewer.displayedPic {
+                            PicViewer(pic: displayedPic)
+                        }
+                    default: Color.clear
+                    }
+                }
                 .toolbar {
                     if UIDevice.current.userInterfaceIdiom == .phone {
                         ToolbarItem(placement: .topBarTrailing) {

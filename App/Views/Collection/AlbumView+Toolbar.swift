@@ -207,7 +207,7 @@ extension AlbumView {
                     isFileImporterPresented = true
                 } label: {
                     Label(String(localized: "Import.SelectFromFiles", table: "Import"),
-                          systemImage: "folder")
+                          systemImage: "document")
                 }
             }
         }

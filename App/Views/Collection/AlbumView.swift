@@ -76,6 +76,17 @@ struct AlbumView: View {
         searchResults ?? albums
     }
 
+    var navigationTitleText: String {
+        currentAlbum?.name ?? libraryManager.displayName(for: libraryManager.currentLibrary)
+    }
+
+    var navigationSubtitleText: String {
+        if currentAlbum != nil && !libraryManager.currentLibrary.isDefault {
+            return libraryManager.currentLibrary.name
+        }
+        return ""
+    }
+
     var body: some View {
         mainContent
             .toolbar { toolbarContent }
@@ -198,10 +209,8 @@ struct AlbumView: View {
                     }
                 }
             }
-            .navigationTitle(currentAlbum?.name ?? String(localized: "ViewTitle.Collection"))
-            .navigationSubtitle(libraryManager.currentLibrary.isDefault
-                                ? Text(verbatim: "")
-                                : Text(libraryManager.currentLibrary.name))
+            .navigationTitle(navigationTitleText)
+            .navigationSubtitle(Text(verbatim: navigationSubtitleText))
             .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
     }
 

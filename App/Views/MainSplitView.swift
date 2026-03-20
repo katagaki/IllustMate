@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/07.
 //
 
+import Photos
 import SwiftUI
 
 struct MainSplitView: View {
@@ -12,9 +13,15 @@ struct MainSplitView: View {
     @EnvironmentObject var navigation: NavigationManager
     @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
+    @Environment(PhotosManager.self) var photosManager
+    @Environment(PhotosViewerManager.self) var photosViewer
     @Namespace var namespace
 
+    @AppStorage("PhotosModeEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isPhotosModeEnabled: Bool = false
+
     @State var albums: [Album] = []
+    @State var photosItems: [PHCollectionItem] = []
     @State var selectedView: ViewPath? = .collection
     @State var isMoreViewPresenting: Bool = false
     @State var isLibraryManagerPresented: Bool = false
@@ -22,31 +29,37 @@ struct MainSplitView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedView) {
-                Section {
-                    LibrarySwitcherMenu(
-                        isLibraryManagerPresented: $isLibraryManagerPresented
-                    )
+                if !isPhotosModeEnabled {
+                    Section {
+                        LibrarySwitcherMenu(
+                            isLibraryManagerPresented: $isLibraryManagerPresented
+                        )
+                    }
                 }
                 Section {
                     NavigationLink(value: ViewPath.collection) {
                         Label {
-                            Text("ViewTitle.Collection")
+                            Text(isPhotosModeEnabled
+                                 ? String(localized: "ViewTitle.Photos")
+                                 : String(localized: "ViewTitle.Collection"))
                         } icon: {
-                            Image(systemName: "house.fill")
+                            Image(systemName: isPhotosModeEnabled ? "photo.on.rectangle" : "house.fill")
                         }
                     }
-                    NavigationLink(value: ViewPath.albums) {
-                        Label {
-                            Text("ViewTitle.Albums")
-                        } icon: {
-                            Image(systemName: "rectangle.stack.fill")
+                    if !isPhotosModeEnabled {
+                        NavigationLink(value: ViewPath.albums) {
+                            Label {
+                                Text("ViewTitle.Albums")
+                            } icon: {
+                                Image(systemName: "rectangle.stack.fill")
+                            }
                         }
-                    }
-                    NavigationLink(value: ViewPath.pics) {
-                        Label {
-                            Text("ViewTitle.Pics")
-                        } icon: {
-                            Image(systemName: "photo.on.rectangle.angled")
+                        NavigationLink(value: ViewPath.pics) {
+                            Label {
+                                Text("ViewTitle.Pics")
+                            } icon: {
+                                Image(systemName: "photo.on.rectangle.angled")
+                            }
                         }
                     }
                     Button {
@@ -55,18 +68,49 @@ struct MainSplitView: View {
                         Label("ViewTitle.More", systemImage: "ellipsis")
                     }
                 }
-                Section {
-                    ForEach(albums) { album in
-                        NavigationLink(value: ViewPath.album(album: album)) {
-                            Label {
-                                Text(album.name)
-                            } icon: {
-                                SidebarAlbumIcon(album: album)
+                if isPhotosModeEnabled {
+                    Section {
+                        ForEach(photosItems) { item in
+                            switch item {
+                            case .album(let collection):
+                                NavigationLink(value: ViewPath.photosAlbum(
+                                    album: PHAssetCollectionWrapper(collection: collection))) {
+                                    Label {
+                                        Text(collection.localizedTitle ?? String(
+                                            localized: "Import.Albums.Untitled", table: "Import"))
+                                    } icon: {
+                                        Image(systemName: "rectangle.stack")
+                                    }
+                                }
+                            case .folder(let folder):
+                                NavigationLink(value: ViewPath.photosFolder(
+                                    folder: PHCollectionListWrapper(collectionList: folder))) {
+                                    Label {
+                                        Text(folder.localizedTitle ?? String(
+                                            localized: "Import.Albums.Untitled", table: "Import"))
+                                    } icon: {
+                                        Image(systemName: "folder")
+                                    }
+                                }
                             }
                         }
+                    } header: {
+                        Text("Shared.Albums")
                     }
-                } header: {
-                    Text("Shared.Albums")
+                } else {
+                    Section {
+                        ForEach(albums) { album in
+                            NavigationLink(value: ViewPath.album(album: album)) {
+                                Label {
+                                    Text(album.name)
+                                } icon: {
+                                    SidebarAlbumIcon(album: album)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Shared.Albums")
+                    }
                 }
             }
             .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
@@ -77,24 +121,70 @@ struct MainSplitView: View {
                 case .albums: AlbumsView()
                 case .pics: PicsView()
                 case .album(let album): AlbumNavigationStack(album: album)
+                case .photosAlbum(let wrapper):
+                    NavigationStack {
+                        PhotosAlbumContentView(collection: wrapper.collection)
+                    }
+                case .photosFolder(let wrapper):
+                    NavigationStack {
+                        PhotosFolderView(folder: wrapper.collectionList)
+                            .navigationDestination(for: ViewPath.self) { viewPath in
+                                switch viewPath {
+                                case .photosFolder(let innerWrapper):
+                                    PhotosFolderView(folder: innerWrapper.collectionList)
+                                case .photosAlbum(let innerWrapper):
+                                    PhotosAlbumContentView(collection: innerWrapper.collection)
+                                default: Color.clear
+                                }
+                            }
+                    }
                 default: Color.clear
                 }
             }
             .navigationSplitViewColumnWidth(min: 300.0, ideal: 375.0, max: 500.0)
         } detail: {
-            if let pic = viewer.displayedPic {
-                PicViewer(pic: pic)
-                    .id(pic.id)
+            if isPhotosModeEnabled {
+                if let asset = photosViewer.displayedAsset {
+                    PhotosAssetViewer(asset: asset)
+                        .id(asset.localIdentifier)
+                } else {
+                    ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
+                }
             } else {
-                ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
+                if let pic = viewer.displayedPic {
+                    PicViewer(pic: pic)
+                        .id(pic.id)
+                } else {
+                    ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
+                }
             }
         }
         .task {
-            do {
-                albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
-                await AlbumCoverCache.shared.loadCovers(for: albums)
-            } catch {
-                debugPrint(error.localizedDescription)
+            if isPhotosModeEnabled {
+                photosItems = photosManager.fetchTopLevelCollections()
+            } else {
+                do {
+                    albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                    await AlbumCoverCache.shared.loadCovers(for: albums)
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+            }
+        }
+        .onChange(of: isPhotosModeEnabled) { _, newValue in
+            selectedView = .collection
+            if newValue {
+                photosItems = photosManager.fetchTopLevelCollections()
+            } else {
+                photosItems = []
+                Task {
+                    do {
+                        albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                        await AlbumCoverCache.shared.loadCovers(for: albums)
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
+                }
             }
         }
         .onChange(of: navigation.dataVersion) { _, _ in
@@ -105,11 +195,15 @@ struct MainSplitView: View {
             viewer.displayedThumbnail = nil
             viewer.allPics = []
             Task {
-                do {
-                    albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
-                    await AlbumCoverCache.shared.loadCovers(for: albums)
-                } catch {
-                    debugPrint(error.localizedDescription)
+                if isPhotosModeEnabled {
+                    photosItems = photosManager.fetchTopLevelCollections()
+                } else {
+                    do {
+                        albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                        await AlbumCoverCache.shared.loadCovers(for: albums)
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
                 }
             }
         }
@@ -161,4 +255,3 @@ struct SidebarAlbumIcon: View {
         }
     }
 }
-
