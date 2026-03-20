@@ -32,14 +32,24 @@ struct PhotosAssetsGrid: View {
             spacing: 2.0
         ) {
             ForEach(Array(visibleAssets), id: \.localIdentifier) { asset in
-                NavigationLink(value: ViewPath.photosAssetViewer(
-                    asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
-                    PhotosAssetLabel(asset: asset)
+                Group {
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        Button {
+                            photosViewer.setDisplay(asset, in: assets)
+                        } label: {
+                            PhotosAssetLabel(asset: asset)
+                        }
+                    } else {
+                        NavigationLink(value: ViewPath.photosAssetViewer(
+                            asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
+                            PhotosAssetLabel(asset: asset)
+                        }
+                        .simultaneousGesture(TapGesture().onEnded {
+                            photosViewer.setDisplay(asset, in: assets)
+                        })
+                    }
                 }
                 .matchedTransitionSource(id: asset.localIdentifier, in: namespace)
-                .simultaneousGesture(TapGesture().onEnded {
-                    photosViewer.setDisplay(asset, in: assets)
-                })
                 .draggable(PHAssetTransferable(localIdentifier: asset.localIdentifier))
                 .contextMenu {
                     PhotosAssetContextMenu(asset: asset)
@@ -89,14 +99,24 @@ struct PhotosFetchResultAssetsGrid: View {
             spacing: 2.0
         ) {
             ForEach(displayedAssets, id: \.localIdentifier) { asset in
-                NavigationLink(value: ViewPath.photosAssetViewer(
-                    asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
-                    PhotosAssetLabel(asset: asset)
+                Group {
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        Button {
+                            photosViewer.setDisplay(asset, in: displayedAssets)
+                        } label: {
+                            PhotosAssetLabel(asset: asset)
+                        }
+                    } else {
+                        NavigationLink(value: ViewPath.photosAssetViewer(
+                            asset: PHAssetWrapper(asset: asset), namespace: namespace)) {
+                            PhotosAssetLabel(asset: asset)
+                        }
+                        .simultaneousGesture(TapGesture().onEnded {
+                            photosViewer.setDisplay(asset, in: displayedAssets)
+                        })
+                    }
                 }
                 .matchedTransitionSource(id: asset.localIdentifier, in: namespace)
-                .simultaneousGesture(TapGesture().onEnded {
-                    photosViewer.setDisplay(asset, in: displayedAssets)
-                })
                 .draggable(PHAssetTransferable(localIdentifier: asset.localIdentifier))
                 .contextMenu {
                     PhotosAssetContextMenu(asset: asset)

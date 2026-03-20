@@ -148,7 +148,7 @@ struct MainSplitView: View {
                     PhotosAssetViewer(asset: asset)
                         .id(asset.localIdentifier)
                 } else {
-                    ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
+                    ContentUnavailableView("Shared.SelectAPhoto", systemImage: "photo.on.rectangle.angled")
                 }
             } else {
                 if let pic = viewer.displayedPic {
