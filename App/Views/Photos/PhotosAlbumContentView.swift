@@ -33,9 +33,11 @@ struct PhotosAlbumContentView: View {
             VStack(alignment: .leading, spacing: 0.0) {
                 Group {
                     if UIDevice.current.userInterfaceIdiom == .phone {
-                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount)
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
+                                      count: assetCount)
                     } else {
-                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount) {
+                        SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"),
+                                      count: assetCount) {
                             Picker("Shared.GridSize",
                                    systemImage: "square.grid.2x2",
                                    selection: $columnCount.animation(.smooth.speed(2.0))) {
@@ -68,6 +70,7 @@ struct PhotosAlbumContentView: View {
             }
             .padding([.top], 20.0)
         }
+        .scrollBounceBehavior(.basedOnSize)
         .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
         .toolbar {
             if UIDevice.current.userInterfaceIdiom == .phone {

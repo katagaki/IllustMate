@@ -283,6 +283,7 @@ struct AlbumView: View {
                     .padding(.top, (hideSectionHeaders && displayedAlbums.isEmpty) ? 0.0 : 20.0)
                     .animation(.smooth.speed(2.0), value: hideSectionHeaders)
                 }
+                .scrollBounceBehavior(.basedOnSize)
             }
         }
     }

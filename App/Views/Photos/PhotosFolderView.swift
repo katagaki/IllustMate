@@ -70,6 +70,7 @@ struct PhotosFolderView: View {
             }
             .padding([.top], 20.0)
         }
+        .scrollBounceBehavior(.basedOnSize)
         .navigationTitle(folder.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
         .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
         .onChange(of: searchText) { _, newValue in

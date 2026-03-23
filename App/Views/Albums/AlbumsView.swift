@@ -30,6 +30,7 @@ struct AlbumsView: View {
                         // TODO: Move menu support in macOS Albums view
                     }
                 }
+                .scrollBounceBehavior(.basedOnSize)
                 .navigationDestination(for: ViewPath.self) { viewPath in
                     switch viewPath {
                     case .album(let album):
