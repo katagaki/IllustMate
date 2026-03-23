@@ -69,8 +69,8 @@ struct PhotosAlbumContentView: View {
                 }
             }
             .padding([.top], 20.0)
+            .fixNavigationHeaderTransition()
         }
-        .scrollBounceBehavior(.basedOnSize)
         .navigationTitle(collection.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import"))
         .toolbar {
             if UIDevice.current.userInterfaceIdiom == .phone {

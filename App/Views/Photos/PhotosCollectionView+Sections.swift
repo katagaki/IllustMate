@@ -22,8 +22,8 @@ extension PhotosCollectionView {
                 }
             }
             .padding([.top], 20.0)
+            .fixNavigationHeaderTransition()
         }
-        .scrollBounceBehavior(.basedOnSize)
         .onAppear {
             if !hasFetchedCollections {
                 items = photosManager.fetchTopLevelCollections()
