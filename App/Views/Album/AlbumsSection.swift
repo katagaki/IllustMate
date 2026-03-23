@@ -88,7 +88,7 @@ struct AlbumsSection<Content: View>: View {
                     .padding(20.0)
                 }
                 .scrollIndicators(.hidden)
-                .frame(height: 120.0)
+                .frame(height: 122.0)
             }
         }
     }

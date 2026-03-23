@@ -14,7 +14,7 @@ struct AlbumGridLabel: View {
     var length: CGFloat?
 
     var body: some View {
-        VStack(alignment: .center, spacing: 2.0) {
+        VStack(alignment: .center, spacing: length != nil ? 4.0 : 2.0) {
             AlbumCover.AsyncAlbumCover(album: album, length: length)
             .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             Text(album.name)
