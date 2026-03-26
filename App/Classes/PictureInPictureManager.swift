@@ -47,7 +47,11 @@ class PictureInPictureManager: NSObject {
         pipController = AVPictureInPictureController(playerLayer: playerLayer)
         pipController?.delegate = self
         pipController?.requiresLinearPlayback = true
+        #if targetEnvironment(macCatalyst)
+        pipController?.setValue(2, forKey: "controlsStyle")
+        #else
         pipController?.setValue(1, forKey: "controlsStyle")
+        #endif
     }
 
     // swiftlint:disable:next function_body_length
