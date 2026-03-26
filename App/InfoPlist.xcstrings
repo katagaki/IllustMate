@@ -19,7 +19,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ピックメイト"
+            "value" : "PicMate"
           }
         },
         "ko" : {
@@ -40,7 +40,8 @@
             "value" : "PicMate"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "CFBundleName" : {
       "extractionState" : "manual",
@@ -103,7 +104,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「ピックメイト」はコレクションを保護するためにFace IDを使用します。"
+            "value" : "コレクションを保護するためにFace IDを使用します。"
           }
         },
         "ko" : {
@@ -145,7 +146,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「ピックメイト」は画像をインポートする際に写真ライブラリにアクセスします。"
+            "value" : "画像をインポートする際に写真ライブラリにアクセスします。"
           }
         },
         "ko" : {
@@ -186,7 +187,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ピックメイト"
+            "value" : "PicMate"
           }
         },
         "ko" : {
@@ -226,7 +227,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ピックメイトバックアップ"
+            "value" : "PicMateバックアップ"
           }
         },
         "ko" : {
