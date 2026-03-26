@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/15.
 //
 
-import Komponents
 import SwiftUI
 
 struct AlbumsScrollView: View {

@@ -28,8 +28,9 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
             return PhotoGridEntry(date: .now, albumID: nil, albumName: nil, images: [], columns: columns, rows: rows)
         }
         let count = columns * rows
+        let maxDim = gridMaxDimension(for: context.family)
         let images = PhotostandDatabase.fetchRandomPicDataMultiple(
-            inAlbumWithID: album.id, count: count, maxDimension: 400
+            inAlbumWithID: album.id, count: count, maxDimension: maxDim
         )
         return PhotoGridEntry(
             date: .now,
@@ -70,10 +71,12 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
             return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(86400)))
         }
 
+        let maxDim = gridMaxDimension(for: context.family)
+
         // Single entry refreshed every 24 hours to stay within memory limits
         let images: [Data] = autoreleasepool {
             PhotostandDatabase.fetchRandomPicDataMultiple(
-                inAlbumWithID: album.id, count: count, maxDimension: 400
+                inAlbumWithID: album.id, count: count, maxDimension: maxDim
             )
         }
         let entry = PhotoGridEntry(
@@ -98,6 +101,20 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
             return (3, 3)
         @unknown default:
             return (2, 2)
+        }
+    }
+
+    /// Grid cells are much smaller than full widgets, so use smaller dimensions.
+    private func gridMaxDimension(for family: WidgetFamily) -> CGFloat {
+        switch family {
+        case .systemSmall:
+            return 200
+        case .systemMedium:
+            return 200
+        case .systemLarge:
+            return 250
+        @unknown default:
+            return 200
         }
     }
 }

@@ -23,7 +23,10 @@ struct PhotostandProvider: AppIntentTimelineProvider {
         guard let album = configuration.album else {
             return PhotostandEntry(date: .now, albumID: nil, albumName: nil, imageData: nil)
         }
-        let imageData = PhotostandDatabase.fetchRandomPicData(inAlbumWithID: album.id)
+        let maxDimension = maxDimension(for: context.family)
+        let imageData = PhotostandDatabase.fetchRandomPicData(
+            inAlbumWithID: album.id, maxDimension: maxDimension
+        )
         return PhotostandEntry(date: .now, albumID: album.id, albumName: album.name, imageData: imageData)
     }
 
@@ -31,6 +34,11 @@ struct PhotostandProvider: AppIntentTimelineProvider {
         guard let album = configuration.album else {
             let entry = PhotostandEntry(date: .now, albumID: nil, albumName: nil, imageData: nil)
             return Timeline(entries: [entry], policy: .never)
+        }
+
+        guard let database = PhotostandDatabase.openDatabase() else {
+            let entry = PhotostandEntry(date: .now, albumID: album.id, albumName: album.name, imageData: nil)
+            return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(3600)))
         }
 
         let picCount = PhotostandDatabase.fetchPicCount(inAlbumWithID: album.id)
@@ -41,15 +49,19 @@ struct PhotostandProvider: AppIntentTimelineProvider {
             return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(interval.seconds)))
         }
 
+        let maxDim = maxDimension(for: context.family)
+
         // Generate entries covering the next 24 hours at the selected interval
         var entries: [PhotostandEntry] = []
         entries.reserveCapacity(interval.entryCount)
         let currentDate = Date.now
         for entryIndex in 0..<interval.entryCount {
             let entryDate = currentDate.addingTimeInterval(interval.seconds * Double(entryIndex))
-            // Use autoreleasepool so the full-size UIImage from decoding is freed each iteration
+            // Use autoreleasepool so intermediate buffers are freed each iteration
             let imageData: Data? = autoreleasepool {
-                PhotostandDatabase.fetchRandomPicData(inAlbumWithID: album.id)
+                PhotostandDatabase.fetchRandomPicData(
+                    using: database, albumID: album.id, maxDimension: maxDim
+                )
             }
             entries.append(PhotostandEntry(
                 date: entryDate,
@@ -60,5 +72,18 @@ struct PhotostandProvider: AppIntentTimelineProvider {
         }
 
         return Timeline(entries: entries, policy: .atEnd)
+    }
+
+    /// Returns the appropriate max image dimension for a widget family.
+    /// Widgets render at 2x-3x scale, so we target ~2x the point size.
+    private func maxDimension(for family: WidgetFamily) -> CGFloat {
+        switch family {
+        case .systemSmall:
+            return 400
+        case .systemMedium, .systemLarge:
+            return 600
+        @unknown default:
+            return 400
+        }
     }
 }

@@ -5,13 +5,27 @@
 //  Created by シン・ジャスティン on 2026/03/20.
 //
 
+import ImageIO
 import UIKit
 
 extension UIImage {
-    func resizedForWidget(maxDimension: CGFloat = 800) -> Data? {
-        let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
-        let targetSize = CGSize(width: size.width * scale, height: size.height * scale)
-        guard let resized = preparingThumbnail(of: targetSize) else { return nil }
-        return resized.jpegData(compressionQuality: 0.8)
+    /// Decodes image data directly at widget size using ImageIO, avoiding full-size bitmap allocation.
+    static func downsampledForWidget(data: Data, maxDimension: CGFloat = 800) -> Data? {
+        let options: [CFString: Any] = [kCGImageSourceShouldCache: false]
+        guard let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary) else {
+            return nil
+        }
+        let downsampleOptions: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxDimension
+        ]
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(
+            source, 0, downsampleOptions as CFDictionary
+        ) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage).jpegData(compressionQuality: 0.8)
     }
 }

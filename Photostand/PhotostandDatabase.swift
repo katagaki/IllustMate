@@ -25,6 +25,9 @@ struct PhotostandDatabase {
     static let picAlbumId = Expression<String?>("containing_album_id")
     static let picData = Expression<Data>("data")
 
+    /// Maximum blob size (in bytes) the widget will attempt to load.
+    static let maxBlobSize = 25 * 1024 * 1024 // 25 MB
+
     struct AlbumRecord {
         let id: String
         let name: String
@@ -57,28 +60,41 @@ struct PhotostandDatabase {
         return AlbumRecord(id: rowId, name: name)
     }
 
-    static func fetchRandomPicData(inAlbumWithID albumID: String) -> Data? {
+    static func fetchRandomPicData(
+        inAlbumWithID albumID: String,
+        maxDimension: CGFloat = 800
+    ) -> Data? {
         guard let database = openDatabase() else { return nil }
-        // Step 1: Pick a random pic ID without loading blob data
+        return fetchRandomPicData(using: database, albumID: albumID, maxDimension: maxDimension)
+    }
+
+    /// Fetches a single random image using a provided database connection.
+    /// Skips photos whose blob exceeds `maxBlobSize` to stay within the widget memory limit.
+    static func fetchRandomPicData(
+        using database: Connection,
+        albumID: String,
+        maxDimension: CGFloat = 800
+    ) -> Data? {
+        // Step 1: Pick a random pic ID whose blob is within the size limit
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
+            .filter(picData.length <= maxBlobSize)
             .select(picId)
             .order(Expression<Int>.random())
             .limit(1)
         guard let idRow = try? database.pluck(idQuery),
               let randomId = try? idRow.get(picId) else { return nil }
-        // Step 2: Fetch and resize in autoreleasepool so the full-size UIImage is freed
-        return autoreleasepool {
-            let dataQuery = picsTable
-                .filter(picId == randomId)
-                .select(picData)
-            guard let row = try? database.pluck(dataQuery),
-                  let data = try? row.get(picData),
-                  let image = UIImage(data: data) else { return nil }
-            return image.resizedForWidget()
-        }
+        // Step 2: Fetch raw data and downsample directly at target size
+        let dataQuery = picsTable
+            .filter(picId == randomId)
+            .select(picData)
+        guard let row = try? database.pluck(dataQuery),
+              let data = try? row.get(picData) else { return nil }
+        return UIImage.downsampledForWidget(data: data, maxDimension: maxDimension)
     }
 
+    /// Fetches multiple random images, reusing a single database connection.
+    /// Skips photos whose blob exceeds `maxBlobSize` to stay within the widget memory limit.
     static func fetchRandomPicDataMultiple(
         inAlbumWithID albumID: String,
         count: Int,
@@ -87,21 +103,20 @@ struct PhotostandDatabase {
         guard let database = openDatabase() else { return [] }
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
+            .filter(picData.length <= maxBlobSize)
             .select(picId)
             .order(Expression<Int>.random())
             .limit(count)
         guard let rows = try? database.prepare(idQuery) else { return [] }
         let ids = rows.compactMap { try? $0.get(picId) }
         return ids.compactMap { id in
-            // Autoreleasepool ensures each full-size UIImage is freed before loading the next
             autoreleasepool {
                 let dataQuery = picsTable
                     .filter(picId == id)
                     .select(picData)
                 guard let row = try? database.pluck(dataQuery),
-                      let data = try? row.get(picData),
-                      let image = UIImage(data: data) else { return nil }
-                return image.resizedForWidget(maxDimension: maxDimension)
+                      let data = try? row.get(picData) else { return nil }
+                return UIImage.downsampledForWidget(data: data, maxDimension: maxDimension)
             }
         }
     }

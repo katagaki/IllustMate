@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
-import Komponents
 import Photos
 import PhotosUI
 import SwiftUI

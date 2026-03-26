@@ -178,6 +178,7 @@ struct PhotosAssetContextMenu: View {
                 if let result {
                     DispatchQueue.main.async {
                         UIPasteboard.general.image = result
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
                     }
                 }
             }

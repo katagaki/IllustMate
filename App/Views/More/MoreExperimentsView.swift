@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2023/10/08.
 //
 
-import Komponents
 import SwiftUI
 
 struct MoreExperimentsView: View {

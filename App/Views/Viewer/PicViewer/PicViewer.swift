@@ -124,6 +124,7 @@ struct PicViewer: View {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
                         if let image = currentImage {
                             UIPasteboard.general.image = image
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                         }
                     }
                     .disabled(currentImage == nil)
@@ -152,6 +153,7 @@ struct PicViewer: View {
                     Button("Shared.Copy", systemImage: "doc.on.doc") {
                         if let image = currentImage {
                             UIPasteboard.general.image = image
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
                         }
                     }
                     .disabled(currentImage == nil)

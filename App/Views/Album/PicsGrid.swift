@@ -63,6 +63,7 @@ struct PicsGrid<Content: View>: View {
                                 if let data = await DataActor.shared.imageData(forPicWithID: pic.id),
                                    let image = UIImage(data: data) {
                                     UIPasteboard.general.image = image
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 }
                             }
                         }
