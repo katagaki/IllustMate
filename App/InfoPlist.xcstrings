@@ -4,6 +4,12 @@
     "CFBundleDisplayName" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -23,12 +29,6 @@
           }
         },
         "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PicMate"
-          }
-        },
-        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PicMate"
@@ -45,6 +45,12 @@
     "CFBundleName" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -54,7 +60,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ピックメイト"
+            "value" : "PicMate"
           }
         },
         "ko" : {
@@ -69,24 +75,25 @@
             "value" : "PicMate"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PicMate"
-          }
-        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PicMate"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "NSFaceIDUsageDescription" : {
       "comment" : "Privacy - Face ID Usage Description",
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate verwendet Face ID, um Ihre Sammlung zu schützen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -111,12 +118,6 @@
             "value" : "PicMate 使用 Face ID 来保护您的收藏。"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PicMate verwendet Face ID, um Ihre Sammlung zu schützen."
-          }
-        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -129,6 +130,12 @@
       "comment" : "Privacy - Photo Library Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate benötigt Zugriff auf Ihre Fotomediathek, um Bilder aus Ihren Alben zu durchsuchen und zu importieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "new",
@@ -137,7 +144,7 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "「ピックメイト」は画像をインポートする際に写真ライブラリにアクセスします。"
           }
         },
@@ -153,12 +160,6 @@
             "value" : "PicMate 需要访问您的照片图库，以便浏览和导入相册中的图片。"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PicMate benötigt Zugriff auf Ihre Fotomediathek, um Bilder aus Ihren Alben zu durchsuchen und zu importieren."
-          }
-        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -170,6 +171,12 @@
     "NSUbiquitousContainerName" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -194,12 +201,6 @@
             "value" : "PicMate"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PicMate"
-          }
-        },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
@@ -210,6 +211,12 @@
     },
     "PicMate Backup" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PicMate-Backup"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -232,12 +239,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PicMate 备份"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PicMate-Backup"
           }
         },
         "zh-Hant" : {
