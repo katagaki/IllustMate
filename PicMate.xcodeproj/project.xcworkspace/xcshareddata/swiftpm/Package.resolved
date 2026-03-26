@@ -1,15 +1,6 @@
 {
-  "originHash" : "9a6a3ace0d01a5bc36d6da4329a5aead278c03348e61fa7b78335dd3398be466",
+  "originHash" : "42598adf0e546dd7490b40b2fd0f5298dee9c098f71dcdbfcb5cc4c07573f374",
   "pins" : [
-    {
-      "identity" : "komponents",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/katagaki/Komponents",
-      "state" : {
-        "branch" : "main",
-        "revision" : "93f484d6f2cef9c179387fcca2b2048413f9f0a6"
-      }
-    },
     {
       "identity" : "sqlite.swift",
       "kind" : "remoteSourceControl",
