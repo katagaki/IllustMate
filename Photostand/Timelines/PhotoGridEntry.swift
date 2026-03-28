@@ -110,9 +110,9 @@ struct PhotoGridProvider: AppIntentTimelineProvider {
         case .systemSmall:
             return 200
         case .systemMedium:
-            return 200
+            return 300
         case .systemLarge:
-            return 250
+            return 350
         @unknown default:
             return 200
         }
