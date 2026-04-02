@@ -16,6 +16,7 @@ struct ImporterView: View {
     @Environment(\.dismiss) var dismiss
 
     @State var selectedPhotoItems: [PhotosPickerItem] = []
+    @State var selectedVideoItems: [PhotosPickerItem] = []
     @State var selectedFileURLs: [URL] = []
     @State var selectedLoadedFiles: [(filename: String, data: Data)] = []
     @State var selectedAlbum: Album?
@@ -32,7 +33,7 @@ struct ImporterView: View {
     @State var navigationPath = NavigationPath()
 
     var selectedItemCount: Int {
-        selectedPhotoItems.count + selectedFileURLs.count + selectedLoadedFiles.count
+        selectedPhotoItems.count + selectedVideoItems.count + selectedFileURLs.count + selectedLoadedFiles.count
     }
 
     var body: some View {
@@ -52,9 +53,17 @@ struct ImporterView: View {
                                     .foregroundStyle(.tertiary)
                                 Group {
                                     PhotosPicker(selection: $selectedPhotoItems,
-                                                 matching: .any(of: [.images, .videos]),
+                                                 matching: .images,
                                                  photoLibrary: .shared()) {
                                         Text("Import.SelectPhotos", tableName: "Import")
+                                            .bold()
+                                            .padding(4.0)
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    PhotosPicker(selection: $selectedVideoItems,
+                                                 matching: .videos,
+                                                 photoLibrary: .shared()) {
+                                        Text("Import.SelectVideos", tableName: "Import")
                                             .bold()
                                             .padding(4.0)
                                             .frame(maxWidth: .infinity)
@@ -193,11 +202,10 @@ struct ImporterView: View {
     func importPhotosAndFiles() {
         UIApplication.shared.isIdleTimerDisabled = true
         Task {
+            // Import photos from Photos picker
             for selectedPhotoItem in selectedPhotoItems {
                 var creationDate: Date?
                 var filename: String?
-                var isVideo = false
-                var videoDuration: TimeInterval = 0
 
                 if let identifier = selectedPhotoItem.itemIdentifier {
                     let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
@@ -205,23 +213,40 @@ struct ImporterView: View {
                         creationDate = asset.creationDate
                         let resources = PHAssetResource.assetResources(for: asset)
                         filename = resources.first?.originalFilename
-                        isVideo = asset.mediaType == .video
-                        videoDuration = asset.duration
                     }
                 }
 
-                if isVideo {
-                    await importVideoFromPhotosPicker(
-                        selectedPhotoItem,
-                        filename: filename ?? Pic.newVideoFilename(),
-                        duration: videoDuration,
-                        creationDate: creationDate
-                    )
-                } else if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
+                if let data = try? await selectedPhotoItem.loadTransferable(type: Data.self) {
                     await DataActor.shared.createPic(filename ?? Pic.newFilename(), data: data,
                                                    inAlbumWithID: selectedAlbum?.id,
                                                    dateAdded: creationDate)
                 }
+                await MainActor.run {
+                    importCurrentCount += 1
+                }
+            }
+            // Import videos from Photos picker
+            for selectedVideoItem in selectedVideoItems {
+                var creationDate: Date?
+                var filename: String?
+                var videoDuration: TimeInterval = 0
+
+                if let identifier = selectedVideoItem.itemIdentifier {
+                    let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
+                    if let asset = result.firstObject {
+                        creationDate = asset.creationDate
+                        let resources = PHAssetResource.assetResources(for: asset)
+                        filename = resources.first?.originalFilename
+                        videoDuration = asset.duration
+                    }
+                }
+
+                await importVideoFromPhotosPicker(
+                    selectedVideoItem,
+                    filename: filename ?? Pic.newVideoFilename(),
+                    duration: videoDuration,
+                    creationDate: creationDate
+                )
                 await MainActor.run {
                     importCurrentCount += 1
                 }

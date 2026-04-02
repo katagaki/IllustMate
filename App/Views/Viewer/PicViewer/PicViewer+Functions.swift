@@ -46,17 +46,27 @@ extension PicViewer {
         }
     }
 
+    var videoAspectRatio: CGFloat? {
+        guard let thumbnail = viewer.displayedThumbnail,
+              thumbnail.size.height > 0 else { return nil }
+        return thumbnail.size.width / thumbnail.size.height
+    }
+
     var videoContent: some View {
-        ZStack(alignment: .bottomLeading) {
-            if let player = viewer.videoPlayer {
-                VideoPlayer(player: player)
-                    .clipShape(.rect(cornerRadius: 8.0))
-            } else if let thumbnail = viewer.displayedThumbnail {
-                Image(uiImage: thumbnail)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(.rect(cornerRadius: 8.0))
+        VStack(spacing: 8.0) {
+            Group {
+                if let player = viewer.videoPlayer {
+                    VideoPlayer(player: player)
+                        .aspectRatio(videoAspectRatio ?? 16.0 / 9.0, contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 8.0))
+                } else if let thumbnail = viewer.displayedThumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
             }
+            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
 
             if showImageSize, let duration = viewer.displayedPic?.duration {
                 Text(formatDuration(duration))
@@ -64,14 +74,12 @@ extension PicViewer {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(.bar, in: .capsule)
-                    .padding(8)
                     .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, isLandscape ? 4 : 20)
         .padding(.bottom, isLandscape ? 0 : 20)
-        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
         .zIndex(1)
         .onTapGesture {
             withAnimation(.smooth.speed(2)) {

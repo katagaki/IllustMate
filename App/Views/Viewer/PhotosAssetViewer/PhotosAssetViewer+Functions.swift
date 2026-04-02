@@ -47,17 +47,26 @@ extension PhotosAssetViewer {
         }
     }
 
+    var videoAspectRatio: CGFloat {
+        guard currentAsset.pixelHeight > 0 else { return 16.0 / 9.0 }
+        return CGFloat(currentAsset.pixelWidth) / CGFloat(currentAsset.pixelHeight)
+    }
+
     var videoContent: some View {
-        ZStack(alignment: .bottomLeading) {
-            if let videoPlayer {
-                VideoPlayer(player: videoPlayer)
-                    .clipShape(.rect(cornerRadius: 8.0))
-            } else if let thumbnail {
-                Image(uiImage: thumbnail)
-                    .resizable()
-                    .scaledToFit()
-                    .clipShape(.rect(cornerRadius: 8.0))
+        VStack(spacing: 8.0) {
+            Group {
+                if let videoPlayer {
+                    VideoPlayer(player: videoPlayer)
+                        .aspectRatio(videoAspectRatio, contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 8.0))
+                } else if let thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
             }
+            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
 
             if showImageSize {
                 HStack(alignment: .center, spacing: 4.0) {
@@ -69,14 +78,12 @@ extension PhotosAssetViewer {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
                 .background(.bar, in: .capsule)
-                .padding(8)
                 .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, isLandscape ? 4 : 20)
         .padding(.bottom, isLandscape ? 0 : 20)
-        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
         .zIndex(1)
         .onTapGesture {
             withAnimation(.smooth.speed(2)) {
