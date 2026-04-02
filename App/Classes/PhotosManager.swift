@@ -57,14 +57,22 @@ class PhotosManager {
 
     func fetchAssets(in collection: PHAssetCollection) -> PHFetchResult<PHAsset> {
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        fetchOptions.predicate = NSPredicate(
+            format: "mediaType = %d OR mediaType = %d",
+            PHAssetMediaType.image.rawValue,
+            PHAssetMediaType.video.rawValue
+        )
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         return PHAsset.fetchAssets(in: collection, options: fetchOptions)
     }
 
-    func imageCount(in collection: PHAssetCollection) -> Int {
+    func mediaCount(in collection: PHAssetCollection) -> Int {
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        fetchOptions.predicate = NSPredicate(
+            format: "mediaType = %d OR mediaType = %d",
+            PHAssetMediaType.image.rawValue,
+            PHAssetMediaType.video.rawValue
+        )
         return PHAsset.fetchAssets(in: collection, options: fetchOptions).count
     }
 
@@ -79,9 +87,13 @@ class PhotosManager {
 
     func fetchAssetsNotInAnyAlbum() async -> [PHAsset] {
         await Task.detached(priority: .userInitiated) {
-            // Fetch all image assets
+            // Fetch all image and video assets
             let allOptions = PHFetchOptions()
-            allOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            allOptions.predicate = NSPredicate(
+                format: "mediaType = %d OR mediaType = %d",
+                PHAssetMediaType.image.rawValue,
+                PHAssetMediaType.video.rawValue
+            )
             allOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
             let allAssets = PHAsset.fetchAssets(with: allOptions)
 
@@ -94,7 +106,9 @@ class PhotosManager {
             albums.enumerateObjects { collection, _, _ in
                 let fetchOptions = PHFetchOptions()
                 fetchOptions.predicate = NSPredicate(
-                    format: "mediaType = %d", PHAssetMediaType.image.rawValue
+                    format: "mediaType = %d OR mediaType = %d",
+                    PHAssetMediaType.image.rawValue,
+                    PHAssetMediaType.video.rawValue
                 )
                 let assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
                 assets.enumerateObjects { asset, _, _ in

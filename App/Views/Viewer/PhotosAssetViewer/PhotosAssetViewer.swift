@@ -29,6 +29,7 @@ struct PhotosAssetViewer: View {
     @State var magnificationAnchor: UnitPoint = .center
     @State var displayOffset: CGSize = .zero
     @State var viewSize: CGSize = .zero
+    @State var videoPlayer: AVPlayer?
 
     var isLandscape: Bool {
         verticalSizeClass == .compact
@@ -92,65 +93,76 @@ struct PhotosAssetViewer: View {
             if isLandscape {
                 // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    if pipManager.isPossible {
-                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                            startPictureInPicture()
+                    if currentAsset.mediaType != .video {
+                        if pipManager.isPossible {
+                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                                startPictureInPicture()
+                            }
+                            .disabled(currentImage == nil)
+                        }
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            if let image = currentImage {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         }
                         .disabled(currentImage == nil)
-                    }
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                    .disabled(currentImage == nil)
-                    ShareLink(
-                        "Shared.Share",
-                        item: shareImage,
-                        preview: SharePreview(
-                            displayName,
-                            image: shareImage
+                        ShareLink(
+                            "Shared.Share",
+                            item: shareImage,
+                            preview: SharePreview(
+                                displayName,
+                                image: shareImage
+                            )
                         )
-                    )
-                    .disabled(currentImage == nil)
+                        .disabled(currentImage == nil)
+                    }
                 }
             } else {
                 // Portrait: show actions in bottom bar
-                if pipManager.isPossible {
+                if currentAsset.mediaType != .video {
+                    if pipManager.isPossible {
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                                startPictureInPicture()
+                            }
+                            .disabled(currentImage == nil)
+                        }
+                    }
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
-                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                            startPictureInPicture()
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            if let image = currentImage {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         }
                         .disabled(currentImage == nil)
-                    }
-                }
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                    .disabled(currentImage == nil)
-                    ShareLink(
-                        "Shared.Share",
-                        item: shareImage,
-                        preview: SharePreview(
-                            displayName,
-                            image: shareImage
+                        ShareLink(
+                            "Shared.Share",
+                            item: shareImage,
+                            preview: SharePreview(
+                                displayName,
+                                image: shareImage
+                            )
                         )
-                    )
-                    .disabled(currentImage == nil)
+                        .disabled(currentImage == nil)
+                    }
                 }
             }
         }
         .toolbar(isLandscape ? .hidden : .automatic, for: .bottomBar)
         .task(id: currentAsset.localIdentifier) {
             isFullImageLoaded = false
-            loadThumbnail()
-            await loadFullImage()
+            videoPlayer?.pause()
+            videoPlayer = nil
+            if currentAsset.mediaType == .video {
+                loadThumbnail()
+                loadVideoPlayer()
+            } else {
+                loadThumbnail()
+                await loadFullImage()
+            }
         }
 #if targetEnvironment(macCatalyst)
         .focusable()

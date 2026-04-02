@@ -194,7 +194,11 @@ struct PhotosAlbumPickerView: View {
 
     private func imageCount(in collection: PHAssetCollection) -> Int {
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        fetchOptions.predicate = NSPredicate(
+            format: "mediaType = %d OR mediaType = %d",
+            PHAssetMediaType.image.rawValue,
+            PHAssetMediaType.video.rawValue
+        )
         return PHAsset.fetchAssets(in: collection, options: fetchOptions).count
     }
 

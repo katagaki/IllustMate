@@ -38,7 +38,54 @@ extension PhotosAssetViewer {
         }
     }
 
+    @ViewBuilder
     var imageContent: some View {
+        if currentAsset.mediaType == .video {
+            videoContent
+        } else {
+            photoContent
+        }
+    }
+
+    var videoContent: some View {
+        ZStack(alignment: .bottomLeading) {
+            if let videoPlayer {
+                VideoPlayer(player: videoPlayer)
+                    .clipShape(.rect(cornerRadius: 8.0))
+            } else if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(.rect(cornerRadius: 8.0))
+            }
+
+            if showImageSize {
+                HStack(alignment: .center, spacing: 4.0) {
+                    Text(verbatim: "\(currentAsset.pixelWidth)×\(currentAsset.pixelHeight)")
+                    Text(verbatim: "·")
+                    Text(formatDuration(currentAsset.duration))
+                }
+                .font(.caption)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.bar, in: .capsule)
+                .padding(8)
+                .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, isLandscape ? 4 : 20)
+        .padding(.bottom, isLandscape ? 0 : 20)
+        .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+        .zIndex(1)
+        .onTapGesture {
+            withAnimation(.smooth.speed(2)) {
+                showImageSize.toggle()
+            }
+        }
+    }
+
+    var photoContent: some View {
         ZStack(alignment: .bottomLeading) {
             ZStack {
                 // Show thumbnail as placeholder
@@ -117,6 +164,22 @@ extension PhotosAssetViewer {
             if let result {
                 DispatchQueue.main.async {
                     self.thumbnail = result
+                }
+            }
+        }
+    }
+
+    func loadVideoPlayer() {
+        let options = PHVideoRequestOptions()
+        options.isNetworkAccessAllowed = true
+        options.deliveryMode = .automatic
+
+        PHImageManager.default().requestPlayerItem(
+            forVideo: currentAsset, options: options
+        ) { playerItem, _ in
+            if let playerItem {
+                DispatchQueue.main.async {
+                    self.videoPlayer = AVPlayer(playerItem: playerItem)
                 }
             }
         }

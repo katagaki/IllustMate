@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/02.
 //
 
+import AVFoundation
 import CoreTransferable
 import Foundation
 import UIKit
@@ -16,13 +17,22 @@ final class Pic: Identifiable, Hashable, @unchecked Sendable {
     var containingAlbumID: String?
     var dateAdded: Date
     var thumbnailData: Data?
+    var mediaType: MediaType
+    var duration: TimeInterval?
+    var filePath: String?
+
+    var isVideo: Bool { mediaType == .video }
 
     init(id: String = UUID().uuidString, name: String, containingAlbumID: String? = nil,
-         dateAdded: Date = Date.now) {
+         dateAdded: Date = Date.now, mediaType: MediaType = .pic,
+         duration: TimeInterval? = nil, filePath: String? = nil) {
         self.id = id
         self.name = name
         self.containingAlbumID = containingAlbumID
         self.dateAdded = dateAdded
+        self.mediaType = mediaType
+        self.duration = duration
+        self.filePath = filePath
     }
 
     static func == (lhs: Pic, rhs: Pic) -> Bool {
@@ -57,6 +67,24 @@ final class Pic: Identifiable, Hashable, @unchecked Sendable {
             return sourceImage.jpegThumbnail(of: 120.0)
         }
         return nil
+    }
+
+    static func makeVideoThumbnail(_ url: URL) -> Data? {
+        let asset = AVURLAsset(url: url)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        generator.maximumSize = CGSize(width: 240, height: 240)
+        guard let cgImage = try? generator.copyCGImage(at: .zero, actualTime: nil) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage).jpegData(compressionQuality: 0.7)
+    }
+
+    static func newVideoFilename() -> String {
+        let date = Date.now
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMddHHmmssSSSS"
+        return "VID_" + dateFormatter.string(from: date)
     }
 }
 

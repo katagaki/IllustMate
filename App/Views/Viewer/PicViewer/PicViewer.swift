@@ -115,57 +115,61 @@ struct PicViewer: View {
             if isLandscape {
                 // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    if pipManager.isPossible {
-                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                            startPictureInPicture()
+                    if viewer.displayedPic?.isVideo != true {
+                        if pipManager.isPossible {
+                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                                startPictureInPicture()
+                            }
+                            .disabled(currentImage == nil)
+                        }
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            if let image = currentImage {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         }
                         .disabled(currentImage == nil)
-                    }
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                    .disabled(currentImage == nil)
-                    ShareLink(
-                        "Shared.Share",
-                        item: shareImage,
-                        preview: SharePreview(
-                            displayedPicName,
-                            image: shareImage
+                        ShareLink(
+                            "Shared.Share",
+                            item: shareImage,
+                            preview: SharePreview(
+                                displayedPicName,
+                                image: shareImage
+                            )
                         )
-                    )
-                    .disabled(currentImage == nil)
+                        .disabled(currentImage == nil)
+                    }
                 }
             } else {
                 // Portrait: show actions in bottom bar
-                if pipManager.isPossible {
+                if viewer.displayedPic?.isVideo != true {
+                    if pipManager.isPossible {
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                                startPictureInPicture()
+                            }
+                            .disabled(currentImage == nil)
+                        }
+                    }
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
-                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                            startPictureInPicture()
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            if let image = currentImage {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         }
                         .disabled(currentImage == nil)
-                    }
-                }
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                    .disabled(currentImage == nil)
-                    ShareLink(
-                        "Shared.Share",
-                        item: shareImage,
-                        preview: SharePreview(
-                            displayedPicName,
-                            image: shareImage
+                        ShareLink(
+                            "Shared.Share",
+                            item: shareImage,
+                            preview: SharePreview(
+                                displayedPicName,
+                                image: shareImage
+                            )
                         )
-                    )
-                    .disabled(currentImage == nil)
+                        .disabled(currentImage == nil)
+                    }
                 }
             }
         }

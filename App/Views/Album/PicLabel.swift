@@ -56,6 +56,18 @@ struct PicLabel: View {
                         .transition(.opacity.animation(.smooth.speed(2.0)))
                 }
             }
+            .overlay(alignment: .bottomTrailing) {
+                if pic.isVideo, let duration = pic.duration {
+                    Text(formatDuration(duration))
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(.black.opacity(0.6), in: .capsule)
+                        .padding(4)
+                }
+            }
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 4.0))

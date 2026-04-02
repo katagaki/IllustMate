@@ -38,8 +38,11 @@ actor DataActor {
     let picName = Expression<String>("name")
     let picAlbumId = Expression<String?>("containing_album_id")
     let picDateAdded = Expression<Double>("date_added")
-    let picData = Expression<Data>("data")
+    let picData = Expression<Data?>("data")
     let picThumbnailData = Expression<Data?>("thumbnail_data")
+    let picMediaType = Expression<Int>("media_type")
+    let picDuration = Expression<Double?>("duration")
+    let picFilePath = Expression<String?>("file_path")
 
     // Preferences columns
     let prefAlbumId = Expression<String>("album_id")
@@ -91,7 +94,14 @@ actor DataActor {
                 table.column(picDateAdded)
                 table.column(picData)
                 table.column(picThumbnailData)
+                table.column(picMediaType, defaultValue: 0)
+                table.column(picDuration)
+                table.column(picFilePath)
             })
+            // Migrate existing databases: add new video columns if missing
+            try? database.run(picsTable.addColumn(picMediaType, defaultValue: 0))
+            try? database.run(picsTable.addColumn(picDuration))
+            try? database.run(picsTable.addColumn(picFilePath))
             try database.run(preferencesTable.create(ifNotExists: true) { table in
                 table.column(prefAlbumId, primaryKey: true)
                 table.column(prefAlbumSort, defaultValue: "nameAscending")
@@ -156,9 +166,15 @@ actor DataActor {
         let albumId = try? row.get(picAlbumId)
         let dateAdded = Date(timeIntervalSince1970: (try? row.get(picDateAdded)) ?? 0)
         let thumbData = try? row.get(picThumbnailData)
+        let mediaTypeRaw = (try? row.get(picMediaType)) ?? 0
+        let duration = try? row.get(picDuration)
+        let filePath = try? row.get(picFilePath)
         let pic = Pic(id: id, name: name,
-                                        containingAlbumID: albumId ?? nil,
-                                        dateAdded: dateAdded)
+                       containingAlbumID: albumId ?? nil,
+                       dateAdded: dateAdded,
+                       mediaType: MediaType(rawValue: mediaTypeRaw) ?? .pic,
+                       duration: duration,
+                       filePath: filePath)
         pic.thumbnailData = thumbData ?? nil
         return pic
     }
@@ -172,7 +188,8 @@ actor DataActor {
         let query = picsTable
             .filter(picAlbumId == id)
             .select(picId, picName, picAlbumId,
-                    picDateAdded, picThumbnailData)
+                    picDateAdded, picThumbnailData,
+                    picMediaType, picDuration, picFilePath)
         return (try? database.prepare(query).map { picFrom(row: $0) }) ?? []
     }
 
@@ -218,17 +235,26 @@ actor DataActor {
         if let targetAlbumID {
             let foreignPics = try foreignDB.prepare(picsTable)
             for foreignPic in foreignPics {
-                if let pData = try? foreignPic.get(picData) {
-                    let id = UUID().uuidString
-                    _ = try? self.database.run(self.picsTable.insert(
-                        self.picId <- id,
-                        self.picName <- (try? foreignPic.get(picName)) ?? Pic.newFilename(),
-                        self.picAlbumId <- targetAlbumID,
-                        self.picDateAdded <- (try? foreignPic.get(picDateAdded)) ?? Date.now.timeIntervalSince1970,
-                        self.picData <- pData,
-                        self.picThumbnailData <- (try? foreignPic.get(picThumbnailData))
-                    ))
+                let pData = try? foreignPic.get(picData)
+                let foreignMediaType = (try? foreignPic.get(picMediaType)) ?? 0
+                let foreignFilePath = try? foreignPic.get(picFilePath)
+                // Skip videos without file data (can't import video files from DB-only backup)
+                if foreignMediaType == MediaType.video.rawValue && foreignFilePath != nil {
+                    continue
                 }
+                guard pData != nil || foreignMediaType == MediaType.pic.rawValue else { continue }
+                let id = UUID().uuidString
+                _ = try? self.database.run(self.picsTable.insert(
+                    self.picId <- id,
+                    self.picName <- (try? foreignPic.get(picName)) ?? Pic.newFilename(),
+                    self.picAlbumId <- targetAlbumID,
+                    self.picDateAdded <- (try? foreignPic.get(picDateAdded)) ?? Date.now.timeIntervalSince1970,
+                    self.picData <- pData,
+                    self.picThumbnailData <- (try? foreignPic.get(picThumbnailData)),
+                    self.picMediaType <- foreignMediaType,
+                    self.picDuration <- (try? foreignPic.get(picDuration)),
+                    self.picFilePath <- foreignFilePath
+                ))
             }
         } else {
             // Merge

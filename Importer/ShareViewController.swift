@@ -38,7 +38,9 @@ class ShareViewController: UIViewController {
                 var failedItemCount: Int = 0
                 for attachment: NSItemProvider in attachments {
                     var loadedFile: Any?
-                    if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+                    if attachment.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+                        loadedFile = await loadItem(attachment, type: UTType.movie)
+                    } else if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
                         loadedFile = await loadItem(attachment, type: UTType.image)
                     } else if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
                         loadedFile = await loadItem(attachment, type: UTType.url)
