@@ -140,14 +140,15 @@ struct PhotosAssetGridView: View {
         videoOptions.isNetworkAccessAllowed = true
         videoOptions.deliveryMode = .highQualityFormat
 
-        let exportSession = await withCheckedContinuation {
+        let exportSession: AVAssetExportSession? = await withCheckedContinuation {
             (continuation: CheckedContinuation<AVAssetExportSession?, Never>) in
             PHImageManager.default().requestExportSession(
                 forVideo: asset,
                 options: videoOptions,
                 exportPreset: AVAssetExportPresetPassthrough
             ) { session, _ in
-                continuation.resume(returning: session)
+                nonisolated(unsafe) let result = session
+                continuation.resume(returning: result)
             }
         }
 

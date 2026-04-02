@@ -123,14 +123,15 @@ extension PhotosFolderImportPickerView {
         videoRequestOptions.isNetworkAccessAllowed = true
         videoRequestOptions.deliveryMode = .highQualityFormat
 
-        let exportSession = await withCheckedContinuation {
+        let exportSession: AVAssetExportSession? = await withCheckedContinuation {
             (continuation: CheckedContinuation<AVAssetExportSession?, Never>) in
             PHImageManager.default().requestExportSession(
                 forVideo: asset,
                 options: videoRequestOptions,
                 exportPreset: AVAssetExportPresetPassthrough
             ) { session, _ in
-                continuation.resume(returning: session)
+                nonisolated(unsafe) let result = session
+                continuation.resume(returning: result)
             }
         }
 
