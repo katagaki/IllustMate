@@ -69,12 +69,13 @@ final class Pic: Identifiable, Hashable, @unchecked Sendable {
         return nil
     }
 
-    static func makeVideoThumbnail(_ url: URL) -> Data? {
+    static func makeVideoThumbnail(_ url: URL) async -> Data? {
         let asset = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
         generator.maximumSize = CGSize(width: 240, height: 240)
-        guard let cgImage = try? generator.copyCGImage(at: .zero, actualTime: nil) else {
+        guard let result = try? await generator.image(at: .zero),
+              case let cgImage = result.image else {
             return nil
         }
         return UIImage(cgImage: cgImage).jpegData(compressionQuality: 0.7)

@@ -121,7 +121,7 @@ extension DataActor {
             return
         }
         let videoURL = videoFileURL(forRelativePath: relativePath)
-        let thumbnailData = Pic.makeVideoThumbnail(videoURL)
+        let thumbnailData = await Pic.makeVideoThumbnail(videoURL)
         _ = try? database.run(picsTable.insert(
             picId <- id,
             picName <- name,

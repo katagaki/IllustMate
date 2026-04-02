@@ -119,29 +119,17 @@ struct AlbumView: View {
                     }
                 }
             ))
-            .photosPicker(isPresented: $isPhotosPickerPresented,
-                          selection: $selectedPhotoItems,
-                          matching: .images,
-                          photoLibrary: .shared())
-            .photosPicker(isPresented: $isVideosPickerPresented,
-                          selection: $selectedVideoItems,
-                          matching: .videos,
-                          photoLibrary: .shared())
-            .modifier(FileImportModifier(
+            .modifier(AlbumMediaImportModifier(
+                isPhotosPickerPresented: $isPhotosPickerPresented,
+                selectedPhotoItems: $selectedPhotoItems,
+                isVideosPickerPresented: $isVideosPickerPresented,
+                selectedVideoItems: $selectedVideoItems,
                 isFileImporterPresented: $isFileImporterPresented,
                 isFileImportSheetPresented: $isFileImportSheetPresented,
-                onFilesImported: { files in importLoadedFiles(files) }
+                onPhotosSelected: { importSelectedPhotos($0) },
+                onVideosSelected: { importSelectedVideos($0) },
+                onFilesImported: { importLoadedFiles($0) }
             ))
-            .onChange(of: selectedPhotoItems) { _, newValue in
-                if !newValue.isEmpty {
-                    importSelectedPhotos(newValue)
-                }
-            }
-            .onChange(of: selectedVideoItems) { _, newValue in
-                if !newValue.isEmpty {
-                    importSelectedVideos(newValue)
-                }
-            }
             .sheet(isPresented: $isDuplicateCheckerPresented) {
                 Group {
                     if let currentAlbum {

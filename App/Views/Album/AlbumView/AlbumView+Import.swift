@@ -131,13 +131,9 @@ extension AlbumView {
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("mov")
-        exportSession.outputURL = tempURL
-        exportSession.outputFileType = .mov
-
-        await exportSession.export()
         defer { try? FileManager.default.removeItem(at: tempURL) }
 
-        guard exportSession.status == .completed,
+        guard (try? await exportSession.export(to: tempURL, as: .mov)) != nil,
               let videoData = try? Data(contentsOf: tempURL) else { return }
 
         let fileExtension = (filename as NSString).pathExtension.isEmpty
