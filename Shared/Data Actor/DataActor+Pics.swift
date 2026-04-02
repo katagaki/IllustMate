@@ -114,7 +114,7 @@ extension DataActor {
         fileExtension: String,
         inAlbumWithID albumID: String? = nil,
         dateAdded: Date? = nil
-    ) {
+    ) async {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         guard let relativePath = saveVideoFile(data, id: id, fileExtension: fileExtension) else {
