@@ -98,18 +98,11 @@ actor DataActor {
                 table.column(picDuration)
                 table.column(picFilePath)
             })
-            // Migrate existing databases: add missing columns
-            try? database.run(albumsTable.addColumn(albumCoverPhoto))
-            try? database.run(albumsTable.addColumn(albumParentId))
-            try? database.run(albumsTable.addColumn(albumDateCreated, defaultValue: 0))
-            try? database.run(picsTable.addColumn(picName, defaultValue: ""))
-            try? database.run(picsTable.addColumn(picAlbumId))
-            try? database.run(picsTable.addColumn(picDateAdded, defaultValue: 0))
-            try? database.run(picsTable.addColumn(picData))
-            try? database.run(picsTable.addColumn(picThumbnailData))
-            try? database.run(picsTable.addColumn(picMediaType, defaultValue: 0))
-            try? database.run(picsTable.addColumn(picDuration))
-            try? database.run(picsTable.addColumn(picFilePath))
+            if DatabaseMigrator.migrationNeeded() {
+                DatabaseMigrator.migrateCollectionDatabase(database,
+                    albumsTable: albumsTable, picsTable: picsTable,
+                    preferencesTable: preferencesTable)
+            }
             try database.run(preferencesTable.create(ifNotExists: true) { table in
                 table.column(prefAlbumId, primaryKey: true)
                 table.column(prefAlbumSort, defaultValue: "nameAscending")

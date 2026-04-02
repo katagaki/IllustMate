@@ -46,6 +46,9 @@ actor LibrariesActor {
                 table.column(libraryId, primaryKey: true)
                 table.column(libraryName)
             })
+            if DatabaseMigrator.migrationNeeded() {
+                DatabaseMigrator.migrateLibrariesDatabase(database, librariesTable: librariesTable)
+            }
             // Ensure default library exists
             let defaultExists = try database.scalar(
                 librariesTable.filter(libraryId == PicLibrary.defaultID).count

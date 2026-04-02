@@ -63,6 +63,9 @@ actor CoverCacheActor {
                 table.column(cacheSecondary)
                 table.column(cacheTertiary)
             })
+            if DatabaseMigrator.migrationNeeded() {
+                DatabaseMigrator.migrateCoverCacheDatabase(database, coverCacheTable: coverCacheTable)
+            }
         } catch {
             debugPrint("Cover cache database setup error: \(error)")
         }

@@ -143,6 +143,7 @@
 				"Data Actor/DataActor+Albums.swift",
 				"Data Actor/DataActor+Pics.swift",
 				"Data Actor/DataActor+VideoStorage.swift",
+				"Data Actor/DatabaseMigrator.swift",
 				"Data Models/Album.swift",
 				"Data Models/MediaType.swift",
 				"Data Models/Pic.swift",
