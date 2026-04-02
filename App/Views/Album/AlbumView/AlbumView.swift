@@ -49,7 +49,9 @@ struct AlbumView: View {
     @State var isFileImporterPresented: Bool = false
     @State var isFileImportSheetPresented: Bool = false
     @State var isPhotosPickerPresented: Bool = false
+    @State var isVideosPickerPresented: Bool = false
     @State var selectedPhotoItems: [PhotosPickerItem] = []
+    @State var selectedVideoItems: [PhotosPickerItem] = []
     @State var isImportingPhotos: Bool = false
     @State var importCurrentCount: Int = 0
     @State var importTotalCount: Int = 0
@@ -121,6 +123,10 @@ struct AlbumView: View {
                           selection: $selectedPhotoItems,
                           matching: .images,
                           photoLibrary: .shared())
+            .photosPicker(isPresented: $isVideosPickerPresented,
+                          selection: $selectedVideoItems,
+                          matching: .videos,
+                          photoLibrary: .shared())
             .modifier(FileImportModifier(
                 isFileImporterPresented: $isFileImporterPresented,
                 isFileImportSheetPresented: $isFileImportSheetPresented,
@@ -129,6 +135,11 @@ struct AlbumView: View {
             .onChange(of: selectedPhotoItems) { _, newValue in
                 if !newValue.isEmpty {
                     importSelectedPhotos(newValue)
+                }
+            }
+            .onChange(of: selectedVideoItems) { _, newValue in
+                if !newValue.isEmpty {
+                    importSelectedVideos(newValue)
                 }
             }
             .sheet(isPresented: $isDuplicateCheckerPresented) {

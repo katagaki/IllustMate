@@ -193,6 +193,12 @@ extension AlbumView {
                           systemImage: "photo.on.rectangle.angled")
                 }
                 Button {
+                    isVideosPickerPresented = true
+                } label: {
+                    Label(String(localized: "Import.SelectVideos", table: "Import"),
+                          systemImage: "video")
+                }
+                Button {
                     isBrowsingAlbums = true
                 } label: {
                     Label(String(localized: "Import.BrowseAlbums", table: "Import"),
