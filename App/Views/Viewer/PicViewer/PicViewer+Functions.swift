@@ -70,12 +70,8 @@ extension PicViewer {
 
             if showImageSize, let duration = viewer.displayedPic?.duration {
                 HStack(alignment: .center, spacing: 4.0) {
-                    if let player = viewer.videoPlayer,
-                       let track = player.currentItem?.tracks.first(where: {
-                           $0.assetTrack?.mediaType == .video
-                       })?.assetTrack {
-                        let size = track.naturalSize.applying(track.preferredTransform)
-                        Text(verbatim: "\(Int(abs(size.width)))×\(Int(abs(size.height)))")
+                    if let res = videoResolution {
+                        Text(verbatim: "\(Int(res.width))×\(Int(res.height))")
                         Text(verbatim: "·")
                     }
                     Text(formatDuration(duration))

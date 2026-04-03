@@ -26,6 +26,7 @@ struct PicViewer: View {
     @State var isRenamePicPresented: Bool = false
     @State var renamePicText: String = ""
     @State var displayedPicName: String = ""
+    @State var videoResolution: CGSize?
 
     var isLandscape: Bool {
         verticalSizeClass == .compact
@@ -196,11 +197,28 @@ struct PicViewer: View {
         .task(id: viewer.displayedPicID) {
             displayedPicName = viewer.displayedPic?.name ?? pic.name
             containingAlbumName = nil
+            videoResolution = nil
             if let albumID = viewer.displayedPic?.containingAlbumID ?? pic.containingAlbumID {
                 let name = await DataActor.shared.album(for: albumID)?.name
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
                         self.containingAlbumName = name
+                    }
+                }
+            }
+            if viewer.displayedPic?.isVideo == true, let videoURL = viewer.displayedVideoURL {
+                let asset = AVURLAsset(url: videoURL)
+                if let track = try? await asset.loadTracks(withMediaType: .video).first {
+                    let size = try? await track.load(.naturalSize)
+                    let transform = try? await track.load(.preferredTransform)
+                    if let size, let transform {
+                        let transformed = size.applying(transform)
+                        videoResolution = CGSize(
+                            width: abs(transformed.width),
+                            height: abs(transformed.height)
+                        )
+                    } else if let size {
+                        videoResolution = size
                     }
                 }
             }
