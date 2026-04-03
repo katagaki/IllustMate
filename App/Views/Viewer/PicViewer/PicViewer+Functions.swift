@@ -69,12 +69,22 @@ extension PicViewer {
             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
 
             if showImageSize, let duration = viewer.displayedPic?.duration {
-                Text(formatDuration(duration))
-                    .font(.caption)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.bar, in: .capsule)
-                    .transition(.opacity)
+                HStack(alignment: .center, spacing: 4.0) {
+                    if let player = viewer.videoPlayer,
+                       let track = player.currentItem?.tracks.first(where: {
+                           $0.assetTrack?.mediaType == .video
+                       })?.assetTrack {
+                        let size = track.naturalSize.applying(track.preferredTransform)
+                        Text(verbatim: "\(Int(abs(size.width)))×\(Int(abs(size.height)))")
+                        Text(verbatim: "·")
+                    }
+                    Text(formatDuration(duration))
+                }
+                .font(.caption)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.bar, in: .capsule)
+                .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
