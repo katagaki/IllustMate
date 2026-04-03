@@ -67,19 +67,6 @@ extension PhotosAssetViewer {
                 }
             }
             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-
-            if showImageSize {
-                HStack(alignment: .center, spacing: 4.0) {
-                    Text(verbatim: "\(currentAsset.pixelWidth)×\(currentAsset.pixelHeight)")
-                    Text(verbatim: "·")
-                    Text(formatDuration(currentAsset.duration))
-                }
-                .font(.caption)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(.bar, in: .capsule)
-                .transition(.opacity)
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, isLandscape ? 4 : 20)

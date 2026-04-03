@@ -67,21 +67,6 @@ extension PicViewer {
                 }
             }
             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
-
-            if showImageSize, let duration = viewer.displayedPic?.duration {
-                HStack(alignment: .center, spacing: 4.0) {
-                    if let res = videoResolution {
-                        Text(verbatim: "\(Int(res.width))×\(Int(res.height))")
-                        Text(verbatim: "·")
-                    }
-                    Text(formatDuration(duration))
-                }
-                .font(.caption)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(.bar, in: .capsule)
-                .transition(.opacity)
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, isLandscape ? 4 : 20)
