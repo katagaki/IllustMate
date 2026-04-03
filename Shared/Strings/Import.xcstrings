@@ -288,7 +288,7 @@
         }
       }
     },
-    "Import.Completed.Text.%lld" : {
+    "Import.Count.Photos.%lld" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -297,13 +297,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Das ausgewählte Foto wurde erfolgreich importiert."
+                  "value" : "%lld Foto"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld Fotos wurden erfolgreich importiert."
+                  "value" : "%lld Fotos"
                 }
               }
             }
@@ -315,13 +315,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "The selected photo has been imported successfully."
+                  "value" : "%lld photo"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld photos have been imported successfully."
+                  "value" : "%lld photos"
                 }
               }
             }
@@ -330,16 +330,10 @@
         "ja" : {
           "variations" : {
             "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "選択した写真が正常にインポートされました。"
-                }
-              },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld枚の写真が正常にインポートされました。"
+                  "value" : "写真%lld件"
                 }
               }
             }
@@ -351,7 +345,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld장의 사진을 성공적으로 가져왔습니다."
+                  "value" : "사진 %lld장"
                 }
               }
             }
@@ -363,7 +357,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "已成功导入 %lld 张照片。"
+                  "value" : "%lld 张照片"
                 }
               }
             }
@@ -375,7 +369,191 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "已成功匯入 %lld 張照片。"
+                  "value" : "%lld 張照片"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Import.Count.Videos.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Video"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Videos"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld video"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld videos"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "ビデオ%lld件"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "비디오 %lld개"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld 个视频"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld 個影片"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Import.Completed.Text.%lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Das ausgewählte Element wurde erfolgreich importiert."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Elemente wurden erfolgreich importiert."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "The selected item has been imported successfully."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld items have been imported successfully."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "選択した項目が正常にインポートされました。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld件の項目が正常にインポートされました。"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld개 항목을 성공적으로 가져왔습니다."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "已成功导入 %lld 个项目。"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "已成功匯入 %lld 個項目。"
                 }
               }
             }
@@ -1030,13 +1208,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d Foto wird importiert."
+                  "value" : "%d Element wird importiert."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d Fotos werden importiert."
+                  "value" : "%d Elemente werden importiert."
                 }
               }
             }
@@ -1048,13 +1226,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d photo will be imported."
+                  "value" : "%d item will be imported."
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d photos will be imported."
+                  "value" : "%d items will be imported."
                 }
               }
             }
@@ -1066,13 +1244,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d枚の写真がインポートされます。"
+                  "value" : "%d件の項目がインポートされます。"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d枚の写真がインポートされます。"
+                  "value" : "%d件の項目がインポートされます。"
                 }
               }
             }
@@ -1084,7 +1262,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d장의 사진을 가져옵니다."
+                  "value" : "%d개 항목을 가져옵니다."
                 }
               }
             }
@@ -1096,7 +1274,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "将导入 %d 张照片。"
+                  "value" : "将导入 %d 个项目。"
                 }
               }
             }
@@ -1108,7 +1286,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "將匯入 %d 張照片。"
+                  "value" : "將匯入 %d 個項目。"
                 }
               }
             }

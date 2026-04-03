@@ -77,14 +77,23 @@ extension PhotosFolderImportPickerView {
         return count
     }
 
-    func imageCount(in collection: PHAssetCollection) -> Int {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(
-            format: "mediaType = %d OR mediaType = %d",
-            PHAssetMediaType.image.rawValue,
-            PHAssetMediaType.video.rawValue
-        )
-        return PHAsset.fetchAssets(in: collection, options: fetchOptions).count
+    func mediaCountText(in collection: PHAssetCollection) -> String {
+        let photoOptions = PHFetchOptions()
+        photoOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        let photoCount = PHAsset.fetchAssets(in: collection, options: photoOptions).count
+
+        let videoOptions = PHFetchOptions()
+        videoOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.video.rawValue)
+        let videoCount = PHAsset.fetchAssets(in: collection, options: videoOptions).count
+
+        var parts: [String] = []
+        if photoCount > 0 {
+            parts.append(String(localized: "Import.Count.Photos.\(photoCount)", table: "Import"))
+        }
+        if videoCount > 0 {
+            parts.append(String(localized: "Import.Count.Videos.\(videoCount)", table: "Import"))
+        }
+        return parts.isEmpty ? "0" : parts.joined(separator: ", ")
     }
 
     func firstAsset(in collection: PHAssetCollection) -> PHAsset? {

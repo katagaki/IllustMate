@@ -86,7 +86,7 @@ extension PhotosFolderImportPickerView {
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(collection.localizedTitle
                      ?? String(localized: "Import.Albums.Untitled", table: "Import"))
-                Text("\(imageCount(in: collection))")
+                Text(mediaCountText(in: collection))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

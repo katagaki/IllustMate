@@ -127,7 +127,7 @@ extension DataActor {
             picName <- name,
             picAlbumId <- albumID,
             picDateAdded <- now.timeIntervalSince1970,
-            picData <- nil as Data?,
+            picData <- Data(),
             picThumbnailData <- thumbnailData,
             picMediaType <- MediaType.video.rawValue,
             picDuration <- duration,
