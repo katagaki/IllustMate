@@ -38,9 +38,9 @@ struct DatabaseMigrator {
         let albumCoverPhoto = Expression<Data?>("cover_photo")
         let albumParentId = Expression<String?>("parent_album_id")
         let albumDateCreated = Expression<Double>("date_created")
-        try? database.run(albumsTable.addColumn(albumCoverPhoto))
-        try? database.run(albumsTable.addColumn(albumParentId))
-        try? database.run(albumsTable.addColumn(albumDateCreated, defaultValue: 0))
+        _ = try? database.run(albumsTable.addColumn(albumCoverPhoto))
+        _ = try? database.run(albumsTable.addColumn(albumParentId))
+        _ = try? database.run(albumsTable.addColumn(albumDateCreated, defaultValue: 0))
 
         // Pics columns
         let picName = Expression<String>("name")
@@ -51,14 +51,14 @@ struct DatabaseMigrator {
         let picMediaType = Expression<Int>("media_type")
         let picDuration = Expression<Double?>("duration")
         let picFilePath = Expression<String?>("file_path")
-        try? database.run(picsTable.addColumn(picName, defaultValue: ""))
-        try? database.run(picsTable.addColumn(picAlbumId))
-        try? database.run(picsTable.addColumn(picDateAdded, defaultValue: 0))
-        try? database.run(picsTable.addColumn(picData))
-        try? database.run(picsTable.addColumn(picThumbnailData))
-        try? database.run(picsTable.addColumn(picMediaType, defaultValue: 0))
-        try? database.run(picsTable.addColumn(picDuration))
-        try? database.run(picsTable.addColumn(picFilePath))
+        _ = try? database.run(picsTable.addColumn(picName, defaultValue: ""))
+        _ = try? database.run(picsTable.addColumn(picAlbumId))
+        _ = try? database.run(picsTable.addColumn(picDateAdded, defaultValue: 0))
+        _ = try? database.run(picsTable.addColumn(picData))
+        _ = try? database.run(picsTable.addColumn(picThumbnailData))
+        _ = try? database.run(picsTable.addColumn(picMediaType, defaultValue: 0))
+        _ = try? database.run(picsTable.addColumn(picDuration))
+        _ = try? database.run(picsTable.addColumn(picFilePath))
 
         // Preferences columns
         let prefAlbumSort = Expression<String>("album_sort")
@@ -67,12 +67,12 @@ struct DatabaseMigrator {
         let prefPicSort = Expression<String>("pic_sort")
         let prefPicColumnCount = Expression<Int>("pic_column_count")
         let prefHideSectionHeaders = Expression<Bool>("hide_section_headers")
-        try? database.run(preferencesTable.addColumn(prefAlbumSort, defaultValue: "nameAscending"))
-        try? database.run(preferencesTable.addColumn(prefAlbumViewStyle, defaultValue: "grid"))
-        try? database.run(preferencesTable.addColumn(prefAlbumColumnCount, defaultValue: 4))
-        try? database.run(preferencesTable.addColumn(prefPicSort, defaultValue: "dateAddedDescending"))
-        try? database.run(preferencesTable.addColumn(prefPicColumnCount, defaultValue: 4))
-        try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
+        _ = try? database.run(preferencesTable.addColumn(prefAlbumSort, defaultValue: "nameAscending"))
+        _ = try? database.run(preferencesTable.addColumn(prefAlbumViewStyle, defaultValue: "grid"))
+        _ = try? database.run(preferencesTable.addColumn(prefAlbumColumnCount, defaultValue: 4))
+        _ = try? database.run(preferencesTable.addColumn(prefPicSort, defaultValue: "dateAddedDescending"))
+        _ = try? database.run(preferencesTable.addColumn(prefPicColumnCount, defaultValue: 4))
+        _ = try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
     }
 
     // MARK: - Hashes DB
@@ -80,8 +80,8 @@ struct DatabaseMigrator {
     static func migrateHashDatabase(_ database: Connection, picHashesTable: Table) {
         let hashValue = Expression<Int64>("dhash")
         let hashVersion = Expression<Int>("hash_version")
-        try? database.run(picHashesTable.addColumn(hashValue, defaultValue: 0))
-        try? database.run(picHashesTable.addColumn(hashVersion, defaultValue: 1))
+        _ = try? database.run(picHashesTable.addColumn(hashValue, defaultValue: 0))
+        _ = try? database.run(picHashesTable.addColumn(hashVersion, defaultValue: 1))
     }
 
     // MARK: - PColors DB
@@ -90,9 +90,9 @@ struct DatabaseMigrator {
         let colorRed = Expression<Int>("red")
         let colorGreen = Expression<Int>("green")
         let colorBlue = Expression<Int>("blue")
-        try? database.run(picColorsTable.addColumn(colorRed, defaultValue: 0))
-        try? database.run(picColorsTable.addColumn(colorGreen, defaultValue: 0))
-        try? database.run(picColorsTable.addColumn(colorBlue, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(colorRed, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(colorGreen, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(colorBlue, defaultValue: 0))
     }
 
     // MARK: - Cover Cache DB
@@ -102,16 +102,16 @@ struct DatabaseMigrator {
         let cachePrimary = Expression<Data?>("primary_data")
         let cacheSecondary = Expression<Data?>("secondary_data")
         let cacheTertiary = Expression<Data?>("tertiary_data")
-        try? database.run(coverCacheTable.addColumn(cacheVersionKey, defaultValue: ""))
-        try? database.run(coverCacheTable.addColumn(cachePrimary))
-        try? database.run(coverCacheTable.addColumn(cacheSecondary))
-        try? database.run(coverCacheTable.addColumn(cacheTertiary))
+        _ = try? database.run(coverCacheTable.addColumn(cacheVersionKey, defaultValue: ""))
+        _ = try? database.run(coverCacheTable.addColumn(cachePrimary))
+        _ = try? database.run(coverCacheTable.addColumn(cacheSecondary))
+        _ = try? database.run(coverCacheTable.addColumn(cacheTertiary))
     }
 
     // MARK: - Libraries DB
 
     static func migrateLibrariesDatabase(_ database: Connection, librariesTable: Table) {
         let libraryName = Expression<String>("name")
-        try? database.run(librariesTable.addColumn(libraryName, defaultValue: ""))
+        _ = try? database.run(librariesTable.addColumn(libraryName, defaultValue: ""))
     }
 }
