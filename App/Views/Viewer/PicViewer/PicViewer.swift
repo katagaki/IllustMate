@@ -115,7 +115,15 @@ struct PicViewer: View {
             if isLandscape {
                 // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    if viewer.displayedPic?.isVideo != true {
+                    if viewer.displayedPic?.isVideo == true {
+                        if let videoURL = viewer.displayedVideoURL {
+                            ShareLink(
+                                "Shared.Share",
+                                item: videoURL,
+                                preview: SharePreview(displayedPicName)
+                            )
+                        }
+                    } else {
                         if pipManager.isPossible {
                             Button("Shared.PictureInPicture", systemImage: "pip.enter") {
                                 startPictureInPicture()
@@ -142,7 +150,18 @@ struct PicViewer: View {
                 }
             } else {
                 // Portrait: show actions in bottom bar
-                if viewer.displayedPic?.isVideo != true {
+                if viewer.displayedPic?.isVideo == true {
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        if let videoURL = viewer.displayedVideoURL {
+                            ShareLink(
+                                "Shared.Share",
+                                item: videoURL,
+                                preview: SharePreview(displayedPicName)
+                            )
+                        }
+                    }
+                } else {
                     if pipManager.isPossible {
                         ToolbarItemGroup(placement: .bottomBar) {
                             Button("Shared.PictureInPicture", systemImage: "pip.enter") {

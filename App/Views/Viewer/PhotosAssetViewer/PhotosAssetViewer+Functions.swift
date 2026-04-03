@@ -192,6 +192,33 @@ extension PhotosAssetViewer {
         }
     }
 
+    func exportVideoForSharing() async {
+        let options = PHVideoRequestOptions()
+        options.isNetworkAccessAllowed = true
+        options.deliveryMode = .highQualityFormat
+
+        let exportSession: AVAssetExportSession? = await withCheckedContinuation {
+            (continuation: CheckedContinuation<AVAssetExportSession?, Never>) in
+            PHImageManager.default().requestExportSession(
+                forVideo: currentAsset,
+                options: options,
+                exportPreset: AVAssetExportPresetPassthrough
+            ) { session, _ in
+                nonisolated(unsafe) let result = session
+                continuation.resume(returning: result)
+            }
+        }
+
+        guard let exportSession else { return }
+
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("mov")
+
+        guard (try? await exportSession.export(to: tempURL, as: .mov)) != nil else { return }
+        self.videoExportURL = tempURL
+    }
+
     func loadFullImage() async {
         await withCheckedContinuation { continuation in
             let manager = PHCachingImageManager.default()

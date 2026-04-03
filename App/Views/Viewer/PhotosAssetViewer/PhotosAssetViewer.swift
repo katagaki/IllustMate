@@ -30,6 +30,7 @@ struct PhotosAssetViewer: View {
     @State var displayOffset: CGSize = .zero
     @State var viewSize: CGSize = .zero
     @State var videoPlayer: AVPlayer?
+    @State var videoExportURL: URL?
 
     var isLandscape: Bool {
         verticalSizeClass == .compact
@@ -93,7 +94,15 @@ struct PhotosAssetViewer: View {
             if isLandscape {
                 // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    if currentAsset.mediaType != .video {
+                    if currentAsset.mediaType == .video {
+                        if let videoExportURL {
+                            ShareLink(
+                                "Shared.Share",
+                                item: videoExportURL,
+                                preview: SharePreview(displayName)
+                            )
+                        }
+                    } else {
                         if pipManager.isPossible {
                             Button("Shared.PictureInPicture", systemImage: "pip.enter") {
                                 startPictureInPicture()
@@ -120,7 +129,18 @@ struct PhotosAssetViewer: View {
                 }
             } else {
                 // Portrait: show actions in bottom bar
-                if currentAsset.mediaType != .video {
+                if currentAsset.mediaType == .video {
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        if let videoExportURL {
+                            ShareLink(
+                                "Shared.Share",
+                                item: videoExportURL,
+                                preview: SharePreview(displayName)
+                            )
+                        }
+                    }
+                } else {
                     if pipManager.isPossible {
                         ToolbarItemGroup(placement: .bottomBar) {
                             Button("Shared.PictureInPicture", systemImage: "pip.enter") {
@@ -156,9 +176,11 @@ struct PhotosAssetViewer: View {
             isFullImageLoaded = false
             videoPlayer?.pause()
             videoPlayer = nil
+            videoExportURL = nil
             if currentAsset.mediaType == .video {
                 loadThumbnail()
                 loadVideoPlayer()
+                await exportVideoForSharing()
             } else {
                 loadThumbnail()
                 await loadFullImage()
