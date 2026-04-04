@@ -37,7 +37,49 @@ extension PicViewer {
         }
     }
 
+    @ViewBuilder
     var imageContent: some View {
+        if viewer.displayedPic?.isVideo == true {
+            videoContent
+        } else {
+            photoContent
+        }
+    }
+
+    var videoAspectRatio: CGFloat? {
+        guard let thumbnail = viewer.displayedThumbnail,
+              thumbnail.size.height > 0 else { return nil }
+        return thumbnail.size.width / thumbnail.size.height
+    }
+
+    var videoContent: some View {
+        VStack(spacing: 8.0) {
+            Group {
+                if let player = viewer.videoPlayer {
+                    VideoPlayerView(player: player)
+                        .aspectRatio(videoAspectRatio ?? 16.0 / 9.0, contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 8.0))
+                } else if let thumbnail = viewer.displayedThumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
+            }
+            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, isLandscape ? 4 : 20)
+        .padding(.bottom, isLandscape ? 0 : 20)
+        .zIndex(1)
+        .onTapGesture {
+            withAnimation(.smooth.speed(2)) {
+                showImageSize.toggle()
+            }
+        }
+    }
+
+    var photoContent: some View {
         // Image with size overlay - fills available space
         ZStack(alignment: .bottomLeading) {
             ZStack {

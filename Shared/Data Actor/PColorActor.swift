@@ -61,6 +61,9 @@ actor PColorActor {
                 table.column(colorGreen)
                 table.column(colorBlue)
             })
+            if DatabaseMigrator.migrationNeeded() {
+                DatabaseMigrator.migrateColorDatabase(database, picColorsTable: picColorsTable)
+            }
         } catch {
             debugPrint("Color database setup error: \(error)")
         }

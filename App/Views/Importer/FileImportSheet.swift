@@ -17,13 +17,13 @@ struct FileImportModifier: ViewModifier {
         content
             #if targetEnvironment(macCatalyst)
             .sheet(isPresented: $isFileImportSheetPresented) {
-                FileImportSheet(allowedContentTypes: [.image],
+                FileImportSheet(allowedContentTypes: [.image, .movie],
                                         onFilesImported: onFilesImported)
             }
             #else
             .fileImporter(
                 isPresented: $isFileImporterPresented,
-                allowedContentTypes: [.image],
+                allowedContentTypes: [.image, .movie],
                 allowsMultipleSelection: true
             ) { result in
                 switch result {

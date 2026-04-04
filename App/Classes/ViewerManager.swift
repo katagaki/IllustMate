@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/13.
 //
 
+import AVFoundation
 import Foundation
 import StoreKit
 import SwiftUI
@@ -19,6 +20,8 @@ class ViewerManager {
     var displayedThumbnail: UIImage?
     var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
+    var displayedVideoURL: URL?
+    var videoPlayer: AVPlayer?
 
     var allPics: [Pic] = []
     var currentIndex: Int = 0
@@ -38,6 +41,9 @@ class ViewerManager {
         displayedThumbnail = nil
         displayedImage = nil
         isFullImageLoaded = false
+        videoPlayer?.pause()
+        videoPlayer = nil
+        displayedVideoURL = nil
         allPics = []
         currentIndex = 0
         for task in prefetchTasks.values {
@@ -80,7 +86,21 @@ class ViewerManager {
         displayedPicID = pic.id
         isFullImageLoaded = false
 
-        if let cachedImage = imageCache[pic.id] {
+        // Clean up previous video state
+        videoPlayer?.pause()
+        videoPlayer = nil
+        displayedVideoURL = nil
+
+        if pic.isVideo {
+            // Load video URL
+            Task {
+                if let url = await DataActor.shared.videoURL(forPicWithID: pic.id) {
+                    self.displayedVideoURL = url
+                    self.videoPlayer = AVPlayer(url: url)
+                }
+            }
+            isFullImageLoaded = true
+        } else if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
             isFullImageLoaded = true
         } else {
@@ -90,8 +110,8 @@ class ViewerManager {
         // Navigate immediately — viewer opens with thumbnail
         completion()
 
-        // Load full image in background if not cached
-        if !isFullImageLoaded {
+        // Load full image in background if not cached (images only)
+        if !pic.isVideo && !isFullImageLoaded {
             loadFullImage(for: pic.id)
         }
     }
@@ -115,7 +135,20 @@ class ViewerManager {
         displayedPicID = pic.id
         isFullImageLoaded = false
 
-        if let cachedImage = imageCache[pic.id] {
+        // Clean up previous video state
+        videoPlayer?.pause()
+        videoPlayer = nil
+        displayedVideoURL = nil
+
+        if pic.isVideo {
+            Task {
+                if let url = await DataActor.shared.videoURL(forPicWithID: pic.id) {
+                    self.displayedVideoURL = url
+                    self.videoPlayer = AVPlayer(url: url)
+                }
+            }
+            isFullImageLoaded = true
+        } else if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
             isFullImageLoaded = true
         } else {

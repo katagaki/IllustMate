@@ -38,7 +38,48 @@ extension PhotosAssetViewer {
         }
     }
 
+    @ViewBuilder
     var imageContent: some View {
+        if currentAsset.mediaType == .video {
+            videoContent
+        } else {
+            photoContent
+        }
+    }
+
+    var videoAspectRatio: CGFloat {
+        guard currentAsset.pixelHeight > 0 else { return 16.0 / 9.0 }
+        return CGFloat(currentAsset.pixelWidth) / CGFloat(currentAsset.pixelHeight)
+    }
+
+    var videoContent: some View {
+        VStack(spacing: 8.0) {
+            Group {
+                if let videoPlayer {
+                    VideoPlayerView(player: videoPlayer)
+                        .aspectRatio(videoAspectRatio, contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 8.0))
+                } else if let thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(.rect(cornerRadius: 8.0))
+                }
+            }
+            .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, isLandscape ? 4 : 20)
+        .padding(.bottom, isLandscape ? 0 : 20)
+        .zIndex(1)
+        .onTapGesture {
+            withAnimation(.smooth.speed(2)) {
+                showImageSize.toggle()
+            }
+        }
+    }
+
+    var photoContent: some View {
         ZStack(alignment: .bottomLeading) {
             ZStack {
                 // Show thumbnail as placeholder
@@ -120,6 +161,49 @@ extension PhotosAssetViewer {
                 }
             }
         }
+    }
+
+    func loadVideoPlayer() {
+        let options = PHVideoRequestOptions()
+        options.isNetworkAccessAllowed = true
+        options.deliveryMode = .automatic
+
+        PHImageManager.default().requestPlayerItem(
+            forVideo: currentAsset, options: options
+        ) { playerItem, _ in
+            if let playerItem {
+                DispatchQueue.main.async {
+                    self.videoPlayer = AVPlayer(playerItem: playerItem)
+                }
+            }
+        }
+    }
+
+    func exportVideoForSharing() async {
+        let options = PHVideoRequestOptions()
+        options.isNetworkAccessAllowed = true
+        options.deliveryMode = .highQualityFormat
+
+        let exportSession: AVAssetExportSession? = await withCheckedContinuation {
+            (continuation: CheckedContinuation<AVAssetExportSession?, Never>) in
+            PHImageManager.default().requestExportSession(
+                forVideo: currentAsset,
+                options: options,
+                exportPreset: AVAssetExportPresetPassthrough
+            ) { session, _ in
+                nonisolated(unsafe) let result = session
+                continuation.resume(returning: result)
+            }
+        }
+
+        guard let exportSession else { return }
+
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("mov")
+
+        guard (try? await exportSession.export(to: tempURL, as: .mov)) != nil else { return }
+        self.videoExportURL = tempURL
     }
 
     func loadFullImage() async {

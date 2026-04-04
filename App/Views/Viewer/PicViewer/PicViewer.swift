@@ -26,6 +26,7 @@ struct PicViewer: View {
     @State var isRenamePicPresented: Bool = false
     @State var renamePicText: String = ""
     @State var displayedPicName: String = ""
+    @State var videoResolution: CGSize?
 
     var isLandscape: Bool {
         verticalSizeClass == .compact
@@ -115,57 +116,80 @@ struct PicViewer: View {
             if isLandscape {
                 // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    if pipManager.isPossible {
-                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                            startPictureInPicture()
+                    if viewer.displayedPic?.isVideo == true {
+                        if let videoURL = viewer.displayedVideoURL {
+                            ShareLink(
+                                "Shared.Share",
+                                item: videoURL,
+                                preview: SharePreview(displayedPicName)
+                            )
+                        }
+                    } else {
+                        if pipManager.isPossible {
+                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                                startPictureInPicture()
+                            }
+                            .disabled(currentImage == nil)
+                        }
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            if let image = currentImage {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         }
                         .disabled(currentImage == nil)
-                    }
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                    .disabled(currentImage == nil)
-                    ShareLink(
-                        "Shared.Share",
-                        item: shareImage,
-                        preview: SharePreview(
-                            displayedPicName,
-                            image: shareImage
+                        ShareLink(
+                            "Shared.Share",
+                            item: shareImage,
+                            preview: SharePreview(
+                                displayedPicName,
+                                image: shareImage
+                            )
                         )
-                    )
-                    .disabled(currentImage == nil)
+                        .disabled(currentImage == nil)
+                    }
                 }
             } else {
                 // Portrait: show actions in bottom bar
-                if pipManager.isPossible {
+                if viewer.displayedPic?.isVideo == true {
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {
-                        Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                            startPictureInPicture()
+                        if let videoURL = viewer.displayedVideoURL {
+                            ShareLink(
+                                "Shared.Share",
+                                item: videoURL,
+                                preview: SharePreview(displayedPicName)
+                            )
+                        }
+                    }
+                } else {
+                    if pipManager.isPossible {
+                        ToolbarItemGroup(placement: .bottomBar) {
+                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
+                                startPictureInPicture()
+                            }
+                            .disabled(currentImage == nil)
+                        }
+                    }
+                    ToolbarSpacer(.flexible, placement: .bottomBar)
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            if let image = currentImage {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
                         }
                         .disabled(currentImage == nil)
-                    }
-                }
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button("Shared.Copy", systemImage: "doc.on.doc") {
-                        if let image = currentImage {
-                            UIPasteboard.general.image = image
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        }
-                    }
-                    .disabled(currentImage == nil)
-                    ShareLink(
-                        "Shared.Share",
-                        item: shareImage,
-                        preview: SharePreview(
-                            displayedPicName,
-                            image: shareImage
+                        ShareLink(
+                            "Shared.Share",
+                            item: shareImage,
+                            preview: SharePreview(
+                                displayedPicName,
+                                image: shareImage
+                            )
                         )
-                    )
-                    .disabled(currentImage == nil)
+                        .disabled(currentImage == nil)
+                    }
                 }
             }
         }
@@ -173,11 +197,28 @@ struct PicViewer: View {
         .task(id: viewer.displayedPicID) {
             displayedPicName = viewer.displayedPic?.name ?? pic.name
             containingAlbumName = nil
+            videoResolution = nil
             if let albumID = viewer.displayedPic?.containingAlbumID ?? pic.containingAlbumID {
                 let name = await DataActor.shared.album(for: albumID)?.name
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
                         self.containingAlbumName = name
+                    }
+                }
+            }
+            if viewer.displayedPic?.isVideo == true, let videoURL = viewer.displayedVideoURL {
+                let asset = AVURLAsset(url: videoURL)
+                if let track = try? await asset.loadTracks(withMediaType: .video).first {
+                    let size = try? await track.load(.naturalSize)
+                    let transform = try? await track.load(.preferredTransform)
+                    if let size, let transform {
+                        let transformed = size.applying(transform)
+                        videoResolution = CGSize(
+                            width: abs(transformed.width),
+                            height: abs(transformed.height)
+                        )
+                    } else if let size {
+                        videoResolution = size
                     }
                 }
             }

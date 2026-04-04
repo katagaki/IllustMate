@@ -249,7 +249,11 @@ struct PhotosAlbumListRow: View {
         .padding([.top, .bottom], 8.0)
         .task(id: collection.localIdentifier) {
             let options = PHFetchOptions()
-            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            options.predicate = NSPredicate(
+                format: "mediaType = %d OR mediaType = %d",
+                PHAssetMediaType.image.rawValue,
+                PHAssetMediaType.video.rawValue
+            )
             picCount = PHAsset.fetchAssets(in: collection, options: options).count
         }
     }

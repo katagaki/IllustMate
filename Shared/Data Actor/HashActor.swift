@@ -59,6 +59,9 @@ actor HashActor {
                 table.column(hashValue)
                 table.column(hashVersion, defaultValue: 1)
             })
+            if DatabaseMigrator.migrationNeeded() {
+                DatabaseMigrator.migrateHashDatabase(database, picHashesTable: picHashesTable)
+            }
         } catch {
             debugPrint("Hash database setup error: \(error)")
         }

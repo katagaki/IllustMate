@@ -77,6 +77,7 @@ struct IllustMateApp: App {
             }
             await migratePreferencesFromUserDefaults()
             await libraryManager.loadLibraries()
+            DatabaseMigrator.markMigrationComplete()
         }
         .onOpenURL { url in
             if url.pathExtension == "pics" {

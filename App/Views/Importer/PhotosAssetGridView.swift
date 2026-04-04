@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2026/02/22.
 //
 
+import AVFoundation
 import Photos
 import SwiftUI
 
@@ -110,7 +111,11 @@ struct PhotosAssetGridView: View {
 
     private func fetchAssets() {
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        fetchOptions.predicate = NSPredicate(
+            format: "mediaType = %d OR mediaType = %d",
+            PHAssetMediaType.image.rawValue,
+            PHAssetMediaType.video.rawValue
+        )
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         let result = PHAsset.fetchAssets(in: collection, options: fetchOptions)
         var fetched: [PHAsset] = []
@@ -130,6 +135,46 @@ struct PhotosAssetGridView: View {
         }
     }
 
+    private func importVideoAsset(_ asset: PHAsset, filename: String) async {
+        let videoOptions = PHVideoRequestOptions()
+        videoOptions.isNetworkAccessAllowed = true
+        videoOptions.deliveryMode = .highQualityFormat
+
+        let exportSession: AVAssetExportSession? = await withCheckedContinuation {
+            (continuation: CheckedContinuation<AVAssetExportSession?, Never>) in
+            PHImageManager.default().requestExportSession(
+                forVideo: asset,
+                options: videoOptions,
+                exportPreset: AVAssetExportPresetPassthrough
+            ) { session, _ in
+                nonisolated(unsafe) let result = session
+                continuation.resume(returning: result)
+            }
+        }
+
+        guard let exportSession else { return }
+
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("mov")
+        defer { try? FileManager.default.removeItem(at: tempURL) }
+
+        guard (try? await exportSession.export(to: tempURL, as: .mov)) != nil,
+              let videoData = try? Data(contentsOf: tempURL) else { return }
+
+        let fileExtension = (filename as NSString).pathExtension.isEmpty
+            ? "mov" : (filename as NSString).pathExtension.lowercased()
+
+        await DataActor.shared.createVideo(
+            filename,
+            data: videoData,
+            duration: asset.duration,
+            fileExtension: fileExtension,
+            inAlbumWithID: selectedAlbum?.id,
+            dateAdded: asset.creationDate
+        )
+    }
+
     private func startImport() {
         let assetsToImport = assets.filter { selectedAssets.contains($0.localIdentifier) }
         isImporting = true
@@ -146,22 +191,27 @@ struct PhotosAssetGridView: View {
             requestOptions.isNetworkAccessAllowed = true
 
             for asset in assetsToImport {
-                let data = await withCheckedContinuation { (continuation: CheckedContinuation<Data?, Never>) in
-                    imageManager.requestImageDataAndOrientation(
-                        for: asset, options: requestOptions
-                    ) { data, _, _, _ in
-                        continuation.resume(returning: data)
-                    }
-                }
+                let resources = PHAssetResource.assetResources(for: asset)
+                let filename = resources.first?.originalFilename ?? Pic.newFilename()
 
-                if let data {
-                    let resources = PHAssetResource.assetResources(for: asset)
-                    let filename = resources.first?.originalFilename ?? Pic.newFilename()
-                    await DataActor.shared.createPic(
-                        filename, data: data,
-                        inAlbumWithID: selectedAlbum?.id,
-                        dateAdded: asset.creationDate
-                    )
+                if asset.mediaType == .video {
+                    await importVideoAsset(asset, filename: filename)
+                } else {
+                    let data = await withCheckedContinuation { (continuation: CheckedContinuation<Data?, Never>) in
+                        imageManager.requestImageDataAndOrientation(
+                            for: asset, options: requestOptions
+                        ) { data, _, _, _ in
+                            continuation.resume(returning: data)
+                        }
+                    }
+
+                    if let data {
+                        await DataActor.shared.createPic(
+                            filename, data: data,
+                            inAlbumWithID: selectedAlbum?.id,
+                            dateAdded: asset.creationDate
+                        )
+                    }
                 }
 
                 await MainActor.run {

@@ -23,7 +23,8 @@ struct PhotostandDatabase {
     // Pic columns
     static let picId = Expression<String>("id")
     static let picAlbumId = Expression<String?>("containing_album_id")
-    static let picData = Expression<Data>("data")
+    static let picData = Expression<Data?>("data")
+    static let picMediaType = Expression<Int>("media_type")
 
     /// Maximum blob size (in bytes) the widget will attempt to load.
     static let maxBlobSize = 25 * 1024 * 1024 // 25 MB
@@ -75,9 +76,10 @@ struct PhotostandDatabase {
         albumID: String,
         maxDimension: CGFloat = 800
     ) -> Data? {
-        // Step 1: Pick a random pic ID whose blob is within the size limit
+        // Step 1: Pick a random pic ID whose blob is within the size limit (images only)
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
+            .filter(picMediaType == 0)
             .filter(picData.length <= maxBlobSize)
             .select(picId)
             .order(Expression<Int>.random())
@@ -103,6 +105,7 @@ struct PhotostandDatabase {
         guard let database = openDatabase() else { return [] }
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
+            .filter(picMediaType == 0)
             .filter(picData.length <= maxBlobSize)
             .select(picId)
             .order(Expression<Int>.random())
@@ -123,7 +126,7 @@ struct PhotostandDatabase {
 
     static func fetchPicCount(inAlbumWithID albumID: String) -> Int {
         guard let database = openDatabase() else { return 0 }
-        let query = picsTable.filter(picAlbumId == albumID)
+        let query = picsTable.filter(picAlbumId == albumID).filter(picMediaType == 0)
         return (try? database.scalar(query.count)) ?? 0
     }
 }

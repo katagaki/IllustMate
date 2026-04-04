@@ -1,4 +1,6 @@
+import AVFoundation
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ShareView: View {
 
@@ -221,9 +223,17 @@ struct ShareView: View {
     }
 
     func importItem(_ file: Any?, to albumID: String?, named name: String) async {
-        if let url = file as? URL, let imageData = try? Data(contentsOf: url),
-            let image = UIImage(data: imageData) {
-            await importItem(image, to: albumID, named: url.lastPathComponent)
+        if let url = file as? URL {
+            let uti = UTType(filenameExtension: url.pathExtension)
+            if uti?.conforms(to: .movie) == true || uti?.conforms(to: .video) == true {
+                await importVideo(url, to: albumID, named: url.lastPathComponent)
+                return
+            }
+            if let imageData = try? Data(contentsOf: url),
+               let image = UIImage(data: imageData) {
+                await importItem(image, to: albumID, named: url.lastPathComponent)
+                return
+            }
         } else if let image = file as? UIImage {
             if let pngData = image.pngData() {
                 await importPic(name, data: pngData, to: albumID)
@@ -232,14 +242,31 @@ struct ShareView: View {
             } else if let heicData = image.heicData() {
                 await importPic(name, data: heicData, to: albumID)
             }
-        } else {
-            await MainActor.run {
-                itemsManager.failedItemCount += 1
-            }
+            return
+        }
+        await MainActor.run {
+            itemsManager.failedItemCount += 1
         }
     }
 
     func importPic(_ name: String, data: Data, to albumID: String?) async {
         await DataActor.shared.createPic(name, data: data, inAlbumWithID: albumID)
+    }
+
+    func importVideo(_ url: URL, to albumID: String?, named name: String) async {
+        guard let videoData = try? Data(contentsOf: url) else {
+            await MainActor.run { itemsManager.failedItemCount += 1 }
+            return
+        }
+        let asset = AVURLAsset(url: url)
+        let duration = (try? await asset.load(.duration))?.seconds ?? 0
+        let ext = (name as NSString).pathExtension.lowercased()
+        await DataActor.shared.createVideo(
+            name,
+            data: videoData,
+            duration: duration,
+            fileExtension: ext.isEmpty ? "mov" : ext,
+            inAlbumWithID: albumID
+        )
     }
 }

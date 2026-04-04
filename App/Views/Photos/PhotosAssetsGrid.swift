@@ -167,26 +167,28 @@ struct PhotosAssetContextMenu: View {
     let asset: PHAsset
 
     var body: some View {
-        Button("Shared.Copy", systemImage: "doc.on.doc") {
-            let manager = PHCachingImageManager.default()
-            let options = PHImageRequestOptions()
-            options.deliveryMode = .highQualityFormat
-            options.isNetworkAccessAllowed = true
-            options.isSynchronous = false
-            manager.requestImage(for: asset, targetSize: PHImageManagerMaximumSize,
-                                 contentMode: .default, options: options) { result, _ in
-                if let result {
-                    DispatchQueue.main.async {
-                        UIPasteboard.general.image = result
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        if asset.mediaType != .video {
+            Button("Shared.Copy", systemImage: "doc.on.doc") {
+                let manager = PHCachingImageManager.default()
+                let options = PHImageRequestOptions()
+                options.deliveryMode = .highQualityFormat
+                options.isNetworkAccessAllowed = true
+                options.isSynchronous = false
+                manager.requestImage(for: asset, targetSize: PHImageManagerMaximumSize,
+                                     contentMode: .default, options: options) { result, _ in
+                    if let result {
+                        DispatchQueue.main.async {
+                            UIPasteboard.general.image = result
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        }
                     }
                 }
             }
-        }
-        ShareLink(item: PHAssetShareable(localIdentifier: asset.localIdentifier),
-                  preview: SharePreview(displayName,
-                                        image: PHAssetShareable(localIdentifier: asset.localIdentifier))) {
-            Label("Shared.Share", systemImage: "square.and.arrow.up")
+            ShareLink(item: PHAssetShareable(localIdentifier: asset.localIdentifier),
+                      preview: SharePreview(displayName,
+                                            image: PHAssetShareable(localIdentifier: asset.localIdentifier))) {
+                Label("Shared.Share", systemImage: "square.and.arrow.up")
+            }
         }
     }
 
@@ -243,6 +245,18 @@ struct PhotosAssetLabel: View {
             .fill(.primary.opacity(0.05))
             .aspectRatio(1.0, contentMode: .fit)
             .overlay { geometryOverlay }
+            .overlay(alignment: .bottomTrailing) {
+                if asset.mediaType == .video {
+                    Text(formatDuration(asset.duration))
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(.black.opacity(0.6), in: .capsule)
+                        .padding(4)
+                }
+            }
             .clipped()
             .contentShape(.rect)
             .clipShape(.rect(cornerRadius: 4.0))

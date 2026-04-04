@@ -49,7 +49,9 @@ struct AlbumView: View {
     @State var isFileImporterPresented: Bool = false
     @State var isFileImportSheetPresented: Bool = false
     @State var isPhotosPickerPresented: Bool = false
+    @State var isVideosPickerPresented: Bool = false
     @State var selectedPhotoItems: [PhotosPickerItem] = []
+    @State var selectedVideoItems: [PhotosPickerItem] = []
     @State var isImportingPhotos: Bool = false
     @State var importCurrentCount: Int = 0
     @State var importTotalCount: Int = 0
@@ -117,20 +119,17 @@ struct AlbumView: View {
                     }
                 }
             ))
-            .photosPicker(isPresented: $isPhotosPickerPresented,
-                          selection: $selectedPhotoItems,
-                          matching: .images,
-                          photoLibrary: .shared())
-            .modifier(FileImportModifier(
+            .modifier(AlbumMediaImportModifier(
+                isPhotosPickerPresented: $isPhotosPickerPresented,
+                selectedPhotoItems: $selectedPhotoItems,
+                isVideosPickerPresented: $isVideosPickerPresented,
+                selectedVideoItems: $selectedVideoItems,
                 isFileImporterPresented: $isFileImporterPresented,
                 isFileImportSheetPresented: $isFileImportSheetPresented,
-                onFilesImported: { files in importLoadedFiles(files) }
+                onPhotosSelected: { importSelectedPhotos($0) },
+                onVideosSelected: { importSelectedVideos($0) },
+                onFilesImported: { importLoadedFiles($0) }
             ))
-            .onChange(of: selectedPhotoItems) { _, newValue in
-                if !newValue.isEmpty {
-                    importSelectedPhotos(newValue)
-                }
-            }
             .sheet(isPresented: $isDuplicateCheckerPresented) {
                 Group {
                     if let currentAlbum {

@@ -20,6 +20,17 @@ struct PhotoGridCell: View {
                     .frame(minWidth: 80, minHeight: 80)
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()
+                if asset.mediaType == .video {
+                    Text(formatDuration(asset.duration))
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(.black.opacity(0.6), in: .capsule)
+                        .padding(4)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                }
                 SelectionOverlay(isSelected)
             }
             .clipShape(.rect(cornerRadius: 4.0))
