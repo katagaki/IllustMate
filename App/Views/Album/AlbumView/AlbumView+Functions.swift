@@ -34,10 +34,12 @@ extension AlbumView {
             }
             group.addTask {
                 let albums = await self.fetchAlbums()
+                let totalAlbumCount = await DataActor.shared.albumCount()
                 await MainActor.run {
                     withAnimation {
                         self.albums = albums
                     }
+                    self.totalAlbumCount = totalAlbumCount
                     self.hasFetchedAlbums = true
                 }
                 await AlbumCoverCache.shared.loadCovers(for: albums)
@@ -73,10 +75,12 @@ extension AlbumView {
     func refreshAlbumsAndSet() {
         Task.detached(priority: .userInitiated) {
             let albums = await fetchAlbums()
+            let totalAlbumCount = await DataActor.shared.albumCount()
             await MainActor.run {
                 withAnimation {
                     self.albums = albums
                 }
+                self.totalAlbumCount = totalAlbumCount
             }
             await AlbumCoverCache.shared.loadCovers(for: albums)
         }

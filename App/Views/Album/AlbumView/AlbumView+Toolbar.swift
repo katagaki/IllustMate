@@ -22,10 +22,10 @@ extension AlbumView {
             }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItemGroup(placement: .bottomBar) {
-                Menu("Shared.Move", systemImage: "tray.full") {
-                    PicMoveMenu(pics: selectedPics, containingAlbum: currentAlbum) {
-                        refreshDataAfterPicMoved()
-                    }
+                PicMoveMenu(title: "Shared.Move", systemImage: "tray.full",
+                            pics: selectedPics, containingAlbum: currentAlbum,
+                            totalAlbumCount: totalAlbumCount) {
+                    refreshDataAfterPicMoved()
                 }
                 .disabled(selectedPics.isEmpty)
                 Text("Shared.Selected.\(selectedPics.count)")

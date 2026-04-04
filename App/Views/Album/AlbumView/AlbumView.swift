@@ -62,6 +62,7 @@ struct AlbumView: View {
     @State var albumColumnCount: Int = 4
     @State var hideSectionHeaders: Bool = false
 
+    @State var totalAlbumCount: Int = 0
     @State var backgroundImage: UIImage?
     @State var lastRefreshTime: Date = .distantPast
     @State var searchText: String = ""

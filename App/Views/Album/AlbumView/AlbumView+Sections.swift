@@ -73,7 +73,7 @@ extension AlbumView {
                 } onDrop: { transferable, album in
                     moveDropToAlbum(transferable, to: album)
                 } moveMenu: { album in
-                    AlbumMoveMenu(album: album) {
+                    AlbumMoveMenu(album: album, totalAlbumCount: totalAlbumCount) {
                         refreshAlbumsAndSet()
                     }
                 }
@@ -158,12 +158,14 @@ extension AlbumView {
                 } onDelete: { pic in
                     deletePic(pic)
                 } moveMenu: { pic in
-                    Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
-                        PicMoveMenu(pics: isSelectingPics ?
-                                    selectedPics : [pic],
-                                    containingAlbum: currentAlbum) {
-                            refreshDataAfterPicMoved()
-                        }
+                    PicMoveMenu(
+                        title: "Shared.MoveTo",
+                        systemImage: "tray.and.arrow.down",
+                        pics: isSelectingPics ? selectedPics : [pic],
+                        containingAlbum: currentAlbum,
+                        totalAlbumCount: totalAlbumCount
+                    ) {
+                        refreshDataAfterPicMoved()
                     }
                 }
             } else if !hasFetchedPicCount {
