@@ -15,6 +15,7 @@ struct VideoPlayerView: UIViewControllerRepresentable {
         let controller = AVPlayerViewController()
         controller.player = player
         controller.allowsVideoFrameAnalysis = false
+        controller.allowsPictureInPicturePlayback = true
         return controller
     }
 
