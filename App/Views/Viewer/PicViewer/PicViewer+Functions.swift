@@ -56,7 +56,7 @@ extension PicViewer {
         VStack(spacing: 8.0) {
             Group {
                 if let player = viewer.videoPlayer {
-                    VideoPlayer(player: player)
+                    VideoPlayerView(player: player)
                         .aspectRatio(videoAspectRatio ?? 16.0 / 9.0, contentMode: .fit)
                         .clipShape(.rect(cornerRadius: 8.0))
                 } else if let thumbnail = viewer.displayedThumbnail {

@@ -56,7 +56,7 @@ extension PhotosAssetViewer {
         VStack(spacing: 8.0) {
             Group {
                 if let videoPlayer {
-                    VideoPlayer(player: videoPlayer)
+                    VideoPlayerView(player: videoPlayer)
                         .aspectRatio(videoAspectRatio, contentMode: .fit)
                         .clipShape(.rect(cornerRadius: 8.0))
                 } else if let thumbnail {
