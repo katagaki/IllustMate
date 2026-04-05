@@ -10,6 +10,7 @@ import UIKit
 
 extension WebServerManager {
 
+    // swiftlint:disable:next cyclomatic_complexity
     func handleRequest(_ request: HTTPRequest) async -> HTTPResponse {
         let path = request.path
         let components = path.split(separator: "/").map(String.init)

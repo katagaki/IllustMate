@@ -2,6 +2,7 @@ import AVFoundation
 import SwiftUI
 import UniformTypeIdentifiers
 
+// swiftlint:disable:next type_body_length
 struct ShareView: View {
 
     var itemsManager: SharedItemsManager

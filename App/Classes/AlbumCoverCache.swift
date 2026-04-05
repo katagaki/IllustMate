@@ -68,7 +68,7 @@ final class AlbumCoverCache {
         version += 1
         Task {
             await CoverCacheActor.shared.deleteCover(forAlbumWithID: id)
-            await MainActor.run {
+            _ = await MainActor.run {
                 pendingDiskDeletions.remove(id)
             }
         }

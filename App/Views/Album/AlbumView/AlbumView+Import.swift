@@ -114,8 +114,7 @@ extension AlbumView {
         videoOptions.isNetworkAccessAllowed = true
         videoOptions.deliveryMode = .highQualityFormat
 
-        let exportSession: AVAssetExportSession? = await withCheckedContinuation {
-            (continuation: CheckedContinuation<AVAssetExportSession?, Never>) in
+        let exportSession: AVAssetExportSession? = await withCheckedContinuation { continuation in
             PHImageManager.default().requestExportSession(
                 forVideo: asset,
                 options: videoOptions,
@@ -186,6 +185,7 @@ extension AlbumView {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     func importFiles(_ urls: [URL]) {
         isImportingPhotos = true
         importTotalCount = urls.count
@@ -193,6 +193,7 @@ extension AlbumView {
         UIApplication.shared.isIdleTimerDisabled = true
         Task {
             var loadedImageFiles: [(filename: String, data: Data)] = []
+            // swiftlint:disable:next large_tuple
             var loadedVideoFiles: [(filename: String, data: Data, duration: TimeInterval)] = []
             for fileURL in urls {
                 let didStartAccessing = fileURL.startAccessingSecurityScopedResource()
