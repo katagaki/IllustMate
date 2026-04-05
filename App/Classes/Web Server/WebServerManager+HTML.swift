@@ -358,7 +358,7 @@ extension WebServerManager {
         <!-- Upload Modal -->
         <div class="modal-overlay" id="uploadModal">
             <div class="upload-modal">
-                <h2>Upload Images</h2>
+                <h2>Upload Pics</h2>
                 <div class="upload-drop-zone" id="dropZone">
                     <p>Drag and drop images here, or</p>
                     <p><label for="fileInput">browse files</label></p>
