@@ -56,6 +56,69 @@ struct HTTPResponse: Sendable {
         )
     }
 
+    static func videoResponse(
+        fileURL: URL,
+        contentType: String,
+        rangeHeader: String?
+    ) -> HTTPResponse {
+        guard let fileSize = (try? FileManager.default.attributesOfItem(atPath: fileURL.path))?[.size] as? Int,
+              let fileHandle = try? FileHandle(forReadingFrom: fileURL) else {
+            return .notFound()
+        }
+        defer { try? fileHandle.close() }
+
+        if let rangeHeader, rangeHeader.hasPrefix("bytes=") {
+            let rangeSpec = String(rangeHeader.dropFirst("bytes=".count))
+            let parts = rangeSpec.split(separator: "-", maxSplits: 1)
+            let start = Int(parts[0]) ?? 0
+            let end: Int
+            if parts.count > 1 && !parts[1].isEmpty {
+                end = min(Int(parts[1]) ?? (fileSize - 1), fileSize - 1)
+            } else {
+                // Serve up to 1 MB per range request
+                end = min(start + 1_048_575, fileSize - 1)
+            }
+
+            guard start <= end && start < fileSize else {
+                return HTTPResponse(
+                    statusCode: 416,
+                    statusText: "Range Not Satisfiable",
+                    headers: ["Content-Range": "bytes */\(fileSize)"],
+                    body: Data()
+                )
+            }
+
+            try? fileHandle.seek(toOffset: UInt64(start))
+            let length = end - start + 1
+            let data = fileHandle.readData(ofLength: length)
+
+            return HTTPResponse(
+                statusCode: 206,
+                statusText: "Partial Content",
+                headers: [
+                    "Content-Type": contentType,
+                    "Content-Range": "bytes \(start)-\(end)/\(fileSize)",
+                    "Accept-Ranges": "bytes",
+                    "Cache-Control": "public, max-age=3600"
+                ],
+                body: data
+            )
+        } else {
+            // No range requested — send entire file
+            let data = fileHandle.readDataToEndOfFile()
+            return HTTPResponse(
+                statusCode: 200,
+                statusText: "OK",
+                headers: [
+                    "Content-Type": contentType,
+                    "Accept-Ranges": "bytes",
+                    "Cache-Control": "public, max-age=3600"
+                ],
+                body: data
+            )
+        }
+    }
+
     static func notFound() -> HTTPResponse {
         HTTPResponse(
             statusCode: 404,
@@ -288,5 +351,18 @@ enum HTTPRequestParser {
         }
 
         return "image/jpeg"
+    }
+
+    static func detectVideoContentType(forExtension ext: String) -> String {
+        switch ext.lowercased() {
+        case "mp4", "m4v":
+            return "video/mp4"
+        case "mov":
+            return "video/quicktime"
+        case "webm":
+            return "video/webm"
+        default:
+            return "video/mp4"
+        }
     }
 }

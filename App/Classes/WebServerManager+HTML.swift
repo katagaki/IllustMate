@@ -170,6 +170,36 @@ extension WebServerManager {
             .pic-thumb:hover {
                 filter: brightness(0.85);
             }
+            .pic-cell {
+                position: relative;
+                aspect-ratio: 1;
+                border-radius: 4px;
+                overflow: hidden;
+                cursor: default;
+                transition: filter 0.15s;
+                background: var(--hover);
+            }
+            .pic-cell:hover {
+                filter: brightness(0.85);
+            }
+            .pic-cell img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .video-badge {
+                position: absolute;
+                bottom: 6px;
+                left: 6px;
+                background: rgba(0,0,0,0.6);
+                color: white;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 2px 6px;
+                border-radius: 4px;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
             .modal-overlay {
                 position: fixed;
                 inset: 0;
@@ -194,7 +224,7 @@ extension WebServerManager {
                 flex-direction: column;
                 align-items: center;
             }
-            .viewer-content img {
+            .viewer-content img, .viewer-content video {
                 max-width: 90vw;
                 max-height: 80vh;
                 object-fit: contain;
@@ -312,10 +342,11 @@ extension WebServerManager {
             <div class="loading">Loading...</div>
         </div>
 
-        <!-- Image Viewer Modal -->
+        <!-- Image/Video Viewer Modal -->
         <div class="modal-overlay" id="viewerModal" onclick="closeViewer(event)">
             <div class="viewer-content">
                 <img id="viewerImage" src="" alt="">
+                <video id="viewerVideo" controls playsinline style="display:none"></video>
                 <div class="viewer-name" id="viewerName"></div>
                 <div class="viewer-controls">
                     <a class="btn" id="downloadLink" download style="text-decoration:none">Download</a>
@@ -489,29 +520,65 @@ extension WebServerManager {
                     const grid = document.createElement('div');
                     grid.className = 'pic-grid';
                     data.pics.forEach(pic => {
-                        const img = document.createElement('img');
-                        img.className = 'pic-thumb';
-                        img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
-                        img.alt = pic.name;
-                        img.loading = 'lazy';
-                        img.addEventListener('click', () => openViewer(pic.id, pic.name));
-                        grid.appendChild(img);
+                        if (pic.isVideo) {
+                            const cell = document.createElement('div');
+                            cell.className = 'pic-cell';
+                            const img = document.createElement('img');
+                            img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
+                            img.alt = pic.name;
+                            img.loading = 'lazy';
+                            cell.appendChild(img);
+                            const badge = document.createElement('div');
+                            badge.className = 'video-badge';
+                            if (pic.duration) {
+                                const m = Math.floor(pic.duration / 60);
+                                const s = Math.floor(pic.duration % 60);
+                                badge.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+                            } else {
+                                badge.textContent = 'Video';
+                            }
+                            cell.appendChild(badge);
+                            cell.addEventListener('click', () => openViewer(pic.id, pic.name, true));
+                            grid.appendChild(cell);
+                        } else {
+                            const img = document.createElement('img');
+                            img.className = 'pic-thumb';
+                            img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
+                            img.alt = pic.name;
+                            img.loading = 'lazy';
+                            img.addEventListener('click', () => openViewer(pic.id, pic.name, false));
+                            grid.appendChild(img);
+                        }
                     });
                     el.appendChild(grid);
                 }
             }
 
-            // Image Viewer
-            function openViewer(picId, picName) {
+            // Image/Video Viewer
+            function openViewer(picId, picName, isVideo) {
                 const modal = document.getElementById('viewerModal');
                 const img = document.getElementById('viewerImage');
+                const video = document.getElementById('viewerVideo');
                 const name = document.getElementById('viewerName');
                 const dl = document.getElementById('downloadLink');
-                const fullUrl = '/api/pics/' + encodeURIComponent(picId) + '/image';
-                img.src = fullUrl;
+
+                if (isVideo) {
+                    const videoUrl = '/api/pics/' + encodeURIComponent(picId) + '/video';
+                    img.style.display = 'none';
+                    video.style.display = 'block';
+                    video.src = videoUrl;
+                    dl.href = videoUrl;
+                    dl.download = picName;
+                } else {
+                    const fullUrl = '/api/pics/' + encodeURIComponent(picId) + '/image';
+                    video.style.display = 'none';
+                    img.style.display = 'block';
+                    img.src = fullUrl;
+                    dl.href = fullUrl;
+                    dl.download = picName;
+                }
+
                 name.textContent = picName;
-                dl.href = fullUrl;
-                dl.download = picName;
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
@@ -519,8 +586,12 @@ extension WebServerManager {
             function closeViewer(event) {
                 if (event && event.target !== event.currentTarget) return;
                 const modal = document.getElementById('viewerModal');
+                const video = document.getElementById('viewerVideo');
                 modal.classList.remove('active');
                 document.getElementById('viewerImage').src = '';
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
                 document.body.style.overflow = '';
             }
 

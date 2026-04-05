@@ -36,6 +36,10 @@ extension WebServerManager {
                 components[1] == "pics" && components[3] == "image" {
                 return await handleGetPicImage(id: components[2])
             }
+            if components.count == 4 && components[0] == "api" &&
+                components[1] == "pics" && components[3] == "video" {
+                return await handleGetPicVideo(id: components[2], rangeHeader: request.headers["range"])
+            }
         }
 
         if request.method == "POST" {
@@ -121,6 +125,17 @@ extension WebServerManager {
         return .ok(imageData: data, contentType: contentType)
     }
 
+    // MARK: - Video Routes
+
+    private func handleGetPicVideo(id: String, rangeHeader: String?) async -> HTTPResponse {
+        guard let fileURL = await DataActor.shared.videoURL(forPicWithID: id) else {
+            return .notFound()
+        }
+        let ext = fileURL.pathExtension
+        let contentType = HTTPRequestParser.detectVideoContentType(forExtension: ext)
+        return .videoResponse(fileURL: fileURL, contentType: contentType, rangeHeader: rangeHeader)
+    }
+
     // MARK: - Upload Routes
 
     private func handleUploadToAlbum(id: String, request: HTTPRequest) async -> HTTPResponse {
@@ -189,10 +204,15 @@ extension WebServerManager {
     }
 
     private static func picToJSON(_ pic: Pic) -> [String: Any] {
-        [
+        var json: [String: Any] = [
             "id": pic.id,
             "name": pic.name,
-            "dateAdded": ISO8601DateFormatter().string(from: pic.dateAdded)
+            "dateAdded": ISO8601DateFormatter().string(from: pic.dateAdded),
+            "isVideo": pic.isVideo
         ]
+        if let duration = pic.duration {
+            json["duration"] = duration
+        }
+        return json
     }
 }
