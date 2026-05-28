@@ -6,6 +6,7 @@
 //
 
 import Foundation
+@preconcurrency import SQLite
 
 extension DataActor {
 

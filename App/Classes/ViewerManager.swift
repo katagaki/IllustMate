@@ -175,7 +175,8 @@ class ViewerManager {
             // Local original first; otherwise fetch on demand from iCloud Drive.
             var data = await DataActor.shared.imageData(forPicWithID: picID)
             if data == nil {
-                data = await OriginalsManager.shared.fetchOriginal(picID: picID)
+                data = await OriginalsManager.shared.fetchOriginal(picID: picID,
+                                                                   in: DataActor.shared.collectionID)
             }
             if let data, let image = await UIImage(data: data)?.byPreparingForDisplay() {
                 loadedImage = image

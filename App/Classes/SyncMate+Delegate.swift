@@ -192,13 +192,15 @@ extension SyncMate: CKSyncEngineDelegate {
                                                               systemFields: systemFields)
                 continue
             }
-            let dataActor = DataActor.instance(for: Self.collectionID(forZone: record.recordID.zoneID))
+            let collectionID = Self.collectionID(forZone: record.recordID.zoneID)
+            let dataActor = DataActor.instance(for: collectionID)
             if record.recordType == SyncRecordType.album {
                 await dataActor.markAlbumSynced(id: record.recordID.recordName, systemFields: systemFields)
             } else {
                 await dataActor.markPicSynced(id: record.recordID.recordName, systemFields: systemFields)
                 if (record["mediaType"] as? Int ?? 0) == MediaType.pic.rawValue {
-                    await OriginalsManager.shared.uploadOriginal(picID: record.recordID.recordName)
+                    await OriginalsManager.shared.uploadOriginal(picID: record.recordID.recordName,
+                                                                 in: collectionID)
                 }
             }
         }
