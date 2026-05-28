@@ -179,6 +179,14 @@ extension DataActor {
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
+    /// Image pics across the library that currently have a local original on disk.
+    func localImagePicIDs() -> [String] {
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
     /// Drops the local copy of an original and clears its path so it re-downloads
     /// on demand. The thumbnail and metadata are untouched, and no change is
     /// marked dirty (this is a local cache eviction, not a data edit).

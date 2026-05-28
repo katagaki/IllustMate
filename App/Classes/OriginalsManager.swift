@@ -112,6 +112,21 @@ actor OriginalsManager {
         if let sampleError { await SyncMate.shared.debugLog("orig err: \(sampleError)") }
     }
 
+    /// Once an original is confirmed fully uploaded to iCloud, deletes its local
+    /// master so a synced library relies on iCloud for storage (reading on demand
+    /// from the container). Gated on `isUploaded`, so the original is never the
+    /// last copy deleted. Only synced-library originals are in the container, so
+    /// non-synced libraries are untouched.
+    func reclaimUploadedOriginals(in collectionID: String) async {
+        let dataActor = DataActor.instance(for: collectionID)
+        for id in await dataActor.localImagePicIDs() {
+            guard let cloudURL = originalURL(forPicID: id, in: collectionID), isUploaded(cloudURL) else {
+                continue
+            }
+            await dataActor.evictLocalOriginal(picID: id)
+        }
+    }
+
     /// When the originals container changes, every pic's stored upload flag is
     /// stale (it points at the old container), so clear it across all libraries
     /// so originals re-upload into the new container. Runs once per change.
@@ -226,8 +241,9 @@ actor OriginalsManager {
         }
     }
 
-    /// Fetches a pic's original from iCloud Drive (downloading it if needed),
-    /// caches it locally, and returns the bytes. Nil if it isn't available.
+    /// Reads a pic's original straight from the iCloud Drive container
+    /// (downloading it if needed) and returns the bytes, without keeping a
+    /// separate local copy — iCloud manages local materialization and eviction.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
         guard let cloudURL = originalURL(forPicID: picID, in: collectionID) else {
             await SyncMate.shared.debugLog("fetch: no container")
@@ -245,9 +261,6 @@ actor OriginalsManager {
             await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): read fail")
             return nil
         }
-        await DataActor.instance(for: collectionID).importDownloadedOriginal(picID: picID, data: data)
-        // The bytes now live in the local Images cache; drop the iCloud copy.
-        evictOriginal(picID: picID, in: collectionID)
         await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): ok \(data.count / 1024)KB")
         return data
     }
