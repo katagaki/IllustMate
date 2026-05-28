@@ -25,6 +25,7 @@ actor LibrariesActor {
     let libraryDirty = Expression<Bool>("dirty")
     let libraryLastModified = Expression<Double>("last_modified")
     let libraryCKSystemFields = Expression<Data?>("ck_system_fields")
+    let librarySyncEnabled = Expression<Bool>("sync_enabled")
     let tombstonesTable = Table("library_tombstones")
     let tombstoneId = Expression<String>("id")
     let tombstoneDeletedAt = Expression<Double>("deleted_at")
@@ -71,6 +72,7 @@ actor LibrariesActor {
             _ = try? database.run(librariesTable.addColumn(libraryDirty, defaultValue: true))
             _ = try? database.run(librariesTable.addColumn(libraryLastModified, defaultValue: 0))
             _ = try? database.run(librariesTable.addColumn(libraryCKSystemFields))
+            _ = try? database.run(librariesTable.addColumn(librarySyncEnabled, defaultValue: false))
             try database.run(tombstonesTable.create(ifNotExists: true) { table in
                 table.column(tombstoneId, primaryKey: true)
                 table.column(tombstoneDeletedAt, defaultValue: 0)
@@ -88,7 +90,8 @@ actor LibrariesActor {
         return rows.compactMap { row in
             guard let id = try? row.get(libraryId),
                   let name = try? row.get(libraryName) else { return nil }
-            return PicLibrary(id: id, name: name)
+            return PicLibrary(id: id, name: name,
+                              syncEnabled: (try? row.get(librarySyncEnabled)) ?? false)
         }
     }
 
@@ -97,7 +100,8 @@ actor LibrariesActor {
         guard let row = try? database.pluck(query),
               let id = try? row.get(libraryId),
               let name = try? row.get(libraryName) else { return nil }
-        return PicLibrary(id: id, name: name)
+        return PicLibrary(id: id, name: name,
+                          syncEnabled: (try? row.get(librarySyncEnabled)) ?? false)
     }
 
     // MARK: - Write
@@ -163,9 +167,34 @@ extension LibrariesActor {
 
     func dirtyLibraryIDs() -> [String] {
         let query = librariesTable
-            .filter(libraryDirty == true && libraryId != PicLibrary.defaultID)
+            .filter(libraryDirty == true && librarySyncEnabled == true && libraryId != PicLibrary.defaultID)
             .select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+    }
+
+    func syncEnabledLibraryIDs() -> [String] {
+        let query = librariesTable.filter(librarySyncEnabled == true).select(libraryId)
+        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+    }
+
+    func isSyncEnabled(id: String) -> Bool {
+        guard let row = try? database.pluck(librariesTable.filter(libraryId == id)) else { return false }
+        return (try? row.get(librarySyncEnabled)) ?? false
+    }
+
+    /// Toggles per-library sync. Enabling also marks the library dirty so its
+    /// registry record uploads.
+    func setSyncEnabled(_ enabled: Bool, forID id: String) {
+        let query = librariesTable.filter(libraryId == id)
+        if enabled {
+            _ = try? database.run(query.update(
+                librarySyncEnabled <- true,
+                libraryDirty <- true,
+                libraryLastModified <- Date.now.timeIntervalSince1970
+            ))
+        } else {
+            _ = try? database.run(query.update(librarySyncEnabled <- false))
+        }
     }
 
     func pendingLibraryTombstones() -> [String] {
@@ -191,12 +220,6 @@ extension LibrariesActor {
             .update(libraryDirty <- false, libraryCKSystemFields <- systemFields))
     }
 
-    /// True if the library has been synced to iCloud (has stored system fields).
-    func isLibrarySynced(id: String) -> Bool {
-        guard let row = try? database.pluck(librariesTable.filter(libraryId == id)) else { return false }
-        return (try? row.get(libraryCKSystemFields)) != nil
-    }
-
     func applyRemoteLibrary(_ snapshot: LibrarySyncSnapshot) {
         guard snapshot.id != PicLibrary.defaultID else { return }
         ensureFolder(for: snapshot.id)
@@ -205,6 +228,7 @@ extension LibrariesActor {
             _ = try? database.run(librariesTable.filter(libraryId == snapshot.id).update(
                 libraryName <- snapshot.name,
                 libraryDirty <- false,
+                librarySyncEnabled <- true,
                 libraryCKSystemFields <- snapshot.systemFields,
                 libraryLastModified <- snapshot.lastModified
             ))
@@ -213,6 +237,7 @@ extension LibrariesActor {
                 libraryId <- snapshot.id,
                 libraryName <- snapshot.name,
                 libraryDirty <- false,
+                librarySyncEnabled <- true,
                 libraryCKSystemFields <- snapshot.systemFields,
                 libraryLastModified <- snapshot.lastModified
             ))

@@ -38,8 +38,9 @@ struct EditLibrarySheet: View {
     @State var deleteConfirmationCode: String = ""
     @State var expectedDeleteCode: String = ""
 
-    @AppStorage("iCloudSyncEnabled",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var iCloudSyncEnabled: Bool = false
+    @State var syncEnabled: Bool = false
+    @State var iCloudAvailable: Bool = true
+    @State var isShowingiCloudAlert: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -63,7 +64,21 @@ struct EditLibrarySheet: View {
                     }
                 }
                 Section {
-                    Toggle(isOn: $iCloudSyncEnabled) {
+                    Toggle(isOn: Binding(
+                        get: { syncEnabled },
+                        set: { newValue in
+                            if newValue && !iCloudAvailable {
+                                isShowingiCloudAlert = true
+                                return
+                            }
+                            syncEnabled = newValue
+                            Task {
+                                await LibrariesActor.shared.setSyncEnabled(newValue, forID: library.id)
+                                await libraryManager.reloadList()
+                                await SyncManager.shared.refresh()
+                            }
+                        }
+                    )) {
                         Text("Sync.Title", tableName: "More")
                     }
                 } footer: {
@@ -157,6 +172,13 @@ struct EditLibrarySheet: View {
         }
         .task {
             await loadCounts()
+            syncEnabled = await LibrariesActor.shared.isSyncEnabled(id: library.id)
+            iCloudAvailable = await SyncManager.shared.canEnableSync()
+        }
+        .alert(Text("Sync.iCloudRequired.Title", tableName: "More"),
+               isPresented: $isShowingiCloudAlert) {
+        } message: {
+            Text("Sync.iCloudRequired.Message", tableName: "More")
         }
         .fileImporter(isPresented: $isPickingBackupFolder, allowedContentTypes: [.folder]) { result in
             switch result {

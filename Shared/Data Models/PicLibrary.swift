@@ -12,12 +12,14 @@ final class PicLibrary: Identifiable, Hashable, @unchecked Sendable {
 
     var id: String
     var name: String
+    var syncEnabled: Bool
 
     var isDefault: Bool { id == Self.defaultID }
 
-    init(id: String = PicLibrary.defaultID, name: String = "") {
+    init(id: String = PicLibrary.defaultID, name: String = "", syncEnabled: Bool = false) {
         self.id = id
         self.name = name
+        self.syncEnabled = syncEnabled
     }
 
     static func == (lhs: PicLibrary, rhs: PicLibrary) -> Bool {

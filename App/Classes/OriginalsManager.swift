@@ -25,6 +25,11 @@ actor OriginalsManager {
         originalsDirectory(for: collectionID)?.appendingPathComponent(id)
     }
 
+    /// True if iCloud Drive is enabled (the ubiquity container is reachable).
+    func isUbiquityAvailable() -> Bool {
+        FileManager.default.url(forUbiquityContainerIdentifier: Self.containerID) != nil
+    }
+
     /// Download state of an item, or nil if it isn't in iCloud at all.
     private func downloadingStatus(_ url: URL) -> URLUbiquitousItemDownloadingStatus? {
         try? url.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])

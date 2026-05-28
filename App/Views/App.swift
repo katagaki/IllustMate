@@ -40,8 +40,6 @@ struct IllustMateApp: App {
 
     @AppStorage("AppLockEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
-    @AppStorage("iCloudSyncEnabled",
-                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var iCloudSyncEnabled: Bool = false
     @AppStorage(
         "LastVersionPromptedForReview",
         store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
@@ -96,17 +94,14 @@ struct IllustMateApp: App {
             }
             await migratePreferencesFromUserDefaults()
             DatabaseMigrator.markMigrationComplete()
-            await SyncManager.shared.refresh(activeLibraryID: libraryManager.currentLibrary.id)
+            await SyncManager.shared.refresh()
         }
-        .onChange(of: libraryManager.currentLibrary.id) { _, newID in
+        .onChange(of: libraryManager.currentLibrary.id) { _, _ in
             // Migrate then sync the newly-active library.
             Task {
                 await imageMigration.runIfNeeded()
-                await SyncManager.shared.refresh(activeLibraryID: newID)
+                await SyncManager.shared.refresh()
             }
-        }
-        .onChange(of: iCloudSyncEnabled) { _, _ in
-            Task { await SyncManager.shared.refresh(activeLibraryID: libraryManager.currentLibrary.id) }
         }
         .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyRemoteChanges)) { _ in
             navigation.signalDataChanged()
@@ -273,7 +268,7 @@ struct IllustMateApp: App {
                     webServer.stop()
                 }
                 if newValue == .active {
-                    Task { await SyncManager.shared.refresh(activeLibraryID: libraryManager.currentLibrary.id) }
+                    Task { await SyncManager.shared.refresh() }
                     let currentVersion = Bundle.main.object(
                         forInfoDictionaryKey: "CFBundleShortVersionString"
                     ) as? String ?? ""

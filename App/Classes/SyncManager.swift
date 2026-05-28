@@ -11,26 +11,30 @@ import Foundation
 final class SyncManager {
 
     static let shared = SyncManager()
-    static let flagKey = "iCloudSyncEnabled"
 
-    private let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+    /// Sync can only be enabled when signed into iCloud and iCloud Drive is on.
+    func canEnableSync() async -> Bool {
+        guard await SyncMate.shared.isAccountAvailable() else { return false }
+        return await OriginalsManager.shared.isUbiquityAvailable()
+    }
 
-    var isEnabled: Bool { defaults?.bool(forKey: Self.flagKey) ?? false }
-
-    /// Starts (or stops) sync to match the setting and pushes/pulls changes for
-    /// the active library. Safe to call repeatedly.
-    func refresh(activeLibraryID: String) async {
+    /// Starts (or stops) sync to match per-library settings, and pushes/pulls
+    /// changes for every sync-enabled library. Safe to call repeatedly.
+    func refresh() async {
+        let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
         #if DEBUG
-        SyncDebugMonitor.shared.enabled = isEnabled
+        SyncDebugMonitor.shared.enabled = !enabledIDs.isEmpty
         #endif
-        guard isEnabled else {
+        guard !enabledIDs.isEmpty else {
             await SyncMate.shared.stop()
             return
         }
         await SyncMate.shared.start()
         await SyncMate.shared.reportAccountStatus()
         await SyncMate.shared.enqueueLibraryChanges()
-        await SyncMate.shared.enqueueChanges(forLibrary: activeLibraryID)
+        for id in enabledIDs {
+            await SyncMate.shared.enqueueChanges(forLibrary: id)
+        }
         await SyncMate.shared.fetchChanges()
     }
 }

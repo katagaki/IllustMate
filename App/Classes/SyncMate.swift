@@ -99,6 +99,11 @@ actor SyncMate {
         try? await engine.fetchChanges()
     }
 
+    /// True if the user is signed into iCloud.
+    func isAccountAvailable() async -> Bool {
+        (try? await container.accountStatus()) == .available
+    }
+
     // MARK: - Zone <-> library mapping
 
     static let librariesZoneName = "Libraries"
