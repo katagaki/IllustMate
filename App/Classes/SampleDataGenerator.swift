@@ -2,9 +2,7 @@
 //  SampleDataGenerator.swift
 //  PicMate
 //
-//  Debug-only test-data seeder reachable via picmate://entrophyrocks.
-//  Generates large, realistic sample libraries to exercise the blob
-//  externalization migration and iCloud sync at scale.
+//  Created by Claude on 2026/05/28.
 //
 
 #if DEBUG
