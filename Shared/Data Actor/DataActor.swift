@@ -69,6 +69,12 @@ actor DataActor {
     let tombstoneRecordType = Expression<String>("record_type")
     let tombstoneDeletedAt = Expression<Double>("deleted_at")
 
+    // Per-library migration bookkeeping (e.g. the "LibraryV2" image-blob migration).
+    let migrationsTable = Table("migrations")
+    let migrationName = Expression<String>("migration_name")
+    let migrationAppVersion = Expression<String>("app_version")
+    let migrationCompleted = Expression<Bool>("completed")
+
     // swiftlint:disable:next function_body_length
     init(collectionID: String) {
         self.collectionID = collectionID
@@ -146,6 +152,12 @@ actor DataActor {
                 table.column(tombstoneId, primaryKey: true)
                 table.column(tombstoneRecordType)
                 table.column(tombstoneDeletedAt, defaultValue: 0)
+            })
+
+            try database.run(migrationsTable.create(ifNotExists: true) { table in
+                table.column(migrationName, primaryKey: true)
+                table.column(migrationAppVersion, defaultValue: "")
+                table.column(migrationCompleted, defaultValue: false)
             })
 
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))

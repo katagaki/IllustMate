@@ -81,7 +81,7 @@ struct IllustMateApp: App {
             // Determine the active library and surface the migration screen
             // first, before slower startup work, so it appears right away.
             await libraryManager.loadLibraries()
-            await imageMigration.runIfNeeded()
+            await imageMigration.runPendingMigrations()
             do {
                 // TODO: Tips are broken in iOS 26 thanks to SwiftUI bug
                 //       Will include everything for now until Apple fixes it
@@ -96,9 +96,9 @@ struct IllustMateApp: App {
             DatabaseMigrator.markMigrationComplete()
             await SyncManager.shared.refresh()
         }
-        .onChange(of: libraryManager.currentLibrary.id) { _, _ in
+        .onChange(of: libraryManager.currentLibrary.id) { _, newID in
             Task {
-                await imageMigration.runIfNeeded()
+                await imageMigration.runIfNeeded(for: newID)
                 await SyncManager.shared.refresh()
             }
         }

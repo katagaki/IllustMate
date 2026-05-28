@@ -27,9 +27,41 @@ struct ImageMigrationProgress: Sendable {
 
 extension DataActor {
 
+    /// Identifies the image-blob externalization migration in the per-library
+    /// `migrations` table.
+    static let libraryV2MigrationName = "LibraryV2"
+
     func needsImageMigration() -> Bool {
         let query = picsTable.filter(picMediaType == MediaType.pic.rawValue && picData != nil)
         return ((try? database.scalar(query.count)) ?? 0) > 0
+    }
+
+    /// Whether this library has finished the LibraryV2 image-blob migration.
+    /// A library with nothing left to migrate is marked complete on the spot,
+    /// so freshly created or synced-in libraries report complete immediately
+    /// (and become eligible for sync) without a UI pass.
+    func isLibraryV2MigrationComplete() -> Bool {
+        if migrationCompletedFlag(Self.libraryV2MigrationName) { return true }
+        guard needsImageMigration() else {
+            markLibraryV2MigrationComplete()
+            return true
+        }
+        return false
+    }
+
+    func markLibraryV2MigrationComplete() {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        _ = try? database.run(migrationsTable.insert(or: .replace,
+            migrationName <- Self.libraryV2MigrationName,
+            migrationAppVersion <- version,
+            migrationCompleted <- true
+        ))
+    }
+
+    private func migrationCompletedFlag(_ name: String) -> Bool {
+        let query = migrationsTable.filter(migrationName == name)
+        guard let row = try? database.pluck(query) else { return false }
+        return (try? row.get(migrationCompleted)) ?? false
     }
 
     /// Externalizes every image BLOB to a file. Safe to call repeatedly and to

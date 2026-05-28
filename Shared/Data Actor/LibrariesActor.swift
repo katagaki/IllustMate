@@ -24,6 +24,10 @@ actor LibrariesActor {
     let libraryCKSystemFields = Expression<Data?>("ck_system_fields")
     let librarySyncEnabled = Expression<Bool>("sync_enabled")
     let libraryStorageMode = Expression<String>("storage_mode")
+    // Mirror of each library's LibraryV2 migration state (source of truth lives
+    // in the library's own `migrations` table). Gates all sync activity so an
+    // unmigrated library never syncs.
+    let libraryMigratedV2 = Expression<Bool>("migrated_v2")
     let tombstonesTable = Table("library_tombstones")
     let tombstoneId = Expression<String>("id")
     let tombstoneDeletedAt = Expression<Double>("deleted_at")
@@ -72,6 +76,7 @@ actor LibrariesActor {
             _ = try? database.run(librariesTable.addColumn(librarySyncEnabled, defaultValue: false))
             _ = try? database.run(librariesTable.addColumn(libraryStorageMode,
                                                            defaultValue: StorageMode.optimize.rawValue))
+            _ = try? database.run(librariesTable.addColumn(libraryMigratedV2, defaultValue: false))
             try database.run(tombstonesTable.create(ifNotExists: true) { table in
                 table.column(tombstoneId, primaryKey: true)
                 table.column(tombstoneDeletedAt, defaultValue: 0)
@@ -164,7 +169,8 @@ extension LibrariesActor {
 
     func dirtyLibraryIDs() -> [String] {
         let query = librariesTable
-            .filter(libraryDirty == true && librarySyncEnabled == true && libraryId != PicLibrary.defaultID)
+            .filter(libraryDirty == true && librarySyncEnabled == true
+                    && libraryMigratedV2 == true && libraryId != PicLibrary.defaultID)
             .select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
@@ -172,18 +178,34 @@ extension LibrariesActor {
     /// Sync-enabled custom libraries never confirmed as synced (no system fields).
     func unsyncedLibraryIDs() -> [String] {
         let query = librariesTable
-            .filter(libraryCKSystemFields == nil && librarySyncEnabled == true && libraryId != PicLibrary.defaultID)
+            .filter(libraryCKSystemFields == nil && librarySyncEnabled == true
+                    && libraryMigratedV2 == true && libraryId != PicLibrary.defaultID)
             .select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
 
     func syncEnabledLibraryIDs() -> [String] {
-        let query = librariesTable.filter(librarySyncEnabled == true).select(libraryId)
+        let query = librariesTable
+            .filter(librarySyncEnabled == true && libraryMigratedV2 == true)
+            .select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
 
     func allLibraryIDs() -> [String] {
         (try? database.prepare(librariesTable.select(libraryId)).map { $0[libraryId] }) ?? []
+    }
+
+    /// Libraries whose LibraryV2 migration mirror is not yet set. Used to
+    /// reconcile the mirror from each library's authoritative `migrations`
+    /// table before sync runs.
+    func unmigratedLibraryIDs() -> [String] {
+        let query = librariesTable.filter(libraryMigratedV2 == false).select(libraryId)
+        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+    }
+
+    func setLibraryMigrated(_ migrated: Bool, forID id: String) {
+        _ = try? database.run(librariesTable.filter(libraryId == id)
+            .update(libraryMigratedV2 <- migrated))
     }
 
     func storageMode(forID id: String) -> String {
@@ -200,7 +222,8 @@ extension LibrariesActor {
     /// Sync-enabled libraries set to keep every original on this device.
     func downloadAllLibraryIDs() -> [String] {
         let query = librariesTable
-            .filter(librarySyncEnabled == true && libraryStorageMode == StorageMode.downloadAll.rawValue)
+            .filter(librarySyncEnabled == true && libraryMigratedV2 == true
+                    && libraryStorageMode == StorageMode.downloadAll.rawValue)
             .select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }

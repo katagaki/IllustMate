@@ -21,6 +21,18 @@ final class SyncManager {
     /// Starts (or stops) sync to match per-library settings, and pushes/pulls
     /// changes for every sync-enabled library. Safe to call repeatedly.
     func refresh() async {
+        // Safeguard: never sync a library whose LibraryV2 image-blob migration
+        // is incomplete, even if its sync toggle (or the global migration flag)
+        // says otherwise. Each library's `migrations` table is the source of
+        // truth; reconcile the registry mirror from it before reading the
+        // sync-enabled set. Only libraries not yet mirrored are checked, so
+        // this is a no-op once every library has migrated.
+        for id in await LibrariesActor.shared.unmigratedLibraryIDs() {
+            if await DataActor.instance(for: id).isLibraryV2MigrationComplete() {
+                await LibrariesActor.shared.setLibraryMigrated(true, forID: id)
+            }
+        }
+
         let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
         #if DEBUG
         SyncDebugMonitor.shared.enabled = !enabledIDs.isEmpty
