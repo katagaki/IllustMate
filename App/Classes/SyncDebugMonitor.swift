@@ -1,0 +1,41 @@
+//
+//  SyncDebugMonitor.swift
+//  PicMate
+//
+//  Created by Claude on 2026/05/28.
+//
+//  DEBUG-only: collects a short rolling log of CloudKit sync activity for the
+//  on-screen overlay. Compiled out of release builds.
+//
+
+#if DEBUG
+import Foundation
+
+@MainActor
+@Observable
+final class SyncDebugMonitor {
+
+    static let shared = SyncDebugMonitor()
+
+    var enabled: Bool = false
+    var account: String = "—"
+    private(set) var events: [String] = []
+
+    func setAccount(_ value: String) {
+        account = value
+    }
+
+    func log(_ message: String) {
+        events.append("\(Self.formatter.string(from: Date())) \(message)")
+        if events.count > 10 {
+            events.removeFirst(events.count - 10)
+        }
+    }
+
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        return formatter
+    }()
+}
+#endif

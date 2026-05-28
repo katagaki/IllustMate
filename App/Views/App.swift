@@ -70,6 +70,11 @@ struct IllustMateApp: App {
                 .frame(width: 1, height: 1)
                 .opacity(0.001)
         }
+        .overlay(alignment: .top) {
+            #if DEBUG
+            SyncDebugOverlay()
+            #endif
+        }
         .onAppear {
             pipManager.setup()
         }

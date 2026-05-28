@@ -16,7 +16,7 @@ import Foundation
 actor SyncMate {
 
     static let shared = SyncMate()
-    static let containerID = "iCloud.com.tsubuzaki.IllustMate"
+    static let containerID = "iCloud.com.tsubuzaki.IllustMateSQLite"
 
     private let container: CKContainer
     private var engine: CKSyncEngine?
@@ -64,6 +64,7 @@ actor SyncMate {
         for tombstone in tombstones {
             pending.append(.deleteRecord(CKRecord.ID(recordName: tombstone.id, zoneID: zoneID)))
         }
+        await debugLog("scan \(albumIDs.count)A \(picIDs.count)P \(tombstones.count)del")
         guard !pending.isEmpty else { return }
         engine.state.add(pendingRecordZoneChanges: pending)
     }
@@ -105,4 +106,32 @@ actor SyncMate {
     func clearState() {
         defaults?.removeObject(forKey: stateKey)
     }
+
+    // MARK: - Debug
+
+    func debugLog(_ message: String) async {
+        #if DEBUG
+        await SyncDebugMonitor.shared.log(message)
+        #endif
+    }
+
+    func reportAccountStatus() async {
+        #if DEBUG
+        let status = (try? await container.accountStatus()) ?? .couldNotDetermine
+        await SyncDebugMonitor.shared.setAccount(Self.describe(status))
+        #endif
+    }
+
+    #if DEBUG
+    private static func describe(_ status: CKAccountStatus) -> String {
+        switch status {
+        case .available: "available"
+        case .noAccount: "no account"
+        case .restricted: "restricted"
+        case .couldNotDetermine: "unknown"
+        case .temporarilyUnavailable: "unavailable"
+        @unknown default: "unknown"
+        }
+    }
+    #endif
 }

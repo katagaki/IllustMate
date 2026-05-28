@@ -18,10 +18,13 @@ extension SyncMate: CKSyncEngineDelegate {
         case .stateUpdate(let update):
             saveState(update.stateSerialization)
         case .fetchedRecordZoneChanges(let changes):
+            await debugLog("↓ \(changes.modifications.count) mod \(changes.deletions.count) del")
             await applyFetchedRecordZoneChanges(changes)
         case .sentRecordZoneChanges(let changes):
+            await debugLog("↑ \(changes.savedRecords.count) sent \(changes.failedRecordSaves.count) fail")
             await handleSentRecordZoneChanges(changes, syncEngine: syncEngine)
         case .accountChange(let change):
+            await debugLog("account change")
             handleAccountChange(change)
         default:
             break
