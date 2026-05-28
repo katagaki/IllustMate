@@ -12,10 +12,12 @@ actor OriginalsManager {
     static let shared = OriginalsManager()
     static let containerID = "iCloud.com.tsubuzaki.IllustMateSQLite"
 
-    /// `Documents/Originals` inside the iCloud Drive ubiquity container.
+    /// App-private `Originals` folder in the iCloud Drive ubiquity container.
+    /// Kept outside `Documents/` so it isn't exposed in the Files app, while
+    /// still syncing over iCloud.
     private func originalsDirectory() -> URL? {
         FileManager.default.url(forUbiquityContainerIdentifier: Self.containerID)?
-            .appendingPathComponent("Documents/Originals", isDirectory: true)
+            .appendingPathComponent("Originals", isDirectory: true)
     }
 
     private func originalURL(forPicID id: String) -> URL? {
