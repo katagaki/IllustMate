@@ -30,6 +30,12 @@ struct IllustMateApp: App {
     @State var importedURL: URL?
     @State var showLockCover: Bool = false
 
+    #if DEBUG
+    @State var isSeedingData: Bool = false
+    @State var seedCurrent: Int = 0
+    @State var seedTotal: Int = 0
+    #endif
+
     @AppStorage("AppLockEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
     @AppStorage(
@@ -92,6 +98,11 @@ struct IllustMateApp: App {
                     }
                 }
             }
+            #if DEBUG
+            if url.scheme == "picmate", url.host == "entrophyrocks" {
+                handleSampleDataURL(url)
+            }
+            #endif
         }
         .onChange(of: importedURL) { _, newValue in
             if newValue != nil {
@@ -108,7 +119,43 @@ struct IllustMateApp: App {
                 ProgressView()
             }
         }
+        #if DEBUG
+        .sheet(isPresented: $isSeedingData) {
+            StatusView(type: .inProgress,
+                       title: .custom("Generating sample data…"),
+                       currentCount: seedCurrent,
+                       totalCount: seedTotal)
+                .phonePresentationDetents([.medium])
+                .interactiveDismissDisabled()
+        }
+        #endif
     }
+
+    #if DEBUG
+    func handleSampleDataURL(_ url: URL) {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        func count(_ name: String) -> Int? {
+            components?.queryItems?.first { $0.name == name }?.value.flatMap { Int($0) }
+        }
+        let picCount = count("pics") ?? Int.random(in: 11000...15000)
+        let albumCount = count("albums") ?? Int.random(in: 20...60)
+        Task { @MainActor in
+            seedCurrent = 0
+            seedTotal = picCount
+            isSeedingData = true
+            UIApplication.shared.isIdleTimerDisabled = true
+            await SampleDataGenerator.generate(
+                picCount: picCount, albumCount: albumCount, into: DataActor.shared
+            ) { completed, total in
+                seedCurrent = completed
+                seedTotal = total
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            isSeedingData = false
+            navigation.signalDataDeleted()
+        }
+    }
+    #endif
 
     func migratePreferencesFromUserDefaults() async {
         let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
