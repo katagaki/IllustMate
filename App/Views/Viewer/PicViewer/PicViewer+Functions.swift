@@ -121,7 +121,7 @@ extension PicViewer {
                     }
                     .frame(width: 20.0, height: 20.0)
                     .shadow(color: .black.opacity(0.4), radius: 2.0)
-                    .padding(16.0)
+                    .padding(8.0)
                     .transition(.opacity)
                 }
             }
