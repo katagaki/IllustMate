@@ -26,6 +26,7 @@ actor LibrariesActor {
     let libraryLastModified = Expression<Double>("last_modified")
     let libraryCKSystemFields = Expression<Data?>("ck_system_fields")
     let librarySyncEnabled = Expression<Bool>("sync_enabled")
+    let libraryStorageMode = Expression<String>("storage_mode")
     let tombstonesTable = Table("library_tombstones")
     let tombstoneId = Expression<String>("id")
     let tombstoneDeletedAt = Expression<Double>("deleted_at")
@@ -73,6 +74,8 @@ actor LibrariesActor {
             _ = try? database.run(librariesTable.addColumn(libraryLastModified, defaultValue: 0))
             _ = try? database.run(librariesTable.addColumn(libraryCKSystemFields))
             _ = try? database.run(librariesTable.addColumn(librarySyncEnabled, defaultValue: false))
+            _ = try? database.run(librariesTable.addColumn(libraryStorageMode,
+                                                           defaultValue: StorageMode.optimize.rawValue))
             try database.run(tombstonesTable.create(ifNotExists: true) { table in
                 table.column(tombstoneId, primaryKey: true)
                 table.column(tombstoneDeletedAt, defaultValue: 0)
@@ -187,6 +190,25 @@ extension LibrariesActor {
 
     func allLibraryIDs() -> [String] {
         (try? database.prepare(librariesTable.select(libraryId)).map { $0[libraryId] }) ?? []
+    }
+
+    func storageMode(forID id: String) -> String {
+        guard let row = try? database.pluck(librariesTable.filter(libraryId == id)) else {
+            return StorageMode.optimize.rawValue
+        }
+        return (try? row.get(libraryStorageMode)) ?? StorageMode.optimize.rawValue
+    }
+
+    func setStorageMode(_ mode: String, forID id: String) {
+        _ = try? database.run(librariesTable.filter(libraryId == id).update(libraryStorageMode <- mode))
+    }
+
+    /// Sync-enabled libraries set to keep every original on this device.
+    func downloadAllLibraryIDs() -> [String] {
+        let query = librariesTable
+            .filter(librarySyncEnabled == true && libraryStorageMode == StorageMode.downloadAll.rawValue)
+            .select(libraryId)
+        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
 
     func isSyncEnabled(id: String) -> Bool {

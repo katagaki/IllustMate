@@ -44,5 +44,11 @@ final class SyncManager {
                 await OriginalsManager.shared.uploadMissingOriginals(in: id)
             }
         }
+        // Download-All libraries proactively pull every original, off the main actor.
+        for id in await LibrariesActor.shared.downloadAllLibraryIDs() {
+            Task.detached(priority: .utility) {
+                await OriginalsManager.shared.downloadAllOriginals(in: id)
+            }
+        }
     }
 }

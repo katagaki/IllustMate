@@ -154,6 +154,15 @@ extension DataActor {
         _ = try? database.run(picsTable.update(syncOriginalSynced <- false))
     }
 
+    /// Image pics whose original isn't cached locally yet (synced from another
+    /// device). Used by Download All / Keep Offline to fetch them.
+    func picIDsMissingLocalOriginal() -> [String] {
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picFilePath == nil)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
     /// Stage-by-stage counts behind `picIDsNeedingOriginalUpload`, for diagnosing
     /// why it may be empty. A value of -1 means that query threw (e.g. a column
     /// that doesn't exist yet).

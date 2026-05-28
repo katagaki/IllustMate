@@ -122,6 +122,15 @@ actor OriginalsManager {
         await SyncMate.shared.debugLog("orig: container changed, reset upload flags")
     }
 
+    /// Proactively downloads every not-yet-local original for a library
+    /// (Download All / Keep Offline). Each call fetches only what's still missing.
+    func downloadAllOriginals(in collectionID: String) async {
+        let ids = await DataActor.instance(for: collectionID).picIDsMissingLocalOriginal()
+        for id in ids {
+            _ = await fetchOriginal(picID: id, in: collectionID)
+        }
+    }
+
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),
     /// caches it locally, and returns the bytes. Nil if it isn't available.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
