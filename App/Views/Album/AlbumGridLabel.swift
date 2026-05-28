@@ -31,14 +31,14 @@ struct AlbumGridLabel: View {
                 if let progress = downloadFraction {
                     ZStack {
                         Circle()
-                            .fill(.thinMaterial)
+                            .stroke(.white.opacity(0.35), lineWidth: 5.0)
                         Circle()
                             .trim(from: 0, to: progress)
-                            .stroke(.tint, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                            .stroke(.white, style: StrokeStyle(lineWidth: 5.0, lineCap: .round))
                             .rotationEffect(.degrees(-90))
-                            .padding(7)
                     }
-                    .frame(width: 40, height: 40)
+                    .frame(width: 36.0, height: 36.0)
+                    .shadow(color: .black.opacity(0.3), radius: 2.0)
                     .animation(.smooth, value: progress)
                 }
             }
