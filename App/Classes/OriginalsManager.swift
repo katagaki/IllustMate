@@ -139,26 +139,57 @@ actor OriginalsManager {
         await SyncMate.shared.debugLog("orig: container changed, reset upload flags")
     }
 
-    /// Proactively downloads every not-yet-local original for a library
-    /// (Download All / Keep Offline). Each call fetches only what's still missing.
-    func downloadAllOriginals(in collectionID: String) async {
-        let ids = await DataActor.instance(for: collectionID).picIDsMissingLocalOriginal()
-        for id in ids {
-            _ = await fetchOriginal(picID: id, in: collectionID)
+    /// True once the container item is materialized locally (the most current
+    /// version is downloaded), i.e. the original is available offline.
+    private func isMaterialized(_ url: URL) -> Bool {
+        downloadingStatus(url) == .current
+    }
+
+    /// Downloads an original into the container without reading its bytes, so it's
+    /// available offline. Returns true once it's materialized (or already was).
+    @discardableResult
+    func materializeOriginal(picID: String, in collectionID: String) async -> Bool {
+        guard let url = originalURL(forPicID: picID, in: collectionID) else { return false }
+        if isMaterialized(url) { return true }
+        try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        return await waitForDownload(url)
+    }
+
+    /// Image pics in a library whose original isn't downloaded locally yet.
+    func picIDsNotMaterialized(in collectionID: String) async -> [String] {
+        let ids = await DataActor.instance(for: collectionID).imagePicIDs()
+        return ids.filter { id in
+            guard let url = originalURL(forPicID: id, in: collectionID) else { return false }
+            return !isMaterialized(url)
         }
     }
 
-    /// Downloads every not-yet-local original in an album (Keep Offline),
-    /// posting progress so the album cover can show a donut.
+    /// Requests materialization of every original not already downloaded for a
+    /// library (Download All). iCloud downloads them in the background.
+    func downloadAllOriginals(in collectionID: String) async {
+        let ids = await DataActor.instance(for: collectionID).imagePicIDs()
+        for id in ids {
+            guard let url = originalURL(forPicID: id, in: collectionID), !isMaterialized(url) else { continue }
+            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        }
+    }
+
+    /// Downloads an album's originals that aren't already materialized (Keep
+    /// Offline), posting progress so the cover can show a donut. If everything is
+    /// already offline, nothing is downloaded and no donut is shown.
     func keepAlbumOffline(albumID: String, in collectionID: String) async {
-        let ids = await DataActor.instance(for: collectionID).picIDsMissingLocalOriginal(inAlbum: albumID)
-        guard !ids.isEmpty else { return }
+        let allIDs = await DataActor.instance(for: collectionID).imagePicIDs(inAlbum: albumID)
+        let pending = allIDs.filter { id in
+            guard let url = originalURL(forPicID: id, in: collectionID) else { return false }
+            return !isMaterialized(url)
+        }
+        guard !pending.isEmpty else { return }
         await postAlbumProgress(albumID, fraction: 0)
         var done = 0
-        for id in ids {
-            _ = await fetchOriginal(picID: id, in: collectionID)
+        for id in pending {
+            await materializeOriginal(picID: id, in: collectionID)
             done += 1
-            await postAlbumProgress(albumID, fraction: Double(done) / Double(ids.count))
+            await postAlbumProgress(albumID, fraction: Double(done) / Double(pending.count))
         }
         await postAlbumProgress(albumID, fraction: nil)
     }

@@ -154,23 +154,6 @@ extension DataActor {
         _ = try? database.run(picsTable.update(syncOriginalSynced <- false))
     }
 
-    /// Image pics whose original isn't cached locally yet (synced from another
-    /// device). Used by Download All / Keep Offline to fetch them.
-    func picIDsMissingLocalOriginal() -> [String] {
-        let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picFilePath == nil)
-            .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
-    }
-
-    /// Image pics in an album whose original isn't cached locally yet.
-    func picIDsMissingLocalOriginal(inAlbum albumID: String) -> [String] {
-        let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picAlbumId == albumID && picFilePath == nil)
-            .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
-    }
-
     /// Image pics in an album that currently have a local original on disk.
     func localImagePicIDs(inAlbum albumID: String) -> [String] {
         let query = picsTable
@@ -183,6 +166,20 @@ extension DataActor {
     func localImagePicIDs() -> [String] {
         let query = picsTable
             .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    /// All image pic IDs in the library, regardless of where the original lives.
+    func imagePicIDs() -> [String] {
+        let query = picsTable.filter(picMediaType == MediaType.pic.rawValue).select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    /// All image pic IDs in an album, regardless of where the original lives.
+    func imagePicIDs(inAlbum albumID: String) -> [String] {
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picAlbumId == albumID)
             .select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }

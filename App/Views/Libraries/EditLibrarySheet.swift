@@ -387,8 +387,7 @@ struct EditLibrarySheet: View {
     }
 
     func downloadAll() async {
-        let dataActor = DataActor(collectionID: library.id)
-        let ids = await dataActor.picIDsMissingLocalOriginal()
+        let ids = await OriginalsManager.shared.picIDsNotMaterialized(in: library.id)
         guard !ids.isEmpty else { return }
         await MainActor.run {
             UIApplication.shared.isIdleTimerDisabled = true
@@ -397,7 +396,7 @@ struct EditLibrarySheet: View {
             downloadTotal = ids.count
         }
         for id in ids {
-            _ = await OriginalsManager.shared.fetchOriginal(picID: id, in: library.id)
+            _ = await OriginalsManager.shared.materializeOriginal(picID: id, in: library.id)
             await MainActor.run { downloadProgress += 1 }
         }
         await MainActor.run {
