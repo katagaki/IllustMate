@@ -103,8 +103,21 @@ extension PicViewer {
                 // Downloading-from-iCloud indicator, anchored to the image corner
                 if viewer.isDownloadingDisplayedOriginal {
                     HStack(spacing: 6.0) {
-                        ProgressView()
-                            .controlSize(.small)
+                        if let progress = viewer.downloadProgress {
+                            ZStack {
+                                Circle()
+                                    .stroke(.secondary.opacity(0.3), lineWidth: 2.5)
+                                Circle()
+                                    .trim(from: 0, to: progress)
+                                    .stroke(.tint, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                    .rotationEffect(.degrees(-90))
+                            }
+                            .frame(width: 16, height: 16)
+                            .animation(.smooth, value: progress)
+                        } else {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
                         Image(systemName: "icloud.and.arrow.down")
                             .font(.caption)
                     }

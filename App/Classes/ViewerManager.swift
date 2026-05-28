@@ -23,6 +23,9 @@ class ViewerManager {
     /// Pic whose original is downloading from iCloud Drive (drives the viewer's
     /// download indicator); nil when nothing is downloading.
     var downloadingOriginalPicID: String?
+    /// Download progress (0...1) for `downloadingOriginalPicID`, or nil while the
+    /// percentage isn't known yet (e.g. before bytes start arriving).
+    var downloadProgress: Double?
     var displayedVideoURL: URL?
     var videoPlayer: AVPlayer?
 
@@ -39,6 +42,7 @@ class ViewerManager {
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
     @ObservationIgnored private var prefetchTasks: [String: Task<Void, Never>] = [:]
+    @ObservationIgnored private let downloadMonitor = CloudDownloadMonitor()
 
     /// Maximum number of full-resolution images to keep cached around the current index.
     private let cacheWindow = 5
@@ -50,6 +54,8 @@ class ViewerManager {
         displayedImage = nil
         isFullImageLoaded = false
         downloadingOriginalPicID = nil
+        downloadProgress = nil
+        downloadMonitor.stop()
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
@@ -186,11 +192,20 @@ class ViewerManager {
             if data == nil {
                 if self.displayedPicID == picID {
                     withAnimation(.smooth.speed(2.0)) { self.downloadingOriginalPicID = picID }
+                    self.downloadProgress = nil
+                    self.downloadMonitor.start(fileName: picID) { [weak self] fraction in
+                        guard let self, self.downloadingOriginalPicID == picID else { return }
+                        self.downloadProgress = fraction
+                    }
                 }
                 data = await OriginalsManager.shared.fetchOriginal(picID: picID,
                                                                    in: DataActor.shared.collectionID)
+                self.downloadMonitor.stop()
                 if self.downloadingOriginalPicID == picID {
-                    withAnimation(.smooth.speed(2.0)) { self.downloadingOriginalPicID = nil }
+                    withAnimation(.smooth.speed(2.0)) {
+                        self.downloadingOriginalPicID = nil
+                        self.downloadProgress = nil
+                    }
                 }
             }
             if let data, let image = await UIImage(data: data)?.byPreparingForDisplay() {
