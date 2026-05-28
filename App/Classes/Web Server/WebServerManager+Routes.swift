@@ -16,7 +16,9 @@ extension WebServerManager {
         let components = path.split(separator: "/").map(String.init)
 
         if request.method == "GET" {
-            if components.isEmpty {
+            if components.first != "api" {
+                // Serve the single-page app for the root and all client-side routes
+                // (e.g. /{albumId}/{albumId}/...), which resolve navigation in the browser.
                 return serveMainPage()
             }
             if components == ["api", "albums"] {
@@ -24,6 +26,15 @@ extension WebServerManager {
             }
             if components.count == 3 && components[0] == "api" && components[1] == "albums" {
                 return await handleGetAlbum(id: components[2])
+            }
+            if components == ["api", "pics"] {
+                let page = Self.pagination(from: request)
+                return await handleGetRootPics(offset: page.offset, limit: page.limit)
+            }
+            if components.count == 4 && components[0] == "api" &&
+                components[1] == "albums" && components[3] == "pics" {
+                let page = Self.pagination(from: request)
+                return await handleGetAlbumPics(id: components[2], offset: page.offset, limit: page.limit)
             }
             if components.count == 4 && components[0] == "api" &&
                 components[1] == "albums" && components[3] == "cover" {
@@ -56,16 +67,34 @@ extension WebServerManager {
         return .notFound()
     }
 
+    // MARK: - Pagination
+
+    /// Default number of pics returned per page when listing an album.
+    static let picPageSize = 60
+    /// Upper bound on a client-requested page size.
+    static let maxPicPageSize = 200
+
+    private static func pagination(from request: HTTPRequest) -> (offset: Int, limit: Int) {
+        let offset = max(Int(request.queryParameters["offset"] ?? "") ?? 0, 0)
+        let requestedLimit = Int(request.queryParameters["limit"] ?? "") ?? picPageSize
+        let limit = min(max(requestedLimit, 1), maxPicPageSize)
+        return (offset, limit)
+    }
+
     // MARK: - Album Routes
 
     private func handleGetRootAlbums() async -> HTTPResponse {
         do {
             let albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
-            let pics = try await DataActor.shared.pics(in: nil, order: .reverse)
+            let pics = try await DataActor.shared.picSkeletons(
+                in: nil, order: .reverse, limit: Self.picPageSize, offset: 0
+            )
+            let picCount = await DataActor.shared.picCount(in: nil)
             let json: [String: Any] = [
                 "name": "Collection",
                 "albums": albums.map { Self.albumToJSON($0) },
-                "pics": pics.map { Self.picToJSON($0) }
+                "pics": pics.map { Self.picToJSON($0) },
+                "picCount": picCount
             ]
             let data = try JSONSerialization.data(withJSONObject: json)
             return .ok(json: data)
@@ -80,14 +109,46 @@ extension WebServerManager {
         }
         do {
             let childAlbums = try await DataActor.shared.albumsWithCounts(in: album, sortedBy: .nameAscending)
-            let pics = try await DataActor.shared.pics(in: album, order: .reverse)
+            let pics = try await DataActor.shared.picSkeletons(
+                in: album, order: .reverse, limit: Self.picPageSize, offset: 0
+            )
+            let picCount = await DataActor.shared.picCount(in: album)
+            let path = await DataActor.shared.albumPath(forAlbumWithID: album.id)
             let json: [String: Any] = [
                 "id": album.id,
                 "name": album.name,
                 "hasCover": album.hasCoverPhoto,
                 "albums": childAlbums.map { Self.albumToJSON($0) },
-                "pics": pics.map { Self.picToJSON($0) }
+                "pics": pics.map { Self.picToJSON($0) },
+                "picCount": picCount,
+                "path": path.map { ["id": $0.id, "name": $0.name] }
             ]
+            let data = try JSONSerialization.data(withJSONObject: json)
+            return .ok(json: data)
+        } catch {
+            return .internalError(error.localizedDescription)
+        }
+    }
+
+    // MARK: - Paginated Pic Routes
+
+    private func handleGetRootPics(offset: Int, limit: Int) async -> HTTPResponse {
+        await picsPage(in: nil, offset: offset, limit: limit)
+    }
+
+    private func handleGetAlbumPics(id: String, offset: Int, limit: Int) async -> HTTPResponse {
+        guard let album = await DataActor.shared.album(for: id) else {
+            return .notFound()
+        }
+        return await picsPage(in: album, offset: offset, limit: limit)
+    }
+
+    private func picsPage(in album: Album?, offset: Int, limit: Int) async -> HTTPResponse {
+        do {
+            let pics = try await DataActor.shared.picSkeletons(
+                in: album, order: .reverse, limit: limit, offset: offset
+            )
+            let json: [String: Any] = ["pics": pics.map { Self.picToJSON($0) }]
             let data = try JSONSerialization.data(withJSONObject: json)
             return .ok(json: data)
         } catch {
