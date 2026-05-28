@@ -375,7 +375,7 @@ extension WebServerManager {
                         <div class="progress-bar-fill" id="progressBarFill"></div>
                     </div>
                 </div>
-                <div class="upload-actions">
+                <div class="upload-actions" id="uploadActions">
                     <button class="btn btn-secondary" onclick="closeUpload()">Cancel</button>
                     <button class="btn btn-primary" id="uploadSubmitBtn" onclick="submitUpload()">Upload</button>
                 </div>
@@ -680,7 +680,7 @@ extension WebServerManager {
                 document.getElementById('fileInput').value = '';
                 document.getElementById('fileList').innerHTML = '';
                 document.getElementById('uploadProgress').style.display = 'none';
-                document.getElementById('uploadSubmitBtn').disabled = false;
+                document.getElementById('uploadActions').style.display = '';
                 selectedFiles = [];
                 document.body.style.overflow = 'hidden';
             }
@@ -729,12 +729,12 @@ extension WebServerManager {
             async function submitUpload() {
                 if (selectedFiles.length === 0) return;
 
-                const btn = document.getElementById('uploadSubmitBtn');
+                const actions = document.getElementById('uploadActions');
                 const progress = document.getElementById('uploadProgress');
                 const statusText = document.getElementById('uploadStatusText');
                 const progressFill = document.getElementById('progressBarFill');
 
-                btn.disabled = true;
+                actions.style.display = 'none';
                 progress.style.display = 'block';
                 statusText.textContent = 'Uploading...';
                 progressFill.style.width = '0%';
@@ -765,7 +765,7 @@ extension WebServerManager {
                     }, 1000);
                 } catch (err) {
                     statusText.textContent = 'Upload failed. Please try again.';
-                    btn.disabled = false;
+                    actions.style.display = '';
                 }
             }
 
