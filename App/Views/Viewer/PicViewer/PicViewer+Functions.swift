@@ -106,13 +106,12 @@ extension PicViewer {
                         if let progress = viewer.downloadProgress {
                             ZStack {
                                 Circle()
-                                    .stroke(.white.opacity(0.35), lineWidth: 3.0)
+                                    .stroke(.white.opacity(0.35), lineWidth: 2.5)
                                 Circle()
                                     .trim(from: 0, to: progress)
-                                    .stroke(.white, style: StrokeStyle(lineWidth: 3.0, lineCap: .round))
+                                    .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                                     .rotationEffect(.degrees(-90))
                             }
-                            .frame(width: 24.0, height: 24.0)
                             .animation(.smooth, value: progress)
                         } else {
                             ProgressView()
@@ -120,6 +119,7 @@ extension PicViewer {
                                 .tint(.white)
                         }
                     }
+                    .frame(width: 20.0, height: 20.0)
                     .shadow(color: .black.opacity(0.4), radius: 2.0)
                     .padding(16.0)
                     .transition(.opacity)
