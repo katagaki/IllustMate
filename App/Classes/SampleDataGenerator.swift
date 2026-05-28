@@ -28,10 +28,12 @@ enum SampleDataGenerator {
         picCount: Int,
         albumCount: Int,
         into dataActor: DataActor,
+        legacyBlobs: Bool = false,
         progress: @escaping @MainActor (_ completed: Int, _ total: Int) -> Void
     ) async {
         let albumIDs = await makeAlbums(count: albumCount, into: dataActor)
-        await makePics(count: picCount, albumIDs: albumIDs, into: dataActor, progress: progress)
+        await makePics(count: picCount, albumIDs: albumIDs, into: dataActor,
+                       legacyBlobs: legacyBlobs, progress: progress)
     }
 
     // MARK: - Albums
@@ -66,6 +68,7 @@ enum SampleDataGenerator {
         count: Int,
         albumIDs: [String],
         into dataActor: DataActor,
+        legacyBlobs: Bool,
         progress: @escaping @MainActor (Int, Int) -> Void
     ) async {
         let maxConcurrent = max(2, ProcessInfo.processInfo.activeProcessorCount)
@@ -78,8 +81,7 @@ enum SampleDataGenerator {
             }
             var completed = 0
             for await pic in group {
-                await dataActor.createPic(pic.name, data: pic.data,
-                                          inAlbumWithID: pic.albumID, dateAdded: pic.date)
+                await insert(pic, into: dataActor, legacyBlobs: legacyBlobs)
                 completed += 1
                 await progress(completed, count)
                 if submitted < count {
@@ -88,6 +90,17 @@ enum SampleDataGenerator {
                     submitted += 1
                 }
             }
+        }
+    }
+
+    private static func insert(_ pic: RenderedPic, into dataActor: DataActor,
+                               legacyBlobs: Bool) async {
+        if legacyBlobs {
+            await dataActor.createImageBlobPic(pic.name, data: pic.data,
+                                               inAlbumWithID: pic.albumID, dateAdded: pic.date)
+        } else {
+            await dataActor.createPic(pic.name, data: pic.data,
+                                      inAlbumWithID: pic.albumID, dateAdded: pic.date)
         }
     }
 

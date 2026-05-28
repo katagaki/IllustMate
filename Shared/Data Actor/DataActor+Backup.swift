@@ -36,6 +36,9 @@ extension DataActor {
 
             let destinationURL = destinationDirectoryURL.appendingPathComponent(backupFileName)
             try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
+            // Externalized images live outside the DB, so re-inline them into the
+            // copy to produce a self-contained, single-file `.pics` backup.
+            inlineImageFiles(intoBackupAt: destinationURL)
         } else {
             throw NSError(domain: "DataActor",
                           code: 2,
@@ -43,85 +46,116 @@ extension DataActor {
         }
     }
 
-    // swiftlint:disable:next function_body_length
+    /// Writes each externalized image file's bytes back into the backup
+    /// database's `data` column (clearing `file_path`), so the resulting `.pics`
+    /// is a blob-based, self-contained file that any app version can restore.
+    private func inlineImageFiles(intoBackupAt url: URL) {
+        guard let backupDB = try? Connection(url.path) else { return }
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil)
+            .select(picId, picFilePath)
+        var work: [(id: String, path: String)] = []
+        if let rows = try? backupDB.prepare(query) {
+            for row in rows {
+                if let path = try? row.get(picFilePath) {
+                    work.append((row[picId], path))
+                }
+            }
+        }
+        for item in work {
+            guard let blob = try? Data(contentsOf: imageFileURL(forRelativePath: item.path)) else {
+                continue
+            }
+            _ = try? backupDB.run(picsTable.filter(picId == item.id).update(
+                picData <- blob,
+                picFilePath <- nil
+            ))
+        }
+    }
+
     func importFromBackup(at url: URL, targetAlbumID: String?) throws {
         guard url.startAccessingSecurityScopedResource() else { return }
         defer { url.stopAccessingSecurityScopedResource() }
 
         let foreignDB = try Connection(url.path)
-
         if let targetAlbumID {
-            // Build a mapping from old album IDs to new album IDs
-            var albumIDMap: [String: String] = [:]
-
-            // Import albums, re-parenting top-level albums under the target album
-            let foreignAlbums = try foreignDB.prepare(albumsTable)
-            for foreignAlbum in foreignAlbums {
-                let oldID = (try? foreignAlbum.get(albumId)) ?? UUID().uuidString
-                let newID = UUID().uuidString
-                albumIDMap[oldID] = newID
-
-                let oldParentID = try? foreignAlbum.get(albumParentId)
-                // Top-level albums (no parent) go under the target album
-                // Albums with parents will be re-mapped after all albums are created
-                _ = try? self.database.run(self.albumsTable.insert(
-                    self.albumId <- newID,
-                    self.albumName <- (try? foreignAlbum.get(albumName)) ?? "",
-                    self.albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
-                    self.albumParentId <- oldParentID == nil ? targetAlbumID : nil,
-                    self.albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
-                ))
-            }
-
-            // Fix parent references for nested albums
-            let foreignAlbumsForParents = try foreignDB.prepare(albumsTable)
-            for foreignAlbum in foreignAlbumsForParents {
-                let oldID = (try? foreignAlbum.get(albumId)) ?? ""
-                guard let oldParentID = try? foreignAlbum.get(albumParentId),
-                      let newID = albumIDMap[oldID],
-                      let newParentID = albumIDMap[oldParentID] else { continue }
-                let query = self.albumsTable.filter(self.albumId == newID)
-                _ = try? self.database.run(query.update(self.albumParentId <- newParentID))
-            }
-
-            // Import pics, mapping their album IDs
-            let foreignPics = try foreignDB.prepare(picsTable)
-            for foreignPic in foreignPics {
-                let pData = try? foreignPic.get(picData)
-                let foreignMediaType = (try? foreignPic.get(picMediaType)) ?? 0
-                let foreignFilePath = try? foreignPic.get(picFilePath)
-                // Skip videos (can't import video files from DB-only backup)
-                if foreignMediaType == MediaType.video.rawValue && foreignFilePath != nil {
-                    continue
-                }
-                guard pData != nil || foreignMediaType == MediaType.pic.rawValue else { continue }
-                let id = UUID().uuidString
-                // Map the pic's album to the new album ID, or target album if it had no album
-                let oldAlbumID = try? foreignPic.get(picAlbumId)
-                let newAlbumID: String
-                if let oldAlbumID, let mapped = albumIDMap[oldAlbumID] {
-                    newAlbumID = mapped
-                } else {
-                    newAlbumID = targetAlbumID
-                }
-                _ = try? self.database.run(self.picsTable.insert(
-                    self.picId <- id,
-                    self.picName <- (try? foreignPic.get(picName)) ?? Pic.newFilename(),
-                    self.picAlbumId <- newAlbumID,
-                    self.picDateAdded <- (try? foreignPic.get(picDateAdded)) ?? Date.now.timeIntervalSince1970,
-                    self.picData <- pData,
-                    self.picThumbnailData <- (try? foreignPic.get(picThumbnailData)),
-                    self.picMediaType <- foreignMediaType,
-                    self.picDuration <- (try? foreignPic.get(picDuration)),
-                    self.picFilePath <- foreignFilePath
-                ))
-            }
+            try importIntoAlbum(targetAlbumID, from: foreignDB)
         } else {
-            // Merge
-            try self.database.execute("ATTACH DATABASE '\(url.path)' AS backup;")
-            try self.database.execute("INSERT OR IGNORE INTO main.albums SELECT * FROM backup.albums;")
-            try self.database.execute("INSERT OR IGNORE INTO main.pics SELECT * FROM backup.pics;")
-            try self.database.execute("DETACH DATABASE backup;")
+            try mergeBackup(from: foreignDB)
         }
+    }
+
+    // MARK: - Import strategies
+
+    private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws {
+        // Build a mapping from old album IDs to freshly-generated ones.
+        var albumIDMap: [String: String] = [:]
+        for foreignAlbum in try foreignDB.prepare(albumsTable) {
+            let oldID = (try? foreignAlbum.get(albumId)) ?? UUID().uuidString
+            let newID = UUID().uuidString
+            albumIDMap[oldID] = newID
+            let oldParentID = try? foreignAlbum.get(albumParentId)
+            // Top-level albums go under the target album; nested ones are re-mapped next.
+            _ = try? database.run(albumsTable.insert(
+                albumId <- newID,
+                albumName <- (try? foreignAlbum.get(albumName)) ?? "",
+                albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
+                albumParentId <- oldParentID == nil ? targetAlbumID : nil,
+                albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
+            ))
+        }
+        for foreignAlbum in try foreignDB.prepare(albumsTable) {
+            let oldID = (try? foreignAlbum.get(albumId)) ?? ""
+            guard let oldParentID = try? foreignAlbum.get(albumParentId),
+                  let newID = albumIDMap[oldID],
+                  let newParentID = albumIDMap[oldParentID] else { continue }
+            _ = try? database.run(albumsTable.filter(albumId == newID)
+                .update(albumParentId <- newParentID))
+        }
+        for foreignPic in try foreignDB.prepare(picsTable) {
+            let oldAlbumID = try? foreignPic.get(picAlbumId)
+            let mappedAlbumID = oldAlbumID.flatMap { albumIDMap[$0] } ?? targetAlbumID
+            importForeignPic(foreignPic, newID: UUID().uuidString, albumID: mappedAlbumID)
+        }
+    }
+
+    private func mergeBackup(from foreignDB: Connection) throws {
+        for foreignAlbum in try foreignDB.prepare(albumsTable) {
+            _ = try? database.run(albumsTable.insert(or: .ignore,
+                albumId <- (try? foreignAlbum.get(albumId)) ?? UUID().uuidString,
+                albumName <- (try? foreignAlbum.get(albumName)) ?? "",
+                albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
+                albumParentId <- (try? foreignAlbum.get(albumParentId)),
+                albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
+            ))
+        }
+        for foreignPic in try foreignDB.prepare(picsTable) {
+            let id = (try? foreignPic.get(picId)) ?? UUID().uuidString
+            let albumID = try? foreignPic.get(picAlbumId)
+            importForeignPic(foreignPic, newID: id, albumID: albumID)
+        }
+    }
+
+    /// Restores one pic from a backup row into the externalized layout: the blob
+    /// is written to an image file (kept inline only if the write fails). Uses
+    /// INSERT OR IGNORE so merges skip pics that already exist; for album imports
+    /// the IDs are fresh so it never conflicts. Videos are skipped (their files
+    /// aren't part of a single-file backup), matching prior behavior.
+    private func importForeignPic(_ row: Row, newID: String, albumID: String?) {
+        let mediaType = (try? row.get(picMediaType)) ?? 0
+        let foreignFilePath = try? row.get(picFilePath)
+        if mediaType == MediaType.video.rawValue && foreignFilePath != nil { return }
+        guard let blob = try? row.get(picData) else { return }
+        let relativePath = saveImageFile(blob, id: newID)
+        _ = try? database.run(picsTable.insert(or: .ignore,
+            picId <- newID,
+            picName <- (try? row.get(picName)) ?? Pic.newFilename(),
+            picAlbumId <- albumID,
+            picDateAdded <- (try? row.get(picDateAdded)) ?? Date.now.timeIntervalSince1970,
+            picData <- relativePath == nil ? blob : nil,
+            picThumbnailData <- (try? row.get(picThumbnailData)),
+            picMediaType <- mediaType,
+            picFilePath <- relativePath
+        ))
     }
 }

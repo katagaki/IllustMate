@@ -86,6 +86,29 @@ extension DataActor {
     }
 
     func imageData(forPicWithID id: String) -> Data? {
+        // Prefer the externalized file; only fall back to the legacy blob when
+        // the file is absent (pre-migration row or a failed file write).
+        let metaQuery = picsTable
+            .filter(picId == id)
+            .select(picFilePath, picMediaType)
+        if let row = try? database.pluck(metaQuery) {
+            let mediaType = (try? row.get(picMediaType)) ?? 0
+            if mediaType == MediaType.pic.rawValue,
+               let path = try? row.get(picFilePath),
+               let data = try? Data(contentsOf: imageFileURL(forRelativePath: path)),
+               !data.isEmpty {
+                return data
+            }
+        }
+        let blobQuery = picsTable
+            .filter(picId == id)
+            .select(picData)
+        return try? database.pluck(blobQuery).flatMap { try? $0.get(picData) }
+    }
+
+    /// Reads the raw stored blob for a pic, bypassing the file fallback.
+    /// Used by the blob-externalization migration.
+    func rawBlobData(forPicWithID id: String) -> Data? {
         let query = picsTable
             .filter(picId == id)
             .select(picData)
@@ -96,14 +119,18 @@ extension DataActor {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         let thumbnailData = Pic.makeThumbnail(data)
+        // Store the image as a file; only keep the blob as a fallback if the
+        // file write fails, so a pic always has its bytes somewhere.
+        let relativePath = saveImageFile(data, id: id)
         _ = try? database.run(picsTable.insert(
             picId <- id,
             picName <- name,
             picAlbumId <- albumID,
             picDateAdded <- now.timeIntervalSince1970,
-            picData <- data,
+            picData <- relativePath == nil ? data : nil,
             picThumbnailData <- thumbnailData,
-            picMediaType <- MediaType.pic.rawValue
+            picMediaType <- MediaType.pic.rawValue,
+            picFilePath <- relativePath
         ))
     }
 
@@ -187,11 +214,11 @@ extension DataActor {
     }
 
     func deletePic(withID picID: String) {
-        // Delete video file from disk if present
+        // Delete the backing media file from disk if present (image or video).
         let selectQuery = picsTable.filter(picId == picID).select(picFilePath)
         if let row = try? database.pluck(selectQuery),
            let path = try? row.get(picFilePath) {
-            deleteVideoFile(atRelativePath: path)
+            deleteMediaFile(atRelativePath: path)
         }
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.delete())
@@ -199,17 +226,26 @@ extension DataActor {
 
     func deletePics(withIDs picIDs: [String]) {
         guard !picIDs.isEmpty else { return }
-        // Delete video files from disk if present
+        // Delete backing media files from disk if present (image or video).
         let selectQuery = picsTable.filter(picIDs.contains(picId)).select(picFilePath)
         if let rows = try? database.prepare(selectQuery) {
             for row in rows {
                 if let path = try? row.get(picFilePath) {
-                    deleteVideoFile(atRelativePath: path)
+                    deleteMediaFile(atRelativePath: path)
                 }
             }
         }
         let query = picsTable.filter(picIDs.contains(picId))
         _ = try? database.run(query.delete())
+    }
+
+    /// Deletes the file backing a pic, routing to the correct directory.
+    private func deleteMediaFile(atRelativePath path: String) {
+        if isImagePath(path) {
+            deleteImageFile(atRelativePath: path)
+        } else {
+            deleteVideoFile(atRelativePath: path)
+        }
     }
 
     /// Returns the file URL for a video pic, or nil if not a video.
@@ -229,9 +265,9 @@ extension DataActor {
     // MARK: - Delete All
 
     func deleteAll() {
-        // Remove all video files
-        let videosDir = videosDirectoryURL()
-        try? FileManager.default.removeItem(at: videosDir)
+        // Remove all media files (images + videos)
+        try? FileManager.default.removeItem(at: imagesDirectoryURL())
+        try? FileManager.default.removeItem(at: videosDirectoryURL())
         _ = try? database.run(picsTable.delete())
         _ = try? database.run(albumsTable.delete())
     }

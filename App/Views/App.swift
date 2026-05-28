@@ -26,6 +26,7 @@ struct IllustMateApp: App {
     @State var auth = AuthenticationManager()
     @State var pipManager = PictureInPictureManager()
     @State var webServer = WebServerManager()
+    @State var imageMigration = ImageMigrationManager()
     @State var isImportingBackup: Bool = false
     @State var importedURL: URL?
     @State var showLockCover: Bool = false
@@ -84,6 +85,7 @@ struct IllustMateApp: App {
             await migratePreferencesFromUserDefaults()
             await libraryManager.loadLibraries()
             DatabaseMigrator.markMigrationComplete()
+            await imageMigration.runIfNeeded()
         }
         .onOpenURL { url in
             if url.pathExtension == "pics" {
@@ -129,6 +131,12 @@ struct IllustMateApp: App {
                 .interactiveDismissDisabled()
         }
         #endif
+        .fullScreenCover(isPresented: Binding(
+            get: { imageMigration.isMigrating },
+            set: { _ in }
+        )) {
+            ImageMigrationView(manager: imageMigration)
+        }
     }
 
     #if DEBUG
@@ -139,13 +147,16 @@ struct IllustMateApp: App {
         }
         let picCount = count("pics") ?? Int.random(in: 11000...15000)
         let albumCount = count("albums") ?? Int.random(in: 20...60)
+        // ?legacy=1 stores bytes as blobs so the image-blob migration can be tested.
+        let legacyBlobs = (count("legacy") ?? 0) != 0
         Task { @MainActor in
             seedCurrent = 0
             seedTotal = picCount
             isSeedingData = true
             UIApplication.shared.isIdleTimerDisabled = true
             await SampleDataGenerator.generate(
-                picCount: picCount, albumCount: albumCount, into: DataActor.shared
+                picCount: picCount, albumCount: albumCount,
+                into: DataActor.shared, legacyBlobs: legacyBlobs
             ) { completed, total in
                 seedCurrent = completed
                 seedTotal = total

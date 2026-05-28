@@ -25,6 +25,7 @@ struct PhotostandDatabase {
     static let picAlbumId = Expression<String?>("containing_album_id")
     static let picData = Expression<Data?>("data")
     static let picMediaType = Expression<Int>("media_type")
+    static let picFilePath = Expression<String?>("file_path")
 
     /// Maximum blob size (in bytes) the widget will attempt to load.
     static let maxBlobSize = 25 * 1024 * 1024 // 25 MB
@@ -76,22 +77,17 @@ struct PhotostandDatabase {
         albumID: String,
         maxDimension: CGFloat = 800
     ) -> Data? {
-        // Step 1: Pick a random pic ID whose blob is within the size limit (images only)
+        // Step 1: Pick a random image pic ID.
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
             .filter(picMediaType == 0)
-            .filter(picData.length <= maxBlobSize)
             .select(picId)
             .order(Expression<Int>.random())
             .limit(1)
         guard let idRow = try? database.pluck(idQuery),
-              let randomId = try? idRow.get(picId) else { return nil }
-        // Step 2: Fetch raw data and downsample directly at target size
-        let dataQuery = picsTable
-            .filter(picId == randomId)
-            .select(picData)
-        guard let row = try? database.pluck(dataQuery),
-              let data = try? row.get(picData) else { return nil }
+              let randomId = try? idRow.get(picId),
+              let data = rawPicData(forID: randomId, using: database) else { return nil }
+        // Step 2: Downsample directly at target size.
         return UIImage.downsampledForWidget(data: data, maxDimension: maxDimension)
     }
 
@@ -106,7 +102,6 @@ struct PhotostandDatabase {
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
             .filter(picMediaType == 0)
-            .filter(picData.length <= maxBlobSize)
             .select(picId)
             .order(Expression<Int>.random())
             .limit(count)
@@ -114,14 +109,30 @@ struct PhotostandDatabase {
         let ids = rows.compactMap { try? $0.get(picId) }
         return ids.compactMap { id in
             autoreleasepool {
-                let dataQuery = picsTable
-                    .filter(picId == id)
-                    .select(picData)
-                guard let row = try? database.pluck(dataQuery),
-                      let data = try? row.get(picData) else { return nil }
+                guard let data = rawPicData(forID: id, using: database) else { return nil }
                 return UIImage.downsampledForWidget(data: data, maxDimension: maxDimension)
             }
         }
+    }
+
+    /// Resolves a pic's raw bytes, preferring the externalized image file and
+    /// falling back to the legacy blob. Skips items larger than `maxBlobSize`
+    /// to stay within the widget's memory limit.
+    private static func rawPicData(forID id: String, using database: Connection) -> Data? {
+        let query = picsTable.filter(picId == id).select(picData, picFilePath)
+        guard let row = try? database.pluck(query) else { return nil }
+        if let path = try? row.get(picFilePath),
+           let containerURL = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID) {
+            let fileURL = containerURL.appendingPathComponent(path)
+            let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path)
+            if let size = (attributes?[.size] as? NSNumber)?.int64Value {
+                guard size <= Int64(maxBlobSize) else { return nil }
+                return try? Data(contentsOf: fileURL)
+            }
+        }
+        guard let blob = try? row.get(picData), blob.count <= maxBlobSize else { return nil }
+        return blob
     }
 
     static func fetchPicCount(inAlbumWithID albumID: String) -> Int {

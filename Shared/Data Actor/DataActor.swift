@@ -79,6 +79,10 @@ actor DataActor {
             fatalError("Could not open SQLite database: \(error)")
         }
         self.database = database
+        // Enable incremental vacuum so space freed by the image-blob migration
+        // can be reclaimed in batches. Takes effect on new databases here, and
+        // on existing ones after the migration's final VACUUM.
+        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
             try database.run(albumsTable.create(ifNotExists: true) { table in
                 table.column(albumId, primaryKey: true)
