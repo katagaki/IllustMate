@@ -4,9 +4,6 @@
 //
 //  Created by Claude on 2026/05/28.
 //
-//  DEBUG-only floating panel showing live CloudKit sync state. Non-interactive
-//  so it never blocks the app underneath.
-//
 
 #if DEBUG
 import SwiftUI

@@ -4,9 +4,6 @@
 //
 //  Created by Claude on 2026/05/28.
 //
-//  DEBUG-only: collects a short rolling log of CloudKit sync activity for the
-//  on-screen overlay. Compiled out of release builds.
-//
 
 #if DEBUG
 import Foundation
