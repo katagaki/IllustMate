@@ -33,6 +33,7 @@ final class SyncManager {
         }
         await SyncMate.shared.start()
         await SyncMate.shared.reportAccountStatus()
+        await SyncMate.shared.enqueueLibraryChanges()
         await SyncMate.shared.enqueueChanges(forLibrary: activeLibraryID)
         await SyncMate.shared.fetchChanges()
     }

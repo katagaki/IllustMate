@@ -111,6 +111,9 @@ struct IllustMateApp: App {
         .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyRemoteChanges)) { _ in
             navigation.signalDataChanged()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyLibraryChanges)) { _ in
+            Task { await libraryManager.reloadList() }
+        }
         .onOpenURL { url in
             if url.pathExtension == "pics" {
                 importedURL = url

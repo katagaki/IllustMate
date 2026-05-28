@@ -11,6 +11,15 @@ import Foundation
 enum SyncRecordType {
     static let pic = "Pic"
     static let album = "Album"
+    static let library = "Library"
+}
+
+/// Sendable snapshot of a library registry entry, exchanged with SyncMate.
+struct LibrarySyncSnapshot: Sendable {
+    let id: String
+    let name: String
+    let systemFields: Data?
+    let lastModified: Double
 }
 
 /// Sendable snapshot of a pic's synced metadata, exchanged with SyncMate.

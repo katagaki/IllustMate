@@ -17,6 +17,9 @@ struct LibraryManagerSheet: View {
     @State var newLibraryName: String = ""
     @State var libraryToEdit: PicLibrary?
 
+    @AppStorage("iCloudSyncEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var iCloudSyncEnabled: Bool = false
+
     var body: some View {
         NavigationStack {
             libraryList
@@ -76,6 +79,12 @@ struct LibraryManagerSheet: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                }
+                if iCloudSyncEnabled {
+                    Image(systemName: "icloud")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(Text("Sync.Title", tableName: "More"))
                 }
                 Spacer()
                 if library.id == libraryManager.currentLibrary.id {

@@ -17,6 +17,9 @@ extension Notification.Name {
     /// Posted (on the main actor) after sync applies remote record changes,
     /// so data-backed views can refresh.
     static let syncDidApplyRemoteChanges = Notification.Name("SyncDidApplyRemoteChanges")
+    /// Posted after sync applies remote library-registry changes, so the
+    /// library list can refresh.
+    static let syncDidApplyLibraryChanges = Notification.Name("SyncDidApplyLibraryChanges")
 }
 
 actor SyncMate {
@@ -75,6 +78,26 @@ actor SyncMate {
         engine.state.add(pendingRecordZoneChanges: pending)
     }
 
+    /// Scans the library registry (custom libraries only) and queues
+    /// create/rename/delete changes for the shared Libraries zone.
+    func enqueueLibraryChanges() async {
+        guard let engine else { return }
+        engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.librariesZoneID))])
+
+        let libraryIDs = await LibrariesActor.shared.dirtyLibraryIDs()
+        let tombstones = await LibrariesActor.shared.pendingLibraryTombstones()
+        var pending: [CKSyncEngine.PendingRecordZoneChange] = []
+        for id in libraryIDs {
+            pending.append(.saveRecord(CKRecord.ID(recordName: id, zoneID: Self.librariesZoneID)))
+        }
+        for id in tombstones {
+            pending.append(.deleteRecord(CKRecord.ID(recordName: id, zoneID: Self.librariesZoneID)))
+        }
+        await debugLog("lib scan \(libraryIDs.count) \(tombstones.count)del")
+        guard !pending.isEmpty else { return }
+        engine.state.add(pendingRecordZoneChanges: pending)
+    }
+
     /// Pulls remote changes immediately (e.g. on foreground).
     func fetchChanges() async {
         guard let engine else { return }
@@ -82,6 +105,12 @@ actor SyncMate {
     }
 
     // MARK: - Zone <-> library mapping
+
+    static let librariesZoneName = "Libraries"
+
+    static var librariesZoneID: CKRecordZone.ID {
+        CKRecordZone.ID(zoneName: librariesZoneName, ownerName: CKCurrentUserDefaultName)
+    }
 
     static func zoneName(for collectionID: String) -> String {
         collectionID == PicLibrary.defaultID ? "DefaultLibrary" : "Library-\(collectionID)"

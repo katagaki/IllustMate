@@ -40,6 +40,20 @@ class LibraryManager: ObservableObject {
         switchActors(to: currentLibrary.id)
     }
 
+    /// Reloads just the library list (e.g. after sync adds/removes a library)
+    /// without changing the active library.
+    func reloadList() async {
+        let allLibraries = await LibrariesActor.shared.allLibraries()
+        let sorted = allLibraries.sorted { lhs, rhs in
+            if lhs.isDefault { return true }
+            if rhs.isDefault { return false }
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
+        withAnimation(.smooth.speed(2.0)) {
+            libraries = sorted
+        }
+    }
+
     func switchLibrary(to library: PicLibrary) {
         currentLibrary = library
         currentLibraryID = library.id

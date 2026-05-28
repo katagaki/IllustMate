@@ -60,6 +60,12 @@ extension SyncMate: CKSyncEngineDelegate {
     // MARK: - Build records (upload)
 
     private func buildRecord(for recordID: CKRecord.ID) async -> CKRecord? {
+        if recordID.zoneID.zoneName == Self.librariesZoneName {
+            guard let library = await LibrariesActor.shared.librarySyncSnapshot(forID: recordID.recordName) else {
+                return nil
+            }
+            return libraryRecord(from: library, recordID: recordID)
+        }
         let collectionID = Self.collectionID(forZone: recordID.zoneID)
         let dataActor = DataActor.instance(for: collectionID)
         let name = recordID.recordName
@@ -70,6 +76,12 @@ extension SyncMate: CKSyncEngineDelegate {
             return picRecord(from: pic, recordID: recordID)
         }
         return nil
+    }
+
+    private func libraryRecord(from snapshot: LibrarySyncSnapshot, recordID: CKRecord.ID) -> CKRecord {
+        let record = baseRecord(snapshot.systemFields, recordID: recordID, type: SyncRecordType.library)
+        record["name"] = snapshot.name
+        return record
     }
 
     private func albumRecord(from snapshot: AlbumSyncSnapshot, recordID: CKRecord.ID) -> CKRecord {
@@ -103,10 +115,19 @@ extension SyncMate: CKSyncEngineDelegate {
     private func applyFetchedRecordZoneChanges(
         _ changes: CKSyncEngine.Event.FetchedRecordZoneChanges
     ) async {
+        var libraryChanged = false
         for modification in changes.modifications {
+            if modification.record.recordID.zoneID.zoneName == Self.librariesZoneName {
+                libraryChanged = true
+            }
             await applyRecord(modification.record)
         }
         for deletion in changes.deletions {
+            if deletion.recordID.zoneID.zoneName == Self.librariesZoneName {
+                libraryChanged = true
+                await LibrariesActor.shared.removeLibraryForRemoteDelete(id: deletion.recordID.recordName)
+                continue
+            }
             let dataActor = DataActor.instance(for: Self.collectionID(forZone: deletion.recordID.zoneID))
             if deletion.recordType == SyncRecordType.album {
                 await dataActor.removeAlbumForRemoteDelete(id: deletion.recordID.recordName)
@@ -117,14 +138,26 @@ extension SyncMate: CKSyncEngineDelegate {
         if !changes.modifications.isEmpty || !changes.deletions.isEmpty {
             await MainActor.run {
                 NotificationCenter.default.post(name: .syncDidApplyRemoteChanges, object: nil)
+                if libraryChanged {
+                    NotificationCenter.default.post(name: .syncDidApplyLibraryChanges, object: nil)
+                }
             }
         }
     }
 
     private func applyRecord(_ record: CKRecord) async {
-        let dataActor = DataActor.instance(for: Self.collectionID(forZone: record.recordID.zoneID))
         let systemFields = Self.encodeSystemFields(record)
         let modified = (record.modificationDate ?? Date.now).timeIntervalSince1970
+        if record.recordID.zoneID.zoneName == Self.librariesZoneName {
+            await LibrariesActor.shared.applyRemoteLibrary(LibrarySyncSnapshot(
+                id: record.recordID.recordName,
+                name: record["name"] as? String ?? "",
+                systemFields: systemFields,
+                lastModified: modified
+            ))
+            return
+        }
+        let dataActor = DataActor.instance(for: Self.collectionID(forZone: record.recordID.zoneID))
         if record.recordType == SyncRecordType.album {
             await dataActor.applyRemoteAlbum(AlbumSyncSnapshot(
                 id: record.recordID.recordName,
@@ -156,8 +189,13 @@ extension SyncMate: CKSyncEngineDelegate {
         syncEngine: CKSyncEngine
     ) async {
         for record in changes.savedRecords {
-            let dataActor = DataActor.instance(for: Self.collectionID(forZone: record.recordID.zoneID))
             let systemFields = Self.encodeSystemFields(record)
+            if record.recordType == SyncRecordType.library {
+                await LibrariesActor.shared.markLibrarySynced(id: record.recordID.recordName,
+                                                              systemFields: systemFields)
+                continue
+            }
+            let dataActor = DataActor.instance(for: Self.collectionID(forZone: record.recordID.zoneID))
             if record.recordType == SyncRecordType.album {
                 await dataActor.markAlbumSynced(id: record.recordID.recordName, systemFields: systemFields)
             } else {
@@ -165,8 +203,12 @@ extension SyncMate: CKSyncEngineDelegate {
             }
         }
         for recordID in changes.deletedRecordIDs {
-            await DataActor.instance(for: Self.collectionID(forZone: recordID.zoneID))
-                .removeTombstone(id: recordID.recordName)
+            if recordID.zoneID.zoneName == Self.librariesZoneName {
+                await LibrariesActor.shared.removeLibraryTombstone(id: recordID.recordName)
+            } else {
+                await DataActor.instance(for: Self.collectionID(forZone: recordID.zoneID))
+                    .removeTombstone(id: recordID.recordName)
+            }
         }
         for failure in changes.failedRecordSaves {
             await handleFailedSave(failure, syncEngine: syncEngine)
