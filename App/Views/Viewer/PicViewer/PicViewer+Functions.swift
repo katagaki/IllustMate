@@ -100,31 +100,28 @@ extension PicViewer {
                 }
             }
             .overlay(alignment: .bottomTrailing) {
-                // Downloading-from-iCloud indicator, anchored to the image corner
+                // Downloading-from-iCloud progress donut, anchored to the image corner
                 if viewer.isDownloadingDisplayedOriginal {
-                    HStack(spacing: 6.0) {
+                    Group {
                         if let progress = viewer.downloadProgress {
                             ZStack {
                                 Circle()
-                                    .stroke(.secondary.opacity(0.3), lineWidth: 2.5)
+                                    .stroke(.white.opacity(0.35), lineWidth: 4.0)
                                 Circle()
                                     .trim(from: 0, to: progress)
-                                    .stroke(.tint, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                                    .stroke(.white, style: StrokeStyle(lineWidth: 4.0, lineCap: .round))
                                     .rotationEffect(.degrees(-90))
                             }
-                            .frame(width: 16, height: 16)
+                            .frame(width: 28.0, height: 28.0)
                             .animation(.smooth, value: progress)
                         } else {
                             ProgressView()
                                 .controlSize(.small)
+                                .tint(.white)
                         }
-                        Image(systemName: "icloud.and.arrow.down")
-                            .font(.caption)
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.bar, in: .capsule)
-                    .padding(8)
+                    .shadow(color: .black.opacity(0.4), radius: 2.0)
+                    .padding(16.0)
                     .transition(.opacity)
                 }
             }
