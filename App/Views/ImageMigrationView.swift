@@ -67,6 +67,7 @@ struct ImageMigrationView: View {
     private var warningBox: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             Image(systemName: "exclamationmark.triangle.fill")
+                .font(.title)
             Text("Migration.Warning", tableName: "More")
                 .multilineTextAlignment(.leading)
         }
