@@ -38,6 +38,9 @@ struct EditLibrarySheet: View {
     @State var deleteConfirmationCode: String = ""
     @State var expectedDeleteCode: String = ""
 
+    @AppStorage("iCloudSyncEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var iCloudSyncEnabled: Bool = false
+
     var body: some View {
         NavigationStack {
             List {
@@ -58,6 +61,13 @@ struct EditLibrarySheet: View {
                     } header: {
                         Text("Libraries.Edit.Name", tableName: "Libraries")
                     }
+                }
+                Section {
+                    Toggle(isOn: $iCloudSyncEnabled) {
+                        Text("Sync.Title", tableName: "More")
+                    }
+                } footer: {
+                    Text("Sync.Footer", tableName: "More")
                 }
                 Section {
                     Button(String(localized: "DuplicateChecker", table: "More")) {

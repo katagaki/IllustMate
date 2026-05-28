@@ -18,6 +18,13 @@ actor DataActor {
         _shared = DataActor(collectionID: collectionID)
     }
 
+    /// Returns the shared actor if it serves `collectionID`, else a dedicated
+    /// actor for that library (used to route incoming sync changes).
+    static func instance(for collectionID: String) -> DataActor {
+        _shared.collectionID == collectionID ? _shared : DataActor(collectionID: collectionID)
+    }
+
+    nonisolated let collectionID: String
     let database: Connection
     let databaseURL: URL
 
@@ -66,6 +73,7 @@ actor DataActor {
 
     // swiftlint:disable:next function_body_length
     init(collectionID: String) {
+        self.collectionID = collectionID
         let databaseFileName = "Collection.db"
         let fileManager = FileManager.default
 
