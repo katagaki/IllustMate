@@ -63,6 +63,11 @@ extension AlbumView {
                 AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
             }
             viewer.removePics(withIDs: deletedIDs)
+            let collectionID = DataActor.shared.collectionID
+            let idsForCleanup = Array(deletedIDs)
+            Task.detached {
+                await OriginalsManager.shared.deleteCloudOriginals(picIDs: idsForCleanup, in: collectionID)
+            }
             self.selectedPics.removeAll()
             refreshPicsAndSet()
         }

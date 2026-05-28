@@ -297,6 +297,21 @@ actor OriginalsManager {
         }
     }
 
+    private func coordinatedDelete(at url: URL) async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            DispatchQueue.global(qos: .utility).async {
+                let coordinator = NSFileCoordinator()
+                var coordinationError: NSError?
+                coordinator.coordinate(
+                    writingItemAt: url, options: .forDeleting, error: &coordinationError
+                ) { deleteURL in
+                    try? FileManager.default.removeItem(at: deleteURL)
+                }
+                continuation.resume()
+            }
+        }
+    }
+
     /// Reads an image original from the iCloud Drive container, downloading it if
     /// needed. iCloud manages local materialization and eviction.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
@@ -326,9 +341,22 @@ actor OriginalsManager {
         return await waitForDownload(url) ? url : nil
     }
 
-    func evictOriginal(picID: String, in collectionID: String) {
-        guard let cloudURL = cloudURL(forPicID: picID, in: collectionID) else { return }
-        try? FileManager.default.evictUbiquitousItem(at: cloudURL)
+    // MARK: - Delete
+
+    /// Permanently removes a pic's original (image or video) from the iCloud
+    /// Drive container when its pic is deleted, so deleted media stops consuming
+    /// iCloud storage. Best-effort and idempotent; the deletion propagates to
+    /// other devices via iCloud Drive.
+    func deleteCloudOriginal(picID: String, in collectionID: String) async {
+        guard isUbiquityAvailable(),
+              let cloudURL = cloudURL(forPicID: picID, in: collectionID) else { return }
+        await coordinatedDelete(at: cloudURL)
+    }
+
+    func deleteCloudOriginals(picIDs: [String], in collectionID: String) async {
+        for id in picIDs {
+            await deleteCloudOriginal(picID: id, in: collectionID)
+        }
     }
 
     private func waitForDownload(_ url: URL, timeoutSeconds: Int = 30) async -> Bool {

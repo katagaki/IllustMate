@@ -130,6 +130,9 @@ extension SyncMate: CKSyncEngineDelegate {
                 await dataActor.removeAlbumForRemoteDelete(id: deletion.recordID.recordName)
             } else {
                 await dataActor.removePicForRemoteDelete(id: deletion.recordID.recordName)
+                await OriginalsManager.shared.deleteCloudOriginal(
+                    picID: deletion.recordID.recordName, in: dataActor.collectionID
+                )
             }
         }
         if !changes.modifications.isEmpty || !changes.deletions.isEmpty {

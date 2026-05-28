@@ -76,6 +76,12 @@ struct DuplicateResultsView: View {
                             await dataActor.deletePic(withID: picID)
                             await HashActor.shared.deleteHash(forPicWithID: picID)
                         }
+                        let collectionID = dataActor.collectionID
+                        Task.detached {
+                            await OriginalsManager.shared.deleteCloudOriginals(
+                                picIDs: Array(idsToDelete), in: collectionID
+                            )
+                        }
                         await MainActor.run {
                             withAnimation(.smooth.speed(2.0)) {
                                 scanManager.removePics(withIDs: idsToDelete)
@@ -154,6 +160,13 @@ struct DuplicateGroupSection: View {
                     for picID in selectedForDeletion {
                         await dataActor.deletePic(withID: picID)
                         await HashActor.shared.deleteHash(forPicWithID: picID)
+                    }
+                    let collectionID = dataActor.collectionID
+                    let idsForCleanup = Array(selectedForDeletion)
+                    Task.detached {
+                        await OriginalsManager.shared.deleteCloudOriginals(
+                            picIDs: idsForCleanup, in: collectionID
+                        )
                     }
                     await MainActor.run {
                         withAnimation(.smooth.speed(2.0)) {
