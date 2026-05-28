@@ -80,9 +80,14 @@ actor OriginalsManager {
         guard !uploadingMissing.contains(collectionID) else { return }
         uploadingMissing.insert(collectionID)
         defer { uploadingMissing.remove(collectionID) }
-        let ids = await DataActor.instance(for: collectionID).picIDsNeedingOriginalUpload()
+        let dataActor = DataActor.instance(for: collectionID)
+        let ids = await dataActor.picIDsNeedingOriginalUpload()
         await SyncMate.shared.debugLog("orig \(collectionID.prefix(4)): \(ids.count) to mirror")
-        guard !ids.isEmpty else { return }
+        guard !ids.isEmpty else {
+            let diag = await dataActor.originalUploadDiagnostics()
+            await SyncMate.shared.debugLog("orig diag: \(diag.images)img \(diag.withPath)path \(diag.needUpload)need")
+            return
+        }
         var up = 0, present = 0, noLocal = 0, failed = 0, noCont = 0
         var sampleError: String?
         for id in ids {

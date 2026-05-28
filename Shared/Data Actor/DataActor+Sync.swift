@@ -148,6 +148,19 @@ extension DataActor {
         _ = try? database.run(picsTable.filter(picId == id).update(syncOriginalSynced <- true))
     }
 
+    /// Stage-by-stage counts behind `picIDsNeedingOriginalUpload`, for diagnosing
+    /// why it may be empty. A value of -1 means that query threw (e.g. a column
+    /// that doesn't exist yet).
+    func originalUploadDiagnostics() -> (images: Int, withPath: Int, needUpload: Int) {
+        let imageFilter = picMediaType == MediaType.pic.rawValue
+        let pathFilter = imageFilter && picFilePath != nil
+        let needFilter = pathFilter && syncOriginalSynced == false
+        let images = (try? database.scalar(picsTable.filter(imageFilter).count)) ?? -1
+        let withPath = (try? database.scalar(picsTable.filter(pathFilter).count)) ?? -1
+        let needUpload = (try? database.scalar(picsTable.filter(needFilter).count)) ?? -1
+        return (images, withPath, needUpload)
+    }
+
     // MARK: - Download: apply remote changes
 
     func applyRemoteAlbum(_ snapshot: AlbumSyncSnapshot) {
