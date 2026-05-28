@@ -7,6 +7,14 @@
 
 import Foundation
 
+enum OriginalUploadOutcome: Sendable {
+    case uploaded
+    case alreadyPresent
+    case noContainer
+    case noLocalFile
+    case failed(String)
+}
+
 actor OriginalsManager {
 
     static let shared = OriginalsManager()
@@ -43,22 +51,26 @@ actor OriginalsManager {
     /// Mirrors a pic's local original into iCloud Drive (idempotent) and marks it
     /// synced. Called both reactively (after the metadata record uploads) and by
     /// the consistency pass for any original the cloud is still missing.
-    func uploadOriginal(picID: String, in collectionID: String) async {
+    @discardableResult
+    func uploadOriginal(picID: String, in collectionID: String) async -> OriginalUploadOutcome {
         guard let cloudURL = originalURL(forPicID: picID, in: collectionID),
-              let directory = originalsDirectory(for: collectionID) else { return }
+              let directory = originalsDirectory(for: collectionID) else { return .noContainer }
         let dataActor = DataActor.instance(for: collectionID)
         // Already in iCloud (downloaded or as a placeholder)?
         if downloadingStatus(cloudURL) != nil {
             await dataActor.markPicOriginalSynced(id: picID)
-            return
+            return .alreadyPresent
         }
-        guard let localURL = await dataActor.localOriginalURL(forPicWithID: picID) else { return }
+        guard let localURL = await dataActor.localOriginalURL(forPicWithID: picID) else {
+            return .noLocalFile
+        }
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: localURL, to: cloudURL)
             await dataActor.markPicOriginalSynced(id: picID)
+            return .uploaded
         } catch {
-            debugPrint("Original upload failed for \(picID): \(error)")
+            return .failed(error.localizedDescription)
         }
     }
 
@@ -69,9 +81,23 @@ actor OriginalsManager {
         uploadingMissing.insert(collectionID)
         defer { uploadingMissing.remove(collectionID) }
         let ids = await DataActor.instance(for: collectionID).picIDsNeedingOriginalUpload()
+        await SyncMate.shared.debugLog("orig \(collectionID.prefix(4)): \(ids.count) to mirror")
+        guard !ids.isEmpty else { return }
+        var up = 0, present = 0, noLocal = 0, failed = 0, noCont = 0
+        var sampleError: String?
         for id in ids {
-            await uploadOriginal(picID: id, in: collectionID)
+            switch await uploadOriginal(picID: id, in: collectionID) {
+            case .uploaded: up += 1
+            case .alreadyPresent: present += 1
+            case .noContainer: noCont += 1
+            case .noLocalFile: noLocal += 1
+            case .failed(let message):
+                failed += 1
+                if sampleError == nil { sampleError = message }
+            }
         }
+        await SyncMate.shared.debugLog("orig done: \(up)up \(present)pre \(noLocal)noloc \(failed)err \(noCont)noc")
+        if let sampleError { await SyncMate.shared.debugLog("orig err: \(sampleError)") }
     }
 
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),
