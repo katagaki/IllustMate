@@ -71,12 +71,14 @@ actor OriginalsManager {
         }
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            try FileManager.default.copyItem(at: localURL, to: cloudURL)
-            await dataActor.markPicOriginalSynced(id: picID)
-            return .uploaded
         } catch {
             return .failed(error.localizedDescription)
         }
+        guard await coordinatedCopy(from: localURL, to: cloudURL) else {
+            return .failed("coordinated write failed")
+        }
+        await dataActor.markPicOriginalSynced(id: picID)
+        return .uploaded
     }
 
     /// Mirrors every local original not yet in iCloud Drive for a library. Heals
@@ -160,6 +162,51 @@ actor OriginalsManager {
             .ubiquitousItemIsUploaded ?? false
     }
 
+    /// Copies a file into the iCloud container under file coordination, so the
+    /// iCloud daemon reliably notices and uploads it. The blocking coordinator
+    /// runs off the actor so it never stalls other sync work.
+    private func coordinatedCopy(from source: URL, to destination: URL) async -> Bool {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let coordinator = NSFileCoordinator()
+                var coordinationError: NSError?
+                var success = false
+                coordinator.coordinate(
+                    writingItemAt: destination, options: .forReplacing, error: &coordinationError
+                ) { writeURL in
+                    do {
+                        if FileManager.default.fileExists(atPath: writeURL.path) {
+                            try FileManager.default.removeItem(at: writeURL)
+                        }
+                        try FileManager.default.copyItem(at: source, to: writeURL)
+                        success = true
+                    } catch {
+                        success = false
+                    }
+                }
+                continuation.resume(returning: success && coordinationError == nil)
+            }
+        }
+    }
+
+    /// Reads an iCloud item under file coordination, so we never read a
+    /// partially-materialized file. Runs off the actor.
+    private func coordinatedReadData(at url: URL) async -> Data? {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let coordinator = NSFileCoordinator()
+                var coordinationError: NSError?
+                var data: Data?
+                coordinator.coordinate(
+                    readingItemAt: url, options: [], error: &coordinationError
+                ) { readURL in
+                    data = try? Data(contentsOf: readURL)
+                }
+                continuation.resume(returning: data)
+            }
+        }
+    }
+
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),
     /// caches it locally, and returns the bytes. Nil if it isn't available.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
@@ -175,7 +222,7 @@ actor OriginalsManager {
             await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): timeout \(statusLabel(cloudURL))")
             return nil
         }
-        guard let data = try? Data(contentsOf: cloudURL) else {
+        guard let data = await coordinatedReadData(at: cloudURL) else {
             await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): read fail")
             return nil
         }
