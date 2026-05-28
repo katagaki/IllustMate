@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2023/10/06.
 //
 
+import Combine
 import SwiftUI
 
 struct AlbumGridLabel: View {
@@ -13,12 +14,21 @@ struct AlbumGridLabel: View {
     var album: Album
     var length: CGFloat?
 
+    @State private var downloadFraction: Double?
+
+    // Posted by OriginalsManager while an album is being saved offline. Kept as a
+    // raw name because this view is shared with the extension target, which can't
+    // see App-only code.
+    private var progressPublisher: NotificationCenter.Publisher {
+        NotificationCenter.default.publisher(for: Notification.Name("OfflineAlbumDownloadProgress"))
+    }
+
     var body: some View {
         VStack(alignment: .center, spacing: length == nil ? 2.0 : 6.0) {
             AlbumCover.AsyncAlbumCover(album: album, length: length)
             .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             .overlay {
-                if let progress = OfflineDownloadProgress.shared.fraction(for: album.id) {
+                if let progress = downloadFraction {
                     ZStack {
                         Circle()
                             .fill(.thinMaterial)
@@ -43,5 +53,9 @@ struct AlbumGridLabel: View {
         }
         .contentShape(.rect)
         .frame(width: length)
+        .onReceive(progressPublisher) { note in
+            guard note.userInfo?["albumID"] as? String == album.id else { return }
+            downloadFraction = note.userInfo?["fraction"] as? Double
+        }
     }
 }

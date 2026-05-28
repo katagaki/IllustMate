@@ -134,19 +134,30 @@ actor OriginalsManager {
     }
 
     /// Downloads every not-yet-local original in an album (Keep Offline),
-    /// publishing progress so the album cover can show a donut.
+    /// posting progress so the album cover can show a donut.
     func keepAlbumOffline(albumID: String, in collectionID: String) async {
         let ids = await DataActor.instance(for: collectionID).picIDsMissingLocalOriginal(inAlbum: albumID)
         guard !ids.isEmpty else { return }
-        await MainActor.run { OfflineDownloadProgress.shared.begin(albumID) }
+        await postAlbumProgress(albumID, fraction: 0)
         var done = 0
         for id in ids {
             _ = await fetchOriginal(picID: id, in: collectionID)
             done += 1
-            let fraction = Double(done) / Double(ids.count)
-            await MainActor.run { OfflineDownloadProgress.shared.update(albumID, fraction: fraction) }
+            await postAlbumProgress(albumID, fraction: Double(done) / Double(ids.count))
         }
-        await MainActor.run { OfflineDownloadProgress.shared.finish(albumID) }
+        await postAlbumProgress(albumID, fraction: nil)
+    }
+
+    /// Notifies album covers of offline-download progress. The observer is in
+    /// AlbumGridLabel; the name is duplicated there because that view ships in
+    /// the extension target and can't import App code.
+    private func postAlbumProgress(_ albumID: String, fraction: Double?) async {
+        await MainActor.run {
+            var info: [String: Any] = ["albumID": albumID]
+            if let fraction { info["fraction"] = fraction }
+            NotificationCenter.default.post(name: Notification.Name("OfflineAlbumDownloadProgress"),
+                                            object: nil, userInfo: info)
+        }
     }
 
     /// Frees the local copies of an album's originals (Remove Download), keeping
