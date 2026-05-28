@@ -284,11 +284,17 @@ extension LibrariesActor {
                 libraryLastModified <- snapshot.lastModified
             ))
         } else {
+            // A library arriving fresh via sync has no local image blobs (its
+            // pics sync in with no `data`; originals live in the iCloud
+            // container), so it's migrated by definition and may sync at once.
+            // The update branch leaves the flag alone: an existing local library
+            // may still have un-migrated blobs.
             _ = try? database.run(librariesTable.insert(or: .replace,
                 libraryId <- snapshot.id,
                 libraryName <- snapshot.name,
                 libraryDirty <- false,
                 librarySyncEnabled <- true,
+                libraryMigratedV2 <- true,
                 libraryCKSystemFields <- snapshot.systemFields,
                 libraryLastModified <- snapshot.lastModified
             ))
