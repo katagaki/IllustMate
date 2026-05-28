@@ -158,6 +158,10 @@ extension WebServerManager {
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
                 gap: 4px;
             }
+            .pic-sentinel {
+                width: 100%;
+                height: 1px;
+            }
             .pic-thumb {
                 width: 100%;
                 aspect-ratio: 1;
@@ -384,6 +388,16 @@ extension WebServerManager {
             let currentAlbumId = null;
             let selectedFiles = [];
 
+            // Lazy pic loading state
+            const PIC_PAGE_SIZE = 60;
+            let totalPicCount = 0;
+            let loadedPicCount = 0;
+            let isLoadingPics = false;
+            let picGridEl = null;
+            let picSentinel = null;
+            let picObserver = null;
+            let picLoadToken = 0;
+
             // Navigation
             async function loadRoot() {
                 currentPath = [];
@@ -458,10 +472,14 @@ extension WebServerManager {
 
             function renderContent(data) {
                 const el = document.getElementById('content');
+                teardownPicLoading();
                 el.innerHTML = '';
 
                 const hasAlbums = data.albums && data.albums.length > 0;
-                const hasPics = data.pics && data.pics.length > 0;
+                totalPicCount = (typeof data.picCount === 'number')
+                    ? data.picCount
+                    : ((data.pics && data.pics.length) || 0);
+                const hasPics = totalPicCount > 0;
 
                 if (!hasAlbums && !hasPics) {
                     el.innerHTML = '<div class="empty-state"><p>No albums or pics here yet.</p></div>';
@@ -517,41 +535,102 @@ extension WebServerManager {
                     title.textContent = 'Pics';
                     el.appendChild(title);
 
-                    const grid = document.createElement('div');
-                    grid.className = 'pic-grid';
-                    data.pics.forEach(pic => {
-                        if (pic.isVideo) {
-                            const cell = document.createElement('div');
-                            cell.className = 'pic-cell';
-                            const img = document.createElement('img');
-                            img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
-                            img.alt = pic.name;
-                            img.loading = 'lazy';
-                            cell.appendChild(img);
-                            const badge = document.createElement('div');
-                            badge.className = 'video-badge';
-                            if (pic.duration) {
-                                const m = Math.floor(pic.duration / 60);
-                                const s = Math.floor(pic.duration % 60);
-                                badge.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-                            } else {
-                                badge.textContent = 'Video';
+                    picGridEl = document.createElement('div');
+                    picGridEl.className = 'pic-grid';
+                    el.appendChild(picGridEl);
+
+                    loadedPicCount = 0;
+                    appendPics(data.pics || []);
+
+                    if (loadedPicCount < totalPicCount) {
+                        picSentinel = document.createElement('div');
+                        picSentinel.className = 'pic-sentinel';
+                        el.appendChild(picSentinel);
+                        picObserver = new IntersectionObserver((entries) => {
+                            if (entries.some(e => e.isIntersecting)) {
+                                loadMorePics();
                             }
-                            cell.appendChild(badge);
-                            cell.addEventListener('click', () => openViewer(pic.id, pic.name, true));
-                            grid.appendChild(cell);
-                        } else {
-                            const img = document.createElement('img');
-                            img.className = 'pic-thumb';
-                            img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
-                            img.alt = pic.name;
-                            img.loading = 'lazy';
-                            img.addEventListener('click', () => openViewer(pic.id, pic.name, false));
-                            grid.appendChild(img);
-                        }
-                    });
-                    el.appendChild(grid);
+                        }, { rootMargin: '800px 0px' });
+                        picObserver.observe(picSentinel);
+                    }
                 }
+            }
+
+            function appendPics(pics) {
+                if (!picGridEl) return;
+                pics.forEach(pic => {
+                    if (pic.isVideo) {
+                        const cell = document.createElement('div');
+                        cell.className = 'pic-cell';
+                        const img = document.createElement('img');
+                        img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
+                        img.alt = pic.name;
+                        img.loading = 'lazy';
+                        cell.appendChild(img);
+                        const badge = document.createElement('div');
+                        badge.className = 'video-badge';
+                        if (pic.duration) {
+                            const m = Math.floor(pic.duration / 60);
+                            const s = Math.floor(pic.duration % 60);
+                            badge.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+                        } else {
+                            badge.textContent = 'Video';
+                        }
+                        cell.appendChild(badge);
+                        cell.addEventListener('click', () => openViewer(pic.id, pic.name, true));
+                        picGridEl.appendChild(cell);
+                    } else {
+                        const img = document.createElement('img');
+                        img.className = 'pic-thumb';
+                        img.src = '/api/pics/' + encodeURIComponent(pic.id) + '/thumbnail';
+                        img.alt = pic.name;
+                        img.loading = 'lazy';
+                        img.addEventListener('click', () => openViewer(pic.id, pic.name, false));
+                        picGridEl.appendChild(img);
+                    }
+                });
+                loadedPicCount += pics.length;
+            }
+
+            async function loadMorePics() {
+                if (isLoadingPics || loadedPicCount >= totalPicCount) return;
+                isLoadingPics = true;
+                const token = picLoadToken;
+                const base = currentAlbumId
+                    ? '/api/albums/' + encodeURIComponent(currentAlbumId) + '/pics'
+                    : '/api/pics';
+                const url = base + '?offset=' + loadedPicCount + '&limit=' + PIC_PAGE_SIZE;
+                try {
+                    const resp = await fetch(url);
+                    const data = await resp.json();
+                    if (token !== picLoadToken) return;
+                    const pics = data.pics || [];
+                    appendPics(pics);
+                    if (pics.length === 0 || loadedPicCount >= totalPicCount) {
+                        teardownPicLoading();
+                    } else if (picObserver && picSentinel) {
+                        // Re-arm so a sentinel still in view keeps filling the viewport.
+                        picObserver.unobserve(picSentinel);
+                        picObserver.observe(picSentinel);
+                    }
+                } catch (err) {
+                    // Leave the observer connected so the next scroll retries.
+                } finally {
+                    if (token === picLoadToken) isLoadingPics = false;
+                }
+            }
+
+            function teardownPicLoading() {
+                picLoadToken++;
+                isLoadingPics = false;
+                if (picObserver) {
+                    picObserver.disconnect();
+                    picObserver = null;
+                }
+                if (picSentinel && picSentinel.parentElement) {
+                    picSentinel.remove();
+                }
+                picSentinel = null;
             }
 
             // Image/Video Viewer
