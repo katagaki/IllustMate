@@ -83,16 +83,16 @@ extension PicViewer {
         // Image with size overlay - fills available space
         ZStack(alignment: .bottomLeading) {
             ZStack {
-                // Show thumbnail as placeholder
+                // Show thumbnail as placeholder until the full image is available
                 if let thumbnail = viewer.displayedThumbnail {
                     Image(uiImage: thumbnail)
                         .resizable()
                         .scaledToFit()
                         .clipShape(.rect(cornerRadius: 8.0))
-                        .opacity(viewer.isFullImageLoaded ? 0 : 1)
+                        .opacity(viewer.displayedImage == nil ? 1 : 0)
                 }
                 // Show full image when loaded
-                if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
+                if let fullImage = viewer.displayedImage {
                     Image(uiImage: fullImage)
                         .resizable()
                         .scaledToFit()
@@ -112,6 +112,22 @@ extension PicViewer {
                 .padding(.vertical, 6)
                 .background(.bar, in: .capsule)
                 .padding(8)
+                .transition(.opacity)
+            }
+
+            // Downloading-from-iCloud indicator (bottom-right of image)
+            if viewer.isDownloadingDisplayedOriginal {
+                HStack(spacing: 6.0) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Image(systemName: "icloud.and.arrow.down")
+                        .font(.caption)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.bar, in: .capsule)
+                .padding(8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                 .transition(.opacity)
             }
         }

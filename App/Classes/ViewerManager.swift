@@ -20,6 +20,9 @@ class ViewerManager {
     var displayedThumbnail: UIImage?
     var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
+    /// Pic whose original is downloading from iCloud Drive (drives the viewer's
+    /// download indicator); nil when nothing is downloading.
+    var downloadingOriginalPicID: String?
     var displayedVideoURL: URL?
     var videoPlayer: AVPlayer?
 
@@ -28,6 +31,11 @@ class ViewerManager {
 
     var hasNext: Bool { currentIndex < allPics.count - 1 }
     var hasPrevious: Bool { currentIndex > 0 }
+
+    /// True while the on-screen pic's original is downloading from iCloud Drive.
+    var isDownloadingDisplayedOriginal: Bool {
+        downloadingOriginalPicID != nil && downloadingOriginalPicID == displayedPicID
+    }
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
     @ObservationIgnored private var prefetchTasks: [String: Task<Void, Never>] = [:]
@@ -41,6 +49,7 @@ class ViewerManager {
         displayedThumbnail = nil
         displayedImage = nil
         isFullImageLoaded = false
+        downloadingOriginalPicID = nil
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
@@ -175,8 +184,14 @@ class ViewerManager {
             // Local original first; otherwise fetch on demand from iCloud Drive.
             var data = await DataActor.shared.imageData(forPicWithID: picID)
             if data == nil {
+                if self.displayedPicID == picID {
+                    withAnimation(.smooth.speed(2.0)) { self.downloadingOriginalPicID = picID }
+                }
                 data = await OriginalsManager.shared.fetchOriginal(picID: picID,
                                                                    in: DataActor.shared.collectionID)
+                if self.downloadingOriginalPicID == picID {
+                    withAnimation(.smooth.speed(2.0)) { self.downloadingOriginalPicID = nil }
+                }
             }
             if let data, let image = await UIImage(data: data)?.byPreparingForDisplay() {
                 loadedImage = image
