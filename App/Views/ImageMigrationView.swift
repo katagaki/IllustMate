@@ -29,18 +29,23 @@ struct ImageMigrationView: View {
             VStack(spacing: 8.0) {
                 Text("Migration.Title", tableName: "More")
                     .font(.headline)
-                Text("Migration.Subtitle", tableName: "More")
+                phaseLabel
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
             VStack(spacing: 12.0) {
-                ProgressView(value: Float(manager.completed), total: progressTotal)
-                    .progressViewStyle(.linear)
-                Text("\(manager.completed)/\(manager.total)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
+                if manager.total > 0 {
+                    ProgressView(value: Float(manager.completed), total: progressTotal)
+                        .progressViewStyle(.linear)
+                    Text("\(manager.completed)/\(manager.total)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                } else {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
             }
             Spacer()
             Label {
@@ -61,6 +66,15 @@ struct ImageMigrationView: View {
                 displayedThumbnail = manager.latestThumbnail
                 try? await Task.sleep(for: .seconds(3))
             }
+        }
+    }
+
+    @ViewBuilder
+    private var phaseLabel: some View {
+        switch manager.phase {
+        case .copying: Text("Migration.Phase.Copying", tableName: "More")
+        case .verifying: Text("Migration.Phase.Verifying", tableName: "More")
+        case .reclaiming: Text("Migration.Phase.Reclaiming", tableName: "More")
         }
     }
 

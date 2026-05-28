@@ -9,8 +9,17 @@ import CryptoKit
 import Foundation
 @preconcurrency import SQLite
 
-/// Progress snapshot for the migration UI.
+/// Stage the migration is currently in (drives the on-screen status label).
+enum ImageMigrationPhase: Sendable {
+    case copying
+    case verifying
+    case reclaiming
+}
+
+/// Progress snapshot for the migration UI. `total == 0` indicates an
+/// indeterminate phase (e.g. the final VACUUM, which reports no progress).
 struct ImageMigrationProgress: Sendable {
+    let phase: ImageMigrationPhase
     let completed: Int
     let total: Int
     let latestThumbnail: Data?
@@ -33,34 +42,48 @@ extension DataActor {
         let pending = pendingMigrationIDs()
         let total = pending.count
         guard total > 0 else { return }
+        // Show the total up front so the UI isn't stuck on 0/0.
+        await progress(ImageMigrationProgress(phase: .copying, completed: 0,
+                                              total: total, latestThumbnail: nil))
 
         let batchSize = chosenBatchSize(total: total)
         let singleBatch = batchSize >= total
-        var processed = 0
+        var copied = 0
+        var verified = 0
         var start = 0
         while start < pending.count {
             let batch = Array(pending[start..<min(start + batchSize, pending.count)])
             // Stage 1 — copy (blob -> file, blob left intact).
             for id in batch {
                 copyBlobToFile(id: id)
-                processed += 1
-                let thumbnail = thumbnailData(forPicWithID: id)
-                await progress(ImageMigrationProgress(completed: processed,
+                copied += 1
+                await progress(ImageMigrationProgress(phase: .copying, completed: copied,
                                                       total: total,
-                                                      latestThumbnail: thumbnail))
+                                                      latestThumbnail: thumbnailData(forPicWithID: id)))
             }
             // Stage 2 — verify file hashes against the still-present blobs.
-            let verified = batch.filter { verifyMigratedFile(id: $0) }
+            var verifiedIDs: [String] = []
+            for id in batch {
+                if verifyMigratedFile(id: id) { verifiedIDs.append(id) }
+                verified += 1
+                await progress(ImageMigrationProgress(phase: .verifying, completed: verified,
+                                                      total: total,
+                                                      latestThumbnail: thumbnailData(forPicWithID: id)))
+            }
             // Stage 3 — finalize: only now null the verified blobs.
-            for id in verified {
+            for id in verifiedIDs {
                 _ = try? database.run(picsTable.filter(picId == id).update(picData <- nil))
             }
             if !singleBatch {
+                await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
+                                                      total: 0, latestThumbnail: nil))
                 reclaimSpaceIncrementally()
             }
             start += batchSize
         }
-        // Reclaim the freed pages back to the filesystem.
+        // Reclaim the freed pages back to the filesystem (indeterminate).
+        await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
+                                              total: 0, latestThumbnail: nil))
         vacuum()
     }
 

@@ -14,6 +14,7 @@ import UIKit
 final class ImageMigrationManager {
 
     var isMigrating: Bool = false
+    var phase: ImageMigrationPhase = .copying
     var completed: Int = 0
     var total: Int = 0
     /// Thumbnail of the pic currently being migrated; sampled by the UI.
@@ -23,12 +24,14 @@ final class ImageMigrationManager {
     /// awake and blocks the UI for the duration.
     func runIfNeeded() async {
         guard await DataActor.shared.needsImageMigration() else { return }
+        phase = .copying
         completed = 0
         total = 0
         latestThumbnail = nil
         isMigrating = true
         UIApplication.shared.isIdleTimerDisabled = true
         await DataActor.shared.migrateImageBlobsToFiles { progress in
+            self.phase = progress.phase
             self.completed = progress.completed
             self.total = progress.total
             if let thumbnail = progress.latestThumbnail {
