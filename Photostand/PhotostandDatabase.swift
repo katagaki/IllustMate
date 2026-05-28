@@ -30,6 +30,11 @@ struct PhotostandDatabase {
     /// Maximum blob size (in bytes) the widget will attempt to load.
     static let maxBlobSize = 25 * 1024 * 1024 // 25 MB
 
+    /// iCloud Drive container where synced libraries keep their originals.
+    static let ubiquityContainerID = "iCloud.com.tsubuzaki.IllustMate"
+    /// The widget only reads the default library (Collection.db at the app-group root).
+    static let defaultLibraryID = "__default__"
+
     struct AlbumRecord {
         let id: String
         let name: String
@@ -119,20 +124,47 @@ struct PhotostandDatabase {
     /// falling back to the legacy blob. Skips items larger than `maxBlobSize`
     /// to stay within the widget's memory limit.
     private static func rawPicData(forID id: String, using database: Connection) -> Data? {
-        let query = picsTable.filter(picId == id).select(picData, picFilePath)
+        let query = picsTable.filter(picId == id).select(picData, picFilePath, picMediaType)
         guard let row = try? database.pluck(query) else { return nil }
+        // 1. Local externalized file (non-synced libraries).
         if let path = try? row.get(picFilePath),
            let containerURL = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID) {
-            let fileURL = containerURL.appendingPathComponent(path)
-            let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path)
-            if let size = (attributes?[.size] as? NSNumber)?.int64Value {
-                guard size <= Int64(maxBlobSize) else { return nil }
-                return try? Data(contentsOf: fileURL)
-            }
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID),
+           let data = cappedData(at: containerURL.appendingPathComponent(path)) {
+            return data
         }
+        // 2. iCloud Drive container (synced libraries keep originals here).
+        if (try? row.get(picMediaType)) == 0, let data = ubiquityImageData(forID: id) {
+            return data
+        }
+        // 3. Legacy blob.
         guard let blob = try? row.get(picData), blob.count <= maxBlobSize else { return nil }
         return blob
+    }
+
+    /// Reads a file capped at `maxBlobSize`, or nil if it's missing or too large.
+    private static func cappedData(at fileURL: URL) -> Data? {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path)
+        guard let size = (attributes?[.size] as? NSNumber)?.int64Value,
+              size <= Int64(maxBlobSize) else { return nil }
+        return try? Data(contentsOf: fileURL)
+    }
+
+    /// Reads a synced original from the iCloud Drive container if it's already
+    /// materialized; otherwise requests a download for a future widget refresh.
+    private static func ubiquityImageData(forID id: String) -> Data? {
+        guard let container = FileManager.default
+            .url(forUbiquityContainerIdentifier: ubiquityContainerID) else { return nil }
+        let fileURL = container.appendingPathComponent("Originals", isDirectory: true)
+            .appendingPathComponent(defaultLibraryID, isDirectory: true)
+            .appendingPathComponent(id)
+        let status = try? fileURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
+            .ubiquitousItemDownloadingStatus
+        if status == .current {
+            return cappedData(at: fileURL)
+        }
+        try? FileManager.default.startDownloadingUbiquitousItem(at: fileURL)
+        return nil
     }
 
     static func fetchPicCount(inAlbumWithID albumID: String) -> Int {
