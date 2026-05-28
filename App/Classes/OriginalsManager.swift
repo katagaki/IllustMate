@@ -108,16 +108,26 @@ actor OriginalsManager {
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),
     /// caches it locally, and returns the bytes. Nil if it isn't available.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
-        guard let cloudURL = originalURL(forPicID: picID, in: collectionID),
-              let status = downloadingStatus(cloudURL) else { return nil }
-        if status == .notDownloaded {
-            try? FileManager.default.startDownloadingUbiquitousItem(at: cloudURL)
-            guard await waitForDownload(cloudURL) else { return nil }
+        guard let cloudURL = originalURL(forPicID: picID, in: collectionID) else {
+            await SyncMate.shared.debugLog("fetch: no container")
+            return nil
         }
-        guard let data = try? Data(contentsOf: cloudURL) else { return nil }
+        // A device that received this file from another device may not have a
+        // materialized placeholder yet, so request the download unconditionally
+        // rather than giving up when the status is still unknown.
+        try? FileManager.default.startDownloadingUbiquitousItem(at: cloudURL)
+        guard await waitForDownload(cloudURL) else {
+            await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): timeout \(statusLabel(cloudURL))")
+            return nil
+        }
+        guard let data = try? Data(contentsOf: cloudURL) else {
+            await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): read fail")
+            return nil
+        }
         await DataActor.instance(for: collectionID).importDownloadedOriginal(picID: picID, data: data)
-        // Keep only the local Images cache; the original stays in iCloud.
+        // The bytes now live in the local Images cache; drop the iCloud copy.
         evictOriginal(picID: picID, in: collectionID)
+        await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): ok \(data.count / 1024)KB")
         return data
     }
 
@@ -128,12 +138,19 @@ actor OriginalsManager {
         try? FileManager.default.evictUbiquitousItem(at: cloudURL)
     }
 
-    private func waitForDownload(_ url: URL, timeoutSeconds: Int = 60) async -> Bool {
+    private func waitForDownload(_ url: URL, timeoutSeconds: Int = 30) async -> Bool {
         for _ in 0..<(timeoutSeconds * 2) {
-            if let status = downloadingStatus(url), status != .notDownloaded { return true }
+            if downloadingStatus(url) == .current { return true }
+            // Re-request: the item may only become known after the container syncs.
+            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
             try? await Task.sleep(for: .milliseconds(500))
         }
-        let status = downloadingStatus(url) ?? .notDownloaded
-        return status != .notDownloaded
+        return downloadingStatus(url) == .current
+    }
+
+    /// Short human-readable iCloud download status, for debug logging.
+    private func statusLabel(_ url: URL) -> String {
+        downloadingStatus(url)?.rawValue
+            .replacingOccurrences(of: "NSURLUbiquitousItemDownloadingStatus", with: "") ?? "unknown"
     }
 }
