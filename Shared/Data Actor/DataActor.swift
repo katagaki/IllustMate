@@ -53,6 +53,17 @@ actor DataActor {
     let prefPicColumnCount = Expression<Int>("pic_column_count")
     let prefHideSectionHeaders = Expression<Bool>("hide_section_headers")
 
+    // Sync bookkeeping columns (shared by albums + pics)
+    let syncDirty = Expression<Bool>("dirty")
+    let syncLastModified = Expression<Double>("last_modified")
+    let syncCKSystemFields = Expression<Data?>("ck_system_fields")
+
+    // Tombstones (deleted records, so deletions propagate during sync)
+    let tombstonesTable = Table("tombstones")
+    let tombstoneId = Expression<String>("id")
+    let tombstoneRecordType = Expression<String>("record_type")
+    let tombstoneDeletedAt = Expression<Double>("deleted_at")
+
     // swiftlint:disable:next function_body_length
     init(collectionID: String) {
         let databaseFileName = "Collection.db"
@@ -115,6 +126,19 @@ actor DataActor {
                 table.column(prefPicSort, defaultValue: "dateAddedDescending")
                 table.column(prefPicColumnCount, defaultValue: 4)
                 table.column(prefHideSectionHeaders, defaultValue: false)
+            })
+            // Sync bookkeeping: add columns (idempotent on existing DBs) and
+            // create the tombstones table. `dirty` defaults to true so existing
+            // records are queued for the initial CloudKit upload.
+            for table in [albumsTable, picsTable] {
+                _ = try? database.run(table.addColumn(syncDirty, defaultValue: true))
+                _ = try? database.run(table.addColumn(syncLastModified, defaultValue: 0))
+                _ = try? database.run(table.addColumn(syncCKSystemFields))
+            }
+            try database.run(tombstonesTable.create(ifNotExists: true) { table in
+                table.column(tombstoneId, primaryKey: true)
+                table.column(tombstoneRecordType)
+                table.column(tombstoneDeletedAt, defaultValue: 0)
             })
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))

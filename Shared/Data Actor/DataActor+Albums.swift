@@ -145,19 +145,29 @@ extension DataActor {
             albumName <- trimmedName,
             albumCoverPhoto <- nil,
             albumParentId <- parentAlbumID,
-            albumDateCreated <- now.timeIntervalSince1970
+            albumDateCreated <- now.timeIntervalSince1970,
+            syncDirty <- true,
+            syncLastModified <- now.timeIntervalSince1970
         ))
         return album
     }
 
     func renameAlbum(withID id: String, to newName: String) {
         let query = albumsTable.filter(albumId == id)
-        _ = try? database.run(query.update(albumName <- newName.trimmingCharacters(in: .whitespaces)))
+        _ = try? database.run(query.update(
+            albumName <- newName.trimmingCharacters(in: .whitespaces),
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
     }
 
     func updateAlbumCover(forAlbumWithID albumID: String, coverData: Data?) {
         let query = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(query.update(albumCoverPhoto <- coverData))
+        _ = try? database.run(query.update(
+            albumCoverPhoto <- coverData,
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
     }
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
@@ -193,38 +203,44 @@ extension DataActor {
 
     func addAlbum(withID albumID: String, toAlbumWithID destinationAlbumID: String) {
         let query = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(query.update(albumParentId <- destinationAlbumID))
+        _ = try? database.run(query.update(
+            albumParentId <- destinationAlbumID,
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
     }
 
     func removeParentAlbum(forAlbumWithidentifier albumID: String) {
         let query = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(query.update(albumParentId <- nil))
+        _ = try? database.run(query.update(
+            albumParentId <- nil,
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
     }
 
     func deleteAlbum(withID albumID: String) {
         let parentID = parentAlbumID(forAlbumWithID: albumID)
+        let now = syncTimestamp
 
-        // Move direct pics to parent album, or orphan them
+        // Move direct pics to the parent album, or orphan them
         let picsQuery = picsTable.filter(picAlbumId == albumID)
-        if let parentID = parentID {
-            _ = try? database.run(picsQuery.update(picAlbumId <- parentID))
-        } else {
-            _ = try? database.run(picsQuery.update(picAlbumId <- nil))
-        }
+        _ = try? database.run(picsQuery.update(
+            picAlbumId <- parentID, syncDirty <- true, syncLastModified <- now
+        ))
 
-        // Move child albums to parent album, or orphan them
+        // Move child albums to the parent album, or orphan them
         let childAlbumsQuery = albumsTable.filter(albumParentId == albumID)
-        if let parentID = parentID {
-            _ = try? database.run(childAlbumsQuery.update(albumParentId <- parentID))
-        } else {
-            _ = try? database.run(childAlbumsQuery.update(albumParentId <- nil))
-        }
+        _ = try? database.run(childAlbumsQuery.update(
+            albumParentId <- parentID, syncDirty <- true, syncLastModified <- now
+        ))
 
-        // Delete the album itself
+        // Delete the album itself, leaving a tombstone so the delete syncs
+        recordTombstone(id: albumID, recordType: SyncRecordType.album)
         let albumQuery = albumsTable.filter(albumId == albumID)
         _ = try? database.run(albumQuery.delete())
 
-        // Delete album preferences
+        // Delete album preferences (local-only; not synced)
         let prefQuery = preferencesTable.filter(prefAlbumId == albumID)
         _ = try? database.run(prefQuery.delete())
     }

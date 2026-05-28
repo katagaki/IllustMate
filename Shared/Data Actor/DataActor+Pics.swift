@@ -130,7 +130,9 @@ extension DataActor {
             picData <- relativePath == nil ? data : nil,
             picThumbnailData <- thumbnailData,
             picMediaType <- MediaType.pic.rawValue,
-            picFilePath <- relativePath
+            picFilePath <- relativePath,
+            syncDirty <- true,
+            syncLastModified <- now.timeIntervalSince1970
         ))
     }
 
@@ -158,25 +160,33 @@ extension DataActor {
             picThumbnailData <- thumbnailData,
             picMediaType <- MediaType.video.rawValue,
             picDuration <- duration,
-            picFilePath <- relativePath
+            picFilePath <- relativePath,
+            syncDirty <- true,
+            syncLastModified <- now.timeIntervalSince1970
         ))
     }
 
     func addPics(withIDs picIDs: [String], toAlbumWithID albumID: String) {
         guard !picIDs.isEmpty else { return }
         let query = picsTable.filter(picIDs.contains(picId))
-        _ = try? database.run(query.update(picAlbumId <- albumID))
+        _ = try? database.run(query.update(
+            picAlbumId <- albumID, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
     }
 
     func addPic(withID picID: String, toAlbumWithID albumID: String) {
         let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picAlbumId <- albumID))
+        _ = try? database.run(query.update(
+            picAlbumId <- albumID, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
     }
 
     func removeParentAlbum(forPicsWithIDs picIDs: [String]) {
         guard !picIDs.isEmpty else { return }
         let query = picsTable.filter(picIDs.contains(picId))
-        _ = try? database.run(query.update(picAlbumId <- nil))
+        _ = try? database.run(query.update(
+            picAlbumId <- nil, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
     }
 
     func setAsAlbumCover(for picID: String) {
@@ -185,7 +195,9 @@ extension DataActor {
            let albumID = containingAlbumID(forPicWithID: picID) {
             let coverData = Album.makeCover(data)
             let query = albumsTable.filter(albumId == albumID)
-            _ = try? database.run(query.update(albumCoverPhoto <- coverData))
+            _ = try? database.run(query.update(
+                albumCoverPhoto <- coverData, syncDirty <- true, syncLastModified <- syncTimestamp
+            ))
         }
     }
 
@@ -198,12 +210,16 @@ extension DataActor {
 
     func renamePic(withID picID: String, to newName: String) {
         let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picName <- newName))
+        _ = try? database.run(query.update(
+            picName <- newName, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
     }
 
     func updateThumbnail(forPicWithID picID: String, thumbnailData: Data?) {
         let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picThumbnailData <- thumbnailData))
+        _ = try? database.run(query.update(
+            picThumbnailData <- thumbnailData, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
     }
 
     private func containingAlbumID(forPicWithID picID: String) -> String? {
@@ -220,6 +236,7 @@ extension DataActor {
            let path = try? row.get(picFilePath) {
             deleteMediaFile(atRelativePath: path)
         }
+        recordTombstone(id: picID, recordType: SyncRecordType.pic)
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.delete())
     }
@@ -235,6 +252,7 @@ extension DataActor {
                 }
             }
         }
+        recordTombstones(ids: picIDs, recordType: SyncRecordType.pic)
         let query = picsTable.filter(picIDs.contains(picId))
         _ = try? database.run(query.delete())
     }

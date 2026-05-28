@@ -145,6 +145,7 @@
 				"Data Actor/DataActor+ImageMigration.swift",
 				"Data Actor/DataActor+ImageStorage.swift",
 				"Data Actor/DataActor+Pics.swift",
+				"Data Actor/DataActor+Sync.swift",
 				"Data Actor/DataActor+VideoStorage.swift",
 				"Data Actor/DatabaseMigrator.swift",
 				"Data Models/Album.swift",
