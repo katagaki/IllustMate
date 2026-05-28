@@ -49,7 +49,14 @@ struct MoreBackupView: View {
         .task {
             do {
                 let dataActor = DataActor(collectionID: collectionID)
-                try await dataActor.backupDatabase(to: destinationURL, libraryName: libraryName)
+                let collectionID = collectionID
+                try await dataActor.backupDatabase(
+                    to: destinationURL,
+                    libraryName: libraryName,
+                    originalProvider: { picID in
+                        await OriginalsManager.shared.fetchOriginal(picID: picID, in: collectionID)
+                    }
+                )
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
                         isExporting = false

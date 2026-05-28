@@ -10,7 +10,18 @@ import Foundation
 
 extension DataActor {
 
-    func backupDatabase(to destinationDirectoryURL: URL, libraryName: String) throws {
+    /// A pic in a backup whose original bytes still need to be inlined.
+    private struct BackupOriginal {
+        let id: String
+        let mediaType: Int
+        let path: String?
+    }
+
+    /// Produces a self-contained `.pics` backup. `originalProvider` (supplied by
+    /// the app layer) fetches a pic's original bytes from iCloud Drive when the
+    /// local copy has been evicted; pass `nil` to back up only what's local.
+    func backupDatabase(to destinationDirectoryURL: URL, libraryName: String,
+                        originalProvider: (@Sendable (String) async -> Data?)? = nil) async throws {
         if destinationDirectoryURL.startAccessingSecurityScopedResource() {
             defer { destinationDirectoryURL.stopAccessingSecurityScopedResource() }
             let fileManager = FileManager.default
@@ -36,9 +47,10 @@ extension DataActor {
 
             let destinationURL = destinationDirectoryURL.appendingPathComponent(backupFileName)
             try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
-            // Externalized images live outside the DB, so re-inline them into the
-            // copy to produce a self-contained, single-file `.pics` backup.
-            inlineImageFiles(intoBackupAt: destinationURL)
+            // Originals live outside the DB (in local files and/or iCloud Drive),
+            // so re-inline every image and video into the copy to produce a
+            // self-contained, single-file `.pics` backup.
+            await inlineOriginals(intoBackupAt: destinationURL, originalProvider: originalProvider)
         } else {
             throw NSError(domain: "DataActor",
                           code: 2,
@@ -46,31 +58,57 @@ extension DataActor {
         }
     }
 
-    /// Writes each externalized image file's bytes back into the backup
-    /// database's `data` column (clearing `file_path`), so the resulting `.pics`
-    /// is a blob-based, self-contained file that any app version can restore.
-    private func inlineImageFiles(intoBackupAt url: URL) {
+    /// Writes every pic's original bytes (image or video) into the backup
+    /// database's `data` column, so the resulting `.pics` is a blob-based,
+    /// self-contained file. Originals are read from the local Images/Videos
+    /// cache when present, or downloaded from iCloud Drive when evicted. Image
+    /// `file_path`s are cleared (the extension is irrelevant); video `file_path`s
+    /// are kept so the original extension survives for restore.
+    private func inlineOriginals(intoBackupAt url: URL,
+                                 originalProvider: (@Sendable (String) async -> Data?)?) async {
         guard let backupDB = try? Connection(url.path) else { return }
         let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil)
-            .select(picId, picFilePath)
-        var work: [(id: String, path: String)] = []
+            .filter(picData == nil)
+            .select(picId, picMediaType, picFilePath)
+        var work: [BackupOriginal] = []
         if let rows = try? backupDB.prepare(query) {
             for row in rows {
-                if let path = try? row.get(picFilePath) {
-                    work.append((row[picId], path))
-                }
+                work.append(BackupOriginal(id: row[picId],
+                                           mediaType: (try? row.get(picMediaType)) ?? 0,
+                                           path: (try? row.get(picFilePath)) ?? nil))
             }
         }
         for item in work {
-            guard let blob = try? Data(contentsOf: imageFileURL(forRelativePath: item.path)) else {
+            guard let blob = await originalBytes(picID: item.id,
+                                                 mediaType: item.mediaType,
+                                                 filePath: item.path,
+                                                 originalProvider: originalProvider) else {
                 continue
             }
+            let isVideo = item.mediaType == MediaType.video.rawValue
             _ = try? backupDB.run(picsTable.filter(picId == item.id).update(
                 picData <- blob,
-                picFilePath <- nil
+                picFilePath <- isVideo ? item.path : nil
             ))
         }
+    }
+
+    /// Returns a pic's original bytes, preferring the local Images/Videos cache
+    /// and falling back to `originalProvider` (iCloud Drive) when the original
+    /// has been evicted to the cloud.
+    private func originalBytes(picID: String, mediaType: Int, filePath: String?,
+                               originalProvider: (@Sendable (String) async -> Data?)?) async -> Data? {
+        let isVideo = mediaType == MediaType.video.rawValue
+        if let filePath {
+            let localURL = isVideo
+                ? videoFileURL(forRelativePath: filePath)
+                : imageFileURL(forRelativePath: filePath)
+            if FileManager.default.fileExists(atPath: localURL.path),
+               let data = try? Data(contentsOf: localURL) {
+                return data
+            }
+        }
+        return await originalProvider?(picID)
     }
 
     func importFromBackup(at url: URL, targetAlbumID: String?) throws {
@@ -135,17 +173,25 @@ extension DataActor {
         }
     }
 
-    /// Restores one pic from a backup row into the externalized layout: the blob
-    /// is written to an image file (kept inline only if the write fails). Uses
-    /// INSERT OR IGNORE so merges skip pics that already exist; for album imports
-    /// the IDs are fresh so it never conflicts. Videos are skipped (their files
-    /// aren't part of a single-file backup), matching prior behavior.
+    /// Restores one pic from a backup row into the externalized layout: the
+    /// inlined blob is written out to an image or video file (kept inline only
+    /// if the write fails). Video originals are reconstructed using the
+    /// extension carried in the backup's `file_path`. Uses INSERT OR IGNORE so
+    /// merges skip pics that already exist; for album imports the IDs are fresh
+    /// so it never conflicts. Rows without inlined bytes (e.g. videos from
+    /// older backups that excluded them) are skipped.
     private func importForeignPic(_ row: Row, newID: String, albumID: String?) {
         let mediaType = (try? row.get(picMediaType)) ?? 0
         let foreignFilePath = try? row.get(picFilePath)
-        if mediaType == MediaType.video.rawValue && foreignFilePath != nil { return }
         guard let blob = try? row.get(picData) else { return }
-        let relativePath = saveImageFile(blob, id: newID)
+        let relativePath: String?
+        if mediaType == MediaType.video.rawValue {
+            let ext = foreignFilePath.flatMap { ($0 as NSString).pathExtension }
+            relativePath = saveVideoFile(blob, id: newID,
+                                         fileExtension: (ext?.isEmpty == false ? ext : nil) ?? "mov")
+        } else {
+            relativePath = saveImageFile(blob, id: newID)
+        }
         _ = try? database.run(picsTable.insert(or: .ignore,
             picId <- newID,
             picName <- (try? row.get(picName)) ?? Pic.newFilename(),
@@ -154,6 +200,7 @@ extension DataActor {
             picData <- relativePath == nil ? blob : nil,
             picThumbnailData <- (try? row.get(picThumbnailData)),
             picMediaType <- mediaType,
+            picDuration <- (try? row.get(picDuration)) ?? nil,
             picFilePath <- relativePath
         ))
     }
