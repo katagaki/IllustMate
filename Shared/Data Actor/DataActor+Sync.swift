@@ -4,10 +4,6 @@
 //
 //  Created by Claude on 2026/05/28.
 //
-//  Local sync bookkeeping: records that mutate are flagged `dirty` with a
-//  `last_modified` timestamp, and deletions leave a tombstone, so a later
-//  CloudKit sync engine can push only what changed. No network here.
-//
 
 import Foundation
 @preconcurrency import SQLite

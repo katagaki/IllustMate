@@ -95,6 +95,7 @@ actor DataActor {
         // on existing ones after the migration's final VACUUM.
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
+            // Albums table
             try database.run(albumsTable.create(ifNotExists: true) { table in
                 table.column(albumId, primaryKey: true)
                 table.column(albumName)
@@ -102,6 +103,8 @@ actor DataActor {
                 table.column(albumParentId)
                 table.column(albumDateCreated)
             })
+
+            // Pics table
             try database.run(picsTable.create(ifNotExists: true) { table in
                 table.column(picId, primaryKey: true)
                 table.column(picName)
@@ -118,6 +121,8 @@ actor DataActor {
                     albumsTable: albumsTable, picsTable: picsTable,
                     preferencesTable: preferencesTable)
             }
+
+            // Preferences table
             try database.run(preferencesTable.create(ifNotExists: true) { table in
                 table.column(prefAlbumId, primaryKey: true)
                 table.column(prefAlbumSort, defaultValue: "nameAscending")
@@ -127,9 +132,8 @@ actor DataActor {
                 table.column(prefPicColumnCount, defaultValue: 4)
                 table.column(prefHideSectionHeaders, defaultValue: false)
             })
-            // Sync bookkeeping: add columns (idempotent on existing DBs) and
-            // create the tombstones table. `dirty` defaults to true so existing
-            // records are queued for the initial CloudKit upload.
+
+            // Sync table
             for table in [albumsTable, picsTable] {
                 _ = try? database.run(table.addColumn(syncDirty, defaultValue: true))
                 _ = try? database.run(table.addColumn(syncLastModified, defaultValue: 0))
@@ -140,6 +144,8 @@ actor DataActor {
                 table.column(tombstoneRecordType)
                 table.column(tombstoneDeletedAt, defaultValue: 0)
             })
+
+            // Indexes
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
         } catch {
