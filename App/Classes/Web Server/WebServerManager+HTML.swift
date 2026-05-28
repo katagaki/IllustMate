@@ -399,31 +399,54 @@ extension WebServerManager {
             let picLoadToken = 0;
 
             // Navigation
-            async function loadRoot() {
-                currentPath = [];
-                currentAlbumId = null;
-                try {
-                    const resp = await fetch('/api/albums');
-                    const data = await resp.json();
-                    renderContent(data);
-                    renderBreadcrumb();
-                } catch (err) {
-                    document.getElementById('content').innerHTML =
-                        '<div class="empty-state"><p>Failed to load. Please try again.</p></div>';
+            function currentPathUrl() {
+                if (currentPath.length === 0) return '/';
+                return '/' + currentPath.map(p => encodeURIComponent(p.id)).join('/');
+            }
+
+            function syncUrl(push) {
+                const url = currentPathUrl();
+                if (push) {
+                    if (url !== location.pathname) history.pushState({}, '', url);
+                } else {
+                    history.replaceState({}, '', url);
                 }
             }
 
-            async function loadAlbum(id, name) {
+            function showContentError(message) {
+                document.getElementById('content').innerHTML =
+                    '<div class="empty-state"><p>' + message + '</p></div>';
+            }
+
+            async function loadRoot(push = true) {
                 try {
-                    const resp = await fetch('/api/albums/' + encodeURIComponent(id));
+                    const resp = await fetch('/api/albums');
                     const data = await resp.json();
-                    currentPath.push({ id: id, name: name });
-                    currentAlbumId = id;
+                    currentPath = [];
+                    currentAlbumId = null;
                     renderContent(data);
                     renderBreadcrumb();
+                    syncUrl(push);
                 } catch (err) {
-                    document.getElementById('content').innerHTML =
-                        '<div class="empty-state"><p>Failed to load album.</p></div>';
+                    showContentError('Failed to load. Please try again.');
+                }
+            }
+
+            async function loadAlbum(id, push = true) {
+                try {
+                    const resp = await fetch('/api/albums/' + encodeURIComponent(id));
+                    if (!resp.ok) { await loadRoot(false); return; }
+                    const data = await resp.json();
+                    const path = (data.path && data.path.length)
+                        ? data.path
+                        : [{ id: data.id, name: data.name }];
+                    currentPath = path.map(p => ({ id: p.id, name: p.name }));
+                    currentAlbumId = data.id;
+                    renderContent(data);
+                    renderBreadcrumb();
+                    syncUrl(push);
+                } catch (err) {
+                    showContentError('Failed to load album.');
                 }
             }
 
@@ -431,15 +454,16 @@ extension WebServerManager {
                 if (index < 0) {
                     loadRoot();
                 } else {
-                    currentPath = currentPath.slice(0, index + 1);
-                    const target = currentPath[currentPath.length - 1];
-                    if (target) {
-                        currentAlbumId = target.id;
-                        currentPath.pop();
-                        loadAlbum(target.id, target.name);
-                    } else {
-                        loadRoot();
-                    }
+                    loadAlbum(currentPath[index].id);
+                }
+            }
+
+            function restoreFromUrl() {
+                const ids = location.pathname.split('/').filter(Boolean);
+                if (ids.length === 0) {
+                    loadRoot(false);
+                } else {
+                    loadAlbum(decodeURIComponent(ids[ids.length - 1]), false);
                 }
             }
 
@@ -497,7 +521,7 @@ extension WebServerManager {
                     data.albums.forEach(album => {
                         const card = document.createElement('div');
                         card.className = 'album-card';
-                        card.addEventListener('click', () => loadAlbum(album.id, album.name));
+                        card.addEventListener('click', () => loadAlbum(album.id));
 
                         const cover = document.createElement('div');
                         cover.className = 'album-cover';
@@ -756,11 +780,9 @@ extension WebServerManager {
                     setTimeout(() => {
                         closeUpload();
                         if (currentAlbumId) {
-                            const name = currentPath.length > 0 ? currentPath[currentPath.length - 1].name : 'Album';
-                            currentPath.pop();
-                            loadAlbum(currentAlbumId, name);
+                            loadAlbum(currentAlbumId, false);
                         } else {
-                            loadRoot();
+                            loadRoot(false);
                         }
                     }, 1000);
                 } catch (err) {
@@ -777,8 +799,11 @@ extension WebServerManager {
                 }
             });
 
+            // Routing
+            window.addEventListener('popstate', () => restoreFromUrl());
+
             // Init
-            loadRoot();
+            restoreFromUrl();
         </script>
     </body>
     </html>

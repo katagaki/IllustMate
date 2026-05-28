@@ -16,7 +16,9 @@ extension WebServerManager {
         let components = path.split(separator: "/").map(String.init)
 
         if request.method == "GET" {
-            if components.isEmpty {
+            if components.first != "api" {
+                // Serve the single-page app for the root and all client-side routes
+                // (e.g. /{albumId}/{albumId}/...), which resolve navigation in the browser.
                 return serveMainPage()
             }
             if components == ["api", "albums"] {
@@ -111,13 +113,15 @@ extension WebServerManager {
                 in: album, order: .reverse, limit: Self.picPageSize, offset: 0
             )
             let picCount = await DataActor.shared.picCount(in: album)
+            let path = await DataActor.shared.albumPath(forAlbumWithID: album.id)
             let json: [String: Any] = [
                 "id": album.id,
                 "name": album.name,
                 "hasCover": album.hasCoverPhoto,
                 "albums": childAlbums.map { Self.albumToJSON($0) },
                 "pics": pics.map { Self.picToJSON($0) },
-                "picCount": picCount
+                "picCount": picCount,
+                "path": path.map { ["id": $0.id, "name": $0.name] }
             ]
             let data = try JSONSerialization.data(withJSONObject: json)
             return .ok(json: data)

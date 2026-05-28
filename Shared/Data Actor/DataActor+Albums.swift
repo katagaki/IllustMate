@@ -234,6 +234,20 @@ extension DataActor {
         return try? database.pluck(query).flatMap { try? $0.get(albumParentId) }
     }
 
+    /// Returns the ancestor chain for an album, ordered root-first and including the album itself.
+    func albumPath(forAlbumWithID albumID: String) -> [Album] {
+        var chain: [Album] = []
+        var currentID: String? = albumID
+        var visited = Set<String>()
+        while let id = currentID, !visited.contains(id) {
+            visited.insert(id)
+            guard let album = album(for: id) else { break }
+            chain.append(album)
+            currentID = album.parentAlbumID
+        }
+        return chain.reversed()
+    }
+
     // MARK: - Search
 
     func searchAlbums(matching searchText: String, sortedBy sortType: SortType) throws -> [Album] {
