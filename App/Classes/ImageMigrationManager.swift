@@ -2,8 +2,7 @@
 //  ImageMigrationManager.swift
 //  PicMate
 //
-//  Drives the one-time image-blob externalization migration and exposes its
-//  progress to the blocking migration UI.
+//  Created by Claude on 2026/05/28.
 //
 
 import Foundation

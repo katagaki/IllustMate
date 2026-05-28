@@ -2,8 +2,7 @@
 //  DataActor+ImageStorage.swift
 //  PicMate
 //
-//  Stores full-resolution image bytes as individual files (mirroring the
-//  Videos/ layout) instead of as BLOBs inside Collection.db.
+//  Created by Claude on 2026/05/28.
 //
 
 import Foundation

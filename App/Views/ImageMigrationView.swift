@@ -2,9 +2,7 @@
 //  ImageMigrationView.swift
 //  PicMate
 //
-//  Blocking, non-dismissable screen shown while image BLOBs are externalized.
-//  Cycles the currently-migrating pic every few seconds so there is something
-//  to watch during a long run.
+//  Created by Claude on 2026/05/28.
 //
 
 import SwiftUI

@@ -2,10 +2,7 @@
 //  DataActor+ImageMigration.swift
 //  PicMate
 //
-//  One-time, fail-safe migration of full-resolution image BLOBs out of
-//  Collection.db and into individual files. A blob is only nulled after its
-//  file has been written AND its SHA-256 verified, so an interrupted run is
-//  always recoverable (the blob survives until the file is proven good).
+//  Created by Claude on 2026/05/28.
 //
 
 import CryptoKit
