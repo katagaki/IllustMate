@@ -21,14 +21,14 @@ struct ImageMigrationView: View {
             Spacer()
             previewImage
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16.0)
+                    RoundedRectangle(cornerRadius: 20.0)
                         .strokeBorder(.separator, lineWidth: 1.0)
                 )
             VStack(spacing: 8.0) {
                 Text("Migration.Title", tableName: "More")
-                    .font(.headline)
+                    .font(.title2)
+                    .fontWeight(.semibold)
                 phaseLabel
-                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -50,14 +50,14 @@ struct ImageMigrationView: View {
             Spacer()
             warningBox
         }
-        .padding(32.0)
+        .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .interactiveDismissDisabled()
         .task {
-            // Refresh the preview every 3 seconds from the latest migrated pic.
+            // Refresh the preview every 1.5 seconds from the latest migrated pic.
             while !Task.isCancelled {
                 displayedThumbnail = manager.latestThumbnail
-                try? await Task.sleep(for: .seconds(3))
+                try? await Task.sleep(for: .seconds(1.5))
             }
         }
     }
@@ -65,14 +65,15 @@ struct ImageMigrationView: View {
     private var warningBox: some View {
         VStack(alignment: .leading, spacing: 8.0) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.title)
+                .font(.title2)
             Text("Migration.Warning", tableName: "More")
+                .font(.subheadline)
                 .multilineTextAlignment(.leading)
         }
         .font(.body)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20.0)
-        .glassEffect(.regular.tint(.orange.opacity(0.2)), in: RoundedRectangle(cornerRadius: 24.0))
+        .padding(12.0)
+        .glassEffect(.regular.tint(.orange.opacity(0.2)), in: RoundedRectangle(cornerRadius: 20.0))
     }
 
     @ViewBuilder
@@ -85,7 +86,7 @@ struct ImageMigrationView: View {
     }
 
     private var previewImage: some View {
-        RoundedRectangle(cornerRadius: 16.0)
+        RoundedRectangle(cornerRadius: 20.0)
             .fill(.quaternary)
             .overlay {
                 if let displayedThumbnail, let image = UIImage(data: displayedThumbnail) {
@@ -99,6 +100,6 @@ struct ImageMigrationView: View {
                 }
             }
             .frame(width: 160.0, height: 160.0)
-            .clipShape(RoundedRectangle(cornerRadius: 16.0))
+            .clipShape(RoundedRectangle(cornerRadius: 20.0))
     }
 }
