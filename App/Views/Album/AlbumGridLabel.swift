@@ -25,7 +25,8 @@ struct AlbumGridLabel: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: length == nil ? 2.0 : 6.0) {
-            AlbumCover.AsyncAlbumCover(album: album, length: length)
+            AlbumCover.AsyncAlbumCover(album: album, length: length,
+                                      isDownloading: downloadFraction != nil)
             .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
             .overlay {
                 if let progress = downloadFraction {

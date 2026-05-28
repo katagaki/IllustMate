@@ -18,6 +18,7 @@ struct AlbumCover: View {
     var primaryImage: Image?
     var secondaryImage: Image?
     var tertiaryImage: Image?
+    var isDownloading: Bool = false
 
     init(
         name: String,
@@ -26,7 +27,8 @@ struct AlbumCover: View {
         albumCount: Int = 0,
         primaryImage: Image? = nil,
         secondaryImage: Image? = nil,
-        tertiaryImage: Image? = nil
+        tertiaryImage: Image? = nil,
+        isDownloading: Bool = false
     ) {
         self.name = name
         self.length = length
@@ -35,6 +37,7 @@ struct AlbumCover: View {
         self.primaryImage = primaryImage
         self.secondaryImage = secondaryImage
         self.tertiaryImage = tertiaryImage
+        self.isDownloading = isDownloading
     }
 
     var body: some View {
@@ -141,6 +144,11 @@ struct AlbumCover: View {
                         endPoint: CGPoint(x: cardRect.maxX, y: cardRect.maxY)
                     )
                 )
+            }
+
+            // Darken the front card so a light cover still contrasts the donut.
+            if isDownloading {
+                context.fill(cardPath, with: .color(.black.opacity(0.3)))
             }
 
             // --- Item count overlay ---
