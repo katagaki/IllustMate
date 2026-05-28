@@ -36,6 +36,8 @@ final class SyncManager {
             await SyncMate.shared.enqueueChanges(forLibrary: id)
         }
         await SyncMate.shared.fetchChanges()
+        // If the originals container changed, re-upload originals into the new one.
+        await OriginalsManager.shared.resetSyncStateIfContainerChanged()
         // Mirror any originals the cloud is still missing, off the main actor.
         for id in enabledIDs {
             Task.detached(priority: .utility) {

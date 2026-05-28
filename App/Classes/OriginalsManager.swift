@@ -18,11 +18,16 @@ enum OriginalUploadOutcome: Sendable {
 actor OriginalsManager {
 
     static let shared = OriginalsManager()
-    static let containerID = "iCloud.com.tsubuzaki.IllustMateSQLite"
+    /// iCloud Drive ubiquity container holding full-resolution originals.
+    /// CloudKit metadata syncs separately through SyncMate's own container.
+    static let containerID = "iCloud.com.tsubuzaki.IllustMate"
 
     /// Libraries with an in-flight `uploadMissingOriginals` pass, so repeated
     /// sync triggers don't stack redundant scans.
     private var uploadingMissing: Set<String> = []
+
+    private let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+    private let containerMarkerKey = "OriginalsContainerID"
 
     /// App-private `Originals/<library>` folder in the iCloud Drive ubiquity
     /// container. Kept outside `Documents/` so it isn't exposed in the Files
@@ -103,6 +108,18 @@ actor OriginalsManager {
         }
         await SyncMate.shared.debugLog("orig done: \(up)up \(present)pre \(noLocal)noloc \(failed)err \(noCont)noc")
         if let sampleError { await SyncMate.shared.debugLog("orig err: \(sampleError)") }
+    }
+
+    /// When the originals container changes, every pic's stored upload flag is
+    /// stale (it points at the old container), so clear it across all libraries
+    /// so originals re-upload into the new container. Runs once per change.
+    func resetSyncStateIfContainerChanged() async {
+        guard defaults?.string(forKey: containerMarkerKey) != Self.containerID else { return }
+        for id in await LibrariesActor.shared.allLibraryIDs() {
+            await DataActor.instance(for: id).resetOriginalSyncState()
+        }
+        defaults?.set(Self.containerID, forKey: containerMarkerKey)
+        await SyncMate.shared.debugLog("orig: container changed, reset upload flags")
     }
 
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),

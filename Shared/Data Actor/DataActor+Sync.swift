@@ -148,6 +148,12 @@ extension DataActor {
         _ = try? database.run(picsTable.filter(picId == id).update(syncOriginalSynced <- true))
     }
 
+    /// Clears every pic's original-upload flag (used when the originals container
+    /// changes, so originals re-upload into the new one).
+    func resetOriginalSyncState() {
+        _ = try? database.run(picsTable.update(syncOriginalSynced <- false))
+    }
+
     /// Stage-by-stage counts behind `picIDsNeedingOriginalUpload`, for diagnosing
     /// why it may be empty. A value of -1 means that query threw (e.g. a column
     /// that doesn't exist yet).

@@ -185,6 +185,10 @@ extension LibrariesActor {
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
 
+    func allLibraryIDs() -> [String] {
+        (try? database.prepare(librariesTable.select(libraryId)).map { $0[libraryId] }) ?? []
+    }
+
     func isSyncEnabled(id: String) -> Bool {
         guard let row = try? database.pluck(librariesTable.filter(libraryId == id)) else { return false }
         return (try? row.get(librarySyncEnabled)) ?? false
