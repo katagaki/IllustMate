@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2026/03/20.
 //
 
+import os
 import WidgetKit
 
 struct PhotostandEntry: TimelineEntry {
@@ -15,6 +16,8 @@ struct PhotostandEntry: TimelineEntry {
 }
 
 struct PhotostandProvider: AppIntentTimelineProvider {
+    static let log = Logger(subsystem: "com.tsubuzaki.IllustMate.Photostand", category: "Timeline")
+
     func placeholder(in context: Context) -> PhotostandEntry {
         PhotostandEntry(date: .now, albumID: nil, albumName: nil, imageData: nil)
     }
@@ -32,17 +35,20 @@ struct PhotostandProvider: AppIntentTimelineProvider {
 
     func timeline(for configuration: SelectAlbumIntent, in context: Context) async -> Timeline<PhotostandEntry> {
         guard let album = configuration.album else {
+            Self.log.notice("Photostand timeline: no album configured")
             let entry = PhotostandEntry(date: .now, albumID: nil, albumName: nil, imageData: nil)
             return Timeline(entries: [entry], policy: .never)
         }
 
         guard let database = PhotostandDatabase.openDatabase() else {
+            Self.log.error("Photostand timeline: failed to open database")
             let entry = PhotostandEntry(date: .now, albumID: album.id, albumName: album.name, imageData: nil)
             return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(3600)))
         }
 
         let picCount = PhotostandDatabase.fetchPicCount(inAlbumWithID: album.id)
         let interval = configuration.refreshInterval
+        Self.log.notice("Photostand timeline: album \(album.id, privacy: .public) pics=\(picCount)")
 
         if picCount == 0 {
             let entry = PhotostandEntry(date: .now, albumID: album.id, albumName: album.name, imageData: nil)
@@ -71,6 +77,8 @@ struct PhotostandProvider: AppIntentTimelineProvider {
             ))
         }
 
+        let withImages = entries.filter { $0.imageData != nil }.count
+        Self.log.notice("Photostand timeline: \(entries.count) entries, \(withImages) with images")
         return Timeline(entries: entries, policy: .atEnd)
     }
 
