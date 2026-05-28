@@ -35,7 +35,6 @@ class ViewerManager {
     var hasNext: Bool { currentIndex < allPics.count - 1 }
     var hasPrevious: Bool { currentIndex > 0 }
 
-    /// True while the on-screen pic's original is downloading from iCloud Drive.
     var isDownloadingDisplayedOriginal: Bool {
         downloadingOriginalPicID != nil && downloadingOriginalPicID == displayedPicID
     }
@@ -69,19 +68,15 @@ class ViewerManager {
     }
 
     func removePics(withIDs deletedIDs: Set<String>) {
-        // If the currently displayed pic was deleted, clear the display
         if deletedIDs.contains(displayedPicID) {
             clearDisplay()
             return
         }
-        // Otherwise, remove deleted pics from the navigation list
         allPics.removeAll { deletedIDs.contains($0.id) }
-        // Recompute currentIndex for the displayed pic
         if let displayedPic,
            let newIndex = allPics.firstIndex(where: { $0.id == displayedPic.id }) {
             currentIndex = newIndex
         }
-        // Evict deleted entries from caches
         for id in deletedIDs {
             imageCache.removeValue(forKey: id)
             prefetchTasks.removeValue(forKey: id)?.cancel()
@@ -89,7 +84,6 @@ class ViewerManager {
     }
 
     func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
-        // Track pic opens for review prompt
         Self.incrementPicOpenCount()
 
         // Show thumbnail immediately to open viewer without delay
@@ -101,19 +95,12 @@ class ViewerManager {
         displayedPicID = pic.id
         isFullImageLoaded = false
 
-        // Clean up previous video state
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
 
         if pic.isVideo {
-            // Load video URL
-            Task {
-                if let url = await DataActor.shared.videoURL(forPicWithID: pic.id) {
-                    self.displayedVideoURL = url
-                    self.videoPlayer = AVPlayer(url: url)
-                }
-            }
+            loadVideo(for: pic)
             isFullImageLoaded = true
         } else if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
@@ -125,7 +112,6 @@ class ViewerManager {
         // Navigate immediately — viewer opens with thumbnail
         completion()
 
-        // Load full image in background if not cached (images only)
         if !pic.isVideo && !isFullImageLoaded {
             loadFullImage(for: pic.id)
         }
@@ -150,18 +136,12 @@ class ViewerManager {
         displayedPicID = pic.id
         isFullImageLoaded = false
 
-        // Clean up previous video state
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
 
         if pic.isVideo {
-            Task {
-                if let url = await DataActor.shared.videoURL(forPicWithID: pic.id) {
-                    self.displayedVideoURL = url
-                    self.videoPlayer = AVPlayer(url: url)
-                }
-            }
+            loadVideo(for: pic)
             isFullImageLoaded = true
         } else if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
@@ -184,10 +164,25 @@ class ViewerManager {
         }
     }
 
+    /// Loads a video's playable URL, preferring the local copy and falling back
+    /// to the iCloud Drive original (downloading it) when none exists locally.
+    private func loadVideo(for pic: Pic) {
+        Task {
+            var url = await DataActor.shared.videoURL(forPicWithID: pic.id)
+            if url == nil {
+                url = await OriginalsManager.shared.materializedVideoURL(
+                    picID: pic.id, in: DataActor.shared.collectionID
+                )
+            }
+            guard self.displayedPicID == pic.id, let url else { return }
+            self.displayedVideoURL = url
+            self.videoPlayer = AVPlayer(url: url)
+        }
+    }
+
     private func loadFullImage(for picID: String) {
         Task(priority: .userInitiated) {
             var loadedImage: UIImage?
-            // Local original first; otherwise fetch on demand from iCloud Drive.
             var data = await DataActor.shared.imageData(forPicWithID: picID)
             if data == nil {
                 if self.displayedPicID == picID {
@@ -215,16 +210,13 @@ class ViewerManager {
             if self.displayedPicID == picID {
                 self.displayedImage = loadedImage
                 self.isFullImageLoaded = true
-                // Prefetch adjacent images after current one loads
                 prefetchAdjacentImages()
-                // Evict images far from the current position
                 evictDistantCacheEntries()
             }
         }
     }
 
     private func prefetchAdjacentImages() {
-        // Cancel any prefetch tasks for pics that are no longer adjacent
         cancelStalePrefetchTasks()
 
         let indicesToPrefetch = [currentIndex - 1, currentIndex + 1]

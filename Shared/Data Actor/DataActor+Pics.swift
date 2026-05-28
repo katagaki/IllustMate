@@ -9,13 +9,11 @@ import Foundation
 @preconcurrency import SQLite
 
 extension DataActor {
-    /// Common columns selected for pic listing queries.
     private var picListColumns: [Expressible] {
         [picId, picName, picAlbumId, picDateAdded, picThumbnailData,
          picMediaType, picDuration, picFilePath]
     }
 
-    /// Common columns selected for skeleton queries (no thumbnail).
     private var picSkeletonColumns: [Expressible] {
         [picId, picName, picAlbumId, picDateAdded, picMediaType, picDuration, picFilePath]
     }
@@ -230,7 +228,6 @@ extension DataActor {
     }
 
     func deletePic(withID picID: String) {
-        // Delete the backing media file from disk if present (image or video).
         let selectQuery = picsTable.filter(picId == picID).select(picFilePath)
         if let row = try? database.pluck(selectQuery),
            let path = try? row.get(picFilePath) {
@@ -243,7 +240,6 @@ extension DataActor {
 
     func deletePics(withIDs picIDs: [String]) {
         guard !picIDs.isEmpty else { return }
-        // Delete backing media files from disk if present (image or video).
         let selectQuery = picsTable.filter(picIDs.contains(picId)).select(picFilePath)
         if let rows = try? database.prepare(selectQuery) {
             for row in rows {
@@ -257,7 +253,6 @@ extension DataActor {
         _ = try? database.run(query.delete())
     }
 
-    /// Deletes the file backing a pic, routing to the correct directory.
     private func deleteMediaFile(atRelativePath path: String) {
         if isImagePath(path) {
             deleteImageFile(atRelativePath: path)
@@ -266,12 +261,15 @@ extension DataActor {
         }
     }
 
-    /// Returns the file URL for a video pic, or nil if not a video.
+    /// Local file URL for a video pic, or nil when no local copy exists (e.g. the
+    /// original was reclaimed after mirroring to iCloud, or this device only has
+    /// the synced metadata). Callers fall back to the iCloud Drive original.
     func videoURL(forPicWithID picID: String) -> URL? {
         let query = picsTable.filter(picId == picID).select(picFilePath)
         guard let row = try? database.pluck(query),
-              let path = try? row.get(picFilePath) else { return nil }
-        return videoFileURL(forRelativePath: path)
+              let path = (try? row.get(picFilePath)) ?? nil else { return nil }
+        let url = videoFileURL(forRelativePath: path)
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
     }
 
     // MARK: - Thumbnails
@@ -283,7 +281,6 @@ extension DataActor {
     // MARK: - Delete All
 
     func deleteAll() {
-        // Remove all media files (images + videos)
         try? FileManager.default.removeItem(at: imagesDirectoryURL())
         try? FileManager.default.removeItem(at: videosDirectoryURL())
         _ = try? database.run(picsTable.delete())

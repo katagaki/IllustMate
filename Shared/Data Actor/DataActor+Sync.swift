@@ -35,7 +35,6 @@ struct PicSyncSnapshot: Sendable {
     let lastModified: Double
 }
 
-/// Sendable snapshot of an album's synced metadata.
 struct AlbumSyncSnapshot: Sendable {
     let id: String
     let name: String
@@ -45,9 +44,15 @@ struct AlbumSyncSnapshot: Sendable {
     let lastModified: Double
 }
 
+/// Where a pic's full-resolution original lives, used to mirror it to iCloud Drive.
+struct OriginalLocation: Sendable {
+    let mediaType: MediaType
+    let filename: String?
+    let localURL: URL?
+}
+
 extension DataActor {
 
-    /// Current time as a Unix timestamp, for `last_modified` bookkeeping.
     var syncTimestamp: Double { Date.now.timeIntervalSince1970 }
 
     /// Records a deletion so it can be propagated to other devices.
@@ -136,12 +141,33 @@ extension DataActor {
             .update(syncDirty <- false, syncCKSystemFields <- systemFields))
     }
 
-    /// Image pics with a local original that hasn't been mirrored to iCloud Drive.
+    /// Pics (image or video) with a local original not yet mirrored to iCloud Drive.
     func picIDsNeedingOriginalUpload() -> [String] {
         let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil && syncOriginalSynced == false)
+            .filter(picFilePath != nil && syncOriginalSynced == false)
             .select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    /// `filename` is the name used inside the iCloud Originals subfolder (the pic
+    /// ID for images, `id.ext` for videos) and is nil for a video whose original
+    /// isn't present locally. `localURL` is set only when the file exists on disk.
+    func originalLocation(forPicWithID id: String) -> OriginalLocation? {
+        let query = picsTable.filter(picId == id).select(picFilePath, picMediaType)
+        guard let row = try? database.pluck(query) else { return nil }
+        let mediaType = MediaType(rawValue: (try? row.get(picMediaType)) ?? 0) ?? .pic
+        let path = (try? row.get(picFilePath)) ?? nil
+        switch mediaType {
+        case .pic:
+            let url = path.map { imageFileURL(forRelativePath: $0) }
+            let exists = url.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+            return OriginalLocation(mediaType: .pic, filename: id, localURL: exists ? url : nil)
+        case .video:
+            let filename = path.map { ($0 as NSString).lastPathComponent }
+            let url = path.map { videoFileURL(forRelativePath: $0) }
+            let exists = url.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+            return OriginalLocation(mediaType: .video, filename: filename, localURL: exists ? url : nil)
+        }
     }
 
     func markPicOriginalSynced(id: String) {
@@ -154,59 +180,45 @@ extension DataActor {
         _ = try? database.run(picsTable.update(syncOriginalSynced <- false))
     }
 
-    /// Image pics in an album that currently have a local original on disk.
-    func localImagePicIDs(inAlbum albumID: String) -> [String] {
+    /// Pics in an album that currently have a local original file path set.
+    func localOriginalPicIDs(inAlbum albumID: String) -> [String] {
         let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picAlbumId == albumID && picFilePath != nil)
+            .filter(picAlbumId == albumID && picFilePath != nil)
             .select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// Image pics across the library that currently have a local original on disk.
-    func localImagePicIDs() -> [String] {
-        let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil)
-            .select(picId)
+    /// Pics across the library that currently have a local original file path set.
+    func localOriginalPicIDs() -> [String] {
+        let query = picsTable.filter(picFilePath != nil).select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// All image pic IDs in the library, regardless of where the original lives.
-    func imagePicIDs() -> [String] {
-        let query = picsTable.filter(picMediaType == MediaType.pic.rawValue).select(picId)
+    /// All pic IDs in the library, regardless of where the original lives.
+    func allOriginalPicIDs() -> [String] {
+        (try? database.prepare(picsTable.select(picId)).map { $0[picId] }) ?? []
+    }
+
+    /// All pic IDs in an album, regardless of where the original lives.
+    func allOriginalPicIDs(inAlbum albumID: String) -> [String] {
+        let query = picsTable.filter(picAlbumId == albumID).select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// All image pic IDs in an album, regardless of where the original lives.
-    func imagePicIDs(inAlbum albumID: String) -> [String] {
-        let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picAlbumId == albumID)
-            .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
-    }
-
-    /// Drops the local copy of an original and clears its path so it re-downloads
-    /// on demand. The thumbnail and metadata are untouched, and no change is
-    /// marked dirty (this is a local cache eviction, not a data edit).
+    /// Drops the local copy of an original once it's mirrored to iCloud Drive.
+    /// Image paths are cleared so the pic re-downloads on demand; video paths are
+    /// kept so the original filename (and extension) stays known for iCloud reads.
     func evictLocalOriginal(picID: String) {
         let query = picsTable.filter(picId == picID).select(picFilePath, picMediaType)
         guard let row = try? database.pluck(query),
-              (try? row.get(picMediaType)) == MediaType.pic.rawValue,
-              let path = try? row.get(picFilePath), isImagePath(path) else { return }
-        deleteImageFile(atRelativePath: path)
-        _ = try? database.run(picsTable.filter(picId == picID).update(picFilePath <- nil))
-    }
-
-    /// Stage-by-stage counts behind `picIDsNeedingOriginalUpload`, for diagnosing
-    /// why it may be empty. A value of -1 means that query threw (e.g. a column
-    /// that doesn't exist yet).
-    func originalUploadDiagnostics() -> (images: Int, withPath: Int, needUpload: Int) {
-        let imageFilter = picMediaType == MediaType.pic.rawValue
-        let pathFilter = imageFilter && picFilePath != nil
-        let needFilter = pathFilter && syncOriginalSynced == false
-        let images = (try? database.scalar(picsTable.filter(imageFilter).count)) ?? -1
-        let withPath = (try? database.scalar(picsTable.filter(pathFilter).count)) ?? -1
-        let needUpload = (try? database.scalar(picsTable.filter(needFilter).count)) ?? -1
-        return (images, withPath, needUpload)
+              let path = (try? row.get(picFilePath)) ?? nil else { return }
+        let mediaType = MediaType(rawValue: (try? row.get(picMediaType)) ?? 0) ?? .pic
+        if mediaType == .video {
+            deleteVideoFile(atRelativePath: path)
+        } else if isImagePath(path) {
+            deleteImageFile(atRelativePath: path)
+            _ = try? database.run(picsTable.filter(picId == picID).update(picFilePath <- nil))
+        }
     }
 
     // MARK: - Download: apply remote changes
