@@ -99,13 +99,11 @@ actor SyncMate {
         engine.state.add(pendingRecordZoneChanges: pending)
     }
 
-    /// Pulls remote changes immediately (e.g. on foreground).
     func fetchChanges() async {
         guard let engine else { return }
         try? await engine.fetchChanges()
     }
 
-    /// True if the user is signed into iCloud.
     func isAccountAvailable() async -> Bool {
         (try? await container.accountStatus()) == .available
     }

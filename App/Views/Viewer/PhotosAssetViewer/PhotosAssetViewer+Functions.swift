@@ -14,7 +14,6 @@ extension PhotosAssetViewer {
     @ViewBuilder
     var mainContent: some View {
         if isLandscape {
-            // Landscape: vertical carousel on the left, image fills remaining space
             HStack(spacing: 0.0) {
                 if photosViewer.allAssets.count > 1 {
                     PhotosAssetCarouselStripVertical()
@@ -25,7 +24,6 @@ extension PhotosAssetViewer {
             .padding(8.0)
             .padding(.leading, 40.0)
         } else {
-            // Portrait: image on top, horizontal carousel at bottom
             VStack(alignment: .center, spacing: 0.0) {
                 imageContent
 
@@ -82,7 +80,6 @@ extension PhotosAssetViewer {
     var photoContent: some View {
         ZStack(alignment: .bottomLeading) {
             ZStack {
-                // Show thumbnail as placeholder
                 if let thumbnail {
                     Image(uiImage: thumbnail)
                         .resizable()
@@ -90,7 +87,6 @@ extension PhotosAssetViewer {
                         .clipShape(.rect(cornerRadius: 8.0))
                         .opacity(isFullImageLoaded ? 0 : 1)
                 }
-                // Show full image when loaded
                 if let fullImage, isFullImageLoaded {
                     Image(uiImage: fullImage)
                         .resizable()
@@ -99,7 +95,6 @@ extension PhotosAssetViewer {
                 }
             }
 
-            // Image size overlay
             if showImageSize, let displayedImage = fullImage {
                 HStack(alignment: .center, spacing: 2.0) {
                     Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")

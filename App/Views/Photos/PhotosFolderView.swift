@@ -33,7 +33,6 @@ struct PhotosFolderView: View {
         return searchResults ?? []
     }
 
-    // Album management state
     @State var albumToRename: PHAssetCollection?
     @State var renameText: String = ""
     @State var albumToDelete: PHAssetCollection?

@@ -17,7 +17,6 @@ final class ImageMigrationManager {
     var phase: ImageMigrationPhase = .copying
     var completed: Int = 0
     var total: Int = 0
-    /// Thumbnail of the pic currently being migrated; sampled by the UI.
     var latestThumbnail: Data?
 
     /// Runs the migration for the active library if needed. Keeps the screen

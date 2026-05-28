@@ -20,7 +20,6 @@ class PhotosViewerManager {
     var hasPrevious: Bool { currentIndex > 0 }
 
     func setDisplay(_ asset: PHAsset, in assets: [PHAsset]) {
-        // Track pic opens for review prompt
         ViewerManager.incrementPicOpenCount()
 
         allAssets = assets

@@ -57,7 +57,6 @@ struct PhotosAssetGridView: View {
                     }
                 }
 
-                // Bottom bar
                 VStack(alignment: .center, spacing: 16.0) {
                     Text("Import.SelectedPhotos.\(selectedAssets.count)", tableName: "Import")
                         .font(.subheadline)

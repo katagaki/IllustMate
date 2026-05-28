@@ -11,14 +11,12 @@ extension DataActor {
 
     static let videosDirectoryName = "Videos"
 
-    /// Returns the URL of the Videos directory within the app group container.
     nonisolated func videosDirectoryURL() -> URL {
         databaseURL
             .deletingLastPathComponent()
             .appendingPathComponent(Self.videosDirectoryName, isDirectory: true)
     }
 
-    /// Ensures the Videos directory exists. Called during init or first video save.
     func ensureVideosDirectoryExists() {
         let url = videosDirectoryURL()
         if !FileManager.default.fileExists(atPath: url.path) {
@@ -26,7 +24,6 @@ extension DataActor {
         }
     }
 
-    /// Saves video data to disk and returns the relative path (e.g. "Videos/<id>.mp4").
     func saveVideoFile(_ data: Data, id: String, fileExtension: String) -> String? {
         ensureVideosDirectoryExists()
         let filename = "\(id).\(fileExtension)"
@@ -41,14 +38,12 @@ extension DataActor {
         }
     }
 
-    /// Resolves a relative file path to a full URL.
     nonisolated func videoFileURL(forRelativePath path: String) -> URL {
         databaseURL
             .deletingLastPathComponent()
             .appendingPathComponent(path)
     }
 
-    /// Deletes a video file from disk.
     func deleteVideoFile(atRelativePath path: String) {
         let fileURL = videoFileURL(forRelativePath: path)
         try? FileManager.default.removeItem(at: fileURL)

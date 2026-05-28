@@ -12,7 +12,6 @@ import UIKit
 
 enum SampleDataGenerator {
 
-    /// A fully-rendered pic produced off the main actor, ready to insert.
     private struct RenderedPic: Sendable {
         let name: String
         let data: Data
@@ -50,8 +49,6 @@ enum SampleDataGenerator {
         return albumIDs
     }
 
-    /// 4–16 alphabetic chars; names longer than 10 chars may (randomly) gain a
-    /// space inserted somewhere in positions 5–8.
     private static func randomAlbumName() -> String {
         let letters = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
         let length = Int.random(in: 4...16)

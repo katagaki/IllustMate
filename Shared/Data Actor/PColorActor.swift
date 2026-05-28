@@ -19,10 +19,8 @@ actor PColorActor {
 
     let database: Connection
 
-    // Table
     let picColorsTable = Table("pic_colors")
 
-    // Columns
     let colorPicId = Expression<String>("pic_id")
     let colorRed = Expression<Int>("red")
     let colorGreen = Expression<Int>("green")

@@ -54,7 +54,6 @@ struct ImageMigrationView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .interactiveDismissDisabled()
         .task {
-            // Refresh the preview every 1.5 seconds from the latest migrated pic.
             while !Task.isCancelled {
                 displayedThumbnail = manager.latestThumbnail
                 try? await Task.sleep(for: .seconds(1.5))

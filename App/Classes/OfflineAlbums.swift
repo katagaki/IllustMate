@@ -38,7 +38,6 @@ enum OfflineAlbums {
         defaults?.set(map, forKey: key)
     }
 
-    /// Flips an album's offline state and starts the matching download/eviction.
     static func toggle(_ albumID: String, in collectionID: String) {
         if contains(albumID) {
             remove(albumID)

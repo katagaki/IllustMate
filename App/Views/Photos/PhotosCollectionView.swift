@@ -30,7 +30,6 @@ struct PhotosCollectionView: View {
         return searchResults ?? []
     }
 
-    // Album management state
     @State var isAddingAlbum: Bool = false
     @State var newAlbumName: String = ""
     @State var albumToRename: PHAssetCollection?

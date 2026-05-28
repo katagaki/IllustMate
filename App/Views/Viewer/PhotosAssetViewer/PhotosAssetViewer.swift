@@ -92,7 +92,6 @@ struct PhotosAssetViewer: View {
                 }
             }
             if isLandscape {
-                // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if currentAsset.mediaType == .video {
                         if let videoExportURL {
@@ -128,7 +127,6 @@ struct PhotosAssetViewer: View {
                     }
                 }
             } else {
-                // Portrait: show actions in bottom bar
                 if currentAsset.mediaType == .video {
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {

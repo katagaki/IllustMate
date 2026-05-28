@@ -44,7 +44,6 @@ extension DataActor {
         return sortAlbum(albums, sortedBy: sortType)
     }
 
-    /// Batch-populates childAlbumCount and childPicCount for all albums in one pass.
     private func populateCounts(for albums: [Album]) {
         let ids = albums.map { $0.id }
         guard !ids.isEmpty else { return }
@@ -52,7 +51,6 @@ extension DataActor {
         let bindings: [Binding?] = ids.map { $0 as Binding? }
         let placeholders = ids.map { _ in "?" }.joined(separator: ", ")
 
-        // Batch album counts
         var albumCounts: [String: Int] = [:]
         // swiftlint:disable:next line_length
         let albumCountSQL = "SELECT parent_album_id, COUNT(*) FROM albums WHERE parent_album_id IN (\(placeholders)) GROUP BY parent_album_id"
@@ -65,7 +63,6 @@ extension DataActor {
             }
         }
 
-        // Batch pic counts
         var picCounts: [String: Int] = [:]
         // swiftlint:disable:next line_length
         let picCountSQL = "SELECT containing_album_id, COUNT(*) FROM pics WHERE containing_album_id IN (\(placeholders)) GROUP BY containing_album_id"
@@ -94,8 +91,6 @@ extension DataActor {
         return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
-    /// Fetches a single representative thumbnail at a given offset (0-indexed),
-    /// ordered by most recently added. Used for concurrent per-thumbnail fetching.
     func representativeThumbnail(forAlbumWithID albumID: String, at offset: Int) -> Data? {
         let query = picsTable
             .filter(picAlbumId == albumID)
@@ -106,7 +101,6 @@ extension DataActor {
         return try? row.get(picThumbnailData)
     }
 
-    /// Batch-fetches up to `limit` representative thumbnails for each album ID.
     /// Executes one small indexed query per album inside a single actor call,
     /// avoiding both actor serialization overhead and expensive window functions.
     func batchRepresentativeThumbnails(

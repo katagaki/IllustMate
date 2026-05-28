@@ -29,11 +29,9 @@ class LibraryManager: ObservableObject {
             libraries = sorted
         }
 
-        // Restore last selected library
         if let saved = allLibraries.first(where: { $0.id == currentLibraryID }) {
             currentLibrary = saved
         } else {
-            // Fallback to default
             currentLibrary = allLibraries.first(where: { $0.isDefault }) ?? PicLibrary()
             currentLibraryID = PicLibrary.defaultID
         }

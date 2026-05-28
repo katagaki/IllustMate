@@ -36,17 +36,13 @@ final class SyncManager {
             await SyncMate.shared.enqueueChanges(forLibrary: id)
         }
         await SyncMate.shared.fetchChanges()
-        // If the originals container changed, re-upload originals into the new one.
         await OriginalsManager.shared.resetSyncStateIfContainerChanged()
-        // Mirror any originals the cloud is still missing, then reclaim local
-        // masters once iCloud confirms them. Off the main actor.
         for id in enabledIDs {
             Task.detached(priority: .utility) {
                 await OriginalsManager.shared.uploadMissingOriginals(in: id)
                 await OriginalsManager.shared.reclaimUploadedOriginals(in: id)
             }
         }
-        // Download-All libraries proactively pull every original, off the main actor.
         for id in await LibrariesActor.shared.downloadAllLibraryIDs() {
             Task.detached(priority: .utility) {
                 await OriginalsManager.shared.downloadAllOriginals(in: id)

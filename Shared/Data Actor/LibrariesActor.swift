@@ -14,14 +14,11 @@ actor LibrariesActor {
 
     let database: Connection
 
-    // Table
     let librariesTable = Table("collections")
 
-    // Columns
     let libraryId = Expression<String>("id")
     let libraryName = Expression<String>("name")
 
-    // Sync bookkeeping
     let libraryDirty = Expression<Bool>("dirty")
     let libraryLastModified = Expression<Double>("last_modified")
     let libraryCKSystemFields = Expression<Data?>("ck_system_fields")
@@ -59,7 +56,6 @@ actor LibrariesActor {
             if DatabaseMigrator.migrationNeeded() {
                 DatabaseMigrator.migrateLibrariesDatabase(database, librariesTable: librariesTable)
             }
-            // Ensure default library exists
             let defaultExists = try database.scalar(
                 librariesTable.filter(libraryId == PicLibrary.defaultID).count
             ) > 0
@@ -113,7 +109,6 @@ actor LibrariesActor {
         let id = PicLibrary.newID()
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
 
-        // Create the library's folder
         let fileManager = FileManager.default
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
@@ -153,7 +148,6 @@ actor LibrariesActor {
         let query = librariesTable.filter(libraryId == id)
         _ = try? database.run(query.delete())
 
-        // Delete the folder and all its contents
         let fileManager = FileManager.default
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"

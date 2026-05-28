@@ -27,7 +27,6 @@ struct ImageMigrationProgress: Sendable {
 
 extension DataActor {
 
-    /// True if any image pic still has its bytes stored as a BLOB.
     func needsImageMigration() -> Bool {
         let query = picsTable.filter(picMediaType == MediaType.pic.rawValue && picData != nil)
         return ((try? database.scalar(query.count)) ?? 0) > 0

@@ -19,10 +19,8 @@ actor HashActor {
 
     let database: Connection
 
-    // Table
     let picHashesTable = Table("pic_hashes")
 
-    // Columns
     let hashPicId = Expression<String>("pic_id")
     let hashValue = Expression<Int64>("dhash")
     let hashVersion = Expression<Int>("hash_version")

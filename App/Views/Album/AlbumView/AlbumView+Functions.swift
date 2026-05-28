@@ -119,15 +119,12 @@ extension AlbumView {
 
     // swiftlint:disable:next cyclomatic_complexity
     func sortPicsByProminentColor(_ pics: [Pic]) async -> [Pic] {
-        // Load only colors for the pics in this list
         let picIDs = pics.map(\.id)
         let cachedColors = await PColorActor.shared.cachedColors(forPicIDs: picIDs)
 
-        // Find pics that need color calculation
         var colorsMap = cachedColors
         let uncachedPics = pics.filter { colorsMap[$0.id] == nil && $0.thumbnailData != nil }
 
-        // Compute colors concurrently with bounded parallelism
         if !uncachedPics.isEmpty {
             let maxConcurrent = 8
             let newColors: [(picID: String, color: RGBColor)] = await withTaskGroup(
@@ -136,7 +133,6 @@ extension AlbumView {
             ) { group in
                 var iterator = uncachedPics.makeIterator()
 
-                // Seed the group with initial batch
                 for _ in 0..<min(maxConcurrent, uncachedPics.count) {
                     guard let pic = iterator.next() else { break }
                     group.addTask {
@@ -146,7 +142,6 @@ extension AlbumView {
                     }
                 }
 
-                // As each task completes, add the next one
                 var results: [(picID: String, color: RGBColor)] = []
                 for await (picID, color) in group {
                     if let color {
@@ -168,7 +163,6 @@ extension AlbumView {
             await PColorActor.shared.storeColors(newColors)
         }
 
-        // Sort by R, then G, then B
         let defaultColor = RGBColor(red: 128, green: 128, blue: 128)
         return pics.sorted { lhs, rhs in
             let colorA = colorsMap[lhs.id] ?? defaultColor

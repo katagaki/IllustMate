@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-/// In-memory cache for album cover images (the 3 representative thumbnails per album).
 @MainActor @Observable
 final class AlbumCoverCache {
     static let shared = AlbumCoverCache()
@@ -78,18 +77,13 @@ final class AlbumCoverCache {
     /// `loadCover` skips the disk cache for these to avoid reloading stale data.
     private var pendingDiskDeletions: Set<String> = []
 
-    /// Loads cover images for a single album into the cache.
-    /// Checks the on-disk cache first, then falls back to the main database.
-    /// Results are decoded off the main thread, then cached and notified.
     nonisolated func loadCover(for album: Album) async {
-        // Skip if already in NSCache
         guard images(forAlbumID: album.id) == nil else { return }
 
         let albumID = album.id
         let hasCover = album.hasCoverPhoto
         let versionKey = album.identifiableString()
 
-        // --- Layer 2: Disk cache ---
         let skipDiskCache = await MainActor.run { pendingDiskDeletions.contains(albumID) }
         if !skipDiskCache,
            let cached = await CoverCacheActor.shared.cachedCover(
@@ -105,7 +99,6 @@ final class AlbumCoverCache {
             return
         }
 
-        // --- Layer 3: Main database ---
         let thumbnails = await DataActor.shared.representativeThumbnails(
             forAlbumWithID: albumID, limit: 3
         )
@@ -115,7 +108,6 @@ final class AlbumCoverCache {
             coverData = await DataActor.shared.albumCoverData(forAlbumWithID: albumID)
         }
 
-        // Assemble raw data blobs in display order
         var dataBlobs: [Data?] = []
         if hasCover, let coverData {
             dataBlobs.append(coverData)
@@ -126,13 +118,11 @@ final class AlbumCoverCache {
         }
         while dataBlobs.count < 3 { dataBlobs.append(nil) }
 
-        // Store in disk cache for next launch
         await CoverCacheActor.shared.storeCover(
             primary: dataBlobs[0], secondary: dataBlobs[1], tertiary: dataBlobs[2],
             forAlbumWithID: albumID, versionKey: versionKey
         )
 
-        // Decode and store in NSCache
         let coverImages = decodeCoverImages(
             primary: dataBlobs[0], secondary: dataBlobs[1], tertiary: dataBlobs[2]
         )
@@ -149,7 +139,6 @@ final class AlbumCoverCache {
         await withTaskGroup(of: Void.self) { group in
             var iterator = albums.makeIterator()
 
-            // Seed with initial batch
             for _ in 0..<min(maxConcurrent, albums.count) {
                 guard let album = iterator.next() else { break }
                 group.addTask {
@@ -157,7 +146,6 @@ final class AlbumCoverCache {
                 }
             }
 
-            // As each finishes, start the next
             for await _ in group {
                 if let album = iterator.next() {
                     group.addTask {

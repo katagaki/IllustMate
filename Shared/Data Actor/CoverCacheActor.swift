@@ -19,10 +19,8 @@ actor CoverCacheActor {
 
     let database: Connection
 
-    // Table
     let coverCacheTable = Table("cover_cache")
 
-    // Columns
     let cacheAlbumId = Expression<String>("album_id")
     let cacheVersionKey = Expression<String>("version_key")
     let cachePrimary = Expression<Data?>("primary_data")
@@ -79,15 +77,12 @@ actor CoverCacheActor {
         let tertiary: Data?
     }
 
-    /// Returns cached cover data if the version key matches, nil otherwise.
     func cachedCover(forAlbumWithID albumID: String, versionKey: String) -> CachedCoverData? {
         let query = coverCacheTable.filter(cacheAlbumId == albumID)
         guard let row = try? database.pluck(query) else { return nil }
 
-        // Check staleness
         guard let storedKey = try? row.get(cacheVersionKey),
               storedKey == versionKey else {
-            // Stale entry — delete it
             _ = try? database.run(coverCacheTable.filter(cacheAlbumId == albumID).delete())
             return nil
         }
@@ -101,7 +96,6 @@ actor CoverCacheActor {
 
     // MARK: - Write
 
-    /// Stores cover data blobs for an album, tagged with the current version key.
     func storeCover(
         primary: Data?, secondary: Data?, tertiary: Data?,
         forAlbumWithID albumID: String, versionKey: String
@@ -117,13 +111,11 @@ actor CoverCacheActor {
 
     // MARK: - Delete
 
-    /// Removes the cached cover for a specific album.
     func deleteCover(forAlbumWithID albumID: String) {
         let query = coverCacheTable.filter(cacheAlbumId == albumID)
         _ = try? database.run(query.delete())
     }
 
-    /// Clears the entire cover cache.
     func deleteAllCovers() {
         _ = try? database.run(coverCacheTable.delete())
     }

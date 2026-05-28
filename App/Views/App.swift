@@ -97,7 +97,6 @@ struct IllustMateApp: App {
             await SyncManager.shared.refresh()
         }
         .onChange(of: libraryManager.currentLibrary.id) { _, _ in
-            // Migrate then sync the newly-active library.
             Task {
                 await imageMigration.runIfNeeded()
                 await SyncManager.shared.refresh()

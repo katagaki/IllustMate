@@ -53,7 +53,6 @@ struct PicViewer: View {
                     context.addFilter(.blur(radius: 40))
                     context.addFilter(.brightness(colorScheme == .dark ? -0.5 : 0.1))
                     let image = Image(uiImage: backgroundImage)
-                    // Scale to fill the canvas
                     let imageSize = backgroundImage.size
                     let scaleX = size.width / imageSize.width
                     let scaleY = size.height / imageSize.height
@@ -114,7 +113,6 @@ struct PicViewer: View {
                 }
             }
             if isLandscape {
-                // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if viewer.displayedPic?.isVideo == true {
                         if let videoURL = viewer.displayedVideoURL {
@@ -150,7 +148,6 @@ struct PicViewer: View {
                     }
                 }
             } else {
-                // Portrait: show actions in bottom bar
                 if viewer.displayedPic?.isVideo == true {
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {

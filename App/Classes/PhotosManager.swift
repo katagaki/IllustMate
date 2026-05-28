@@ -87,7 +87,6 @@ class PhotosManager {
 
     func fetchAssetsNotInAnyAlbum() async -> [PHAsset] {
         await Task.detached(priority: .userInitiated) {
-            // Fetch all image and video assets
             let allOptions = PHFetchOptions()
             allOptions.predicate = NSPredicate(
                 format: "mediaType = %d OR mediaType = %d",
@@ -97,7 +96,6 @@ class PhotosManager {
             allOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
             let allAssets = PHAsset.fetchAssets(with: allOptions)
 
-            // Collect identifiers of assets that belong to any user album
             var albumedIdentifiers: Set<String> = []
             albumedIdentifiers.reserveCapacity(allAssets.count)
             let albums = PHAssetCollection.fetchAssetCollections(
@@ -116,7 +114,6 @@ class PhotosManager {
                 }
             }
 
-            // Return assets not in any album
             var result: [PHAsset] = []
             result.reserveCapacity(max(0, allAssets.count - albumedIdentifiers.count))
             allAssets.enumerateObjects { asset, _, _ in

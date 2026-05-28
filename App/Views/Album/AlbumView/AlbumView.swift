@@ -231,7 +231,6 @@ struct AlbumView: View {
 
     var mainContent: some View {
         ZStack {
-            // Album cover background image (if set)
             if let backgroundImage {
                 Canvas { context, size in
                     let image = context.resolve(Image(uiImage: backgroundImage))

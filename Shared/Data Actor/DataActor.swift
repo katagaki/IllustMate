@@ -28,19 +28,16 @@ actor DataActor {
     let database: Connection
     let databaseURL: URL
 
-    // Tables
     let albumsTable = Table("albums")
     let picsTable = Table("pics")
     let preferencesTable = Table("album_preferences")
 
-    // Album columns
     let albumId = Expression<String>("id")
     let albumName = Expression<String>("name")
     let albumCoverPhoto = Expression<Data?>("cover_photo")
     let albumParentId = Expression<String?>("parent_album_id")
     let albumDateCreated = Expression<Double>("date_created")
 
-    // Pic columns
     let picId = Expression<String>("id")
     let picName = Expression<String>("name")
     let picAlbumId = Expression<String?>("containing_album_id")
@@ -51,7 +48,6 @@ actor DataActor {
     let picDuration = Expression<Double?>("duration")
     let picFilePath = Expression<String?>("file_path")
 
-    // Preferences columns
     let prefAlbumId = Expression<String>("album_id")
     let prefAlbumSort = Expression<String>("album_sort")
     let prefAlbumViewStyle = Expression<String>("album_view_style")
@@ -105,7 +101,6 @@ actor DataActor {
         // on existing ones after the migration's final VACUUM.
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
-            // Albums table
             try database.run(albumsTable.create(ifNotExists: true) { table in
                 table.column(albumId, primaryKey: true)
                 table.column(albumName)
@@ -114,7 +109,6 @@ actor DataActor {
                 table.column(albumDateCreated)
             })
 
-            // Pics table
             try database.run(picsTable.create(ifNotExists: true) { table in
                 table.column(picId, primaryKey: true)
                 table.column(picName)
@@ -132,7 +126,6 @@ actor DataActor {
                     preferencesTable: preferencesTable)
             }
 
-            // Preferences table
             try database.run(preferencesTable.create(ifNotExists: true) { table in
                 table.column(prefAlbumId, primaryKey: true)
                 table.column(prefAlbumSort, defaultValue: "nameAscending")
@@ -143,7 +136,6 @@ actor DataActor {
                 table.column(prefHideSectionHeaders, defaultValue: false)
             })
 
-            // Sync table
             for table in [albumsTable, picsTable] {
                 _ = try? database.run(table.addColumn(syncDirty, defaultValue: true))
                 _ = try? database.run(table.addColumn(syncLastModified, defaultValue: 0))
@@ -156,7 +148,6 @@ actor DataActor {
                 table.column(tombstoneDeletedAt, defaultValue: 0)
             })
 
-            // Indexes
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
         } catch {
@@ -185,14 +176,12 @@ actor DataActor {
         return album
     }
 
-    /// Fetches the cover photo data for a single album by ID.
     func albumCoverData(forAlbumWithID albumID: String) -> Data? {
         let query = albumsTable.filter(albumId == albumID).select(albumCoverPhoto)
         guard let row = try? database.pluck(query) else { return nil }
         return try? row.get(albumCoverPhoto)
     }
 
-    /// Fetches cover photo data for multiple albums in a single actor call.
     func batchAlbumCoverData(forAlbumIDs albumIDs: [String]) -> [String: Data] {
         guard !albumIDs.isEmpty else { return [:] }
         var result: [String: Data] = [:]

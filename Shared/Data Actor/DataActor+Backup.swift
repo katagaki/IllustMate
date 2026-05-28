@@ -88,7 +88,6 @@ extension DataActor {
     // MARK: - Import strategies
 
     private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws {
-        // Build a mapping from old album IDs to freshly-generated ones.
         var albumIDMap: [String: String] = [:]
         for foreignAlbum in try foreignDB.prepare(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? UUID().uuidString

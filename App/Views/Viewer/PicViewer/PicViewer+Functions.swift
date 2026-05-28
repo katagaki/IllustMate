@@ -13,7 +13,6 @@ extension PicViewer {
     @ViewBuilder
     var mainContent: some View {
         if isLandscape {
-            // Landscape: vertical carousel on the left, image fills remaining space
             HStack(spacing: 0.0) {
                 if viewer.allPics.count > 1 {
                     PicCarouselStripVertical()
@@ -24,7 +23,6 @@ extension PicViewer {
             .padding(8.0)
             .padding(.leading, 40.0)
         } else {
-            // Portrait: image on top, horizontal carousel at bottom
             VStack(alignment: .center, spacing: 0.0) {
                 imageContent
 
@@ -80,10 +78,8 @@ extension PicViewer {
     }
 
     var photoContent: some View {
-        // Image with size overlay - fills available space
         ZStack(alignment: .bottomLeading) {
             ZStack {
-                // Show thumbnail as placeholder until the full image is available
                 if let thumbnail = viewer.displayedThumbnail {
                     Image(uiImage: thumbnail)
                         .resizable()
@@ -91,7 +87,6 @@ extension PicViewer {
                         .clipShape(.rect(cornerRadius: 8.0))
                         .opacity(viewer.displayedImage == nil ? 1 : 0)
                 }
-                // Show full image when loaded
                 if let fullImage = viewer.displayedImage {
                     Image(uiImage: fullImage)
                         .resizable()
@@ -100,7 +95,6 @@ extension PicViewer {
                 }
             }
             .overlay(alignment: .bottomTrailing) {
-                // Downloading-from-iCloud progress donut, anchored to the image corner
                 if viewer.isDownloadingDisplayedOriginal {
                     Group {
                         if let progress = viewer.downloadProgress {
@@ -126,7 +120,6 @@ extension PicViewer {
                 }
             }
 
-            // Image size overlay (bottom-left of image)
             if showImageSize, let displayedImage = viewer.displayedImage {
                 HStack(alignment: .center, spacing: 2.0) {
                     Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")
