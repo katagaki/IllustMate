@@ -77,6 +77,6 @@ extension DataActor {
     func importDownloadedOriginal(picID: String, data: Data) {
         guard let relativePath = saveImageFile(data, id: picID) else { return }
         _ = try? database.run(picsTable.filter(picId == picID)
-            .update(picFilePath <- relativePath, picData <- nil))
+            .update(picFilePath <- relativePath, picData <- nil, syncOriginalSynced <- true))
     }
 }

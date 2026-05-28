@@ -57,9 +57,13 @@ actor SyncMate {
         engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: zoneID))])
 
         let dataActor = DataActor.instance(for: collectionID)
-        let albumIDs = await dataActor.dirtyAlbumIDs()
-        let picIDs = await dataActor.dirtyPicIDs()
+        let dirtyAlbums = await dataActor.dirtyAlbumIDs()
+        let unsyncedAlbums = await dataActor.unsyncedAlbumIDs()
+        let dirtyPics = await dataActor.dirtyPicIDs()
+        let unsyncedPics = await dataActor.unsyncedPicIDs()
         let tombstones = await dataActor.pendingTombstones()
+        let albumIDs = Array(Set(dirtyAlbums + unsyncedAlbums))
+        let picIDs = Array(Set(dirtyPics + unsyncedPics))
 
         var pending: [CKSyncEngine.PendingRecordZoneChange] = []
         for id in albumIDs + picIDs {
@@ -79,7 +83,9 @@ actor SyncMate {
         guard let engine else { return }
         engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.librariesZoneID))])
 
-        let libraryIDs = await LibrariesActor.shared.dirtyLibraryIDs()
+        let dirtyLibraries = await LibrariesActor.shared.dirtyLibraryIDs()
+        let unsyncedLibraries = await LibrariesActor.shared.unsyncedLibraryIDs()
+        let libraryIDs = Array(Set(dirtyLibraries + unsyncedLibraries))
         let tombstones = await LibrariesActor.shared.pendingLibraryTombstones()
         var pending: [CKSyncEngine.PendingRecordZoneChange] = []
         for id in libraryIDs {

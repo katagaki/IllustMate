@@ -36,5 +36,11 @@ final class SyncManager {
             await SyncMate.shared.enqueueChanges(forLibrary: id)
         }
         await SyncMate.shared.fetchChanges()
+        // Mirror any originals the cloud is still missing, off the main actor.
+        for id in enabledIDs {
+            Task.detached(priority: .utility) {
+                await OriginalsManager.shared.uploadMissingOriginals(in: id)
+            }
+        }
     }
 }

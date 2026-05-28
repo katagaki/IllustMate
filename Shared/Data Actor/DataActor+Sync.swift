@@ -77,6 +77,19 @@ extension DataActor {
             .map { $0[picId] }) ?? []
     }
 
+    /// Albums never confirmed as synced (no CloudKit system fields). The
+    /// consistency pass re-enqueues these so the cloud can't be left missing them.
+    func unsyncedAlbumIDs() -> [String] {
+        (try? database.prepare(albumsTable.filter(syncCKSystemFields == nil).select(albumId))
+            .map { $0[albumId] }) ?? []
+    }
+
+    /// Pics never confirmed as synced (no CloudKit system fields).
+    func unsyncedPicIDs() -> [String] {
+        (try? database.prepare(picsTable.filter(syncCKSystemFields == nil).select(picId))
+            .map { $0[picId] }) ?? []
+    }
+
     func pendingTombstones() -> [(id: String, recordType: String)] {
         (try? database.prepare(tombstonesTable)
             .map { (id: $0[tombstoneId], recordType: $0[tombstoneRecordType]) }) ?? []
@@ -121,6 +134,18 @@ extension DataActor {
     func markPicSynced(id: String, systemFields: Data?) {
         _ = try? database.run(picsTable.filter(picId == id)
             .update(syncDirty <- false, syncCKSystemFields <- systemFields))
+    }
+
+    /// Image pics with a local original that hasn't been mirrored to iCloud Drive.
+    func picIDsNeedingOriginalUpload() -> [String] {
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picFilePath != nil && syncOriginalSynced == false)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    func markPicOriginalSynced(id: String) {
+        _ = try? database.run(picsTable.filter(picId == id).update(syncOriginalSynced <- true))
     }
 
     // MARK: - Download: apply remote changes

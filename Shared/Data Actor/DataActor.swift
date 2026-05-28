@@ -64,6 +64,8 @@ actor DataActor {
     let syncDirty = Expression<Bool>("dirty")
     let syncLastModified = Expression<Double>("last_modified")
     let syncCKSystemFields = Expression<Data?>("ck_system_fields")
+    // Whether a pic's full-resolution original has been mirrored to iCloud Drive.
+    let syncOriginalSynced = Expression<Bool>("original_synced")
 
     // Tombstones (deleted records, so deletions propagate during sync)
     let tombstonesTable = Table("tombstones")
@@ -147,6 +149,7 @@ actor DataActor {
                 _ = try? database.run(table.addColumn(syncLastModified, defaultValue: 0))
                 _ = try? database.run(table.addColumn(syncCKSystemFields))
             }
+            _ = try? database.run(picsTable.addColumn(syncOriginalSynced, defaultValue: false))
             try database.run(tombstonesTable.create(ifNotExists: true) { table in
                 table.column(tombstoneId, primaryKey: true)
                 table.column(tombstoneRecordType)

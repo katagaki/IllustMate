@@ -198,10 +198,9 @@ extension SyncMate: CKSyncEngineDelegate {
                 await dataActor.markAlbumSynced(id: record.recordID.recordName, systemFields: systemFields)
             } else {
                 await dataActor.markPicSynced(id: record.recordID.recordName, systemFields: systemFields)
-                if (record["mediaType"] as? Int ?? 0) == MediaType.pic.rawValue {
-                    await OriginalsManager.shared.uploadOriginal(picID: record.recordID.recordName,
-                                                                 in: collectionID)
-                }
+                // Videos are skipped inside uploadOriginal (no local image original).
+                await OriginalsManager.shared.uploadOriginal(picID: record.recordID.recordName,
+                                                             in: collectionID)
             }
         }
         for recordID in changes.deletedRecordIDs {

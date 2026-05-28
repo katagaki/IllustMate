@@ -12,6 +12,10 @@ actor OriginalsManager {
     static let shared = OriginalsManager()
     static let containerID = "iCloud.com.tsubuzaki.IllustMateSQLite"
 
+    /// Libraries with an in-flight `uploadMissingOriginals` pass, so repeated
+    /// sync triggers don't stack redundant scans.
+    private var uploadingMissing: Set<String> = []
+
     /// App-private `Originals/<library>` folder in the iCloud Drive ubiquity
     /// container. Kept outside `Documents/` so it isn't exposed in the Files
     /// app, and split per library, while still syncing over iCloud.
@@ -36,17 +40,38 @@ actor OriginalsManager {
             .ubiquitousItemDownloadingStatus
     }
 
-    /// Mirrors a pic's local original into iCloud Drive (idempotent). The source
-    /// device calls this once its metadata record has been uploaded.
+    /// Mirrors a pic's local original into iCloud Drive (idempotent) and marks it
+    /// synced. Called both reactively (after the metadata record uploads) and by
+    /// the consistency pass for any original the cloud is still missing.
     func uploadOriginal(picID: String, in collectionID: String) async {
         guard let cloudURL = originalURL(forPicID: picID, in: collectionID),
               let directory = originalsDirectory(for: collectionID) else { return }
+        let dataActor = DataActor.instance(for: collectionID)
         // Already in iCloud (downloaded or as a placeholder)?
-        if downloadingStatus(cloudURL) != nil { return }
-        guard let localURL = await DataActor.instance(for: collectionID)
-            .localOriginalURL(forPicWithID: picID) else { return }
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try? FileManager.default.copyItem(at: localURL, to: cloudURL)
+        if downloadingStatus(cloudURL) != nil {
+            await dataActor.markPicOriginalSynced(id: picID)
+            return
+        }
+        guard let localURL = await dataActor.localOriginalURL(forPicWithID: picID) else { return }
+        do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try FileManager.default.copyItem(at: localURL, to: cloudURL)
+            await dataActor.markPicOriginalSynced(id: picID)
+        } catch {
+            debugPrint("Original upload failed for \(picID): \(error)")
+        }
+    }
+
+    /// Mirrors every local original not yet in iCloud Drive for a library. Heals
+    /// originals the reactive path missed (e.g. pics synced before this existed).
+    func uploadMissingOriginals(in collectionID: String) async {
+        guard !uploadingMissing.contains(collectionID) else { return }
+        uploadingMissing.insert(collectionID)
+        defer { uploadingMissing.remove(collectionID) }
+        let ids = await DataActor.instance(for: collectionID).picIDsNeedingOriginalUpload()
+        for id in ids {
+            await uploadOriginal(picID: id, in: collectionID)
+        }
     }
 
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),
