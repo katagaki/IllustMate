@@ -20,8 +20,6 @@ struct ImageMigrationView: View {
         VStack(spacing: 24.0) {
             Spacer()
             previewImage
-                .frame(width: 160.0, height: 160.0)
-                .clipShape(RoundedRectangle(cornerRadius: 16.0))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16.0)
                         .strokeBorder(.separator, lineWidth: 1.0)
@@ -86,19 +84,21 @@ struct ImageMigrationView: View {
         }
     }
 
-    @ViewBuilder
     private var previewImage: some View {
-        if let displayedThumbnail, let image = UIImage(data: displayedThumbnail) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-        } else {
-            ZStack {
-                Rectangle().fill(.quaternary)
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.largeTitle)
-                    .foregroundStyle(.secondary)
+        RoundedRectangle(cornerRadius: 16.0)
+            .fill(.quaternary)
+            .overlay {
+                if let displayedThumbnail, let image = UIImage(data: displayedThumbnail) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Image(systemName: "photo.on.rectangle.angled")
+                        .font(.largeTitle)
+                        .foregroundStyle(.secondary)
+                }
             }
-        }
+            .frame(width: 160.0, height: 160.0)
+            .clipShape(RoundedRectangle(cornerRadius: 16.0))
     }
 }
