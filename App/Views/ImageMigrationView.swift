@@ -74,7 +74,7 @@ struct ImageMigrationView: View {
         .font(.body)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20.0)
-        .glassEffect(in: RoundedRectangle(cornerRadius: 24.0))
+        .glassEffect(.regular.tint(.orange.opacity(0.2)), in: RoundedRectangle(cornerRadius: 24.0))
     }
 
     @ViewBuilder
