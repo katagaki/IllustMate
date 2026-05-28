@@ -73,18 +73,20 @@ struct LibraryManagerSheet: View {
         } label: {
             HStack {
                 VStack(alignment: .leading, spacing: 2.0) {
-                    Text(libraryManager.displayName(for: library))
+                    HStack(spacing: 4.0) {
+                        Text(libraryManager.displayName(for: library))
+                        if iCloudSyncEnabled {
+                            Image(systemName: "icloud")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .accessibilityLabel(Text("Sync.Title", tableName: "More"))
+                        }
+                    }
                     if library.isDefault {
                         Text("Libraries.Default.Description", tableName: "Libraries")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                }
-                if iCloudSyncEnabled {
-                    Image(systemName: "icloud")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .accessibilityLabel(Text("Sync.Title", tableName: "More"))
                 }
                 Spacer()
                 if library.id == libraryManager.currentLibrary.id {
