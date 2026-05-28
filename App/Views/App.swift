@@ -6,6 +6,7 @@
 //
 
 import BackgroundTasks
+import Combine
 import StoreKit
 import SwiftUI
 import TipKit
@@ -106,6 +107,9 @@ struct IllustMateApp: App {
         }
         .onChange(of: iCloudSyncEnabled) { _, _ in
             Task { await SyncManager.shared.refresh(activeLibraryID: libraryManager.currentLibrary.id) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyRemoteChanges)) { _ in
+            navigation.signalDataChanged()
         }
         .onOpenURL { url in
             if url.pathExtension == "pics" {

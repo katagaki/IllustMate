@@ -28,6 +28,12 @@ class NavigationManager: ObservableObject {
         dataVersion += 1
     }
 
+    /// Refreshes data-backed views without resetting navigation (e.g. when a
+    /// sync applies remote changes while the user is browsing).
+    func signalDataChanged() {
+        dataVersion += 1
+    }
+
     func push(_ viewPath: ViewPath, for tab: TabType) {
         switch tab {
         case .collection:

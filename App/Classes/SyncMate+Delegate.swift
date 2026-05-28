@@ -114,6 +114,11 @@ extension SyncMate: CKSyncEngineDelegate {
                 await dataActor.removePicForRemoteDelete(id: deletion.recordID.recordName)
             }
         }
+        if !changes.modifications.isEmpty || !changes.deletions.isEmpty {
+            await MainActor.run {
+                NotificationCenter.default.post(name: .syncDidApplyRemoteChanges, object: nil)
+            }
+        }
     }
 
     private func applyRecord(_ record: CKRecord) async {

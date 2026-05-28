@@ -13,6 +13,12 @@
 @preconcurrency import CloudKit
 import Foundation
 
+extension Notification.Name {
+    /// Posted (on the main actor) after sync applies remote record changes,
+    /// so data-backed views can refresh.
+    static let syncDidApplyRemoteChanges = Notification.Name("SyncDidApplyRemoteChanges")
+}
+
 actor SyncMate {
 
     static let shared = SyncMate()
