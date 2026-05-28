@@ -12,15 +12,16 @@ import UIKit
 struct PhotostandDatabase {
     static let appGroupID = "group.com.tsubuzaki.IllustMate"
 
-    // Tables
     static let albumsTable = Table("albums")
     static let picsTable = Table("pics")
+    static let librariesTable = Table("collections")
 
-    // Album columns
     static let albumId = Expression<String>("id")
     static let albumName = Expression<String>("name")
 
-    // Pic columns
+    static let libraryId = Expression<String>("id")
+    static let libraryName = Expression<String>("name")
+
     static let picId = Expression<String>("id")
     static let picAlbumId = Expression<String?>("containing_album_id")
     static let picData = Expression<Data?>("data")
@@ -28,14 +29,9 @@ struct PhotostandDatabase {
     static let picFilePath = Expression<String?>("file_path")
     static let picThumbnailData = Expression<Data?>("thumbnail_data")
 
-    /// Maximum blob size (in bytes) the widget will attempt to load.
     static let maxBlobSize = 25 * 1024 * 1024 // 25 MB
 
-    /// iCloud Drive container where synced libraries keep their originals. Reading
-    /// it requires the iCloud capability on the widget target; without it the
-    /// lookup returns nil and the widget falls back to the thumbnail.
     static let ubiquityContainerID = "iCloud.com.tsubuzaki.IllustMate"
-    /// The widget reads the default library (Collection.db at the app-group root).
     static let defaultLibraryID = "__default__"
 
     struct AlbumRecord {
@@ -43,15 +39,52 @@ struct PhotostandDatabase {
         let name: String
     }
 
-    static func openDatabase() -> Connection? {
-        guard let url = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID)?
+    struct LibraryRecord {
+        let id: String
+        let name: String
+    }
+
+    private static func appGroupURL() -> URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID)
+    }
+
+    /// Directory holding a library's database and media: the app-group root for
+    /// the default library, otherwise a per-library subfolder.
+    private static func libraryBaseURL(forLibraryID libraryID: String) -> URL? {
+        guard let base = appGroupURL() else { return nil }
+        return libraryID == defaultLibraryID ? base : base.appendingPathComponent(libraryID)
+    }
+
+    static func openDatabase(forLibraryID libraryID: String = defaultLibraryID) -> Connection? {
+        guard let url = libraryBaseURL(forLibraryID: libraryID)?
             .appendingPathComponent("Collection.db") else { return nil }
         return try? Connection(url.path, readonly: true)
     }
 
-    static func fetchAllAlbums() -> [AlbumRecord] {
-        guard let database = openDatabase() else { return [] }
+    private static func openLibrariesDatabase() -> Connection? {
+        guard let url = appGroupURL()?.appendingPathComponent("Libraries.db") else { return nil }
+        return try? Connection(url.path, readonly: true)
+    }
+
+    static func fetchAllLibraries() -> [LibraryRecord] {
+        let fallback = [LibraryRecord(id: defaultLibraryID, name: "")]
+        guard let database = openLibrariesDatabase(),
+              let rows = try? database.prepare(librariesTable.select(libraryId, libraryName)) else {
+            return fallback
+        }
+        var records = rows.compactMap { row -> LibraryRecord? in
+            guard let id = try? row.get(libraryId),
+                  let name = try? row.get(libraryName) else { return nil }
+            return LibraryRecord(id: id, name: name)
+        }
+        if !records.contains(where: { $0.id == defaultLibraryID }) {
+            records.insert(LibraryRecord(id: defaultLibraryID, name: ""), at: 0)
+        }
+        return records
+    }
+
+    static func fetchAllAlbums(inLibraryWithID libraryID: String = defaultLibraryID) -> [AlbumRecord] {
+        guard let database = openDatabase(forLibraryID: libraryID) else { return [] }
         let query = albumsTable.select(albumId, albumName).order(albumName.asc)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.compactMap { row in
@@ -61,8 +94,8 @@ struct PhotostandDatabase {
         }
     }
 
-    static func fetchAlbum(withID id: String) -> AlbumRecord? {
-        guard let database = openDatabase() else { return nil }
+    static func fetchAlbum(withID id: String, inLibraryWithID libraryID: String = defaultLibraryID) -> AlbumRecord? {
+        guard let database = openDatabase(forLibraryID: libraryID) else { return nil }
         let query = albumsTable.filter(albumId == id).select(albumId, albumName)
         guard let row = try? database.pluck(query),
               let rowId = try? row.get(albumId),
@@ -72,20 +105,20 @@ struct PhotostandDatabase {
 
     static func fetchRandomPicData(
         inAlbumWithID albumID: String,
+        inLibraryWithID libraryID: String = defaultLibraryID,
         maxDimension: CGFloat = 800
     ) -> Data? {
-        guard let database = openDatabase() else { return nil }
-        return fetchRandomPicData(using: database, albumID: albumID, maxDimension: maxDimension)
+        guard let database = openDatabase(forLibraryID: libraryID) else { return nil }
+        return fetchRandomPicData(using: database, albumID: albumID,
+                                  libraryID: libraryID, maxDimension: maxDimension)
     }
 
-    /// Fetches a single random image using a provided database connection.
-    /// Skips photos whose blob exceeds `maxBlobSize` to stay within the widget memory limit.
     static func fetchRandomPicData(
         using database: Connection,
         albumID: String,
+        libraryID: String = defaultLibraryID,
         maxDimension: CGFloat = 800
     ) -> Data? {
-        // Step 1: Pick a random image pic ID.
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
             .filter(picMediaType == 0)
@@ -94,19 +127,17 @@ struct PhotostandDatabase {
             .limit(1)
         guard let idRow = try? database.pluck(idQuery),
               let randomId = try? idRow.get(picId),
-              let data = rawPicData(forID: randomId, using: database) else { return nil }
-        // Step 2: Downsample directly at target size.
+              let data = rawPicData(forID: randomId, using: database, libraryID: libraryID) else { return nil }
         return UIImage.downsampledForWidget(data: data, maxDimension: maxDimension)
     }
 
-    /// Fetches multiple random images, reusing a single database connection.
-    /// Skips photos whose blob exceeds `maxBlobSize` to stay within the widget memory limit.
     static func fetchRandomPicDataMultiple(
         inAlbumWithID albumID: String,
+        inLibraryWithID libraryID: String = defaultLibraryID,
         count: Int,
         maxDimension: CGFloat = 800
     ) -> [Data] {
-        guard let database = openDatabase() else { return [] }
+        guard let database = openDatabase(forLibraryID: libraryID) else { return [] }
         let idQuery = picsTable
             .filter(picAlbumId == albumID)
             .filter(picMediaType == 0)
@@ -117,40 +148,33 @@ struct PhotostandDatabase {
         let ids = rows.compactMap { try? $0.get(picId) }
         return ids.compactMap { id in
             autoreleasepool {
-                guard let data = rawPicData(forID: id, using: database) else { return nil }
+                guard let data = rawPicData(forID: id, using: database, libraryID: libraryID) else { return nil }
                 return UIImage.downsampledForWidget(data: data, maxDimension: maxDimension)
             }
         }
     }
 
-    /// Resolves a pic's raw bytes, preferring the externalized image file and
-    /// falling back to the legacy blob. Skips items larger than `maxBlobSize`
-    /// to stay within the widget's memory limit.
-    private static func rawPicData(forID id: String, using database: Connection) -> Data? {
+    /// Resolves a pic's raw bytes, preferring the externalized image file, then the
+    /// iCloud Drive original, the legacy blob, and finally the thumbnail. Skips
+    /// items larger than `maxBlobSize` to stay within the widget's memory limit.
+    private static func rawPicData(forID id: String, using database: Connection, libraryID: String) -> Data? {
         let query = picsTable.filter(picId == id)
             .select(picData, picFilePath, picMediaType, picThumbnailData)
         guard let row = try? database.pluck(query) else { return nil }
-        // 1. Local externalized file (non-synced libraries).
         if let path = try? row.get(picFilePath),
-           let containerURL = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID),
-           let data = cappedData(at: containerURL.appendingPathComponent(path)) {
+           let baseURL = libraryBaseURL(forLibraryID: libraryID),
+           let data = cappedData(at: baseURL.appendingPathComponent(path)) {
             return data
         }
-        // 2. iCloud Drive container (synced libraries; needs the iCloud capability).
-        if (try? row.get(picMediaType)) == 0, let data = ubiquityImageData(forID: id) {
+        if (try? row.get(picMediaType)) == 0, let data = ubiquityImageData(forID: id, libraryID: libraryID) {
             return data
         }
-        // 3. Legacy blob.
         if let blob = try? row.get(picData), blob.count <= maxBlobSize {
             return blob
         }
-        // 4. Thumbnail fallback, so a synced original still shows (lower-res) even
-        //    when the full file isn't available to the widget.
         return try? row.get(picThumbnailData)
     }
 
-    /// Reads a file capped at `maxBlobSize`, or nil if it's missing or too large.
     private static func cappedData(at fileURL: URL) -> Data? {
         let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path)
         guard let size = (attributes?[.size] as? NSNumber)?.int64Value,
@@ -158,13 +182,12 @@ struct PhotostandDatabase {
         return try? Data(contentsOf: fileURL)
     }
 
-    /// Reads a synced original from the iCloud Drive container if it's materialized
-    /// and the widget has iCloud access; otherwise requests a download and returns nil.
-    private static func ubiquityImageData(forID id: String) -> Data? {
+    private static func ubiquityImageData(forID id: String, libraryID: String) -> Data? {
         guard let container = FileManager.default
             .url(forUbiquityContainerIdentifier: ubiquityContainerID) else { return nil }
         let fileURL = container.appendingPathComponent("Originals", isDirectory: true)
-            .appendingPathComponent(defaultLibraryID, isDirectory: true)
+            .appendingPathComponent(libraryID, isDirectory: true)
+            .appendingPathComponent("Images", isDirectory: true)
             .appendingPathComponent(id)
         let status = try? fileURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
             .ubiquitousItemDownloadingStatus
@@ -175,8 +198,9 @@ struct PhotostandDatabase {
         return nil
     }
 
-    static func fetchPicCount(inAlbumWithID albumID: String) -> Int {
-        guard let database = openDatabase() else { return 0 }
+    static func fetchPicCount(inAlbumWithID albumID: String,
+                              inLibraryWithID libraryID: String = defaultLibraryID) -> Int {
+        guard let database = openDatabase(forLibraryID: libraryID) else { return 0 }
         let query = picsTable.filter(picAlbumId == albumID).filter(picMediaType == 0)
         return (try? database.scalar(query.count)) ?? 0
     }

@@ -13,6 +13,9 @@ struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
         LocalizedStringResource("PhotoGrid.Intent.Description", table: "Widgets")
     )
 
+    @Parameter(title: LocalizedStringResource("PhotoGrid.Intent.Library", table: "Widgets"))
+    var library: LibraryEntity?
+
     @Parameter(title: LocalizedStringResource("PhotoGrid.Intent.Album", table: "Widgets"))
-    var album: AlbumEntity?
+    var album: GridAlbumEntity?
 }

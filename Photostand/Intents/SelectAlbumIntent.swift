@@ -13,6 +13,9 @@ struct SelectAlbumIntent: WidgetConfigurationIntent {
         LocalizedStringResource("Photostand.Intent.Description", table: "Widgets")
     )
 
+    @Parameter(title: LocalizedStringResource("Photostand.Intent.Library", table: "Widgets"))
+    var library: LibraryEntity?
+
     @Parameter(title: LocalizedStringResource("Photostand.Intent.Album", table: "Widgets"))
     var album: AlbumEntity?
 

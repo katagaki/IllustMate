@@ -8,8 +8,6 @@
 import AppIntents
 import WidgetKit
 
-// MARK: - App Entity for Album Selection
-
 struct AlbumEntity: AppEntity {
     static var typeDisplayRepresentation = TypeDisplayRepresentation(
         name: LocalizedStringResource("Photostand.Entity.Album", table: "Widgets")
@@ -17,6 +15,7 @@ struct AlbumEntity: AppEntity {
     static var defaultQuery = AlbumEntityQuery()
 
     var id: String
+    var libraryID: String
     var name: String
 
     var displayRepresentation: DisplayRepresentation {
@@ -24,17 +23,83 @@ struct AlbumEntity: AppEntity {
     }
 }
 
-struct AlbumEntityQuery: EntityQuery {
-    func entities(for identifiers: [String]) async throws -> [AlbumEntity] {
-        PhotostandDatabase.fetchAllAlbums()
-            .filter { identifiers.contains($0.id) }
+struct GridAlbumEntity: AppEntity {
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(
+        name: LocalizedStringResource("Photostand.Entity.Album", table: "Widgets")
+    )
+    static var defaultQuery = GridAlbumEntityQuery()
+
+    var id: String
+    var libraryID: String
+    var name: String
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(name)")
+    }
+}
+
+/// Resolves albums for the library currently chosen in the widget configuration,
+/// falling back to the default (Collection) library when none is selected yet.
+enum AlbumEntityResolver {
+    static func suggested(forLibraryID libraryID: String) -> [(id: String, name: String)] {
+        PhotostandDatabase.fetchAllAlbums(inLibraryWithID: libraryID)
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-            .map { AlbumEntity(id: $0.id, name: $0.name) }
+            .map { (id: $0.id, name: $0.name) }
+    }
+
+    /// Looks an album up by ID, preferring the selected library and then scanning
+    /// the rest, so a stored selection still resolves after a reload.
+    static func find(id: String, preferringLibraryID libraryID: String) -> (id: String, libraryID: String, name: String)? {
+        if let record = PhotostandDatabase.fetchAlbum(withID: id, inLibraryWithID: libraryID) {
+            return (record.id, libraryID, record.name)
+        }
+        for library in PhotostandDatabase.fetchAllLibraries() where library.id != libraryID {
+            if let record = PhotostandDatabase.fetchAlbum(withID: id, inLibraryWithID: library.id) {
+                return (record.id, library.id, record.name)
+            }
+        }
+        return nil
+    }
+}
+
+struct AlbumEntityQuery: EntityQuery {
+    @IntentParameterDependency<SelectAlbumIntent>(\.$library)
+    var albumIntent
+
+    private var libraryID: String {
+        albumIntent?.library.id ?? PhotostandDatabase.defaultLibraryID
+    }
+
+    func entities(for identifiers: [String]) async throws -> [AlbumEntity] {
+        identifiers.compactMap { id in
+            AlbumEntityResolver.find(id: id, preferringLibraryID: libraryID)
+                .map { AlbumEntity(id: $0.id, libraryID: $0.libraryID, name: $0.name) }
+        }
     }
 
     func suggestedEntities() async throws -> [AlbumEntity] {
-        PhotostandDatabase.fetchAllAlbums()
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-            .map { AlbumEntity(id: $0.id, name: $0.name) }
+        AlbumEntityResolver.suggested(forLibraryID: libraryID)
+            .map { AlbumEntity(id: $0.id, libraryID: libraryID, name: $0.name) }
+    }
+}
+
+struct GridAlbumEntityQuery: EntityQuery {
+    @IntentParameterDependency<SelectAlbumForGridIntent>(\.$library)
+    var gridIntent
+
+    private var libraryID: String {
+        gridIntent?.library.id ?? PhotostandDatabase.defaultLibraryID
+    }
+
+    func entities(for identifiers: [String]) async throws -> [GridAlbumEntity] {
+        identifiers.compactMap { id in
+            AlbumEntityResolver.find(id: id, preferringLibraryID: libraryID)
+                .map { GridAlbumEntity(id: $0.id, libraryID: $0.libraryID, name: $0.name) }
+        }
+    }
+
+    func suggestedEntities() async throws -> [GridAlbumEntity] {
+        AlbumEntityResolver.suggested(forLibraryID: libraryID)
+            .map { GridAlbumEntity(id: $0.id, libraryID: libraryID, name: $0.name) }
     }
 }
