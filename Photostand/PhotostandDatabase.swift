@@ -26,9 +26,17 @@ struct PhotostandDatabase {
     static let picData = Expression<Data?>("data")
     static let picMediaType = Expression<Int>("media_type")
     static let picFilePath = Expression<String?>("file_path")
+    static let picThumbnailData = Expression<Data?>("thumbnail_data")
 
     /// Maximum blob size (in bytes) the widget will attempt to load.
     static let maxBlobSize = 25 * 1024 * 1024 // 25 MB
+
+    /// iCloud Drive container where synced libraries keep their originals. Reading
+    /// it requires the iCloud capability on the widget target; without it the
+    /// lookup returns nil and the widget falls back to the thumbnail.
+    static let ubiquityContainerID = "iCloud.com.tsubuzaki.IllustMate"
+    /// The widget reads the default library (Collection.db at the app-group root).
+    static let defaultLibraryID = "__default__"
 
     struct AlbumRecord {
         let id: String
@@ -119,20 +127,52 @@ struct PhotostandDatabase {
     /// falling back to the legacy blob. Skips items larger than `maxBlobSize`
     /// to stay within the widget's memory limit.
     private static func rawPicData(forID id: String, using database: Connection) -> Data? {
-        let query = picsTable.filter(picId == id).select(picData, picFilePath)
+        let query = picsTable.filter(picId == id)
+            .select(picData, picFilePath, picMediaType, picThumbnailData)
         guard let row = try? database.pluck(query) else { return nil }
+        // 1. Local externalized file (non-synced libraries).
         if let path = try? row.get(picFilePath),
            let containerURL = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID) {
-            let fileURL = containerURL.appendingPathComponent(path)
-            let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path)
-            if let size = (attributes?[.size] as? NSNumber)?.int64Value {
-                guard size <= Int64(maxBlobSize) else { return nil }
-                return try? Data(contentsOf: fileURL)
-            }
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupID),
+           let data = cappedData(at: containerURL.appendingPathComponent(path)) {
+            return data
         }
-        guard let blob = try? row.get(picData), blob.count <= maxBlobSize else { return nil }
-        return blob
+        // 2. iCloud Drive container (synced libraries; needs the iCloud capability).
+        if (try? row.get(picMediaType)) == 0, let data = ubiquityImageData(forID: id) {
+            return data
+        }
+        // 3. Legacy blob.
+        if let blob = try? row.get(picData), blob.count <= maxBlobSize {
+            return blob
+        }
+        // 4. Thumbnail fallback, so a synced original still shows (lower-res) even
+        //    when the full file isn't available to the widget.
+        return try? row.get(picThumbnailData)
+    }
+
+    /// Reads a file capped at `maxBlobSize`, or nil if it's missing or too large.
+    private static func cappedData(at fileURL: URL) -> Data? {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: fileURL.path)
+        guard let size = (attributes?[.size] as? NSNumber)?.int64Value,
+              size <= Int64(maxBlobSize) else { return nil }
+        return try? Data(contentsOf: fileURL)
+    }
+
+    /// Reads a synced original from the iCloud Drive container if it's materialized
+    /// and the widget has iCloud access; otherwise requests a download and returns nil.
+    private static func ubiquityImageData(forID id: String) -> Data? {
+        guard let container = FileManager.default
+            .url(forUbiquityContainerIdentifier: ubiquityContainerID) else { return nil }
+        let fileURL = container.appendingPathComponent("Originals", isDirectory: true)
+            .appendingPathComponent(defaultLibraryID, isDirectory: true)
+            .appendingPathComponent(id)
+        let status = try? fileURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
+            .ubiquitousItemDownloadingStatus
+        if status == .current {
+            return cappedData(at: fileURL)
+        }
+        try? FileManager.default.startDownloadingUbiquitousItem(at: fileURL)
+        return nil
     }
 
     static func fetchPicCount(inAlbumWithID albumID: String) -> Int {
