@@ -21,9 +21,13 @@ final class ImageMigrationManager {
     var latestThumbnail: Data?
 
     /// Runs the migration for the active library if needed. Keeps the screen
-    /// awake and blocks the UI for the duration.
+    /// awake and blocks the UI for the duration. Safe to call on every library
+    /// switch: it no-ops when already running or when nothing needs migrating.
     func runIfNeeded() async {
+        guard !isMigrating else { return }
         guard await DataActor.shared.needsImageMigration() else { return }
+        // Re-check after the await in case another caller started meanwhile.
+        guard !isMigrating else { return }
         phase = .copying
         completed = 0
         total = 0

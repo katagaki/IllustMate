@@ -84,6 +84,8 @@ extension DataActor {
         // Reclaim the freed pages back to the filesystem (indeterminate).
         await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
                                               total: 0, latestThumbnail: nil))
+        // Let the UI render the reclaiming spinner before VACUUM blocks the actor.
+        try? await Task.sleep(for: .seconds(1))
         vacuum()
     }
 

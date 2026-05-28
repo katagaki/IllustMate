@@ -38,6 +38,7 @@ struct ImageMigrationView: View {
                 if manager.total > 0 {
                     ProgressView(value: Float(manager.completed), total: progressTotal)
                         .progressViewStyle(.linear)
+                        .tint(.accent)
                     Text("\(manager.completed)/\(manager.total)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -45,17 +46,11 @@ struct ImageMigrationView: View {
                 } else {
                     ProgressView()
                         .progressViewStyle(.circular)
+                        .tint(.accent)
                 }
             }
             Spacer()
-            Label {
-                Text("Migration.Warning", tableName: "More")
-            } icon: {
-                Image(systemName: "exclamationmark.triangle.fill")
-            }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
+            warningBox
         }
         .padding(32.0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -67,6 +62,18 @@ struct ImageMigrationView: View {
                 try? await Task.sleep(for: .seconds(3))
             }
         }
+    }
+
+    private var warningBox: some View {
+        VStack(alignment: .leading, spacing: 8.0) {
+            Image(systemName: "exclamationmark.triangle.fill")
+            Text("Migration.Warning", tableName: "More")
+                .multilineTextAlignment(.leading)
+        }
+        .font(.body)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20.0)
+        .glassEffect(in: RoundedRectangle(cornerRadius: 24.0))
     }
 
     @ViewBuilder

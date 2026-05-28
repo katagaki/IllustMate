@@ -72,6 +72,10 @@ struct IllustMateApp: App {
             pipManager.setup()
         }
         .task {
+            // Determine the active library and surface the migration screen
+            // first, before slower startup work, so it appears right away.
+            await libraryManager.loadLibraries()
+            await imageMigration.runIfNeeded()
             do {
                 // TODO: Tips are broken in iOS 26 thanks to SwiftUI bug
                 //       Will include everything for now until Apple fixes it
@@ -83,9 +87,11 @@ struct IllustMateApp: App {
                 debugPrint(error.localizedDescription)
             }
             await migratePreferencesFromUserDefaults()
-            await libraryManager.loadLibraries()
             DatabaseMigrator.markMigrationComplete()
-            await imageMigration.runIfNeeded()
+        }
+        .onChange(of: libraryManager.currentLibrary.id) { _, _ in
+            // Run the migration for the newly-active library if it needs it.
+            Task { await imageMigration.runIfNeeded() }
         }
         .onOpenURL { url in
             if url.pathExtension == "pics" {
