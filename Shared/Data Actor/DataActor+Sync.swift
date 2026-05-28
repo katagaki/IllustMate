@@ -163,6 +163,34 @@ extension DataActor {
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
+    /// Image pics in an album whose original isn't cached locally yet.
+    func picIDsMissingLocalOriginal(inAlbum albumID: String) -> [String] {
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picAlbumId == albumID && picFilePath == nil)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    /// Image pics in an album that currently have a local original on disk.
+    func localImagePicIDs(inAlbum albumID: String) -> [String] {
+        let query = picsTable
+            .filter(picMediaType == MediaType.pic.rawValue && picAlbumId == albumID && picFilePath != nil)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    /// Drops the local copy of an original and clears its path so it re-downloads
+    /// on demand. The thumbnail and metadata are untouched, and no change is
+    /// marked dirty (this is a local cache eviction, not a data edit).
+    func evictLocalOriginal(picID: String) {
+        let query = picsTable.filter(picId == picID).select(picFilePath, picMediaType)
+        guard let row = try? database.pluck(query),
+              (try? row.get(picMediaType)) == MediaType.pic.rawValue,
+              let path = try? row.get(picFilePath), isImagePath(path) else { return }
+        deleteImageFile(atRelativePath: path)
+        _ = try? database.run(picsTable.filter(picId == picID).update(picFilePath <- nil))
+    }
+
     /// Stage-by-stage counts behind `picIDsNeedingOriginalUpload`, for diagnosing
     /// why it may be empty. A value of -1 means that query threw (e.g. a column
     /// that doesn't exist yet).

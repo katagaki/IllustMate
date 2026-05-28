@@ -131,6 +131,35 @@ actor OriginalsManager {
         }
     }
 
+    /// Downloads every not-yet-local original in an album (Keep Offline).
+    func keepAlbumOffline(albumID: String, in collectionID: String) async {
+        let ids = await DataActor.instance(for: collectionID).picIDsMissingLocalOriginal(inAlbum: albumID)
+        for id in ids {
+            _ = await fetchOriginal(picID: id, in: collectionID)
+        }
+    }
+
+    /// Frees the local copies of an album's originals (Remove Download), keeping
+    /// thumbnails. Only evicts an original once iCloud confirms it's uploaded, so
+    /// the full-resolution copy is never the last one standing.
+    func removeAlbumDownload(albumID: String, in collectionID: String) async {
+        let dataActor = DataActor.instance(for: collectionID)
+        let ids = await dataActor.localImagePicIDs(inAlbum: albumID)
+        for id in ids {
+            guard let cloudURL = originalURL(forPicID: id, in: collectionID), isUploaded(cloudURL) else {
+                continue
+            }
+            await dataActor.evictLocalOriginal(picID: id)
+            try? FileManager.default.evictUbiquitousItem(at: cloudURL)
+        }
+    }
+
+    /// True only once iCloud reports the item as fully uploaded.
+    private func isUploaded(_ url: URL) -> Bool {
+        (try? url.resourceValues(forKeys: [.ubiquitousItemIsUploadedKey]))?
+            .ubiquitousItemIsUploaded ?? false
+    }
+
     /// Fetches a pic's original from iCloud Drive (downloading it if needed),
     /// caches it locally, and returns the bytes. Nil if it isn't available.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {

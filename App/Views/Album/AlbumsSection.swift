@@ -97,6 +97,24 @@ struct AlbumsSection<Content: View>: View {
     func contextMenu(_ album: Album) -> some View {
         if enablesContextMenu {
             moveMenu(album)
+            Divider()
+            if OfflineAlbums.contains(album.id) {
+                Button("Shared.RemoveDownload", systemImage: "icloud.slash") {
+                    let collectionID = DataActor.shared.collectionID
+                    OfflineAlbums.remove(album.id)
+                    Task {
+                        await OriginalsManager.shared.removeAlbumDownload(albumID: album.id, in: collectionID)
+                    }
+                }
+            } else {
+                Button("Shared.KeepOffline", systemImage: "arrow.down.circle") {
+                    let collectionID = DataActor.shared.collectionID
+                    OfflineAlbums.add(album.id, in: collectionID)
+                    Task {
+                        await OriginalsManager.shared.keepAlbumOffline(albumID: album.id, in: collectionID)
+                    }
+                }
+            }
             if album.hasCoverPhoto {
                 Divider()
                 Button("Shared.ResetCover", systemImage: "photo") {

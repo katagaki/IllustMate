@@ -50,5 +50,12 @@ final class SyncManager {
                 await OriginalsManager.shared.downloadAllOriginals(in: id)
             }
         }
+        // Keep-Offline albums: pull their originals (also catches later additions).
+        let enabled = Set(enabledIDs)
+        for (albumID, collectionID) in OfflineAlbums.all() where enabled.contains(collectionID) {
+            Task.detached(priority: .utility) {
+                await OriginalsManager.shared.keepAlbumOffline(albumID: albumID, in: collectionID)
+            }
+        }
     }
 }
