@@ -37,4 +37,15 @@ enum OfflineAlbums {
         map[albumID] = nil
         defaults?.set(map, forKey: key)
     }
+
+    /// Flips an album's offline state and starts the matching download/eviction.
+    static func toggle(_ albumID: String, in collectionID: String) {
+        if contains(albumID) {
+            remove(albumID)
+            Task { await OriginalsManager.shared.removeAlbumDownload(albumID: albumID, in: collectionID) }
+        } else {
+            add(albumID, in: collectionID)
+            Task { await OriginalsManager.shared.keepAlbumOffline(albumID: albumID, in: collectionID) }
+        }
+    }
 }

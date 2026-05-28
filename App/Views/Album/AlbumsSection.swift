@@ -18,6 +18,8 @@ struct AlbumsSection<Content: View>: View {
     var enablesContextMenu: Bool = true
     var columnCount: Int = 3
     var hideSectionHeaders: Bool = false
+    var isKeptOffline: ((Album) -> Bool)?
+    var onToggleOffline: ((Album) -> Void)?
     var onRename: ((Album) -> Void)?
     var onDelete: ((Album) -> Void)?
     var onDrop: ((Drop, Album) -> Void)?
@@ -97,21 +99,15 @@ struct AlbumsSection<Content: View>: View {
     func contextMenu(_ album: Album) -> some View {
         if enablesContextMenu {
             moveMenu(album)
-            Divider()
-            if OfflineAlbums.contains(album.id) {
-                Button("Shared.RemoveDownload", systemImage: "icloud.slash") {
-                    let collectionID = DataActor.shared.collectionID
-                    OfflineAlbums.remove(album.id)
-                    Task {
-                        await OriginalsManager.shared.removeAlbumDownload(albumID: album.id, in: collectionID)
+            if let onToggleOffline {
+                Divider()
+                if isKeptOffline?(album) == true {
+                    Button("Shared.RemoveDownload", systemImage: "icloud.slash") {
+                        onToggleOffline(album)
                     }
-                }
-            } else {
-                Button("Shared.KeepOffline", systemImage: "arrow.down.circle") {
-                    let collectionID = DataActor.shared.collectionID
-                    OfflineAlbums.add(album.id, in: collectionID)
-                    Task {
-                        await OriginalsManager.shared.keepAlbumOffline(albumID: album.id, in: collectionID)
+                } else {
+                    Button("Shared.KeepOffline", systemImage: "arrow.down.circle") {
+                        onToggleOffline(album)
                     }
                 }
             }
