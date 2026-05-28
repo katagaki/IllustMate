@@ -48,8 +48,9 @@ extension SyncMate: CKSyncEngineDelegate {
                 }
             }
         }
+        let builtRecords = records
         return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: pending) { recordID in
-            records[recordID]
+            builtRecords[recordID]
         }
     }
 
