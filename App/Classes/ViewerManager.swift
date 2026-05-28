@@ -172,8 +172,12 @@ class ViewerManager {
     private func loadFullImage(for picID: String) {
         Task(priority: .userInitiated) {
             var loadedImage: UIImage?
-            if let data = await DataActor.shared.imageData(forPicWithID: picID),
-               let image = await UIImage(data: data)?.byPreparingForDisplay() {
+            // Local original first; otherwise fetch on demand from iCloud Drive.
+            var data = await DataActor.shared.imageData(forPicWithID: picID)
+            if data == nil {
+                data = await OriginalsManager.shared.fetchOriginal(picID: picID)
+            }
+            if let data, let image = await UIImage(data: data)?.byPreparingForDisplay() {
                 loadedImage = image
             }
             self.imageCache[picID] = loadedImage

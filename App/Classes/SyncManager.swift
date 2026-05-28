@@ -4,10 +4,6 @@
 //
 //  Created by Claude on 2026/05/28.
 //
-//  Thin lifecycle owner: starts/stops SyncMate based on the user's iCloud Sync
-//  setting and kicks an upload + fetch for the active library at the right
-//  moments (launch, foreground, library switch, toggle).
-//
 
 import Foundation
 

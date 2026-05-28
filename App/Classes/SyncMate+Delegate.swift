@@ -4,9 +4,6 @@
 //
 //  Created by Claude on 2026/05/28.
 //
-//  CKSyncEngineDelegate: builds CKRecords for upload, applies fetched changes
-//  to the matching library's DataActor, and resolves conflicts last-writer-wins.
-//
 
 @preconcurrency import CloudKit
 import Foundation
@@ -200,6 +197,9 @@ extension SyncMate: CKSyncEngineDelegate {
                 await dataActor.markAlbumSynced(id: record.recordID.recordName, systemFields: systemFields)
             } else {
                 await dataActor.markPicSynced(id: record.recordID.recordName, systemFields: systemFields)
+                if (record["mediaType"] as? Int ?? 0) == MediaType.pic.rawValue {
+                    await OriginalsManager.shared.uploadOriginal(picID: record.recordID.recordName)
+                }
             }
         }
         for recordID in changes.deletedRecordIDs {

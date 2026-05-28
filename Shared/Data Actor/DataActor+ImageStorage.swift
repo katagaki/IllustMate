@@ -59,4 +59,23 @@ extension DataActor {
     nonisolated func isImagePath(_ path: String) -> Bool {
         path.hasPrefix("\(Self.imagesDirectoryName)/")
     }
+
+    /// Local file URL of an image pic's original, or nil if it isn't present
+    /// locally (e.g. a synced pic whose original lives only in iCloud Drive).
+    func localOriginalURL(forPicWithID id: String) -> URL? {
+        let query = picsTable.filter(picId == id).select(picFilePath, picMediaType)
+        guard let row = try? database.pluck(query),
+              (try? row.get(picMediaType)) == MediaType.pic.rawValue,
+              let path = try? row.get(picFilePath) else { return nil }
+        let url = imageFileURL(forRelativePath: path)
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
+    /// Writes an original fetched from iCloud Drive into the local Images cache
+    /// and points the pic at it. Does not mark the pic dirty (sync-driven).
+    func importDownloadedOriginal(picID: String, data: Data) {
+        guard let relativePath = saveImageFile(data, id: picID) else { return }
+        _ = try? database.run(picsTable.filter(picId == picID)
+            .update(picFilePath <- relativePath, picData <- nil))
+    }
 }

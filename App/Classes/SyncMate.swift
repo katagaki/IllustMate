@@ -4,11 +4,6 @@
 //
 //  Created by Claude on 2026/05/28.
 //
-//  Owns a single CKSyncEngine for the private CloudKit database and syncs
-//  album/pic *metadata* (no originals yet — those are fetched on demand in a
-//  later step). One CloudKit zone per library; downloads are routed to the
-//  matching library's DataActor.
-//
 
 @preconcurrency import CloudKit
 import Foundation
