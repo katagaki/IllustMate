@@ -133,12 +133,20 @@ actor OriginalsManager {
         }
     }
 
-    /// Downloads every not-yet-local original in an album (Keep Offline).
+    /// Downloads every not-yet-local original in an album (Keep Offline),
+    /// publishing progress so the album cover can show a donut.
     func keepAlbumOffline(albumID: String, in collectionID: String) async {
         let ids = await DataActor.instance(for: collectionID).picIDsMissingLocalOriginal(inAlbum: albumID)
+        guard !ids.isEmpty else { return }
+        await MainActor.run { OfflineDownloadProgress.shared.begin(albumID) }
+        var done = 0
         for id in ids {
             _ = await fetchOriginal(picID: id, in: collectionID)
+            done += 1
+            let fraction = Double(done) / Double(ids.count)
+            await MainActor.run { OfflineDownloadProgress.shared.update(albumID, fraction: fraction) }
         }
+        await MainActor.run { OfflineDownloadProgress.shared.finish(albumID) }
     }
 
     /// Frees the local copies of an album's originals (Remove Download), keeping

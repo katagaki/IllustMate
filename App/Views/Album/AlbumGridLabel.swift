@@ -17,6 +17,21 @@ struct AlbumGridLabel: View {
         VStack(alignment: .center, spacing: length == nil ? 2.0 : 6.0) {
             AlbumCover.AsyncAlbumCover(album: album, length: length)
             .matchedGeometryEffect(id: "\(album.id).Image", in: namespace)
+            .overlay {
+                if let progress = OfflineDownloadProgress.shared.fraction(for: album.id) {
+                    ZStack {
+                        Circle()
+                            .fill(.thinMaterial)
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(.tint, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                            .padding(7)
+                    }
+                    .frame(width: 40, height: 40)
+                    .animation(.smooth, value: progress)
+                }
+            }
             Text(album.name)
                 .matchedGeometryEffect(id: "\(album.id).Title", in: namespace)
                 .font(.caption2.weight(.semibold))
