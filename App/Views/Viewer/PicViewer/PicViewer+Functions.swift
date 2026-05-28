@@ -99,6 +99,22 @@ extension PicViewer {
                         .clipShape(.rect(cornerRadius: 8.0))
                 }
             }
+            .overlay(alignment: .bottomTrailing) {
+                // Downloading-from-iCloud indicator, anchored to the image corner
+                if viewer.isDownloadingDisplayedOriginal {
+                    HStack(spacing: 6.0) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Image(systemName: "icloud.and.arrow.down")
+                            .font(.caption)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.bar, in: .capsule)
+                    .padding(8)
+                    .transition(.opacity)
+                }
+            }
 
             // Image size overlay (bottom-left of image)
             if showImageSize, let displayedImage = viewer.displayedImage {
@@ -112,22 +128,6 @@ extension PicViewer {
                 .padding(.vertical, 6)
                 .background(.bar, in: .capsule)
                 .padding(8)
-                .transition(.opacity)
-            }
-
-            // Downloading-from-iCloud indicator (bottom-right of image)
-            if viewer.isDownloadingDisplayedOriginal {
-                HStack(spacing: 6.0) {
-                    ProgressView()
-                        .controlSize(.small)
-                    Image(systemName: "icloud.and.arrow.down")
-                        .font(.caption)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(.bar, in: .capsule)
-                .padding(8)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                 .transition(.opacity)
             }
         }
