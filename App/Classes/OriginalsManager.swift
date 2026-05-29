@@ -341,6 +341,17 @@ actor OriginalsManager {
         return await waitForDownload(url) ? url : nil
     }
 
+    /// Best-effort byte size of a pic's original in iCloud Drive (even when not
+    /// downloaded), used to estimate backup size for the free-space check. nil
+    /// when the size can't be determined.
+    func originalSize(picID: String, in collectionID: String) async -> Int64? {
+        guard let url = cloudURL(forPicID: picID, in: collectionID) else { return nil }
+        let values = try? url.resourceValues(forKeys: [.fileSizeKey, .totalFileSizeKey])
+        if let total = values?.totalFileSize { return Int64(total) }
+        if let size = values?.fileSize { return Int64(size) }
+        return nil
+    }
+
     // MARK: - Delete
 
     /// Permanently removes a pic's original (image or video) from the iCloud
