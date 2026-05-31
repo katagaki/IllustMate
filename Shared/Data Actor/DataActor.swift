@@ -168,18 +168,12 @@ actor DataActor {
         ((try? database.scalar("PRAGMA auto_vacuum")) as? Int64) ?? 0
     }
 
-    /// Ensures the database is in incremental auto_vacuum mode so that free
-    /// pages can later be released with a cheap `PRAGMA incremental_vacuum`
-    /// that needs no scratch space. Switching the mode on an already-populated
-    /// database is a no-op until a full `VACUUM` runs, so this performs that
-    /// one-time conversion — but only when there is enough free space for the
-    /// rebuild. Returns whether the database ends up in incremental mode.
+    /// Switches an existing database to incremental auto_vacuum. The mode change
+    /// only applies after a full VACUUM, so this runs one when space allows.
     @discardableResult
     func ensureIncrementalAutoVacuum() -> Bool {
         if autoVacuumMode() == 2 { return true }
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
-        // The mode change only takes effect after a full VACUUM, which needs
-        // scratch space roughly equal to the current file size.
         guard freeBytesAtDatabaseLocation() > databaseFileSizeBytes() else { return false }
         do {
             try database.vacuum()
@@ -189,15 +183,10 @@ actor DataActor {
         return autoVacuumMode() == 2
     }
 
-    /// Reclaims free pages back to the filesystem and reports whether space was
-    /// actually reclaimed. Prefers incremental vacuum (no scratch space
-    /// required) when the database is in incremental auto_vacuum mode, falling
-    /// back to a full `VACUUM` otherwise. Unlike a bare `VACUUM`, failures are
-    /// surfaced rather than silently swallowed.
+    /// Releases free pages to the filesystem, preferring incremental vacuum and
+    /// falling back to a full VACUUM. Returns whether reclamation succeeded.
     @discardableResult
     func reclaimDiskSpace() -> Bool {
-        // Try to put the database into incremental mode so this and future
-        // reclamations are cheap and don't depend on having 2x free space.
         if ensureIncrementalAutoVacuum() {
             do {
                 try database.execute("PRAGMA incremental_vacuum;")
@@ -207,8 +196,6 @@ actor DataActor {
                 return false
             }
         }
-        // Not in incremental mode (e.g. too little free space to convert):
-        // attempt a full VACUUM, which reclaims everything when it succeeds.
         do {
             try database.vacuum()
             return true

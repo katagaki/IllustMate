@@ -60,10 +60,7 @@ extension DataActor {
 
         let batchSize = chosenBatchSize(total: total)
         let singleBatch = batchSize >= total
-        // Put the database into incremental auto_vacuum mode up front so that
-        // freed pages can be released cheaply after each batch without needing
-        // scratch space for a full rebuild. New databases are already
-        // incremental; existing ones are converted here when there is room.
+        // Enable incremental auto_vacuum so per-batch reclaim is cheap.
         ensureIncrementalAutoVacuum()
         var copied = 0
         var verified = 0
@@ -158,9 +155,7 @@ extension DataActor {
     }
 
     private func reclaimSpaceIncrementally() {
-        // `PRAGMA incremental_vacuum` only releases pages when the database is
-        // actually in incremental auto_vacuum mode; in any other mode it is a
-        // silent no-op, so skip it rather than pretending space was reclaimed.
+        // Only effective in incremental mode; a no-op otherwise.
         guard autoVacuumMode() == 2 else { return }
         do {
             try database.execute("PRAGMA incremental_vacuum;")
