@@ -1,10 +1,3 @@
-//
-//  LibraryManagerSheet.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/17.
-//
-
 import SwiftUI
 
 struct LibraryManagerSheet: View {
@@ -48,6 +41,9 @@ struct LibraryManagerSheet: View {
                 }
         }
         .phonePresentationDetents([.medium, .large])
+        .onChange(of: libraryManager.currentLibrary.id) { _, _ in
+            dismiss()
+        }
     }
 
     private var libraryList: some View {
@@ -65,7 +61,15 @@ struct LibraryManagerSheet: View {
         } label: {
             HStack {
                 VStack(alignment: .leading, spacing: 2.0) {
-                    Text(libraryManager.displayName(for: library))
+                    HStack(spacing: 4.0) {
+                        Text(libraryManager.displayName(for: library))
+                        if library.syncEnabled {
+                            Image(systemName: "icloud")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .accessibilityLabel(Text("Sync.Title", tableName: "More"))
+                        }
+                    }
                     if library.isDefault {
                         Text("Libraries.Default.Description", tableName: "Libraries")
                             .font(.caption)

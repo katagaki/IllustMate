@@ -1,10 +1,3 @@
-//
-//  WebServerView.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/16.
-//
-
 import SwiftUI
 
 struct WebServerView: View {

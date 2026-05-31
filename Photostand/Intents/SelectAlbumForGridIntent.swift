@@ -1,10 +1,3 @@
-//
-//  SelectAlbumForGridIntent.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import AppIntents
 
 struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
@@ -13,6 +6,9 @@ struct SelectAlbumForGridIntent: WidgetConfigurationIntent {
         LocalizedStringResource("PhotoGrid.Intent.Description", table: "Widgets")
     )
 
+    @Parameter(title: LocalizedStringResource("PhotoGrid.Intent.Library", table: "Widgets"))
+    var library: LibraryEntity?
+
     @Parameter(title: LocalizedStringResource("PhotoGrid.Intent.Album", table: "Widgets"))
-    var album: AlbumEntity?
+    var album: GridAlbumEntity?
 }

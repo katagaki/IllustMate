@@ -1,10 +1,3 @@
-//
-//  ViewerManager.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/13.
-//
-
 import AVFoundation
 import Foundation
 import StoreKit
@@ -20,6 +13,9 @@ class ViewerManager {
     var displayedThumbnail: UIImage?
     var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
+    var downloadingOriginalPicID: String?
+    var downloadProgress: Double?
+    var failedDownloadPicID: String?
     var displayedVideoURL: URL?
     var videoPlayer: AVPlayer?
 
@@ -29,8 +25,17 @@ class ViewerManager {
     var hasNext: Bool { currentIndex < allPics.count - 1 }
     var hasPrevious: Bool { currentIndex > 0 }
 
+    var isDownloadingDisplayedOriginal: Bool {
+        downloadingOriginalPicID != nil && downloadingOriginalPicID == displayedPicID
+    }
+
+    var didDisplayedOriginalDownloadFail: Bool {
+        failedDownloadPicID != nil && failedDownloadPicID == displayedPicID
+    }
+
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
     @ObservationIgnored private var prefetchTasks: [String: Task<Void, Never>] = [:]
+    @ObservationIgnored private let downloadMonitor = CloudDownloadMonitor()
 
     /// Maximum number of full-resolution images to keep cached around the current index.
     private let cacheWindow = 5
@@ -41,6 +46,10 @@ class ViewerManager {
         displayedThumbnail = nil
         displayedImage = nil
         isFullImageLoaded = false
+        downloadingOriginalPicID = nil
+        downloadProgress = nil
+        failedDownloadPicID = nil
+        downloadMonitor.stop()
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
@@ -54,19 +63,15 @@ class ViewerManager {
     }
 
     func removePics(withIDs deletedIDs: Set<String>) {
-        // If the currently displayed pic was deleted, clear the display
         if deletedIDs.contains(displayedPicID) {
             clearDisplay()
             return
         }
-        // Otherwise, remove deleted pics from the navigation list
         allPics.removeAll { deletedIDs.contains($0.id) }
-        // Recompute currentIndex for the displayed pic
         if let displayedPic,
            let newIndex = allPics.firstIndex(where: { $0.id == displayedPic.id }) {
             currentIndex = newIndex
         }
-        // Evict deleted entries from caches
         for id in deletedIDs {
             imageCache.removeValue(forKey: id)
             prefetchTasks.removeValue(forKey: id)?.cancel()
@@ -74,7 +79,6 @@ class ViewerManager {
     }
 
     func setDisplay(_ pic: Pic, completion: @escaping @MainActor @Sendable () -> Void) {
-        // Track pic opens for review prompt
         Self.incrementPicOpenCount()
 
         // Show thumbnail immediately to open viewer without delay
@@ -86,19 +90,12 @@ class ViewerManager {
         displayedPicID = pic.id
         isFullImageLoaded = false
 
-        // Clean up previous video state
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
 
         if pic.isVideo {
-            // Load video URL
-            Task {
-                if let url = await DataActor.shared.videoURL(forPicWithID: pic.id) {
-                    self.displayedVideoURL = url
-                    self.videoPlayer = AVPlayer(url: url)
-                }
-            }
+            loadVideo(for: pic)
             isFullImageLoaded = true
         } else if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
@@ -110,7 +107,6 @@ class ViewerManager {
         // Navigate immediately — viewer opens with thumbnail
         completion()
 
-        // Load full image in background if not cached (images only)
         if !pic.isVideo && !isFullImageLoaded {
             loadFullImage(for: pic.id)
         }
@@ -135,18 +131,12 @@ class ViewerManager {
         displayedPicID = pic.id
         isFullImageLoaded = false
 
-        // Clean up previous video state
         videoPlayer?.pause()
         videoPlayer = nil
         displayedVideoURL = nil
 
         if pic.isVideo {
-            Task {
-                if let url = await DataActor.shared.videoURL(forPicWithID: pic.id) {
-                    self.displayedVideoURL = url
-                    self.videoPlayer = AVPlayer(url: url)
-                }
-            }
+            loadVideo(for: pic)
             isFullImageLoaded = true
         } else if let cachedImage = imageCache[pic.id] {
             displayedImage = cachedImage
@@ -169,27 +159,96 @@ class ViewerManager {
         }
     }
 
+    private func loadVideo(for pic: Pic) {
+        let picID = pic.id
+        Task {
+            if let localURL = await DataActor.shared.videoURL(forPicWithID: picID) {
+                guard self.displayedPicID == picID else { return }
+                self.displayedVideoURL = localURL
+                self.videoPlayer = AVPlayer(url: localURL)
+                return
+            }
+
+            if self.displayedPicID == picID {
+                withAnimation(.smooth.speed(2.0)) {
+                    self.downloadingOriginalPicID = picID
+                    self.failedDownloadPicID = nil
+                }
+                self.downloadProgress = nil
+                if let fileName = await OriginalsManager.shared.cloudOriginalFilename(
+                    picID: picID, in: DataActor.shared.collectionID
+                ) {
+                    self.downloadMonitor.start(fileName: fileName) { [weak self] fraction in
+                        guard let self, self.downloadingOriginalPicID == picID else { return }
+                        self.downloadProgress = fraction
+                    }
+                }
+            }
+
+            let url = await OriginalsManager.shared.materializedVideoURL(
+                picID: picID, in: DataActor.shared.collectionID
+            )
+
+            if self.downloadingOriginalPicID == picID {
+                self.downloadMonitor.stop()
+                withAnimation(.smooth.speed(2.0)) {
+                    self.downloadingOriginalPicID = nil
+                    self.downloadProgress = nil
+                    if url == nil {
+                        self.failedDownloadPicID = picID
+                    }
+                }
+            }
+
+            guard self.displayedPicID == picID, let url else { return }
+            self.displayedVideoURL = url
+            self.videoPlayer = AVPlayer(url: url)
+        }
+    }
+
     private func loadFullImage(for picID: String) {
         Task(priority: .userInitiated) {
             var loadedImage: UIImage?
-            if let data = await DataActor.shared.imageData(forPicWithID: picID),
-               let image = await UIImage(data: data)?.byPreparingForDisplay() {
+            var data = await DataActor.shared.imageData(forPicWithID: picID)
+            if data == nil {
+                if self.displayedPicID == picID {
+                    withAnimation(.smooth.speed(2.0)) {
+                        self.downloadingOriginalPicID = picID
+                        self.failedDownloadPicID = nil
+                    }
+                    self.downloadProgress = nil
+                    self.downloadMonitor.start(fileName: picID) { [weak self] fraction in
+                        guard let self, self.downloadingOriginalPicID == picID else { return }
+                        self.downloadProgress = fraction
+                    }
+                }
+                data = await OriginalsManager.shared.fetchOriginal(picID: picID,
+                                                                   in: DataActor.shared.collectionID)
+                if self.downloadingOriginalPicID == picID {
+                    self.downloadMonitor.stop()
+                    withAnimation(.smooth.speed(2.0)) {
+                        self.downloadingOriginalPicID = nil
+                        self.downloadProgress = nil
+                        if data == nil {
+                            self.failedDownloadPicID = picID
+                        }
+                    }
+                }
+            }
+            if let data, let image = await UIImage(data: data)?.byPreparingForDisplay() {
                 loadedImage = image
             }
             self.imageCache[picID] = loadedImage
             if self.displayedPicID == picID {
                 self.displayedImage = loadedImage
                 self.isFullImageLoaded = true
-                // Prefetch adjacent images after current one loads
                 prefetchAdjacentImages()
-                // Evict images far from the current position
                 evictDistantCacheEntries()
             }
         }
     }
 
     private func prefetchAdjacentImages() {
-        // Cancel any prefetch tasks for pics that are no longer adjacent
         cancelStalePrefetchTasks()
 
         let indicesToPrefetch = [currentIndex - 1, currentIndex + 1]

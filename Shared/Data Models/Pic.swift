@@ -1,10 +1,3 @@
-//
-//  Pic.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import AVFoundation
 import CoreTransferable
 import Foundation

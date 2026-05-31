@@ -1,10 +1,3 @@
-//
-//  SelectAlbumIntent.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import AppIntents
 
 struct SelectAlbumIntent: WidgetConfigurationIntent {
@@ -12,6 +5,9 @@ struct SelectAlbumIntent: WidgetConfigurationIntent {
     static var description = IntentDescription(
         LocalizedStringResource("Photostand.Intent.Description", table: "Widgets")
     )
+
+    @Parameter(title: LocalizedStringResource("Photostand.Intent.Library", table: "Widgets"))
+    var library: LibraryEntity?
 
     @Parameter(title: LocalizedStringResource("Photostand.Intent.Album", table: "Widgets"))
     var album: AlbumEntity?

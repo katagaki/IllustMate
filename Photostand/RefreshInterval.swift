@@ -1,10 +1,3 @@
-//
-//  RefreshInterval.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import AppIntents
 
 enum RefreshInterval: String, CaseIterable, AppEnum {

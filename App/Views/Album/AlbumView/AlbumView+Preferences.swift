@@ -1,10 +1,3 @@
-//
-//  AlbumView+Preferences.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 extension AlbumView {
 
     var preferencesAlbumID: String {

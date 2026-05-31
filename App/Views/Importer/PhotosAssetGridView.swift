@@ -1,10 +1,3 @@
-//
-//  PhotosAssetGridView.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/22.
-//
-
 import AVFoundation
 import Photos
 import SwiftUI
@@ -57,7 +50,6 @@ struct PhotosAssetGridView: View {
                     }
                 }
 
-                // Bottom bar
                 VStack(alignment: .center, spacing: 16.0) {
                     Text("Import.SelectedPhotos.\(selectedAssets.count)", tableName: "Import")
                         .font(.subheadline)

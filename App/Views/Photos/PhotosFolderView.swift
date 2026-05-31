@@ -1,10 +1,3 @@
-//
-//  PhotosFolderView.swift
-//  PicMate
-//
-//  Created on 2026/02/26.
-//
-
 import Photos
 import SwiftUI
 
@@ -33,7 +26,6 @@ struct PhotosFolderView: View {
         return searchResults ?? []
     }
 
-    // Album management state
     @State var albumToRename: PHAssetCollection?
     @State var renameText: String = ""
     @State var albumToDelete: PHAssetCollection?

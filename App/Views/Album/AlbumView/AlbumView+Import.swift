@@ -1,10 +1,3 @@
-//
-//  AlbumView+Import.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/15.
-//
-
 import AVFoundation
 import Photos
 import PhotosUI
@@ -19,21 +12,13 @@ extension AlbumView {
         importCurrentCount = 0
         UIApplication.shared.isIdleTimerDisabled = true
         Task {
+            let canUseMetadata = await requestPhotosMetadataAccess()
             for item in items {
                 if let data = try? await item.loadTransferable(type: Data.self) {
-                    var creationDate: Date?
-                    var filename: String?
-                    if let identifier = item.itemIdentifier {
-                        let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
-                        if let asset = result.firstObject {
-                            creationDate = asset.creationDate
-                            let resources = PHAssetResource.assetResources(for: asset)
-                            filename = resources.first?.originalFilename
-                        }
-                    }
-                    await DataActor.shared.createPic(filename ?? Pic.newFilename(), data: data,
+                    let metadata = canUseMetadata ? assetMetadata(for: item) : nil
+                    await DataActor.shared.createPic(metadata?.filename ?? Pic.newFilename(), data: data,
                                                      inAlbumWithID: currentAlbum?.id,
-                                                     dateAdded: creationDate)
+                                                     dateAdded: metadata?.creationDate)
                 }
                 await MainActor.run {
                     importCurrentCount += 1
@@ -60,26 +45,13 @@ extension AlbumView {
         importCurrentCount = 0
         UIApplication.shared.isIdleTimerDisabled = true
         Task {
+            let canUseMetadata = await requestPhotosMetadataAccess()
             for item in items {
-                var creationDate: Date?
-                var filename: String?
-                var videoDuration: TimeInterval = 0
-
-                if let identifier = item.itemIdentifier {
-                    let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
-                    if let asset = result.firstObject {
-                        creationDate = asset.creationDate
-                        let resources = PHAssetResource.assetResources(for: asset)
-                        filename = resources.first?.originalFilename
-                        videoDuration = asset.duration
-                    }
-                }
-
+                let metadata = canUseMetadata ? assetMetadata(for: item) : nil
                 await importVideoFromPicker(
                     item,
-                    filename: filename ?? Pic.newVideoFilename(),
-                    duration: videoDuration,
-                    creationDate: creationDate
+                    filename: metadata?.filename ?? Pic.newVideoFilename(),
+                    creationDate: metadata?.creationDate
                 )
                 await MainActor.run {
                     importCurrentCount += 1
@@ -103,40 +75,20 @@ extension AlbumView {
     private func importVideoFromPicker(
         _ item: PhotosPickerItem,
         filename: String,
-        duration: TimeInterval,
         creationDate: Date?
     ) async {
-        guard let identifier = item.itemIdentifier else { return }
-        let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
-        guard let asset = result.firstObject else { return }
-
-        let videoOptions = PHVideoRequestOptions()
-        videoOptions.isNetworkAccessAllowed = true
-        videoOptions.deliveryMode = .highQualityFormat
-
-        let exportSession: AVAssetExportSession? = await withCheckedContinuation { continuation in
-            PHImageManager.default().requestExportSession(
-                forVideo: asset,
-                options: videoOptions,
-                exportPreset: AVAssetExportPresetPassthrough
-            ) { session, _ in
-                nonisolated(unsafe) let result = session
-                continuation.resume(returning: result)
-            }
-        }
-
-        guard let exportSession else { return }
-
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-            .appendingPathExtension("mov")
+        guard let picked = try? await item.loadTransferable(type: PickedVideoFile.self) else { return }
+        let tempURL = picked.url
         defer { try? FileManager.default.removeItem(at: tempURL) }
 
-        guard (try? await exportSession.export(to: tempURL, as: .mov)) != nil,
-              let videoData = try? Data(contentsOf: tempURL) else { return }
+        let asset = AVURLAsset(url: tempURL)
+        let duration = (try? await asset.load(.duration))?.seconds ?? 0
+        guard let videoData = try? Data(contentsOf: tempURL) else { return }
 
-        let fileExtension = (filename as NSString).pathExtension.isEmpty
-            ? "mov" : (filename as NSString).pathExtension.lowercased()
+        let nameExtension = (filename as NSString).pathExtension.lowercased()
+        let fileExtension = nameExtension.isEmpty
+            ? (tempURL.pathExtension.isEmpty ? "mov" : tempURL.pathExtension.lowercased())
+            : nameExtension
 
         await DataActor.shared.createVideo(
             filename,
@@ -146,6 +98,27 @@ extension AlbumView {
             inAlbumWithID: currentAlbum?.id,
             dateAdded: creationDate
         )
+    }
+
+    /// Requests read/write Photos access up front so the system prompt appears at a deliberate moment
+    /// (when an import starts) rather than unexpectedly mid-import. Returns whether asset metadata may
+    /// be read; if not, callers fall back to generated filenames.
+    private func requestPhotosMetadataAccess() async -> Bool {
+        var status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        if status == .notDetermined {
+            status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+        }
+        return status == .authorized || status == .limited
+    }
+
+    /// Reads the original filename and creation date for a picked item from the Photos library.
+    /// Only call when access has been granted, as it touches `PHAsset` directly.
+    private func assetMetadata(for item: PhotosPickerItem) -> (filename: String?, creationDate: Date?)? {
+        guard let identifier = item.itemIdentifier else { return nil }
+        let result = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
+        guard let asset = result.firstObject else { return nil }
+        let filename = PHAssetResource.assetResources(for: asset).first?.originalFilename
+        return (filename, asset.creationDate)
     }
 
     func importLoadedFiles(_ files: [(filename: String, data: Data)]) {
@@ -239,6 +212,23 @@ extension AlbumView {
                     isImportCompleted = true
                 }
             }
+        }
+    }
+}
+
+/// Loads a picked video out-of-process into a temporary file, so video import works without
+/// requiring Photos library authorization.
+private struct PickedVideoFile: Transferable {
+    let url: URL
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(importedContentType: .movie) { received in
+            let copyURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)
+                .appendingPathExtension(received.file.pathExtension.isEmpty ? "mov" : received.file.pathExtension)
+            try? FileManager.default.removeItem(at: copyURL)
+            try FileManager.default.copyItem(at: received.file, to: copyURL)
+            return Self(url: copyURL)
         }
     }
 }

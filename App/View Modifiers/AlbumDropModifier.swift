@@ -1,10 +1,3 @@
-//
-//  AlbumDropModifier.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/17.
-//
-
 import SwiftUI
 
 struct AlbumDropModifier: ViewModifier {

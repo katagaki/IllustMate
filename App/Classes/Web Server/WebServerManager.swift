@@ -1,10 +1,3 @@
-//
-//  WebServerManager.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/16.
-//
-
 import Foundation
 import Network
 import UIKit
@@ -126,16 +119,13 @@ class WebServerManager {
             var buffer = accumulated
             buffer.append(data)
 
-            // Check if we have complete headers
             let headerTerminator = Data("\r\n\r\n".utf8)
             guard let headerEndRange = buffer.range(of: headerTerminator) else {
                 if buffer.count > 1_048_576 {
-                    // Headers too large, reject
                     let response = HTTPResponse.badRequest("Headers too large")
                     self.sendResponse(response, on: connection)
                     return
                 }
-                // Headers not complete yet, keep receiving
                 self.receiveHTTPData(on: connection, accumulated: buffer)
                 return
             }
@@ -149,11 +139,9 @@ class WebServerManager {
             let bodyStartIndex = headerEndRange.upperBound
             let currentBody = buffer[bodyStartIndex...]
 
-            // Parse Content-Length
             let contentLength = parseContentLength(from: headerString)
 
             if currentBody.count < contentLength {
-                // Need more body data
                 self.receiveHTTPBody(
                     on: connection,
                     headerString: headerString,
@@ -161,7 +149,6 @@ class WebServerManager {
                     expectedLength: contentLength
                 )
             } else {
-                // Complete request
                 let body = Data(currentBody.prefix(contentLength))
                 let request = Self.buildHTTPRequest(headerString: headerString, body: body)
                 self.dispatchRequest(request, on: connection)

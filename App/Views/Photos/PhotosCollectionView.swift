@@ -1,10 +1,3 @@
-//
-//  PhotosCollectionView.swift
-//  PicMate
-//
-//  Created on 2026/02/26.
-//
-
 import Photos
 import SwiftUI
 
@@ -30,7 +23,6 @@ struct PhotosCollectionView: View {
         return searchResults ?? []
     }
 
-    // Album management state
     @State var isAddingAlbum: Bool = false
     @State var newAlbumName: String = ""
     @State var albumToRename: PHAssetCollection?

@@ -1,10 +1,3 @@
-//
-//  AsyncAlbumCover.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import SwiftUI
 
 extension AlbumCover {
@@ -14,6 +7,7 @@ extension AlbumCover {
 
         var album: Album
         var length: CGFloat?
+        var isDownloading: Bool = false
 
         @State private var primaryImage: Image?
         @State private var secondaryImage: Image?
@@ -27,7 +21,8 @@ extension AlbumCover {
                        albumCount: album.albumCount(),
                        primaryImage: primaryImage,
                        secondaryImage: secondaryImage,
-                       tertiaryImage: tertiaryImage)
+                       tertiaryImage: tertiaryImage,
+                       isDownloading: isDownloading)
             .onChange(of: AlbumCoverCache.shared.version) {
                 if AlbumCoverCache.shared.images(forAlbumID: album.id) == nil {
                     guard isLoaded else { return }

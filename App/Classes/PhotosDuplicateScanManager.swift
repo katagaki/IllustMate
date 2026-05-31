@@ -1,10 +1,3 @@
-//
-//  PhotosDuplicateScanManager.swift
-//  PicMate
-//
-//  Created on 2026/03/15.
-//
-
 import Foundation
 import Photos
 import SwiftUI
@@ -18,16 +11,13 @@ struct PhotosDuplicateGroup: Identifiable {
 @MainActor @Observable
 class PhotosDuplicateScanManager {
 
-    // Scan state
     var isScanning: Bool = false
     var scanProgress: Int = 0
     var scanTotal: Int = 0
     var scanPhase: ScanPhase = .idle
 
-    // Results
     var duplicateGroups: [PhotosDuplicateGroup] = []
 
-    // Configuration
     var hammingThreshold: Int = 8
 
     enum ScanPhase {
@@ -46,7 +36,6 @@ class PhotosDuplicateScanManager {
         scanProgress = 0
         duplicateGroups = []
 
-        // Fetch all image assets in this album
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
@@ -58,13 +47,11 @@ class PhotosDuplicateScanManager {
             assets.append(asset)
         }
 
-        // Check which assets already have cached hashes (keyed by localIdentifier)
         let cachedIDs = await HashActor.shared.picIDsWithCachedHash()
         let uncachedAssets = assets.filter { !cachedIDs.contains($0.localIdentifier) }
 
         scanTotal = uncachedAssets.count
 
-        // Phase 1: Compute hashes for uncached assets
         for asset in uncachedAssets {
             if let image = await loadImage(for: asset),
                let hash = DHash.compute(from: image) {
@@ -73,7 +60,6 @@ class PhotosDuplicateScanManager {
             scanProgress += 1
         }
 
-        // Phase 2: Compare hashes
         withAnimation(.smooth.speed(2.0)) {
             scanPhase = .comparingHashes
         }
@@ -84,7 +70,6 @@ class PhotosDuplicateScanManager {
 
         let groups = findDuplicateGroups(hashes: scopedHashes, threshold: hammingThreshold)
 
-        // Build asset lookup
         let assetsByID = Dictionary(uniqueKeysWithValues: assets.map { ($0.localIdentifier, $0) })
 
         var resultGroups: [PhotosDuplicateGroup] = []

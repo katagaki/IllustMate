@@ -1,10 +1,3 @@
-//
-//  DataActor.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/17.
-//
-
 import Foundation
 @preconcurrency import SQLite
 import SwiftUI
@@ -14,26 +7,40 @@ actor DataActor {
     nonisolated(unsafe) private static var _shared = DataActor(collectionID: PicLibrary.defaultID)
     static var shared: DataActor { _shared }
 
+    nonisolated(unsafe) private static var instances: [String: DataActor] = [:]
+    private static let instancesLock = NSLock()
+
     static func switchLibrary(to collectionID: String) {
+        instancesLock.lock()
+        instances[collectionID] = nil
+        instancesLock.unlock()
         _shared = DataActor(collectionID: collectionID)
     }
 
+    static func instance(for collectionID: String) -> DataActor {
+        if _shared.collectionID == collectionID { return _shared }
+        instancesLock.lock()
+        defer { instancesLock.unlock() }
+        if let existing = instances[collectionID] { return existing }
+        let actor = DataActor(collectionID: collectionID)
+        instances[collectionID] = actor
+        return actor
+    }
+
+    nonisolated let collectionID: String
     let database: Connection
     let databaseURL: URL
 
-    // Tables
     let albumsTable = Table("albums")
     let picsTable = Table("pics")
     let preferencesTable = Table("album_preferences")
 
-    // Album columns
     let albumId = Expression<String>("id")
     let albumName = Expression<String>("name")
     let albumCoverPhoto = Expression<Data?>("cover_photo")
     let albumParentId = Expression<String?>("parent_album_id")
     let albumDateCreated = Expression<Double>("date_created")
 
-    // Pic columns
     let picId = Expression<String>("id")
     let picName = Expression<String>("name")
     let picAlbumId = Expression<String?>("containing_album_id")
@@ -44,7 +51,6 @@ actor DataActor {
     let picDuration = Expression<Double?>("duration")
     let picFilePath = Expression<String?>("file_path")
 
-    // Preferences columns
     let prefAlbumId = Expression<String>("album_id")
     let prefAlbumSort = Expression<String>("album_sort")
     let prefAlbumViewStyle = Expression<String>("album_view_style")
@@ -53,8 +59,24 @@ actor DataActor {
     let prefPicColumnCount = Expression<Int>("pic_column_count")
     let prefHideSectionHeaders = Expression<Bool>("hide_section_headers")
 
+    let syncDirty = Expression<Bool>("dirty")
+    let syncLastModified = Expression<Double>("last_modified")
+    let syncCKSystemFields = Expression<Data?>("ck_system_fields")
+    let syncOriginalSynced = Expression<Bool>("original_synced")
+
+    let tombstonesTable = Table("tombstones")
+    let tombstoneId = Expression<String>("id")
+    let tombstoneRecordType = Expression<String>("record_type")
+    let tombstoneDeletedAt = Expression<Double>("deleted_at")
+
+    let migrationsTable = Table("migrations")
+    let migrationName = Expression<String>("migration_name")
+    let migrationAppVersion = Expression<String>("app_version")
+    let migrationCompleted = Expression<Bool>("completed")
+
     // swiftlint:disable:next function_body_length
     init(collectionID: String) {
+        self.collectionID = collectionID
         let databaseFileName = "Collection.db"
         let fileManager = FileManager.default
 
@@ -79,6 +101,7 @@ actor DataActor {
             fatalError("Could not open SQLite database: \(error)")
         }
         self.database = database
+        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
             try database.run(albumsTable.create(ifNotExists: true) { table in
                 table.column(albumId, primaryKey: true)
@@ -87,6 +110,7 @@ actor DataActor {
                 table.column(albumParentId)
                 table.column(albumDateCreated)
             })
+
             try database.run(picsTable.create(ifNotExists: true) { table in
                 table.column(picId, primaryKey: true)
                 table.column(picName)
@@ -103,6 +127,7 @@ actor DataActor {
                     albumsTable: albumsTable, picsTable: picsTable,
                     preferencesTable: preferencesTable)
             }
+
             try database.run(preferencesTable.create(ifNotExists: true) { table in
                 table.column(prefAlbumId, primaryKey: true)
                 table.column(prefAlbumSort, defaultValue: "nameAscending")
@@ -112,6 +137,25 @@ actor DataActor {
                 table.column(prefPicColumnCount, defaultValue: 4)
                 table.column(prefHideSectionHeaders, defaultValue: false)
             })
+
+            for table in [albumsTable, picsTable] {
+                _ = try? database.run(table.addColumn(syncDirty, defaultValue: true))
+                _ = try? database.run(table.addColumn(syncLastModified, defaultValue: 0))
+                _ = try? database.run(table.addColumn(syncCKSystemFields))
+            }
+            _ = try? database.run(picsTable.addColumn(syncOriginalSynced, defaultValue: false))
+            try database.run(tombstonesTable.create(ifNotExists: true) { table in
+                table.column(tombstoneId, primaryKey: true)
+                table.column(tombstoneRecordType)
+                table.column(tombstoneDeletedAt, defaultValue: 0)
+            })
+
+            try database.run(migrationsTable.create(ifNotExists: true) { table in
+                table.column(migrationName, primaryKey: true)
+                table.column(migrationAppVersion, defaultValue: "")
+                table.column(migrationCompleted, defaultValue: false)
+            })
+
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
         } catch {
@@ -140,14 +184,12 @@ actor DataActor {
         return album
     }
 
-    /// Fetches the cover photo data for a single album by ID.
     func albumCoverData(forAlbumWithID albumID: String) -> Data? {
         let query = albumsTable.filter(albumId == albumID).select(albumCoverPhoto)
         guard let row = try? database.pluck(query) else { return nil }
         return try? row.get(albumCoverPhoto)
     }
 
-    /// Fetches cover photo data for multiple albums in a single actor call.
     func batchAlbumCoverData(forAlbumIDs albumIDs: [String]) -> [String: Data] {
         guard !albumIDs.isEmpty else { return [:] }
         var result: [String: Data] = [:]

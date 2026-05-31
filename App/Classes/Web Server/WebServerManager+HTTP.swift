@@ -1,10 +1,3 @@
-//
-//  WebServerManager+HTTP.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/16.
-//
-
 import Foundation
 
 // MARK: - HTTP Models
@@ -104,7 +97,6 @@ struct HTTPResponse: Sendable {
                 body: data
             )
         } else {
-            // No range requested — send entire file
             let data = fileHandle.readDataToEndOfFile()
             return HTTPResponse(
                 statusCode: 200,
@@ -184,7 +176,6 @@ enum HTTPRequestParser {
         let method = parts.count > 0 ? String(parts[0]) : "GET"
         let rawPath = parts.count > 1 ? String(parts[1]) : "/"
 
-        // Parse path and query parameters
         var path = rawPath
         var queryParameters: [String: String] = [:]
         if let questionIndex = rawPath.firstIndex(of: "?") {
@@ -200,10 +191,8 @@ enum HTTPRequestParser {
             }
         }
 
-        // URL-decode the path
         path = path.removingPercentEncoding ?? path
 
-        // Parse headers
         var headers: [String: String] = [:]
         for line in lines.dropFirst() {
             guard let colonIndex = line.firstIndex(of: ":") else { continue }
@@ -245,7 +234,6 @@ enum HTTPRequestParser {
         var files: [MultipartFile] = []
         var searchStart = body.startIndex
 
-        // Find all boundary positions
         var parts: [Range<Data.Index>] = []
         while let range = body.range(of: boundaryData, in: searchStart..<body.endIndex) {
             parts.append(range)
@@ -276,7 +264,6 @@ enum HTTPRequestParser {
             // Check for closing boundary marker (--)
             if contentData.starts(with: Data("--".utf8)) { continue }
 
-            // Split headers and body
             guard let headerBodySplit = contentData.range(of: crlfCrlf) else { continue }
             let headersData = contentData[contentData.startIndex..<headerBodySplit.lowerBound]
             var fileBody = Data(contentData[headerBodySplit.upperBound...])
@@ -288,7 +275,6 @@ enum HTTPRequestParser {
 
             guard let headersString = String(data: headersData, encoding: .utf8) else { continue }
 
-            // Parse part headers
             var filename = ""
             var partContentType = "application/octet-stream"
 

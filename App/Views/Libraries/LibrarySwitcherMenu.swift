@@ -1,10 +1,3 @@
-//
-//  LibrarySwitcherMenu.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/17.
-//
-
 import SwiftUI
 import TipKit
 

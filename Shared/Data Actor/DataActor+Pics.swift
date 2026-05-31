@@ -1,21 +1,12 @@
-//
-//  DataActor+Pics.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/22.
-//
-
 import Foundation
 @preconcurrency import SQLite
 
 extension DataActor {
-    /// Common columns selected for pic listing queries.
     private var picListColumns: [Expressible] {
         [picId, picName, picAlbumId, picDateAdded, picThumbnailData,
          picMediaType, picDuration, picFilePath]
     }
 
-    /// Common columns selected for skeleton queries (no thumbnail).
     private var picSkeletonColumns: [Expressible] {
         [picId, picName, picAlbumId, picDateAdded, picMediaType, picDuration, picFilePath]
     }
@@ -100,6 +91,25 @@ extension DataActor {
     }
 
     func imageData(forPicWithID id: String) -> Data? {
+        let metaQuery = picsTable
+            .filter(picId == id)
+            .select(picFilePath, picMediaType)
+        if let row = try? database.pluck(metaQuery) {
+            let mediaType = (try? row.get(picMediaType)) ?? 0
+            if mediaType == MediaType.pic.rawValue,
+               let path = try? row.get(picFilePath),
+               let data = try? Data(contentsOf: imageFileURL(forRelativePath: path)),
+               !data.isEmpty {
+                return data
+            }
+        }
+        let blobQuery = picsTable
+            .filter(picId == id)
+            .select(picData)
+        return try? database.pluck(blobQuery).flatMap { try? $0.get(picData) }
+    }
+
+    func rawBlobData(forPicWithID id: String) -> Data? {
         let query = picsTable
             .filter(picId == id)
             .select(picData)
@@ -110,15 +120,20 @@ extension DataActor {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         let thumbnailData = Pic.makeThumbnail(data)
+        let relativePath = saveImageFile(data, id: id)
         _ = try? database.run(picsTable.insert(
             picId <- id,
             picName <- name,
             picAlbumId <- albumID,
             picDateAdded <- now.timeIntervalSince1970,
-            picData <- data,
+            picData <- relativePath == nil ? data : nil,
             picThumbnailData <- thumbnailData,
-            picMediaType <- MediaType.pic.rawValue
+            picMediaType <- MediaType.pic.rawValue,
+            picFilePath <- relativePath,
+            syncDirty <- true,
+            syncLastModified <- now.timeIntervalSince1970
         ))
+        notifyLocalMutation()
     }
 
     func createVideo(
@@ -145,25 +160,37 @@ extension DataActor {
             picThumbnailData <- thumbnailData,
             picMediaType <- MediaType.video.rawValue,
             picDuration <- duration,
-            picFilePath <- relativePath
+            picFilePath <- relativePath,
+            syncDirty <- true,
+            syncLastModified <- now.timeIntervalSince1970
         ))
+        notifyLocalMutation()
     }
 
     func addPics(withIDs picIDs: [String], toAlbumWithID albumID: String) {
         guard !picIDs.isEmpty else { return }
         let query = picsTable.filter(picIDs.contains(picId))
-        _ = try? database.run(query.update(picAlbumId <- albumID))
+        _ = try? database.run(query.update(
+            picAlbumId <- albumID, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func addPic(withID picID: String, toAlbumWithID albumID: String) {
         let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picAlbumId <- albumID))
+        _ = try? database.run(query.update(
+            picAlbumId <- albumID, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func removeParentAlbum(forPicsWithIDs picIDs: [String]) {
         guard !picIDs.isEmpty else { return }
         let query = picsTable.filter(picIDs.contains(picId))
-        _ = try? database.run(query.update(picAlbumId <- nil))
+        _ = try? database.run(query.update(
+            picAlbumId <- nil, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func setAsAlbumCover(for picID: String) {
@@ -172,7 +199,10 @@ extension DataActor {
            let albumID = containingAlbumID(forPicWithID: picID) {
             let coverData = Album.makeCover(data)
             let query = albumsTable.filter(albumId == albumID)
-            _ = try? database.run(query.update(albumCoverPhoto <- coverData))
+            _ = try? database.run(query.update(
+                albumCoverPhoto <- coverData, syncDirty <- true, syncLastModified <- syncTimestamp
+            ))
+            notifyLocalMutation()
         }
     }
 
@@ -185,12 +215,18 @@ extension DataActor {
 
     func renamePic(withID picID: String, to newName: String) {
         let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picName <- newName))
+        _ = try? database.run(query.update(
+            picName <- newName, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func updateThumbnail(forPicWithID picID: String, thumbnailData: Data?) {
         let query = picsTable.filter(picId == picID)
-        _ = try? database.run(query.update(picThumbnailData <- thumbnailData))
+        _ = try? database.run(query.update(
+            picThumbnailData <- thumbnailData, syncDirty <- true, syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     private func containingAlbumID(forPicWithID picID: String) -> String? {
@@ -201,37 +237,49 @@ extension DataActor {
     }
 
     func deletePic(withID picID: String) {
-        // Delete video file from disk if present
         let selectQuery = picsTable.filter(picId == picID).select(picFilePath)
         if let row = try? database.pluck(selectQuery),
            let path = try? row.get(picFilePath) {
-            deleteVideoFile(atRelativePath: path)
+            deleteMediaFile(atRelativePath: path)
+        }
+        if picWasSynced(id: picID) {
+            recordTombstone(id: picID, recordType: SyncRecordType.pic)
         }
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.delete())
+        notifyLocalMutation()
     }
 
     func deletePics(withIDs picIDs: [String]) {
         guard !picIDs.isEmpty else { return }
-        // Delete video files from disk if present
         let selectQuery = picsTable.filter(picIDs.contains(picId)).select(picFilePath)
         if let rows = try? database.prepare(selectQuery) {
             for row in rows {
                 if let path = try? row.get(picFilePath) {
-                    deleteVideoFile(atRelativePath: path)
+                    deleteMediaFile(atRelativePath: path)
                 }
             }
         }
+        recordTombstones(ids: syncedPicIDs(among: picIDs), recordType: SyncRecordType.pic)
         let query = picsTable.filter(picIDs.contains(picId))
         _ = try? database.run(query.delete())
+        notifyLocalMutation()
     }
 
-    /// Returns the file URL for a video pic, or nil if not a video.
+    private func deleteMediaFile(atRelativePath path: String) {
+        if isImagePath(path) {
+            deleteImageFile(atRelativePath: path)
+        } else {
+            deleteVideoFile(atRelativePath: path)
+        }
+    }
+
     func videoURL(forPicWithID picID: String) -> URL? {
         let query = picsTable.filter(picId == picID).select(picFilePath)
         guard let row = try? database.pluck(query),
-              let path = try? row.get(picFilePath) else { return nil }
-        return videoFileURL(forRelativePath: path)
+              let path = (try? row.get(picFilePath)) ?? nil else { return nil }
+        let url = videoFileURL(forRelativePath: path)
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
     }
 
     // MARK: - Thumbnails
@@ -243,9 +291,8 @@ extension DataActor {
     // MARK: - Delete All
 
     func deleteAll() {
-        // Remove all video files
-        let videosDir = videosDirectoryURL()
-        try? FileManager.default.removeItem(at: videosDir)
+        try? FileManager.default.removeItem(at: imagesDirectoryURL())
+        try? FileManager.default.removeItem(at: videosDirectoryURL())
         _ = try? database.run(picsTable.delete())
         _ = try? database.run(albumsTable.delete())
     }

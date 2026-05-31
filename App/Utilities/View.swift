@@ -1,10 +1,3 @@
-//
-//  View.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/28.
-//
-
 import SwiftUI
 
 extension View {

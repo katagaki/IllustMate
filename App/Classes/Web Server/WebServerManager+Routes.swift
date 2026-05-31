@@ -1,10 +1,3 @@
-//
-//  WebServerManager+Routes.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/16.
-//
-
 import Foundation
 import UIKit
 
@@ -165,7 +158,6 @@ extension WebServerManager {
         if let coverData = album.coverPhoto {
             return .ok(imageData: coverData, contentType: "image/jpeg")
         }
-        // Fall back to the latest pic's thumbnail
         if let thumbnail = await DataActor.shared.representativeThumbnail(forAlbumWithID: id, at: 0) {
             return .ok(imageData: thumbnail, contentType: "image/jpeg")
         }
@@ -190,9 +182,13 @@ extension WebServerManager {
     // MARK: - Video Routes
 
     private func handleGetPicVideo(id: String, rangeHeader: String?) async -> HTTPResponse {
-        guard let fileURL = await DataActor.shared.videoURL(forPicWithID: id) else {
-            return .notFound()
+        var fileURL = await DataActor.shared.videoURL(forPicWithID: id)
+        if fileURL == nil {
+            fileURL = await OriginalsManager.shared.materializedVideoURL(
+                picID: id, in: DataActor.shared.collectionID
+            )
         }
+        guard let fileURL else { return .notFound() }
         let ext = fileURL.pathExtension
         let contentType = HTTPRequestParser.detectVideoContentType(forExtension: ext)
         return .videoResponse(fileURL: fileURL, contentType: contentType, rangeHeader: rangeHeader)

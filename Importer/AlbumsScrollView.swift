@@ -1,10 +1,3 @@
-//
-//  AlbumsScrollView.swift
-//  Importer
-//
-//  Created by シン・ジャスティン on 2023/10/15.
-//
-
 import SwiftUI
 
 struct AlbumsScrollView: View {

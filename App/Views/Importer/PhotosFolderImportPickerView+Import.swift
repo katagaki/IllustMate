@@ -1,10 +1,3 @@
-//
-//  PhotosFolderImportPickerView+Import.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import Photos
 import SwiftUI
 
@@ -52,14 +45,12 @@ extension PhotosFolderImportPickerView {
             }
         }
 
-        // Import albums as child albums
         for album in albums {
             let albumName = album.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import")
             let childAlbum = await DataActor.shared.createAlbum(albumName, parentAlbumID: parentAlbumID)
             await importPhotosFromAlbum(album, intoAlbumID: childAlbum.id)
         }
 
-        // Recurse into subfolders
         for subfolder in subfolders {
             let subfolderName = subfolder.localizedTitle ?? String(localized: "Import.Albums.Untitled", table: "Import")
             let childAlbum = await DataActor.shared.createAlbum(subfolderName, parentAlbumID: parentAlbumID)

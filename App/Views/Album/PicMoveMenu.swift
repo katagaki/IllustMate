@@ -1,10 +1,3 @@
-//
-//  PicMoveMenu.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/09.
-//
-
 import SwiftUI
 
 struct PicMoveMenu: View {

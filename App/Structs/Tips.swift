@@ -1,10 +1,3 @@
-//
-//  Tips.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/18.
-//
-
 import TipKit
 
 struct ImportTip: Tip {

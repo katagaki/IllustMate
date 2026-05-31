@@ -1,10 +1,3 @@
-//
-//  AlbumsSection.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/08.
-//
-
 import SwiftUI
 
 struct AlbumsSection<Content: View>: View {
@@ -18,6 +11,8 @@ struct AlbumsSection<Content: View>: View {
     var enablesContextMenu: Bool = true
     var columnCount: Int = 3
     var hideSectionHeaders: Bool = false
+    var isKeptOffline: ((Album) -> Bool)?
+    var onToggleOffline: ((Album) -> Void)?
     var onRename: ((Album) -> Void)?
     var onDelete: ((Album) -> Void)?
     var onDrop: ((Drop, Album) -> Void)?
@@ -97,6 +92,18 @@ struct AlbumsSection<Content: View>: View {
     func contextMenu(_ album: Album) -> some View {
         if enablesContextMenu {
             moveMenu(album)
+            if let onToggleOffline {
+                Divider()
+                if isKeptOffline?(album) == true {
+                    Button("Shared.RemoveDownload", systemImage: "icloud.slash") {
+                        onToggleOffline(album)
+                    }
+                } else {
+                    Button("Shared.KeepOffline", systemImage: "arrow.down.circle") {
+                        onToggleOffline(album)
+                    }
+                }
+            }
             if album.hasCoverPhoto {
                 Divider()
                 Button("Shared.ResetCover", systemImage: "photo") {

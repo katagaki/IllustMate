@@ -1,10 +1,3 @@
-//
-//  PColorActor.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/14.
-//
-
 import Foundation
 @preconcurrency import SQLite
 
@@ -19,10 +12,8 @@ actor PColorActor {
 
     let database: Connection
 
-    // Table
     let picColorsTable = Table("pic_colors")
 
-    // Columns
     let colorPicId = Expression<String>("pic_id")
     let colorRed = Expression<Int>("red")
     let colorGreen = Expression<Int>("green")

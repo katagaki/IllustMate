@@ -1,10 +1,3 @@
-//
-//  AlbumsView.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/18.
-//
-
 import SwiftUI
 
 struct AlbumsView: View {
@@ -26,7 +19,11 @@ struct AlbumsView: View {
         ZStack {
             NavigationStack(path: $navigation.albumsTabPath) {
                 ScrollView(.vertical) {
-                    AlbumsSection(albums: albums, style: $style) { _ in
+                    AlbumsSection(albums: albums, style: $style,
+                                  isKeptOffline: { OfflineAlbums.contains($0.id) },
+                                  onToggleOffline: {
+                                      OfflineAlbums.toggle($0.id, in: DataActor.shared.collectionID)
+                                  }) { _ in
                         // TODO: Move menu support in macOS Albums view
                     }
                 }

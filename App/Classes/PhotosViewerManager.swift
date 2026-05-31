@@ -1,10 +1,3 @@
-//
-//  PhotosViewerManager.swift
-//  PicMate
-//
-//  Created on 2026/03/08.
-//
-
 import Foundation
 import Photos
 import SwiftUI
@@ -20,7 +13,6 @@ class PhotosViewerManager {
     var hasPrevious: Bool { currentIndex > 0 }
 
     func setDisplay(_ asset: PHAsset, in assets: [PHAsset]) {
-        // Track pic opens for review prompt
         ViewerManager.incrementPicOpenCount()
 
         allAssets = assets

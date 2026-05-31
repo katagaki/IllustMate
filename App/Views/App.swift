@@ -1,11 +1,5 @@
-//
-//  PicMateApp.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import BackgroundTasks
+import Combine
 import StoreKit
 import SwiftUI
 import TipKit
@@ -26,9 +20,16 @@ struct IllustMateApp: App {
     @State var auth = AuthenticationManager()
     @State var pipManager = PictureInPictureManager()
     @State var webServer = WebServerManager()
+    @State var imageMigration = ImageMigrationManager()
     @State var isImportingBackup: Bool = false
     @State var importedURL: URL?
     @State var showLockCover: Bool = false
+
+    #if DEBUG
+    @State var isSeedingData: Bool = false
+    @State var seedCurrent: Int = 0
+    @State var seedTotal: Int = 0
+    #endif
 
     @AppStorage("AppLockEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
@@ -61,10 +62,17 @@ struct IllustMateApp: App {
                 .frame(width: 1, height: 1)
                 .opacity(0.001)
         }
+        .overlay(alignment: .top) {
+            #if DEBUG
+            SyncDebugOverlay()
+            #endif
+        }
         .onAppear {
             pipManager.setup()
         }
         .task {
+            await libraryManager.loadLibraries()
+            await imageMigration.runPendingMigrations()
             do {
                 // TODO: Tips are broken in iOS 26 thanks to SwiftUI bug
                 //       Will include everything for now until Apple fixes it
@@ -76,8 +84,27 @@ struct IllustMateApp: App {
                 debugPrint(error.localizedDescription)
             }
             await migratePreferencesFromUserDefaults()
-            await libraryManager.loadLibraries()
             DatabaseMigrator.markMigrationComplete()
+            await SyncManager.shared.refresh()
+        }
+        .onChange(of: libraryManager.currentLibrary.id) { _, newID in
+            Task {
+                await imageMigration.runIfNeeded(for: newID)
+                await SyncManager.shared.refresh()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyRemoteChanges)) { _ in
+            navigation.signalDataChanged()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .dataActorDidMutateLocally)) { note in
+            if let collectionID = note.object as? String {
+                Task { @MainActor in
+                    SyncManager.shared.schedulePush(forLibrary: collectionID)
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyLibraryChanges)) { _ in
+            Task { await libraryManager.reloadList() }
         }
         .onOpenURL { url in
             if url.pathExtension == "pics" {
@@ -92,6 +119,11 @@ struct IllustMateApp: App {
                     }
                 }
             }
+            #if DEBUG
+            if url.scheme == "picmate", url.host == "entrophyrocks" {
+                handleSampleDataURL(url)
+            }
+            #endif
         }
         .onChange(of: importedURL) { _, newValue in
             if newValue != nil {
@@ -108,7 +140,51 @@ struct IllustMateApp: App {
                 ProgressView()
             }
         }
+        #if DEBUG
+        .sheet(isPresented: $isSeedingData) {
+            StatusView(type: .inProgress,
+                       title: .custom("Generating sample data…"),
+                       currentCount: seedCurrent,
+                       totalCount: seedTotal)
+                .phonePresentationDetents([.medium])
+                .interactiveDismissDisabled()
+        }
+        #endif
+        .fullScreenCover(isPresented: Binding(
+            get: { imageMigration.isMigrating },
+            set: { _ in }
+        )) {
+            ImageMigrationView(manager: imageMigration)
+        }
     }
+
+    #if DEBUG
+    func handleSampleDataURL(_ url: URL) {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        func count(_ name: String) -> Int? {
+            components?.queryItems?.first { $0.name == name }?.value.flatMap { Int($0) }
+        }
+        let picCount = count("pics") ?? Int.random(in: 11000...15000)
+        let albumCount = count("albums") ?? Int.random(in: 20...60)
+        let legacyBlobs = (count("legacy") ?? 0) != 0
+        Task { @MainActor in
+            seedCurrent = 0
+            seedTotal = picCount
+            isSeedingData = true
+            UIApplication.shared.isIdleTimerDisabled = true
+            await SampleDataGenerator.generate(
+                picCount: picCount, albumCount: albumCount,
+                into: DataActor.shared, legacyBlobs: legacyBlobs
+            ) { completed, total in
+                seedCurrent = completed
+                seedTotal = total
+            }
+            UIApplication.shared.isIdleTimerDisabled = false
+            isSeedingData = false
+            navigation.signalDataDeleted()
+        }
+    }
+    #endif
 
     func migratePreferencesFromUserDefaults() async {
         let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
@@ -188,6 +264,7 @@ struct IllustMateApp: App {
                     webServer.stop()
                 }
                 if newValue == .active {
+                    Task { await SyncManager.shared.refresh() }
                     let currentVersion = Bundle.main.object(
                         forInfoDictionaryKey: "CFBundleShortVersionString"
                     ) as? String ?? ""

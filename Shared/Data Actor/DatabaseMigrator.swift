@@ -1,10 +1,3 @@
-//
-//  DatabaseMigrator.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/04/02.
-//
-
 import Foundation
 @preconcurrency import SQLite
 
@@ -12,8 +5,18 @@ struct DatabaseMigrator {
 
     private static let appGroupID = "group.com.tsubuzaki.IllustMate"
     private static let migratedVersionKey = "DatabaseMigratedVersion"
+    private static let libraryV2CompletedKey = "LibraryV2MigrationsCompleted"
 
-    /// Returns true if a migration is needed (app version changed or first launch).
+    static func needsLibraryV2Migration() -> Bool {
+        let defaults = UserDefaults(suiteName: appGroupID)
+        return !(defaults?.bool(forKey: libraryV2CompletedKey) ?? false)
+    }
+
+    static func markLibraryV2MigrationComplete() {
+        let defaults = UserDefaults(suiteName: appGroupID)
+        defaults?.set(true, forKey: libraryV2CompletedKey)
+    }
+
     static func migrationNeeded() -> Bool {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
         let defaults = UserDefaults(suiteName: appGroupID)
@@ -21,7 +24,6 @@ struct DatabaseMigrator {
         return migratedVersion != currentVersion
     }
 
-    /// Records the current app version as migrated.
     static func markMigrationComplete() {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
         let defaults = UserDefaults(suiteName: appGroupID)
@@ -34,7 +36,6 @@ struct DatabaseMigrator {
                                           albumsTable: Table,
                                           picsTable: Table,
                                           preferencesTable: Table) {
-        // Albums columns
         let albumCoverPhoto = Expression<Data?>("cover_photo")
         let albumParentId = Expression<String?>("parent_album_id")
         let albumDateCreated = Expression<Double>("date_created")
@@ -42,7 +43,6 @@ struct DatabaseMigrator {
         _ = try? database.run(albumsTable.addColumn(albumParentId))
         _ = try? database.run(albumsTable.addColumn(albumDateCreated, defaultValue: 0))
 
-        // Pics columns
         let picName = Expression<String>("name")
         let picAlbumId = Expression<String?>("containing_album_id")
         let picDateAdded = Expression<Double>("date_added")
@@ -60,7 +60,6 @@ struct DatabaseMigrator {
         _ = try? database.run(picsTable.addColumn(picDuration))
         _ = try? database.run(picsTable.addColumn(picFilePath))
 
-        // Preferences columns
         let prefAlbumSort = Expression<String>("album_sort")
         let prefAlbumViewStyle = Expression<String>("album_view_style")
         let prefAlbumColumnCount = Expression<Int>("album_column_count")

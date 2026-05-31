@@ -1,10 +1,3 @@
-//
-//  PHAssetWrapper.swift
-//  PicMate
-//
-//  Created on 2026/02/28.
-//
-
 import Foundation
 import Photos
 

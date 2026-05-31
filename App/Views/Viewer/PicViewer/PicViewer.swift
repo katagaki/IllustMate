@@ -1,10 +1,3 @@
-//
-//  PicViewer.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/06.
-//
-
 import AVKit
 import SwiftUI
 
@@ -23,6 +16,7 @@ struct PicViewer: View {
     @State var magnificationAnchor: UnitPoint = .center
     @State var containingAlbumName: String?
     @State var showImageSize: Bool = true
+    @State var showDownloadFailedPopover: Bool = false
     @State var isRenamePicPresented: Bool = false
     @State var renamePicText: String = ""
     @State var displayedPicName: String = ""
@@ -53,7 +47,6 @@ struct PicViewer: View {
                     context.addFilter(.blur(radius: 40))
                     context.addFilter(.brightness(colorScheme == .dark ? -0.5 : 0.1))
                     let image = Image(uiImage: backgroundImage)
-                    // Scale to fill the canvas
                     let imageSize = backgroundImage.size
                     let scaleX = size.width / imageSize.width
                     let scaleY = size.height / imageSize.height
@@ -114,7 +107,6 @@ struct PicViewer: View {
                 }
             }
             if isLandscape {
-                // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if viewer.displayedPic?.isVideo == true {
                         if let videoURL = viewer.displayedVideoURL {
@@ -150,7 +142,6 @@ struct PicViewer: View {
                     }
                 }
             } else {
-                // Portrait: show actions in bottom bar
                 if viewer.displayedPic?.isVideo == true {
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {

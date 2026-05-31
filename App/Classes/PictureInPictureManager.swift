@@ -1,10 +1,3 @@
-//
-//  PictureInPictureManager.swift
-//  PicMate
-//
-//  Created on 2026/03/10.
-//
-
 import AVFoundation
 import AVKit
 import CoreMedia
@@ -153,7 +146,6 @@ class PictureInPictureManager: NSObject {
 
     // MARK: - Video Creation
 
-    /// Writes a single-frame video (~1 s) from the given image to a temporary file.
     private nonisolated static func createVideo(from image: UIImage) -> URL? {
         guard let cgImage = image.cgImage else { return nil }
 

@@ -1,10 +1,3 @@
-//
-//  AlbumView.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import Photos
 import PhotosUI
 import SwiftUI
@@ -231,7 +224,6 @@ struct AlbumView: View {
 
     var mainContent: some View {
         ZStack {
-            // Album cover background image (if set)
             if let backgroundImage {
                 Canvas { context, size in
                     let image = context.resolve(Image(uiImage: backgroundImage))

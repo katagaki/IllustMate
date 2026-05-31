@@ -1,10 +1,3 @@
-//
-//  PhotosAssetViewer.swift
-//  PicMate
-//
-//  Created on 2026/02/28.
-//
-
 import AVKit
 import Photos
 import SwiftUI
@@ -92,7 +85,6 @@ struct PhotosAssetViewer: View {
                 }
             }
             if isLandscape {
-                // Landscape: show actions in top trailing bar
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if currentAsset.mediaType == .video {
                         if let videoExportURL {
@@ -128,7 +120,6 @@ struct PhotosAssetViewer: View {
                     }
                 }
             } else {
-                // Portrait: show actions in bottom bar
                 if currentAsset.mediaType == .video {
                     ToolbarSpacer(.flexible, placement: .bottomBar)
                     ToolbarItemGroup(placement: .bottomBar) {

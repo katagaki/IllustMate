@@ -1,10 +1,3 @@
-//
-//  DuplicateResultsView.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/09.
-//
-
 import SwiftUI
 
 struct DuplicateResultsView: View {
@@ -75,6 +68,12 @@ struct DuplicateResultsView: View {
                         for picID in idsToDelete {
                             await dataActor.deletePic(withID: picID)
                             await HashActor.shared.deleteHash(forPicWithID: picID)
+                        }
+                        let collectionID = dataActor.collectionID
+                        Task.detached {
+                            await OriginalsManager.shared.deleteCloudOriginals(
+                                picIDs: Array(idsToDelete), in: collectionID
+                            )
                         }
                         await MainActor.run {
                             withAnimation(.smooth.speed(2.0)) {
@@ -154,6 +153,13 @@ struct DuplicateGroupSection: View {
                     for picID in selectedForDeletion {
                         await dataActor.deletePic(withID: picID)
                         await HashActor.shared.deleteHash(forPicWithID: picID)
+                    }
+                    let collectionID = dataActor.collectionID
+                    let idsForCleanup = Array(selectedForDeletion)
+                    Task.detached {
+                        await OriginalsManager.shared.deleteCloudOriginals(
+                            picIDs: idsForCleanup, in: collectionID
+                        )
                     }
                     await MainActor.run {
                         withAnimation(.smooth.speed(2.0)) {

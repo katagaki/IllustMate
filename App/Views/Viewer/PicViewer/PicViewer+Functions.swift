@@ -1,10 +1,3 @@
-//
-//  PicViewer+Functions.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import AVKit
 import SwiftUI
 
@@ -13,7 +6,6 @@ extension PicViewer {
     @ViewBuilder
     var mainContent: some View {
         if isLandscape {
-            // Landscape: vertical carousel on the left, image fills remaining space
             HStack(spacing: 0.0) {
                 if viewer.allPics.count > 1 {
                     PicCarouselStripVertical()
@@ -24,7 +16,6 @@ extension PicViewer {
             .padding(8.0)
             .padding(.leading, 40.0)
         } else {
-            // Portrait: image on top, horizontal carousel at bottom
             VStack(alignment: .center, spacing: 0.0) {
                 imageContent
 
@@ -43,6 +34,63 @@ extension PicViewer {
             videoContent
         } else {
             photoContent
+        }
+    }
+
+    /// Bottom-trailing indicator shared by photo and video content: a progress ring or spinner while
+    /// the original is downloading from iCloud, or a tappable error badge if the download failed.
+    @ViewBuilder
+    var downloadStatusOverlay: some View {
+        if viewer.didDisplayedOriginalDownloadFail {
+            Button {
+                showDownloadFailedPopover = true
+            } label: {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.white, .orange)
+                    .frame(width: 20.0, height: 20.0)
+                    .shadow(color: .black.opacity(0.4), radius: 2.0)
+                    .padding(8.0)
+            }
+            .buttonStyle(.plain)
+            .transition(.opacity)
+            .popover(isPresented: $showDownloadFailedPopover) {
+                VStack(alignment: .leading, spacing: 8.0) {
+                    Label("Shared.OriginalUnavailable.Title", systemImage: "exclamationmark.circle")
+                        .font(.headline)
+                    Text("Shared.OriginalUnavailable.Description")
+                        .font(.subheadline)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(width: 260.0, alignment: .leading)
+                .padding()
+                .presentationCompactAdaptation(.popover)
+            }
+        } else if viewer.isDownloadingDisplayedOriginal {
+            Group {
+                if let progress = viewer.downloadProgress {
+                    ZStack {
+                        Circle()
+                            .stroke(.white.opacity(0.35), lineWidth: 2.5)
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                    }
+                    .animation(.smooth, value: progress)
+                } else {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(.white)
+                }
+            }
+            .frame(width: 20.0, height: 20.0)
+            .shadow(color: .black.opacity(0.4), radius: 2.0)
+            .padding(8.0)
+            .transition(.opacity)
         }
     }
 
@@ -67,6 +115,9 @@ extension PicViewer {
                 }
             }
             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+            .overlay(alignment: .bottomTrailing) {
+                downloadStatusOverlay
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, isLandscape ? 4 : 20)
@@ -80,27 +131,26 @@ extension PicViewer {
     }
 
     var photoContent: some View {
-        // Image with size overlay - fills available space
         ZStack(alignment: .bottomLeading) {
             ZStack {
-                // Show thumbnail as placeholder
                 if let thumbnail = viewer.displayedThumbnail {
                     Image(uiImage: thumbnail)
                         .resizable()
                         .scaledToFit()
                         .clipShape(.rect(cornerRadius: 8.0))
-                        .opacity(viewer.isFullImageLoaded ? 0 : 1)
+                        .opacity(viewer.displayedImage == nil ? 1 : 0)
                 }
-                // Show full image when loaded
-                if let fullImage = viewer.displayedImage, viewer.isFullImageLoaded {
+                if let fullImage = viewer.displayedImage {
                     Image(uiImage: fullImage)
                         .resizable()
                         .scaledToFit()
                         .clipShape(.rect(cornerRadius: 8.0))
                 }
             }
+            .overlay(alignment: .bottomTrailing) {
+                downloadStatusOverlay
+            }
 
-            // Image size overlay (bottom-left of image)
             if showImageSize, let displayedImage = viewer.displayedImage {
                 HStack(alignment: .center, spacing: 2.0) {
                     Text(verbatim: "\(Int(displayedImage.size.width * displayedImage.scale))")

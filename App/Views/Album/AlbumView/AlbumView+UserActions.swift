@@ -1,10 +1,3 @@
-//
-//  AlbumView+UserActions.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import SwiftUI
 
 extension AlbumView {
@@ -63,6 +56,11 @@ extension AlbumView {
                 AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
             }
             viewer.removePics(withIDs: deletedIDs)
+            let collectionID = DataActor.shared.collectionID
+            let idsForCleanup = Array(deletedIDs)
+            Task.detached {
+                await OriginalsManager.shared.deleteCloudOriginals(picIDs: idsForCleanup, in: collectionID)
+            }
             self.selectedPics.removeAll()
             refreshPicsAndSet()
         }

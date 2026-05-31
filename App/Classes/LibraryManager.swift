@@ -1,10 +1,3 @@
-//
-//  LibraryManager.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/17.
-//
-
 import Foundation
 import SwiftUI
 
@@ -18,26 +11,34 @@ class LibraryManager: ObservableObject {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var currentLibraryID: String = PicLibrary.defaultID
 
-    func loadLibraries() async {
-        let allLibraries = await LibrariesActor.shared.allLibraries()
-        let sorted = allLibraries.sorted { lhs, rhs in
+    private func sortedByName(_ libraries: [PicLibrary]) -> [PicLibrary] {
+        libraries.sorted { lhs, rhs in
             if lhs.isDefault { return true }
             if rhs.isDefault { return false }
             return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
         }
+    }
+
+    func loadLibraries() async {
+        let allLibraries = await LibrariesActor.shared.allLibraries()
         withAnimation(.smooth.speed(2.0)) {
-            libraries = sorted
+            libraries = sortedByName(allLibraries)
         }
 
-        // Restore last selected library
         if let saved = allLibraries.first(where: { $0.id == currentLibraryID }) {
             currentLibrary = saved
         } else {
-            // Fallback to default
             currentLibrary = allLibraries.first(where: { $0.isDefault }) ?? PicLibrary()
             currentLibraryID = PicLibrary.defaultID
         }
         switchActors(to: currentLibrary.id)
+    }
+
+    func reloadList() async {
+        let allLibraries = await LibrariesActor.shared.allLibraries()
+        withAnimation(.smooth.speed(2.0)) {
+            libraries = sortedByName(allLibraries)
+        }
     }
 
     func switchLibrary(to library: PicLibrary) {

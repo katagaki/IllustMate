@@ -1,10 +1,3 @@
-//
-//  TabType.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import Foundation
 
 enum TabType: Int {

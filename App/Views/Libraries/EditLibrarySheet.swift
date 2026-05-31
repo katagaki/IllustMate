@@ -1,10 +1,3 @@
-//
-//  EditLibrarySheet.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/18.
-//
-
 import SwiftUI
 
 // swiftlint:disable:next type_body_length
@@ -38,6 +31,15 @@ struct EditLibrarySheet: View {
     @State var deleteConfirmationCode: String = ""
     @State var expectedDeleteCode: String = ""
 
+    @State var syncEnabled: Bool = false
+    @State var iCloudAvailable: Bool = true
+    @State var isShowingiCloudAlert: Bool = false
+    @State var storageMode: StorageMode = .optimize
+    @State var isConfirmingDownloadAll: Bool = false
+    @State var isDownloadingAll: Bool = false
+    @State var downloadProgress: Int = 0
+    @State var downloadTotal: Int = 0
+
     var body: some View {
         NavigationStack {
             List {
@@ -58,6 +60,48 @@ struct EditLibrarySheet: View {
                     } header: {
                         Text("Libraries.Edit.Name", tableName: "Libraries")
                     }
+                }
+                Section {
+                    Toggle(isOn: Binding(
+                        get: { syncEnabled },
+                        set: { newValue in
+                            if newValue && !iCloudAvailable {
+                                isShowingiCloudAlert = true
+                                return
+                            }
+                            syncEnabled = newValue
+                            Task {
+                                await LibrariesActor.shared.setSyncEnabled(newValue, forID: library.id)
+                                await libraryManager.reloadList()
+                                await SyncManager.shared.refresh()
+                            }
+                        }
+                    )) {
+                        Text("Sync.Title", tableName: "More")
+                    }
+                    if syncEnabled {
+                        Picker(selection: Binding(
+                            get: { storageMode },
+                            set: { newMode in
+                                if newMode == .downloadAll {
+                                    isConfirmingDownloadAll = true
+                                } else {
+                                    storageMode = newMode
+                                    Task {
+                                        await LibrariesActor.shared.setStorageMode(newMode.rawValue,
+                                                                                   forID: library.id)
+                                    }
+                                }
+                            }
+                        )) {
+                            Text("Sync.Storage.Optimize", tableName: "More").tag(StorageMode.optimize)
+                            Text("Sync.Storage.DownloadAll", tableName: "More").tag(StorageMode.downloadAll)
+                        } label: {
+                            Text("Sync.Storage", tableName: "More")
+                        }
+                    }
+                } footer: {
+                    Text("Sync.Footer", tableName: "More")
                 }
                 Section {
                     Button(String(localized: "DuplicateChecker", table: "More")) {
@@ -147,6 +191,37 @@ struct EditLibrarySheet: View {
         }
         .task {
             await loadCounts()
+            syncEnabled = await LibrariesActor.shared.isSyncEnabled(id: library.id)
+            iCloudAvailable = await SyncManager.shared.canEnableSync()
+            storageMode = StorageMode(rawValue: await LibrariesActor.shared.storageMode(forID: library.id))
+                ?? .optimize
+        }
+        .alert(Text("Sync.iCloudRequired.Title", tableName: "More"),
+               isPresented: $isShowingiCloudAlert) {
+        } message: {
+            Text("Sync.iCloudRequired.Message", tableName: "More")
+        }
+        .alert(Text("Sync.DownloadAll.Confirm.Title", tableName: "More"),
+               isPresented: $isConfirmingDownloadAll) {
+            Button("Shared.Yes") {
+                storageMode = .downloadAll
+                Task {
+                    await LibrariesActor.shared.setStorageMode(StorageMode.downloadAll.rawValue,
+                                                               forID: library.id)
+                    await downloadAll()
+                }
+            }
+            Button("Shared.No", role: .cancel) { }
+        } message: {
+            Text("Sync.DownloadAll.Confirm.Message", tableName: "More")
+        }
+        .sheet(isPresented: $isDownloadingAll) {
+            StatusView(type: .inProgress,
+                       title: .custom("Sync.Downloading", tableName: "More"),
+                       currentCount: downloadProgress,
+                       totalCount: downloadTotal)
+                .phonePresentationDetents([.medium])
+                .interactiveDismissDisabled()
         }
         .fileImporter(isPresented: $isPickingBackupFolder, allowedContentTypes: [.folder]) { result in
             switch result {
@@ -300,6 +375,25 @@ struct EditLibrarySheet: View {
         await dataActor.vacuum()
         await MainActor.run {
             isFreeingUpSpace = false
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    func downloadAll() async {
+        let ids = await OriginalsManager.shared.picIDsNotMaterialized(in: library.id)
+        guard !ids.isEmpty else { return }
+        await MainActor.run {
+            UIApplication.shared.isIdleTimerDisabled = true
+            isDownloadingAll = true
+            downloadProgress = 0
+            downloadTotal = ids.count
+        }
+        for id in ids {
+            _ = await OriginalsManager.shared.materializeOriginal(picID: id, in: library.id)
+            await MainActor.run { downloadProgress += 1 }
+        }
+        await MainActor.run {
+            isDownloadingAll = false
             UIApplication.shared.isIdleTimerDisabled = false
         }
     }

@@ -1,10 +1,3 @@
-//
-//  PhotosFolderImportPickerView.swift
-//  PicMate
-//
-//  Created on 2026/03/19.
-//
-
 import Photos
 import SwiftUI
 

@@ -1,10 +1,3 @@
-//
-//  AlbumCover.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/09.
-//
-
 import Photos
 import SwiftUI
 
@@ -18,6 +11,7 @@ struct AlbumCover: View {
     var primaryImage: Image?
     var secondaryImage: Image?
     var tertiaryImage: Image?
+    var isDownloading: Bool = false
 
     init(
         name: String,
@@ -26,7 +20,8 @@ struct AlbumCover: View {
         albumCount: Int = 0,
         primaryImage: Image? = nil,
         secondaryImage: Image? = nil,
-        tertiaryImage: Image? = nil
+        tertiaryImage: Image? = nil,
+        isDownloading: Bool = false
     ) {
         self.name = name
         self.length = length
@@ -35,6 +30,7 @@ struct AlbumCover: View {
         self.primaryImage = primaryImage
         self.secondaryImage = secondaryImage
         self.tertiaryImage = tertiaryImage
+        self.isDownloading = isDownloading
     }
 
     var body: some View {
@@ -62,7 +58,6 @@ struct AlbumCover: View {
             let logicalH = size.height * scale
             let logicalW = size.width * scale
 
-            // --- Tertiary image (back, rotated -12°) ---
             if let tertiaryImage {
                 drawRotatedCard(
                     context: context, size: size, image: tertiaryImage,
@@ -72,7 +67,6 @@ struct AlbumCover: View {
                 )
             }
 
-            // --- Secondary image (middle, rotated +10°) ---
             if let secondaryImage {
                 drawRotatedCard(
                     context: context, size: size, image: secondaryImage,
@@ -82,7 +76,6 @@ struct AlbumCover: View {
                 )
             }
 
-            // --- Primary image (front) or gradient placeholder ---
             if let primaryImage {
                 var front = context
                 front.addFilter(.shadow(
@@ -91,7 +84,6 @@ struct AlbumCover: View {
                 front.drawLayer { ctx in
                     ctx.clip(to: cardPath)
 
-                    // Draw image filling the card rect
                     let resolved = ctx.resolve(primaryImage)
                     let srcSize = resolved.size
                     let scale = max(cardW / srcSize.width, cardH / srcSize.height)
@@ -105,7 +97,6 @@ struct AlbumCover: View {
                     )
                     ctx.draw(resolved, in: drawRect)
 
-                    // Darkening gradient at bottom
                     if logicalW >= 80 {
                         let gradientRect = CGRect(
                             x: cardRect.minX,
@@ -123,11 +114,9 @@ struct AlbumCover: View {
                         )
                     }
 
-                    // Thin border stroke
                     ctx.stroke(cardPath, with: .color(.primary.opacity(0.15)), lineWidth: 0.5)
                 }
             } else {
-                // Empty album gradient placeholder
                 let gradColors = Color.gradient(from: name)
                 var front = context
                 front.addFilter(.shadow(
@@ -143,7 +132,10 @@ struct AlbumCover: View {
                 )
             }
 
-            // --- Item count overlay ---
+            if isDownloading {
+                context.fill(cardPath, with: .color(.black.opacity(0.3)))
+            }
+
             if logicalW >= 80,
                let resolved = context.resolveSymbol(id: itemCountTag) {
                 let countOrigin = CGPoint(
@@ -165,7 +157,6 @@ struct AlbumCover: View {
     }
 
     // swiftlint:disable function_parameter_count
-    /// Draws a rotated card image into the Canvas context (used for secondary/tertiary stack cards).
     private func drawRotatedCard(
         context: GraphicsContext,
         size: CGSize,

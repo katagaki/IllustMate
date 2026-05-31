@@ -1,10 +1,3 @@
-//
-//  AlbumView+Toolbar.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/15.
-//
-
 import SwiftUI
 import TipKit
 

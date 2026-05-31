@@ -1,10 +1,3 @@
-//
-//  HashActor.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/09.
-//
-
 import Foundation
 @preconcurrency import SQLite
 
@@ -19,10 +12,8 @@ actor HashActor {
 
     let database: Connection
 
-    // Table
     let picHashesTable = Table("pic_hashes")
 
-    // Columns
     let hashPicId = Expression<String>("pic_id")
     let hashValue = Expression<Int64>("dhash")
     let hashVersion = Expression<Int>("hash_version")

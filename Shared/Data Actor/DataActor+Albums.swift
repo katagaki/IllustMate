@@ -1,10 +1,3 @@
-//
-//  DataActor+Albums.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/22.
-//
-
 import Foundation
 @preconcurrency import SQLite
 
@@ -44,7 +37,6 @@ extension DataActor {
         return sortAlbum(albums, sortedBy: sortType)
     }
 
-    /// Batch-populates childAlbumCount and childPicCount for all albums in one pass.
     private func populateCounts(for albums: [Album]) {
         let ids = albums.map { $0.id }
         guard !ids.isEmpty else { return }
@@ -52,7 +44,6 @@ extension DataActor {
         let bindings: [Binding?] = ids.map { $0 as Binding? }
         let placeholders = ids.map { _ in "?" }.joined(separator: ", ")
 
-        // Batch album counts
         var albumCounts: [String: Int] = [:]
         // swiftlint:disable:next line_length
         let albumCountSQL = "SELECT parent_album_id, COUNT(*) FROM albums WHERE parent_album_id IN (\(placeholders)) GROUP BY parent_album_id"
@@ -65,7 +56,6 @@ extension DataActor {
             }
         }
 
-        // Batch pic counts
         var picCounts: [String: Int] = [:]
         // swiftlint:disable:next line_length
         let picCountSQL = "SELECT containing_album_id, COUNT(*) FROM pics WHERE containing_album_id IN (\(placeholders)) GROUP BY containing_album_id"
@@ -94,8 +84,6 @@ extension DataActor {
         return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
-    /// Fetches a single representative thumbnail at a given offset (0-indexed),
-    /// ordered by most recently added. Used for concurrent per-thumbnail fetching.
     func representativeThumbnail(forAlbumWithID albumID: String, at offset: Int) -> Data? {
         let query = picsTable
             .filter(picAlbumId == albumID)
@@ -106,7 +94,6 @@ extension DataActor {
         return try? row.get(picThumbnailData)
     }
 
-    /// Batch-fetches up to `limit` representative thumbnails for each album ID.
     /// Executes one small indexed query per album inside a single actor call,
     /// avoiding both actor serialization overhead and expensive window functions.
     func batchRepresentativeThumbnails(
@@ -145,19 +132,32 @@ extension DataActor {
             albumName <- trimmedName,
             albumCoverPhoto <- nil,
             albumParentId <- parentAlbumID,
-            albumDateCreated <- now.timeIntervalSince1970
+            albumDateCreated <- now.timeIntervalSince1970,
+            syncDirty <- true,
+            syncLastModified <- now.timeIntervalSince1970
         ))
+        notifyLocalMutation()
         return album
     }
 
     func renameAlbum(withID id: String, to newName: String) {
         let query = albumsTable.filter(albumId == id)
-        _ = try? database.run(query.update(albumName <- newName.trimmingCharacters(in: .whitespaces)))
+        _ = try? database.run(query.update(
+            albumName <- newName.trimmingCharacters(in: .whitespaces),
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func updateAlbumCover(forAlbumWithID albumID: String, coverData: Data?) {
         let query = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(query.update(albumCoverPhoto <- coverData))
+        _ = try? database.run(query.update(
+            albumCoverPhoto <- coverData,
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
@@ -193,40 +193,47 @@ extension DataActor {
 
     func addAlbum(withID albumID: String, toAlbumWithID destinationAlbumID: String) {
         let query = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(query.update(albumParentId <- destinationAlbumID))
+        _ = try? database.run(query.update(
+            albumParentId <- destinationAlbumID,
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func removeParentAlbum(forAlbumWithidentifier albumID: String) {
         let query = albumsTable.filter(albumId == albumID)
-        _ = try? database.run(query.update(albumParentId <- nil))
+        _ = try? database.run(query.update(
+            albumParentId <- nil,
+            syncDirty <- true,
+            syncLastModified <- syncTimestamp
+        ))
+        notifyLocalMutation()
     }
 
     func deleteAlbum(withID albumID: String) {
         let parentID = parentAlbumID(forAlbumWithID: albumID)
+        let now = syncTimestamp
 
-        // Move direct pics to parent album, or orphan them
         let picsQuery = picsTable.filter(picAlbumId == albumID)
-        if let parentID = parentID {
-            _ = try? database.run(picsQuery.update(picAlbumId <- parentID))
-        } else {
-            _ = try? database.run(picsQuery.update(picAlbumId <- nil))
-        }
+        _ = try? database.run(picsQuery.update(
+            picAlbumId <- parentID, syncDirty <- true, syncLastModified <- now
+        ))
 
-        // Move child albums to parent album, or orphan them
         let childAlbumsQuery = albumsTable.filter(albumParentId == albumID)
-        if let parentID = parentID {
-            _ = try? database.run(childAlbumsQuery.update(albumParentId <- parentID))
-        } else {
-            _ = try? database.run(childAlbumsQuery.update(albumParentId <- nil))
-        }
+        _ = try? database.run(childAlbumsQuery.update(
+            albumParentId <- parentID, syncDirty <- true, syncLastModified <- now
+        ))
 
-        // Delete the album itself
+        if albumWasSynced(id: albumID) {
+            recordTombstone(id: albumID, recordType: SyncRecordType.album)
+        }
         let albumQuery = albumsTable.filter(albumId == albumID)
         _ = try? database.run(albumQuery.delete())
 
-        // Delete album preferences
         let prefQuery = preferencesTable.filter(prefAlbumId == albumID)
         _ = try? database.run(prefQuery.delete())
+        notifyLocalMutation()
     }
 
     func parentAlbumID(forAlbumWithID albumID: String) -> String? {

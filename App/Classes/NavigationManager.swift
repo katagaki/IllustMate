@@ -1,10 +1,3 @@
-//
-//  NavigationManager.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import Foundation
 
 @MainActor
@@ -25,6 +18,10 @@ class NavigationManager: ObservableObject {
 
     func signalDataDeleted() {
         popAll()
+        dataVersion += 1
+    }
+
+    func signalDataChanged() {
         dataVersion += 1
     }
 

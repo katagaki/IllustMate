@@ -1,10 +1,3 @@
-//
-//  DuplicateScanManager.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/09.
-//
-
 import Foundation
 import SwiftUI
 import UIKit
@@ -17,19 +10,15 @@ struct DuplicateGroup: Identifiable {
 @MainActor @Observable
 class DuplicateScanManager {
 
-    // Scan state
     var isScanning: Bool = false
     var scanProgress: Int = 0
     var scanTotal: Int = 0
     var scanPhase: ScanPhase = .idle
 
-    // Results
     var duplicateGroups: [DuplicateGroup] = []
 
-    // Configuration
     var hammingThreshold: Int = 8
 
-    // Data access
     let collectionID: String?
 
     var dataActor: DataActor {
@@ -65,7 +54,6 @@ class DuplicateScanManager {
         scanProgress = 0
         duplicateGroups = []
 
-        // Get all pic IDs in scope
         let dataActor = self.dataActor
         let allScopedIDs: [String]
         switch scope {
@@ -77,13 +65,11 @@ class DuplicateScanManager {
             allScopedIDs = await dataActor.picIDs(inAlbumWithID: album.id)
         }
 
-        // Find which ones don't have cached hashes
         let cachedIDs = await HashActor.shared.picIDsWithCachedHash()
         let uncachedIDs = allScopedIDs.filter { !cachedIDs.contains($0) }
 
         scanTotal = uncachedIDs.count
 
-        // Phase 1: Compute hashes for uncached pics
         for picID in uncachedIDs {
             if let data = await dataActor.imageData(forPicWithID: picID),
                let image = UIImage(data: data),
@@ -93,7 +79,6 @@ class DuplicateScanManager {
             scanProgress += 1
         }
 
-        // Phase 2: Load all hashes for scoped pics and group by similarity
         scanPhase = .comparingHashes
 
         let allHashes = await HashActor.shared.allCachedHashes()
@@ -102,7 +87,6 @@ class DuplicateScanManager {
 
         let groups = findDuplicateGroups(hashes: scopedHashes, threshold: hammingThreshold)
 
-        // Convert to DuplicateGroup with Pic objects
         var resultGroups: [DuplicateGroup] = []
         for group in groups where group.count >= 2 {
             var pics: [Pic] = []

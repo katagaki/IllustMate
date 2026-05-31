@@ -1,10 +1,3 @@
-//
-//  DataActor+Preferences.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/20.
-//
-
 import Foundation
 @preconcurrency import SQLite
 

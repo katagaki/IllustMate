@@ -1,10 +1,3 @@
-//
-//  AlbumView+Sections.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/24.
-//
-
 import SwiftUI
 
 extension AlbumView {
@@ -65,7 +58,11 @@ extension AlbumView {
             if !displayedAlbums.isEmpty {
                 AlbumsSection(albums: displayedAlbums, style: $albumStyleState,
                              columnCount: albumColumnCount,
-                             hideSectionHeaders: hideSectionHeaders) { album in
+                             hideSectionHeaders: hideSectionHeaders,
+                             isKeptOffline: { OfflineAlbums.contains($0.id) },
+                             onToggleOffline: {
+                                 OfflineAlbums.toggle($0.id, in: DataActor.shared.collectionID)
+                             }) { album in
                     renameAlbumText = album.name
                     albumToRename = album
                 } onDelete: { album in

@@ -1,10 +1,3 @@
-//
-//  PicLabel.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/06.
-//
-
 import SwiftUI
 
 final class ThumbnailCache: @unchecked Sendable {
@@ -13,7 +6,7 @@ final class ThumbnailCache: @unchecked Sendable {
 
     init() {
         cache.countLimit = 500
-        cache.totalCostLimit = 100 * 1024 * 1024 // 100 MB
+        cache.totalCostLimit = 100 * 1024 * 1024
     }
 
     func image(forKey key: String) -> UIImage? {

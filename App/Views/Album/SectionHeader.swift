@@ -1,10 +1,3 @@
-//
-//  SectionHeader.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/06.
-//
-
 import SwiftUI
 
 struct SectionHeader<Buttons: View, Content: View>: View {
