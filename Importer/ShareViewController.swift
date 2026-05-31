@@ -35,10 +35,6 @@ class ShareViewController: UIViewController {
         loadItems()
     }
 
-    /// Points the shared data actors at the library the user currently has open in
-    /// the main app. The extension runs in its own process, so without this it would
-    /// always read from and import into the default library regardless of which
-    /// library the user actually switched to.
     static func switchToCurrentLibrary() {
         let collectionID = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")?
             .string(forKey: "CurrentCollectionID") ?? PicLibrary.defaultID
