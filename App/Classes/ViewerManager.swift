@@ -160,14 +160,47 @@ class ViewerManager {
     }
 
     private func loadVideo(for pic: Pic) {
+        let picID = pic.id
         Task {
-            var url = await DataActor.shared.videoURL(forPicWithID: pic.id)
-            if url == nil {
-                url = await OriginalsManager.shared.materializedVideoURL(
-                    picID: pic.id, in: DataActor.shared.collectionID
-                )
+            if let localURL = await DataActor.shared.videoURL(forPicWithID: picID) {
+                guard self.displayedPicID == picID else { return }
+                self.displayedVideoURL = localURL
+                self.videoPlayer = AVPlayer(url: localURL)
+                return
             }
-            guard self.displayedPicID == pic.id, let url else { return }
+
+            if self.displayedPicID == picID {
+                withAnimation(.smooth.speed(2.0)) {
+                    self.downloadingOriginalPicID = picID
+                    self.failedDownloadPicID = nil
+                }
+                self.downloadProgress = nil
+                if let fileName = await OriginalsManager.shared.cloudOriginalFilename(
+                    picID: picID, in: DataActor.shared.collectionID
+                ) {
+                    self.downloadMonitor.start(fileName: fileName) { [weak self] fraction in
+                        guard let self, self.downloadingOriginalPicID == picID else { return }
+                        self.downloadProgress = fraction
+                    }
+                }
+            }
+
+            let url = await OriginalsManager.shared.materializedVideoURL(
+                picID: picID, in: DataActor.shared.collectionID
+            )
+
+            if self.downloadingOriginalPicID == picID {
+                self.downloadMonitor.stop()
+                withAnimation(.smooth.speed(2.0)) {
+                    self.downloadingOriginalPicID = nil
+                    self.downloadProgress = nil
+                    if url == nil {
+                        self.failedDownloadPicID = picID
+                    }
+                }
+            }
+
+            guard self.displayedPicID == picID, let url else { return }
             self.displayedVideoURL = url
             self.videoPlayer = AVPlayer(url: url)
         }

@@ -119,6 +119,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- now.timeIntervalSince1970
         ))
+        notifyLocalMutation()
     }
 
     func createVideo(
@@ -149,6 +150,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- now.timeIntervalSince1970
         ))
+        notifyLocalMutation()
     }
 
     func addPics(withIDs picIDs: [String], toAlbumWithID albumID: String) {
@@ -157,6 +159,7 @@ extension DataActor {
         _ = try? database.run(query.update(
             picAlbumId <- albumID, syncDirty <- true, syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func addPic(withID picID: String, toAlbumWithID albumID: String) {
@@ -164,6 +167,7 @@ extension DataActor {
         _ = try? database.run(query.update(
             picAlbumId <- albumID, syncDirty <- true, syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func removeParentAlbum(forPicsWithIDs picIDs: [String]) {
@@ -172,6 +176,7 @@ extension DataActor {
         _ = try? database.run(query.update(
             picAlbumId <- nil, syncDirty <- true, syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func setAsAlbumCover(for picID: String) {
@@ -183,6 +188,7 @@ extension DataActor {
             _ = try? database.run(query.update(
                 albumCoverPhoto <- coverData, syncDirty <- true, syncLastModified <- syncTimestamp
             ))
+            notifyLocalMutation()
         }
     }
 
@@ -198,6 +204,7 @@ extension DataActor {
         _ = try? database.run(query.update(
             picName <- newName, syncDirty <- true, syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func updateThumbnail(forPicWithID picID: String, thumbnailData: Data?) {
@@ -205,6 +212,7 @@ extension DataActor {
         _ = try? database.run(query.update(
             picThumbnailData <- thumbnailData, syncDirty <- true, syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     private func containingAlbumID(forPicWithID picID: String) -> String? {
@@ -225,6 +233,7 @@ extension DataActor {
         }
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.delete())
+        notifyLocalMutation()
     }
 
     func deletePics(withIDs picIDs: [String]) {
@@ -240,6 +249,7 @@ extension DataActor {
         recordTombstones(ids: syncedPicIDs(among: picIDs), recordType: SyncRecordType.pic)
         let query = picsTable.filter(picIDs.contains(picId))
         _ = try? database.run(query.delete())
+        notifyLocalMutation()
     }
 
     private func deleteMediaFile(atRelativePath path: String) {

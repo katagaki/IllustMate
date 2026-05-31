@@ -301,10 +301,24 @@ actor OriginalsManager {
     }
 
     func materializedVideoURL(picID: String, in collectionID: String) async -> URL? {
-        guard let url = cloudURL(forPicID: picID, in: collectionID) else { return nil }
+        guard let url = cloudURL(forPicID: picID, in: collectionID) else {
+            await SyncMate.shared.debugLog("video \(picID.prefix(6)): no container")
+            return nil
+        }
         if isMaterialized(url) { return url }
         try? FileManager.default.startDownloadingUbiquitousItem(at: url)
-        return await waitForDownload(url) ? url : nil
+        if await waitForDownload(url) {
+            await SyncMate.shared.debugLog("video \(picID.prefix(6)): ok")
+            return url
+        }
+        await SyncMate.shared.debugLog("video \(picID.prefix(6)): timeout \(statusLabel(url))")
+        return nil
+    }
+
+    /// The on-disk name of a pic's original in the ubiquity container (e.g. `<id>.mov` for videos,
+    /// the bare id for images). Used to drive the download-progress query, which matches by filename.
+    func cloudOriginalFilename(picID: String, in collectionID: String) -> String? {
+        cloudURL(forPicID: picID, in: collectionID)?.lastPathComponent
     }
 
     func originalSize(picID: String, in collectionID: String) async -> Int64? {

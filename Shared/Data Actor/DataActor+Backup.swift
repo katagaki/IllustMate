@@ -158,6 +158,7 @@ extension DataActor {
         } else {
             try mergeBackup(from: foreignDB)
         }
+        notifyLocalMutation()
     }
 
     // MARK: - Import strategies

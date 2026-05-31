@@ -37,6 +37,63 @@ extension PicViewer {
         }
     }
 
+    /// Bottom-trailing indicator shared by photo and video content: a progress ring or spinner while
+    /// the original is downloading from iCloud, or a tappable error badge if the download failed.
+    @ViewBuilder
+    var downloadStatusOverlay: some View {
+        if viewer.didDisplayedOriginalDownloadFail {
+            Button {
+                showDownloadFailedPopover = true
+            } label: {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.white, .orange)
+                    .frame(width: 20.0, height: 20.0)
+                    .shadow(color: .black.opacity(0.4), radius: 2.0)
+                    .padding(8.0)
+            }
+            .buttonStyle(.plain)
+            .transition(.opacity)
+            .popover(isPresented: $showDownloadFailedPopover) {
+                VStack(alignment: .leading, spacing: 8.0) {
+                    Label("Shared.OriginalUnavailable.Title", systemImage: "exclamationmark.circle")
+                        .font(.headline)
+                    Text("Shared.OriginalUnavailable.Description")
+                        .font(.subheadline)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(width: 260.0, alignment: .leading)
+                .padding()
+                .presentationCompactAdaptation(.popover)
+            }
+        } else if viewer.isDownloadingDisplayedOriginal {
+            Group {
+                if let progress = viewer.downloadProgress {
+                    ZStack {
+                        Circle()
+                            .stroke(.white.opacity(0.35), lineWidth: 2.5)
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                    }
+                    .animation(.smooth, value: progress)
+                } else {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(.white)
+                }
+            }
+            .frame(width: 20.0, height: 20.0)
+            .shadow(color: .black.opacity(0.4), radius: 2.0)
+            .padding(8.0)
+            .transition(.opacity)
+        }
+    }
+
     var videoAspectRatio: CGFloat? {
         guard let thumbnail = viewer.displayedThumbnail,
               thumbnail.size.height > 0 else { return nil }
@@ -58,6 +115,9 @@ extension PicViewer {
                 }
             }
             .shadow(color: .black.opacity(0.2), radius: 4.0, x: 0.0, y: 4.0)
+            .overlay(alignment: .bottomTrailing) {
+                downloadStatusOverlay
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, isLandscape ? 4 : 20)
@@ -88,57 +148,7 @@ extension PicViewer {
                 }
             }
             .overlay(alignment: .bottomTrailing) {
-                if viewer.didDisplayedOriginalDownloadFail {
-                    Button {
-                        showDownloadFailedPopover = true
-                    } label: {
-                        Image(systemName: "exclamationmark.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .symbolRenderingMode(.palette)
-                            .foregroundStyle(.white, .orange)
-                            .frame(width: 20.0, height: 20.0)
-                            .shadow(color: .black.opacity(0.4), radius: 2.0)
-                            .padding(8.0)
-                    }
-                    .buttonStyle(.plain)
-                    .transition(.opacity)
-                    .popover(isPresented: $showDownloadFailedPopover) {
-                        VStack(alignment: .leading, spacing: 8.0) {
-                            Label("Shared.OriginalUnavailable.Title", systemImage: "exclamationmark.circle")
-                                .font(.headline)
-                            Text("Shared.OriginalUnavailable.Description")
-                                .font(.subheadline)
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .frame(width: 260.0, alignment: .leading)
-                        .padding()
-                        .presentationCompactAdaptation(.popover)
-                    }
-                } else if viewer.isDownloadingDisplayedOriginal {
-                    Group {
-                        if let progress = viewer.downloadProgress {
-                            ZStack {
-                                Circle()
-                                    .stroke(.white.opacity(0.35), lineWidth: 2.5)
-                                Circle()
-                                    .trim(from: 0, to: progress)
-                                    .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                                    .rotationEffect(.degrees(-90))
-                            }
-                            .animation(.smooth, value: progress)
-                        } else {
-                            ProgressView()
-                                .controlSize(.small)
-                                .tint(.white)
-                        }
-                    }
-                    .frame(width: 20.0, height: 20.0)
-                    .shadow(color: .black.opacity(0.4), radius: 2.0)
-                    .padding(8.0)
-                    .transition(.opacity)
-                }
+                downloadStatusOverlay
             }
 
             if showImageSize, let displayedImage = viewer.displayedImage {

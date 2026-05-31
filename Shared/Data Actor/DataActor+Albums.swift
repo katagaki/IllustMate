@@ -136,6 +136,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- now.timeIntervalSince1970
         ))
+        notifyLocalMutation()
         return album
     }
 
@@ -146,6 +147,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func updateAlbumCover(forAlbumWithID albumID: String, coverData: Data?) {
@@ -155,6 +157,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func sortAlbum(_ albums: [Album], sortedBy sortType: SortType) -> [Album] {
@@ -195,6 +198,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func removeParentAlbum(forAlbumWithidentifier albumID: String) {
@@ -204,6 +208,7 @@ extension DataActor {
             syncDirty <- true,
             syncLastModified <- syncTimestamp
         ))
+        notifyLocalMutation()
     }
 
     func deleteAlbum(withID albumID: String) {
@@ -228,6 +233,7 @@ extension DataActor {
 
         let prefQuery = preferencesTable.filter(prefAlbumId == albumID)
         _ = try? database.run(prefQuery.delete())
+        notifyLocalMutation()
     }
 
     func parentAlbumID(forAlbumWithID albumID: String) -> String? {

@@ -7,6 +7,10 @@ enum SyncRecordType {
     static let library = "Library"
 }
 
+extension Notification.Name {
+    static let dataActorDidMutateLocally = Notification.Name("DataActorDidMutateLocally")
+}
+
 struct LibrarySyncSnapshot: Sendable {
     let id: String
     let name: String
@@ -44,6 +48,10 @@ struct OriginalLocation: Sendable {
 extension DataActor {
 
     var syncTimestamp: Double { Date.now.timeIntervalSince1970 }
+
+    nonisolated func notifyLocalMutation() {
+        NotificationCenter.default.post(name: .dataActorDidMutateLocally, object: collectionID)
+    }
 
     func recordTombstone(id: String, recordType: String) {
         _ = try? database.run(tombstonesTable.insert(or: .replace,

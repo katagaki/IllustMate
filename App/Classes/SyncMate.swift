@@ -87,6 +87,11 @@ actor SyncMate {
         try? await engine.fetchChanges()
     }
 
+    func sendChanges() async {
+        guard let engine else { return }
+        try? await engine.sendChanges()
+    }
+
     func isAccountAvailable() async -> Bool {
         (try? await container.accountStatus()) == .available
     }

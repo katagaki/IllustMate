@@ -10,6 +10,31 @@ final class SyncManager {
         return await OriginalsManager.shared.isUbiquityAvailable()
     }
 
+    private var pendingPushLibraries: Set<String> = []
+    private var pushDebounceTask: Task<Void, Never>?
+
+    func schedulePush(forLibrary collectionID: String) {
+        pendingPushLibraries.insert(collectionID)
+        pushDebounceTask?.cancel()
+        pushDebounceTask = Task { [self] in
+            try? await Task.sleep(for: .seconds(1))
+            guard !Task.isCancelled else { return }
+            let libraries = pendingPushLibraries
+            pendingPushLibraries.removeAll()
+            for id in libraries {
+                await pushChanges(forLibrary: id)
+            }
+        }
+    }
+
+    func pushChanges(forLibrary collectionID: String) async {
+        let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
+        guard enabledIDs.contains(collectionID) else { return }
+        await SyncMate.shared.start()
+        await SyncMate.shared.enqueueChanges(forLibrary: collectionID)
+        await SyncMate.shared.sendChanges()
+    }
+
     func refresh() async {
         for id in await LibrariesActor.shared.unmigratedLibraryIDs() {
             if await DataActor.instance(for: id).isLibraryV2MigrationComplete() {

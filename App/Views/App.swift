@@ -96,6 +96,13 @@ struct IllustMateApp: App {
         .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyRemoteChanges)) { _ in
             navigation.signalDataChanged()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .dataActorDidMutateLocally)) { note in
+            if let collectionID = note.object as? String {
+                Task { @MainActor in
+                    SyncManager.shared.schedulePush(forLibrary: collectionID)
+                }
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .syncDidApplyLibraryChanges)) { _ in
             Task { await libraryManager.reloadList() }
         }
