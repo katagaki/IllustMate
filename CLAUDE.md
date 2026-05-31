@@ -1,5 +1,6 @@
 # Code style
 
-- Keep comments concise. Prefer a single short line that explains *why*, not
-  *what*. Avoid multi-line explanatory comment blocks and doc comments that
-  restate the code.
+- If the code is self-explanatory, write no comment at all.
+- Only comment to explain *why* something non-obvious is done (e.g. a
+  surprising API requirement or workaround), never to restate *what* the code
+  does. No multi-line explanatory blocks or doc comments that echo the code.

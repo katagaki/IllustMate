@@ -60,7 +60,6 @@ extension DataActor {
 
         let batchSize = chosenBatchSize(total: total)
         let singleBatch = batchSize >= total
-        // Enable incremental auto_vacuum so per-batch reclaim is cheap.
         ensureIncrementalAutoVacuum()
         var copied = 0
         var verified = 0
@@ -155,7 +154,7 @@ extension DataActor {
     }
 
     private func reclaimSpaceIncrementally() {
-        // Only effective in incremental mode; a no-op otherwise.
+        // incremental_vacuum is a no-op outside incremental mode.
         guard autoVacuumMode() == 2 else { return }
         do {
             try database.execute("PRAGMA incremental_vacuum;")

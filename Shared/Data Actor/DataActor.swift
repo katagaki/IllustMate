@@ -168,12 +168,11 @@ actor DataActor {
         ((try? database.scalar("PRAGMA auto_vacuum")) as? Int64) ?? 0
     }
 
-    /// Switches an existing database to incremental auto_vacuum. The mode change
-    /// only applies after a full VACUUM, so this runs one when space allows.
     @discardableResult
     func ensureIncrementalAutoVacuum() -> Bool {
         if autoVacuumMode() == 2 { return true }
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
+        // The mode change only takes effect after a full VACUUM.
         guard freeBytesAtDatabaseLocation() > databaseFileSizeBytes() else { return false }
         do {
             try database.vacuum()
@@ -183,8 +182,6 @@ actor DataActor {
         return autoVacuumMode() == 2
     }
 
-    /// Releases free pages to the filesystem, preferring incremental vacuum and
-    /// falling back to a full VACUUM. Returns whether reclamation succeeded.
     @discardableResult
     func reclaimDiskSpace() -> Bool {
         if ensureIncrementalAutoVacuum() {
