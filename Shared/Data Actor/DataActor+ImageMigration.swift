@@ -72,6 +72,10 @@ extension DataActor {
 
         let batchSize = chosenBatchSize(total: total)
         let singleBatch = batchSize >= total
+        // The per-batch `incremental_vacuum` only frees pages once the database
+        // is actually in INCREMENTAL auto-vacuum mode; convert up front (while no
+        // files exist yet) so the multi-batch path can keep peak disk bounded.
+        if !singleBatch { ensureIncrementalVacuumActive() }
         var copied = 0
         var verified = 0
         var start = 0
@@ -169,6 +173,22 @@ extension DataActor {
     /// No-op unless the database is in incremental auto-vacuum mode.
     private func reclaimSpaceIncrementally() {
         _ = try? database.execute("PRAGMA incremental_vacuum;")
+    }
+
+    /// `PRAGMA incremental_vacuum` reclaims nothing unless the database is in
+    /// INCREMENTAL auto-vacuum mode, and a database created before that mode was
+    /// set keeps its original mode until a full `VACUUM` rewrites it. Without
+    /// this conversion the per-batch reclaim would be a silent no-op during the
+    /// very migration that needs it, defeating the batching that bounds peak
+    /// disk usage. Convert once up front, only when the conversion fits in free
+    /// space (no externalized files exist yet, so peak use is ~2× the database).
+    private func ensureIncrementalVacuumActive() {
+        // 2 == SQLITE_AUTO_VACUUM_INCREMENTAL.
+        guard let mode = (try? database.scalar("PRAGMA auto_vacuum")) as? Int64,
+              mode != 2 else { return }
+        guard currentDatabaseFileSize() < availableFreeBytes() else { return }
+        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
+        _ = try? database.vacuum()
     }
 }
 
