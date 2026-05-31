@@ -163,8 +163,76 @@ actor DataActor {
         }
     }
 
-    func vacuum() {
-        _ = try? self.database.vacuum()
+    /// Current auto_vacuum mode: 0 = NONE, 1 = FULL, 2 = INCREMENTAL.
+    func autoVacuumMode() -> Int64 {
+        ((try? database.scalar("PRAGMA auto_vacuum")) as? Int64) ?? 0
+    }
+
+    /// Ensures the database is in incremental auto_vacuum mode so that free
+    /// pages can later be released with a cheap `PRAGMA incremental_vacuum`
+    /// that needs no scratch space. Switching the mode on an already-populated
+    /// database is a no-op until a full `VACUUM` runs, so this performs that
+    /// one-time conversion — but only when there is enough free space for the
+    /// rebuild. Returns whether the database ends up in incremental mode.
+    @discardableResult
+    func ensureIncrementalAutoVacuum() -> Bool {
+        if autoVacuumMode() == 2 { return true }
+        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
+        // The mode change only takes effect after a full VACUUM, which needs
+        // scratch space roughly equal to the current file size.
+        guard freeBytesAtDatabaseLocation() > databaseFileSizeBytes() else { return false }
+        do {
+            try database.vacuum()
+        } catch {
+            debugPrint("Auto-vacuum conversion VACUUM failed: \(error)")
+        }
+        return autoVacuumMode() == 2
+    }
+
+    /// Reclaims free pages back to the filesystem and reports whether space was
+    /// actually reclaimed. Prefers incremental vacuum (no scratch space
+    /// required) when the database is in incremental auto_vacuum mode, falling
+    /// back to a full `VACUUM` otherwise. Unlike a bare `VACUUM`, failures are
+    /// surfaced rather than silently swallowed.
+    @discardableResult
+    func reclaimDiskSpace() -> Bool {
+        // Try to put the database into incremental mode so this and future
+        // reclamations are cheap and don't depend on having 2x free space.
+        if ensureIncrementalAutoVacuum() {
+            do {
+                try database.execute("PRAGMA incremental_vacuum;")
+                return true
+            } catch {
+                debugPrint("Incremental vacuum failed: \(error)")
+                return false
+            }
+        }
+        // Not in incremental mode (e.g. too little free space to convert):
+        // attempt a full VACUUM, which reclaims everything when it succeeds.
+        do {
+            try database.vacuum()
+            return true
+        } catch {
+            debugPrint("VACUUM failed: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func vacuum() -> Bool {
+        reclaimDiskSpace()
+    }
+
+    func databaseFileSizeBytes() -> Int64 {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: databaseURL.path)
+        return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
+    }
+
+    func freeBytesAtDatabaseLocation() -> Int64 {
+        let values = try? databaseURL.resourceValues(
+            forKeys: [.volumeAvailableCapacityForImportantUsageKey]
+        )
+        return values?.volumeAvailableCapacityForImportantUsage ?? Int64.max
     }
 
     // MARK: - Row to Model Helpers

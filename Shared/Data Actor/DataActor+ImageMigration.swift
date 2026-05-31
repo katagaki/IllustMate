@@ -60,7 +60,11 @@ extension DataActor {
 
         let batchSize = chosenBatchSize(total: total)
         let singleBatch = batchSize >= total
-        if !singleBatch { ensureIncrementalVacuumActive() }
+        // Put the database into incremental auto_vacuum mode up front so that
+        // freed pages can be released cheaply after each batch without needing
+        // scratch space for a full rebuild. New databases are already
+        // incremental; existing ones are converted here when there is room.
+        ensureIncrementalAutoVacuum()
         var copied = 0
         var verified = 0
         var start = 0
@@ -86,7 +90,11 @@ extension DataActor {
                                                       latestThumbnail: thumbnailData(forPicWithID: id)))
             }
             for id in verifiedIDs {
-                _ = try? database.run(picsTable.filter(picId == id).update(picData <- nil))
+                do {
+                    try database.run(picsTable.filter(picId == id).update(picData <- nil))
+                } catch {
+                    debugPrint("Failed to clear migrated blob for \(id): \(error)")
+                }
             }
             if !singleBatch {
                 await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
@@ -98,7 +106,9 @@ extension DataActor {
         await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
                                               total: 0, latestThumbnail: nil))
         try? await Task.sleep(for: .seconds(1))
-        vacuum()
+        if !reclaimDiskSpace() {
+            debugPrint("Image migration: final disk space reclamation freed no space")
+        }
     }
 
     // MARK: - Helpers
@@ -137,8 +147,8 @@ extension DataActor {
     }
 
     private func chosenBatchSize(total: Int) -> Int {
-        let free = availableFreeBytes()
-        let payload = currentDatabaseFileSize()
+        let free = freeBytesAtDatabaseLocation()
+        let payload = databaseFileSizeBytes()
         guard payload > 0, free > 0 else { return total }
         if free > 2 * payload { return total }
         let averageEntry = payload / Int64(max(total, 1))
@@ -147,29 +157,16 @@ extension DataActor {
         return max(1, Int((Double(total) / Double(batchCount)).rounded(.up)))
     }
 
-    private func availableFreeBytes() -> Int64 {
-        let values = try? databaseURL.resourceValues(
-            forKeys: [.volumeAvailableCapacityForImportantUsageKey]
-        )
-        return values?.volumeAvailableCapacityForImportantUsage ?? Int64.max
-    }
-
-    private func currentDatabaseFileSize() -> Int64 {
-        let attributes = try? FileManager.default.attributesOfItem(atPath: databaseURL.path)
-        return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
-    }
-
     private func reclaimSpaceIncrementally() {
-        _ = try? database.execute("PRAGMA incremental_vacuum;")
-    }
-
-    private func ensureIncrementalVacuumActive() {
-        // 2 == SQLITE_AUTO_VACUUM_INCREMENTAL.
-        guard let mode = (try? database.scalar("PRAGMA auto_vacuum")) as? Int64,
-              mode != 2 else { return }
-        guard currentDatabaseFileSize() < availableFreeBytes() else { return }
-        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
-        _ = try? database.vacuum()
+        // `PRAGMA incremental_vacuum` only releases pages when the database is
+        // actually in incremental auto_vacuum mode; in any other mode it is a
+        // silent no-op, so skip it rather than pretending space was reclaimed.
+        guard autoVacuumMode() == 2 else { return }
+        do {
+            try database.execute("PRAGMA incremental_vacuum;")
+        } catch {
+            debugPrint("Incremental vacuum failed: \(error)")
+        }
     }
 }
 
