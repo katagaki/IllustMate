@@ -92,7 +92,14 @@ extension DataActor {
             // Stage 2 — verify file hashes against the still-present blobs.
             var verifiedIDs: [String] = []
             for id in batch {
-                if verifyMigratedFile(id: id) { verifiedIDs.append(id) }
+                if verifyMigratedFile(id: id) {
+                    verifiedIDs.append(id)
+                } else {
+                    // Don't leave file_path pointing at an unverified file: the
+                    // blob is still present and authoritative, and imageData
+                    // would otherwise prefer the bad file over the good blob.
+                    revertMigratedFile(id: id)
+                }
                 verified += 1
                 await progress(ImageMigrationProgress(phase: .verifying, completed: verified,
                                                       total: total,
@@ -130,6 +137,19 @@ extension DataActor {
         guard let blob = rawBlobData(forPicWithID: id), !blob.isEmpty,
               let relativePath = saveImageFile(blob, id: id) else { return }
         _ = try? database.run(picsTable.filter(picId == id).update(picFilePath <- relativePath))
+    }
+
+    /// Undoes a failed externalization: removes the stray file and clears the
+    /// path so the still-present blob remains the pic's source of truth. This
+    /// keeps the invariant `file_path set ⇒ verified`, which `imageData` relies
+    /// on when it prefers the file over the blob.
+    private func revertMigratedFile(id: String) {
+        let query = picsTable.filter(picId == id).select(picFilePath)
+        if let row = try? database.pluck(query),
+           let path = (try? row.get(picFilePath)) ?? nil {
+            deleteImageFile(atRelativePath: path)
+        }
+        _ = try? database.run(picsTable.filter(picId == id).update(picFilePath <- nil))
     }
 
     private func verifyMigratedFile(id: String) -> Bool {
