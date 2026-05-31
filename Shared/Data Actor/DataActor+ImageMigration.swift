@@ -173,7 +173,6 @@ extension DataActor {
     }
 }
 
-#if DEBUG
 extension DataActor {
     func createImageBlobPic(_ name: String, data: Data,
                             inAlbumWithID albumID: String? = nil, dateAdded: Date? = nil) {
@@ -190,4 +189,3 @@ extension DataActor {
         ))
     }
 }
-#endif

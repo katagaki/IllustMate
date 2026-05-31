@@ -1,4 +1,3 @@
-#if DEBUG
 import CoreGraphics
 import Foundation
 import UIKit
@@ -197,4 +196,3 @@ enum SampleDataGenerator {
         return path
     }
 }
-#endif

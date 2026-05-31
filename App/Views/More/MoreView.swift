@@ -86,6 +86,16 @@ struct MoreView: View {
             }
             WebServerView()
             Section {
+                NavigationLink(String(localized: "Labs.FileExplorer", table: "More"),
+                               value: ViewPath.moreLabsFileExplorer)
+                NavigationLink(String(localized: "Labs.TestData", table: "More"),
+                               value: ViewPath.moreLabsTestData)
+            } header: {
+                Text("Labs", tableName: "More")
+            } footer: {
+                Text("Labs.Description", tableName: "More")
+            }
+            Section {
                 Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
                     HStack {
                         Text(String(localized: "GitHub", table: "More"))
@@ -105,6 +115,8 @@ struct MoreView: View {
             switch viewPath {
             case .moreDebug: MoreExperimentsView()
             case .moreAttributions: MoreLicensesView()
+            case .moreLabsFileExplorer: LabsFileExplorerView()
+            case .moreLabsTestData: LabsTestDataView()
             default: Color.clear
             }
         }
