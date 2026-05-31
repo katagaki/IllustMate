@@ -3,6 +3,7 @@ import Foundation
 @preconcurrency import SQLite
 
 enum ImageMigrationPhase: Sendable {
+    case preparing
     case copying
     case verifying
     case reclaiming
