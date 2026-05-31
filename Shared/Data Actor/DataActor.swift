@@ -7,14 +7,31 @@ actor DataActor {
     nonisolated(unsafe) private static var _shared = DataActor(collectionID: PicLibrary.defaultID)
     static var shared: DataActor { _shared }
 
+    /// Cache of actors for non-active libraries, so routing sync changes doesn't
+    /// open a fresh SQLite connection per record. Guarded by `instancesLock`.
+    nonisolated(unsafe) private static var instances: [String: DataActor] = [:]
+    private static let instancesLock = NSLock()
+
     static func switchLibrary(to collectionID: String) {
+        instancesLock.lock()
+        instances[collectionID] = nil
+        instancesLock.unlock()
         _shared = DataActor(collectionID: collectionID)
     }
 
-    /// Returns the shared actor if it serves `collectionID`, else a dedicated
-    /// actor for that library (used to route incoming sync changes).
+    /// Returns the shared actor if it serves `collectionID`, else a cached
+    /// dedicated actor for that library (used to route incoming sync changes).
+    /// Caching keeps a single connection per library — applying or building
+    /// thousands of records for a non-active library would otherwise open a new
+    /// connection (and re-run schema setup) on every call.
     static func instance(for collectionID: String) -> DataActor {
-        _shared.collectionID == collectionID ? _shared : DataActor(collectionID: collectionID)
+        if _shared.collectionID == collectionID { return _shared }
+        instancesLock.lock()
+        defer { instancesLock.unlock() }
+        if let existing = instances[collectionID] { return existing }
+        let actor = DataActor(collectionID: collectionID)
+        instances[collectionID] = actor
+        return actor
     }
 
     nonisolated let collectionID: String
