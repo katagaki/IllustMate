@@ -1,10 +1,3 @@
-//
-//  PictureInPictureManager.swift
-//  PicMate
-//
-//  Created on 2026/03/10.
-//
-
 import AVFoundation
 import AVKit
 import CoreMedia

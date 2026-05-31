@@ -1,10 +1,3 @@
-//
-//  ProminentColor.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/14.
-//
-
 import UIKit
 
 enum ProminentColor {

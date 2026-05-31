@@ -1,10 +1,3 @@
-//
-//  PhotosCollectionView.swift
-//  PicMate
-//
-//  Created on 2026/02/26.
-//
-
 import Photos
 import SwiftUI
 

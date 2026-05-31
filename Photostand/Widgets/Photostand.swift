@@ -1,10 +1,3 @@
-//
-//  Photostand.swift
-//  Photostand
-//
-//  Created by シン・ジャスティン on 2026/03/09.
-//
-
 import AppIntents
 import SwiftUI
 import WidgetKit

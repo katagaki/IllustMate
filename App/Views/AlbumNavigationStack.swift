@@ -1,10 +1,3 @@
-//
-//  AlbumNavigationStack.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/07.
-//
-
 import SwiftUI
 
 struct AlbumNavigationStack: View {

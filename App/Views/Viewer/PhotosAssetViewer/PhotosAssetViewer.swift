@@ -1,10 +1,3 @@
-//
-//  PhotosAssetViewer.swift
-//  PicMate
-//
-//  Created on 2026/02/28.
-//
-
 import AVKit
 import Photos
 import SwiftUI

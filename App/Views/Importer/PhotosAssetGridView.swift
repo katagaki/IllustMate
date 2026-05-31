@@ -1,10 +1,3 @@
-//
-//  PhotosAssetGridView.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/22.
-//
-
 import AVFoundation
 import Photos
 import SwiftUI

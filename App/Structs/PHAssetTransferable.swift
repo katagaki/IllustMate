@@ -1,10 +1,3 @@
-//
-//  PHAssetTransferable.swift
-//  PicMate
-//
-//  Created on 2026/03/09.
-//
-
 import CoreTransferable
 import Foundation
 import UniformTypeIdentifiers

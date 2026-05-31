@@ -1,10 +1,3 @@
-//
-//  PicsGrid.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/08.
-//
-
 import SwiftUI
 
 struct PicsGrid<Content: View>: View {

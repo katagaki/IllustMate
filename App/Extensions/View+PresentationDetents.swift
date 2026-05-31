@@ -1,10 +1,3 @@
-//
-//  View.swift
-//  PicMate
-//
-//  Created on 2026/03/11.
-//
-
 import SwiftUI
 
 extension View {

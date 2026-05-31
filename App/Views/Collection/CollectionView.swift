@@ -1,10 +1,3 @@
-//
-//  CollectionView.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/03.
-//
-
 import Photos
 import SwiftUI
 

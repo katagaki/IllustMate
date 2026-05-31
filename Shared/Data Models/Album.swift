@@ -1,10 +1,3 @@
-//
-//  Album.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import CoreTransferable
 import Foundation
 import SwiftUI

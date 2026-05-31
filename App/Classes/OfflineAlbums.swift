@@ -1,10 +1,3 @@
-//
-//  OfflineAlbums.swift
-//  PicMate
-//
-//  Created by Claude on 2026/05/28.
-//
-
 import Foundation
 
 /// Device-local registry of albums pinned for offline access (not synced).

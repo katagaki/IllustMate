@@ -1,10 +1,3 @@
-//
-//  PhotosViewerManager.swift
-//  PicMate
-//
-//  Created on 2026/03/08.
-//
-
 import Foundation
 import Photos
 import SwiftUI

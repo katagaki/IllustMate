@@ -1,10 +1,3 @@
-//
-//  PicLabel.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/06.
-//
-
 import SwiftUI
 
 final class ThumbnailCache: @unchecked Sendable {

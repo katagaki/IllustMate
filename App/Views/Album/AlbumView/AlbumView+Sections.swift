@@ -1,10 +1,3 @@
-//
-//  AlbumView+Sections.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/24.
-//
-
 import SwiftUI
 
 extension AlbumView {

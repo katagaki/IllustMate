@@ -1,10 +1,3 @@
-//
-//  CloudDownloadMonitor.swift
-//  PicMate
-//
-//  Created by Claude on 2026/05/28.
-//
-
 import Foundation
 
 /// Watches a single iCloud Drive item's download percentage via NSMetadataQuery

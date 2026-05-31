@@ -1,10 +1,3 @@
-//
-//  AuthenticationManager.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/01.
-//
-
 import LocalAuthentication
 import SwiftUI
 

@@ -1,10 +1,3 @@
-//
-//  DataActor+Pics.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/02/22.
-//
-
 import Foundation
 @preconcurrency import SQLite
 

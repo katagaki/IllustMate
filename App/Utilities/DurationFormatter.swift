@@ -1,10 +1,3 @@
-//
-//  DurationFormatter.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/04/02.
-//
-
 import Foundation
 
 func formatDuration(_ seconds: TimeInterval) -> String {

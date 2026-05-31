@@ -1,10 +1,3 @@
-//
-//  AlbumView+Functions.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/15.
-//
-
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import Foundation

@@ -1,10 +1,3 @@
-//
-//  WebServerManager+Routes.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/16.
-//
-
 import Foundation
 import UIKit
 

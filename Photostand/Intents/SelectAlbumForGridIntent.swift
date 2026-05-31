@@ -1,10 +1,3 @@
-//
-//  SelectAlbumForGridIntent.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import AppIntents
 
 struct SelectAlbumForGridIntent: WidgetConfigurationIntent {

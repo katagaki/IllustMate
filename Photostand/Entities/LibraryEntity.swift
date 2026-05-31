@@ -1,10 +1,3 @@
-//
-//  LibraryEntity.swift
-//  PicMate
-//
-//  Created by Claude on 2026/05/29.
-//
-
 import AppIntents
 import WidgetKit
 

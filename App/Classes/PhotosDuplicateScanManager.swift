@@ -1,10 +1,3 @@
-//
-//  PhotosDuplicateScanManager.swift
-//  PicMate
-//
-//  Created on 2026/03/15.
-//
-
 import Foundation
 import Photos
 import SwiftUI

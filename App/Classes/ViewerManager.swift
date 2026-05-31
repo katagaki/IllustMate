@@ -1,10 +1,3 @@
-//
-//  ViewerManager.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/13.
-//
-
 import AVFoundation
 import Foundation
 import StoreKit

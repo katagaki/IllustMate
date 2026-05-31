@@ -1,10 +1,3 @@
-//
-//  SyncMate+Delegate.swift
-//  PicMate
-//
-//  Created by Claude on 2026/05/28.
-//
-
 @preconcurrency import CloudKit
 import Foundation
 

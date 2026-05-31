@@ -1,10 +1,3 @@
-//
-//  SampleDataGenerator.swift
-//  PicMate
-//
-//  Created by Claude on 2026/05/28.
-//
-
 #if DEBUG
 import CoreGraphics
 import Foundation

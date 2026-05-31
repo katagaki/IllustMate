@@ -1,10 +1,3 @@
-//
-//  AlbumGridLabel.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/06.
-//
-
 import Combine
 import SwiftUI
 

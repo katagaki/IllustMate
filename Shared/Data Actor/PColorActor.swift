@@ -1,10 +1,3 @@
-//
-//  PColorActor.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/14.
-//
-
 import Foundation
 @preconcurrency import SQLite
 

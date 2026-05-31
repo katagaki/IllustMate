@@ -1,10 +1,3 @@
-//
-//  EditLibrarySheet.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/18.
-//
-
 import SwiftUI
 
 // swiftlint:disable:next type_body_length

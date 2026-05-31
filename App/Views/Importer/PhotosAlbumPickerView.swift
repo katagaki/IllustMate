@@ -1,10 +1,3 @@
-//
-//  PhotosAlbumPickerView.swift
-//  PicMate
-//
-//  Created on 2026/02/22.
-//
-
 import Photos
 import SwiftUI
 

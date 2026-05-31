@@ -1,10 +1,3 @@
-//
-//  PicViewer+Functions.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2026/03/20.
-//
-
 import AVKit
 import SwiftUI
 

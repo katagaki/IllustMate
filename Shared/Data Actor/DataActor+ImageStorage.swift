@@ -1,10 +1,3 @@
-//
-//  DataActor+ImageStorage.swift
-//  PicMate
-//
-//  Created by Claude on 2026/05/28.
-//
-
 import Foundation
 @preconcurrency import SQLite
 

@@ -1,10 +1,3 @@
-//
-//  PicMateApp.swift
-//  PicMate
-//
-//  Created by シン・ジャスティン on 2023/10/02.
-//
-
 import BackgroundTasks
 import Combine
 import StoreKit

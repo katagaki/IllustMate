@@ -1,10 +1,3 @@
-//
-//  PicLibrary.swift
-//  PicMate
-//
-//  Created by Claude on 2026/03/17.
-//
-
 import Foundation
 
 final class PicLibrary: Identifiable, Hashable, @unchecked Sendable {
