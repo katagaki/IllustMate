@@ -31,8 +31,6 @@ struct GridAlbumEntity: AppEntity {
     }
 }
 
-/// Resolves albums for the library currently chosen in the widget configuration,
-/// falling back to the default (Collection) library when none is selected yet.
 enum AlbumEntityResolver {
     static func suggested(forLibraryID libraryID: String) -> [(id: String, name: String)] {
         PhotostandDatabase.fetchAllAlbums(inLibraryWithID: libraryID)
@@ -40,8 +38,6 @@ enum AlbumEntityResolver {
             .map { (id: $0.id, name: $0.name) }
     }
 
-    /// Looks an album up by ID, preferring the selected library and then scanning
-    /// the rest, so a stored selection still resolves after a reload.
     static func find(id: String, preferringLibraryID libraryID: String) -> (id: String, libraryID: String, name: String)? {
         if let record = PhotostandDatabase.fetchAlbum(withID: id, inLibraryWithID: libraryID) {
             return (record.id, libraryID, record.name)

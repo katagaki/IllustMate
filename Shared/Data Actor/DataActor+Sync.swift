@@ -7,7 +7,6 @@ enum SyncRecordType {
     static let library = "Library"
 }
 
-/// Sendable snapshot of a library registry entry, exchanged with SyncMate.
 struct LibrarySyncSnapshot: Sendable {
     let id: String
     let name: String
@@ -15,7 +14,6 @@ struct LibrarySyncSnapshot: Sendable {
     let lastModified: Double
 }
 
-/// Sendable snapshot of a pic's synced metadata, exchanged with SyncMate.
 struct PicSyncSnapshot: Sendable {
     let id: String
     let name: String
@@ -37,7 +35,6 @@ struct AlbumSyncSnapshot: Sendable {
     let lastModified: Double
 }
 
-/// Where a pic's full-resolution original lives, used to mirror it to iCloud Drive.
 struct OriginalLocation: Sendable {
     let mediaType: MediaType
     let filename: String?
@@ -48,7 +45,6 @@ extension DataActor {
 
     var syncTimestamp: Double { Date.now.timeIntervalSince1970 }
 
-    /// Records a deletion so it can be propagated to other devices.
     func recordTombstone(id: String, recordType: String) {
         _ = try? database.run(tombstonesTable.insert(or: .replace,
             tombstoneId <- id,
@@ -63,16 +59,12 @@ extension DataActor {
         }
     }
 
-    /// Whether a pic was ever confirmed in CloudKit. A never-synced record's
-    /// deletion needs no tombstone (the cloud never saw it), so gating on this
-    /// keeps the tombstones table from growing forever for non-sync users.
     func picWasSynced(id: String) -> Bool {
         let query = picsTable.filter(picId == id).select(syncCKSystemFields)
         guard let row = try? database.pluck(query) else { return false }
         return ((try? row.get(syncCKSystemFields)) ?? nil) != nil
     }
 
-    /// Subset of `ids` whose pics were confirmed in CloudKit (see `picWasSynced`).
     func syncedPicIDs(among ids: [String]) -> [String] {
         guard !ids.isEmpty else { return [] }
         let query = picsTable
@@ -81,7 +73,6 @@ extension DataActor {
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// Whether an album was ever confirmed in CloudKit (see `picWasSynced`).
     func albumWasSynced(id: String) -> Bool {
         let query = albumsTable.filter(albumId == id).select(syncCKSystemFields)
         guard let row = try? database.pluck(query) else { return false }
@@ -100,14 +91,11 @@ extension DataActor {
             .map { $0[picId] }) ?? []
     }
 
-    /// Albums never confirmed as synced (no CloudKit system fields). The
-    /// consistency pass re-enqueues these so the cloud can't be left missing them.
     func unsyncedAlbumIDs() -> [String] {
         (try? database.prepare(albumsTable.filter(syncCKSystemFields == nil).select(albumId))
             .map { $0[albumId] }) ?? []
     }
 
-    /// Pics never confirmed as synced (no CloudKit system fields).
     func unsyncedPicIDs() -> [String] {
         (try? database.prepare(picsTable.filter(syncCKSystemFields == nil).select(picId))
             .map { $0[picId] }) ?? []
@@ -159,7 +147,6 @@ extension DataActor {
             .update(syncDirty <- false, syncCKSystemFields <- systemFields))
     }
 
-    /// Pics (image or video) with a local original not yet mirrored to iCloud Drive.
     func picIDsNeedingOriginalUpload() -> [String] {
         let query = picsTable
             .filter(picFilePath != nil && syncOriginalSynced == false)
@@ -167,9 +154,6 @@ extension DataActor {
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// `filename` is the name used inside the iCloud Originals subfolder (the pic
-    /// ID for images, `id.ext` for videos) and is nil for a video whose original
-    /// isn't present locally. `localURL` is set only when the file exists on disk.
     func originalLocation(forPicWithID id: String) -> OriginalLocation? {
         let query = picsTable.filter(picId == id).select(picFilePath, picMediaType)
         guard let row = try? database.pluck(query) else { return nil }
@@ -192,13 +176,10 @@ extension DataActor {
         _ = try? database.run(picsTable.filter(picId == id).update(syncOriginalSynced <- true))
     }
 
-    /// Clears every pic's original-upload flag (used when the originals container
-    /// changes, so originals re-upload into the new one).
     func resetOriginalSyncState() {
         _ = try? database.run(picsTable.update(syncOriginalSynced <- false))
     }
 
-    /// Pics in an album that currently have a local original file path set.
     func localOriginalPicIDs(inAlbum albumID: String) -> [String] {
         let query = picsTable
             .filter(picAlbumId == albumID && picFilePath != nil)
@@ -206,26 +187,20 @@ extension DataActor {
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// Pics across the library that currently have a local original file path set.
     func localOriginalPicIDs() -> [String] {
         let query = picsTable.filter(picFilePath != nil).select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// All pic IDs in the library, regardless of where the original lives.
     func allOriginalPicIDs() -> [String] {
         (try? database.prepare(picsTable.select(picId)).map { $0[picId] }) ?? []
     }
 
-    /// All pic IDs in an album, regardless of where the original lives.
     func allOriginalPicIDs(inAlbum albumID: String) -> [String] {
         let query = picsTable.filter(picAlbumId == albumID).select(picId)
         return (try? database.prepare(query).map { $0[picId] }) ?? []
     }
 
-    /// Drops the local copy of an original once it's mirrored to iCloud Drive.
-    /// Image paths are cleared so the pic re-downloads on demand; video paths are
-    /// kept so the original filename (and extension) stays known for iCloud reads.
     func evictLocalOriginal(picID: String) {
         let query = picsTable.filter(picId == picID).select(picFilePath, picMediaType)
         guard let row = try? database.pluck(query),

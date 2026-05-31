@@ -42,8 +42,6 @@ struct LibraryManagerSheet: View {
         }
         .phonePresentationDetents([.medium, .large])
         .onChange(of: libraryManager.currentLibrary.id) { _, _ in
-            // Close the Libraries UI when the active library changes (also
-            // dismisses the nested edit sheet) so the switched library shows.
             dismiss()
         }
     }

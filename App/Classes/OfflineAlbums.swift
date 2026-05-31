@@ -1,8 +1,5 @@
 import Foundation
 
-/// Device-local registry of albums pinned for offline access (not synced).
-/// Maps an album ID to the library (collection) it belongs to, so the sync
-/// refresh can keep their originals downloaded.
 enum OfflineAlbums {
 
     private static let key = "KeptOfflineAlbums"

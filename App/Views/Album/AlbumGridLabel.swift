@@ -9,9 +9,6 @@ struct AlbumGridLabel: View {
 
     @State private var downloadFraction: Double?
 
-    // Posted by OriginalsManager while an album is being saved offline. Kept as a
-    // raw name because this view is shared with the extension target, which can't
-    // see App-only code.
     private var progressPublisher: NotificationCenter.Publisher {
         NotificationCenter.default.publisher(for: Notification.Name("OfflineAlbumDownloadProgress"))
     }

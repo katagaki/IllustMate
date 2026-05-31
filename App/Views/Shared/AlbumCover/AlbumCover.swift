@@ -132,7 +132,6 @@ struct AlbumCover: View {
                 )
             }
 
-            // Darken the front card so a light cover still contrasts the donut.
             if isDownloading {
                 context.fill(cardPath, with: .color(.black.opacity(0.3)))
             }

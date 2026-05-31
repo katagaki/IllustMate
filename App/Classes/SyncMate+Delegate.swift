@@ -29,8 +29,6 @@ extension SyncMate: CKSyncEngineDelegate {
         let pending = syncEngine.state.pendingRecordZoneChanges.filter { scope.contains($0) }
         guard !pending.isEmpty else { return nil }
 
-        // Build records up front (DB access is async); drop saves whose record
-        // no longer exists locally.
         var records: [CKRecord.ID: CKRecord] = [:]
         for change in pending {
             if case .saveRecord(let recordID) = change {
@@ -219,13 +217,11 @@ extension SyncMate: CKSyncEngineDelegate {
         let error = failure.error
         if error.code == .serverRecordChanged,
            let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
-            // Last-writer-wins: accept the server's version.
             await applyRecord(serverRecord)
         } else if error.code == .zoneNotFound {
             syncEngine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: recordID.zoneID))])
             syncEngine.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
         }
-        // Otherwise transient: the record stays dirty and retries on the next sync.
     }
 
     private func handleAccountChange(_ change: CKSyncEngine.Event.AccountChange) {

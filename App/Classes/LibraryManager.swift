@@ -11,7 +11,6 @@ class LibraryManager: ObservableObject {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var currentLibraryID: String = PicLibrary.defaultID
 
-    /// Default library first, then alphabetical by name.
     private func sortedByName(_ libraries: [PicLibrary]) -> [PicLibrary] {
         libraries.sorted { lhs, rhs in
             if lhs.isDefault { return true }
@@ -35,8 +34,6 @@ class LibraryManager: ObservableObject {
         switchActors(to: currentLibrary.id)
     }
 
-    /// Reloads just the library list (e.g. after sync adds/removes a library)
-    /// without changing the active library.
     func reloadList() async {
         let allLibraries = await LibrariesActor.shared.allLibraries()
         withAnimation(.smooth.speed(2.0)) {

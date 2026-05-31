@@ -210,27 +210,22 @@ extension DataActor {
         let parentID = parentAlbumID(forAlbumWithID: albumID)
         let now = syncTimestamp
 
-        // Move direct pics to the parent album, or orphan them
         let picsQuery = picsTable.filter(picAlbumId == albumID)
         _ = try? database.run(picsQuery.update(
             picAlbumId <- parentID, syncDirty <- true, syncLastModified <- now
         ))
 
-        // Move child albums to the parent album, or orphan them
         let childAlbumsQuery = albumsTable.filter(albumParentId == albumID)
         _ = try? database.run(childAlbumsQuery.update(
             albumParentId <- parentID, syncDirty <- true, syncLastModified <- now
         ))
 
-        // Delete the album itself, leaving a tombstone so the delete syncs —
-        // but only if it was ever synced, else the tombstone is dead weight.
         if albumWasSynced(id: albumID) {
             recordTombstone(id: albumID, recordType: SyncRecordType.album)
         }
         let albumQuery = albumsTable.filter(albumId == albumID)
         _ = try? database.run(albumQuery.delete())
 
-        // Delete album preferences (local-only; not synced)
         let prefQuery = preferencesTable.filter(prefAlbumId == albumID)
         _ = try? database.run(prefQuery.delete())
     }

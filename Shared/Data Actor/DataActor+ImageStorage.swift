@@ -18,8 +18,6 @@ extension DataActor {
         }
     }
 
-    /// Image bytes are stored verbatim; the extension is irrelevant since the
-    /// data is always read back raw and decoded via `UIImage(data:)`.
     func saveImageFile(_ data: Data, id: String) -> String? {
         ensureImagesDirectoryExists()
         let relativePath = "\(Self.imagesDirectoryName)/\(id)"

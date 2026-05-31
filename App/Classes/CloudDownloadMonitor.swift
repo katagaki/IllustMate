@@ -1,8 +1,5 @@
 import Foundation
 
-/// Watches a single iCloud Drive item's download percentage via NSMetadataQuery
-/// and reports it (0...1) while a download is in flight. NSFileCoordinator only
-/// signals completion, so this query is the only source of a real percentage.
 @MainActor
 final class CloudDownloadMonitor {
 
@@ -10,8 +7,6 @@ final class CloudDownloadMonitor {
     private var pollTask: Task<Void, Never>?
     private var onProgress: ((Double) -> Void)?
 
-    /// Starts monitoring the ubiquity item whose file name is `fileName`
-    /// (originals are stored under their pic ID). Reports progress until stopped.
     func start(fileName: String, onProgress: @escaping (Double) -> Void) {
         stop()
         self.onProgress = onProgress

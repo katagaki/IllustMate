@@ -20,9 +20,6 @@ actor OriginalsManager {
 
     // MARK: - Paths
 
-    /// App-private `Originals/<library>/<Images|Videos>` folder in the iCloud
-    /// Drive ubiquity container. Kept outside `Documents/` so it isn't exposed in
-    /// the Files app, split per library and per media kind, while syncing over iCloud.
     private func originalsDirectory(for collectionID: String, mediaType: MediaType) -> URL? {
         let subfolder = mediaType == .video ? "Videos" : "Images"
         return FileManager.default.url(forUbiquityContainerIdentifier: Self.containerID)?
@@ -31,10 +28,6 @@ actor OriginalsManager {
             .appendingPathComponent(subfolder, isDirectory: true)
     }
 
-    /// iCloud URL of a pic's original, resolved without a database lookup: image
-    /// originals are stored under their bare ID, video originals keep their
-    /// extension and are located by listing the Videos folder for `id.*`. Falls
-    /// back to the pre-split `Originals/<library>/<id>` layout for older uploads.
     private func cloudURL(forPicID id: String, in collectionID: String) -> URL? {
         if let imagesDirectory = originalsDirectory(for: collectionID, mediaType: .pic) {
             let imageURL = imagesDirectory.appendingPathComponent(id)
@@ -58,8 +51,6 @@ actor OriginalsManager {
             .appendingPathComponent(id)
     }
 
-    /// Locates a video original by pic ID, tolerating undownloaded
-    /// `.id.ext.icloud` placeholder names that iCloud uses before materialization.
     private func enumerateVideoOriginal(in directory: URL, picID: String) -> URL? {
         guard let items = try? FileManager.default.contentsOfDirectory(
             at: directory, includingPropertiesForKeys: nil
@@ -89,9 +80,6 @@ actor OriginalsManager {
 
     // MARK: - Upload
 
-    /// Mirrors a pic's local original (image or video) into iCloud Drive
-    /// (idempotent) and marks it synced. Called reactively after a metadata
-    /// record uploads, and by the consistency pass for anything the cloud is missing.
     @discardableResult
     func uploadOriginal(picID: String, in collectionID: String) async -> OriginalUploadOutcome {
         let dataActor = DataActor.instance(for: collectionID)
@@ -120,8 +108,6 @@ actor OriginalsManager {
         return .uploaded
     }
 
-    /// Mirrors every local original not yet in iCloud Drive for a library, healing
-    /// originals the reactive path missed and migrating local videos into iCloud.
     func uploadMissingOriginals(in collectionID: String) async {
         guard !uploadingMissing.contains(collectionID) else { return }
         uploadingMissing.insert(collectionID)
@@ -147,9 +133,6 @@ actor OriginalsManager {
         if let sampleError { await SyncMate.shared.debugLog("orig err: \(sampleError)") }
     }
 
-    /// Once an original is confirmed uploaded, frees its local master so a synced
-    /// library relies on iCloud. Image paths are cleared; video paths are kept so
-    /// the extension stays known. Gated on `isUploaded`, never deleting the last copy.
     func reclaimUploadedOriginals(in collectionID: String) async {
         let dataActor = DataActor.instance(for: collectionID)
         for id in await dataActor.localOriginalPicIDs() {
@@ -161,8 +144,6 @@ actor OriginalsManager {
         }
     }
 
-    /// When the originals container changes, every pic's upload flag is stale, so
-    /// clear it across all libraries to re-upload into the new container.
     func resetSyncStateIfContainerChanged() async {
         guard defaults?.string(forKey: containerMarkerKey) != Self.containerID else { return }
         for id in await LibrariesActor.shared.allLibraryIDs() {
@@ -202,8 +183,6 @@ actor OriginalsManager {
         }
     }
 
-    /// Downloads an album's originals that aren't already materialized (Keep
-    /// Offline), posting progress so the cover can show a donut.
     func keepAlbumOffline(albumID: String, in collectionID: String) async {
         let allIDs = await DataActor.instance(for: collectionID).allOriginalPicIDs(inAlbum: albumID)
         let pending = allIDs.filter { id in
@@ -221,8 +200,6 @@ actor OriginalsManager {
         await postAlbumProgress(albumID, fraction: nil)
     }
 
-    /// Notifies album covers of offline-download progress. The observer name is
-    /// duplicated in AlbumGridLabel, which ships in the extension target.
     private func postAlbumProgress(_ albumID: String, fraction: Double?) async {
         await MainActor.run {
             var info: [String: Any] = ["albumID": albumID]
@@ -232,8 +209,6 @@ actor OriginalsManager {
         }
     }
 
-    /// Frees the local copies of an album's originals (Remove Download), keeping
-    /// thumbnails. Only evicts once iCloud confirms the upload.
     func removeAlbumDownload(albumID: String, in collectionID: String) async {
         let dataActor = DataActor.instance(for: collectionID)
         for id in await dataActor.localOriginalPicIDs(inAlbum: albumID) {
@@ -307,8 +282,6 @@ actor OriginalsManager {
         }
     }
 
-    /// Reads an image original from the iCloud Drive container, downloading it if
-    /// needed. iCloud manages local materialization and eviction.
     func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
         guard let cloudURL = cloudURL(forPicID: picID, in: collectionID) else {
             await SyncMate.shared.debugLog("fetch: no container")
@@ -327,8 +300,6 @@ actor OriginalsManager {
         return data
     }
 
-    /// Downloads a video original from iCloud Drive and returns a playable file
-    /// URL. Used when this device has no local copy (reclaimed or synced-in).
     func materializedVideoURL(picID: String, in collectionID: String) async -> URL? {
         guard let url = cloudURL(forPicID: picID, in: collectionID) else { return nil }
         if isMaterialized(url) { return url }
@@ -336,9 +307,6 @@ actor OriginalsManager {
         return await waitForDownload(url) ? url : nil
     }
 
-    /// Best-effort byte size of a pic's original in iCloud Drive (even when not
-    /// downloaded), used to estimate backup size for the free-space check. nil
-    /// when the size can't be determined.
     func originalSize(picID: String, in collectionID: String) async -> Int64? {
         guard let url = cloudURL(forPicID: picID, in: collectionID) else { return nil }
         let values = try? url.resourceValues(forKeys: [.fileSizeKey, .totalFileSizeKey])
@@ -349,10 +317,6 @@ actor OriginalsManager {
 
     // MARK: - Delete
 
-    /// Permanently removes a pic's original (image or video) from the iCloud
-    /// Drive container when its pic is deleted, so deleted media stops consuming
-    /// iCloud storage. Best-effort and idempotent; the deletion propagates to
-    /// other devices via iCloud Drive.
     func deleteCloudOriginal(picID: String, in collectionID: String) async {
         guard isUbiquityAvailable(),
               let cloudURL = cloudURL(forPicID: picID, in: collectionID) else { return }

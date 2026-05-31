@@ -17,9 +17,6 @@ actor LibrariesActor {
     let libraryCKSystemFields = Expression<Data?>("ck_system_fields")
     let librarySyncEnabled = Expression<Bool>("sync_enabled")
     let libraryStorageMode = Expression<String>("storage_mode")
-    // Mirror of each library's LibraryV2 migration state (source of truth lives
-    // in the library's own `migrations` table). Gates all sync activity so an
-    // unmigrated library never syncs.
     let libraryMigratedV2 = Expression<Bool>("migrated_v2")
     let tombstonesTable = Table("library_tombstones")
     let tombstoneId = Expression<String>("id")
@@ -62,7 +59,6 @@ actor LibrariesActor {
                     libraryName <- ""
                 ))
             }
-            // Sync bookkeeping (idempotent on existing DBs)
             _ = try? database.run(librariesTable.addColumn(libraryDirty, defaultValue: true))
             _ = try? database.run(librariesTable.addColumn(libraryLastModified, defaultValue: 0))
             _ = try? database.run(librariesTable.addColumn(libraryCKSystemFields))
@@ -138,7 +134,6 @@ actor LibrariesActor {
     func deleteLibrary(withID id: String) {
         guard id != PicLibrary.defaultID else { return }
 
-        // Record a tombstone so the deletion propagates, then delete the row
         _ = try? database.run(tombstonesTable.insert(or: .replace,
             tombstoneId <- id,
             tombstoneDeletedAt <- Date.now.timeIntervalSince1970
@@ -168,7 +163,6 @@ extension LibrariesActor {
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
 
-    /// Sync-enabled custom libraries never confirmed as synced (no system fields).
     func unsyncedLibraryIDs() -> [String] {
         let query = librariesTable
             .filter(libraryCKSystemFields == nil && librarySyncEnabled == true
@@ -188,9 +182,6 @@ extension LibrariesActor {
         (try? database.prepare(librariesTable.select(libraryId)).map { $0[libraryId] }) ?? []
     }
 
-    /// Libraries whose LibraryV2 migration mirror is not yet set. Used to
-    /// reconcile the mirror from each library's authoritative `migrations`
-    /// table before sync runs.
     func unmigratedLibraryIDs() -> [String] {
         let query = librariesTable.filter(libraryMigratedV2 == false).select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
@@ -212,7 +203,6 @@ extension LibrariesActor {
         _ = try? database.run(librariesTable.filter(libraryId == id).update(libraryStorageMode <- mode))
     }
 
-    /// Sync-enabled libraries set to keep every original on this device.
     func downloadAllLibraryIDs() -> [String] {
         let query = librariesTable
             .filter(librarySyncEnabled == true && libraryMigratedV2 == true
@@ -226,8 +216,6 @@ extension LibrariesActor {
         return (try? row.get(librarySyncEnabled)) ?? false
     }
 
-    /// Toggles per-library sync. Enabling also marks the library dirty so its
-    /// registry record uploads.
     func setSyncEnabled(_ enabled: Bool, forID id: String) {
         let query = librariesTable.filter(libraryId == id)
         if enabled {
@@ -269,9 +257,6 @@ extension LibrariesActor {
         ensureFolder(for: snapshot.id)
         let exists = ((try? database.scalar(librariesTable.filter(libraryId == snapshot.id).count)) ?? 0) > 0
         if exists {
-            // Preserve the local sync toggle: re-enabling here would override a
-            // library the user deliberately turned sync off for whenever any
-            // remote change (e.g. a rename from another device) arrives.
             _ = try? database.run(librariesTable.filter(libraryId == snapshot.id).update(
                 libraryName <- snapshot.name,
                 libraryDirty <- false,
@@ -279,11 +264,6 @@ extension LibrariesActor {
                 libraryLastModified <- snapshot.lastModified
             ))
         } else {
-            // A library arriving fresh via sync has no local image blobs (its
-            // pics sync in with no `data`; originals live in the iCloud
-            // container), so it's migrated by definition and may sync at once.
-            // The update branch leaves the flag alone: an existing local library
-            // may still have un-migrated blobs.
             _ = try? database.run(librariesTable.insert(or: .replace,
                 libraryId <- snapshot.id,
                 libraryName <- snapshot.name,

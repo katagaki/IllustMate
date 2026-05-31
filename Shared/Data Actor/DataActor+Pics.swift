@@ -77,8 +77,6 @@ extension DataActor {
     }
 
     func imageData(forPicWithID id: String) -> Data? {
-        // Prefer the externalized file; only fall back to the legacy blob when
-        // the file is absent (pre-migration row or a failed file write).
         let metaQuery = picsTable
             .filter(picId == id)
             .select(picFilePath, picMediaType)
@@ -97,8 +95,6 @@ extension DataActor {
         return try? database.pluck(blobQuery).flatMap { try? $0.get(picData) }
     }
 
-    /// Reads the raw stored blob for a pic, bypassing the file fallback.
-    /// Used by the blob-externalization migration.
     func rawBlobData(forPicWithID id: String) -> Data? {
         let query = picsTable
             .filter(picId == id)
@@ -110,8 +106,6 @@ extension DataActor {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         let thumbnailData = Pic.makeThumbnail(data)
-        // Store the image as a file; only keep the blob as a fallback if the
-        // file write fails, so a pic always has its bytes somewhere.
         let relativePath = saveImageFile(data, id: id)
         _ = try? database.run(picsTable.insert(
             picId <- id,
@@ -256,9 +250,6 @@ extension DataActor {
         }
     }
 
-    /// Local file URL for a video pic, or nil when no local copy exists (e.g. the
-    /// original was reclaimed after mirroring to iCloud, or this device only has
-    /// the synced metadata). Callers fall back to the iCloud Drive original.
     func videoURL(forPicWithID picID: String) -> URL? {
         let query = picsTable.filter(picId == picID).select(picFilePath)
         guard let row = try? database.pluck(query),

@@ -41,8 +41,6 @@ struct PhotostandDatabase {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID)
     }
 
-    /// Directory holding a library's database and media: the app-group root for
-    /// the default library, otherwise a per-library subfolder.
     private static func libraryBaseURL(forLibraryID libraryID: String) -> URL? {
         guard let base = appGroupURL() else { return nil }
         return libraryID == defaultLibraryID ? base : base.appendingPathComponent(libraryID)
@@ -147,9 +145,6 @@ struct PhotostandDatabase {
         }
     }
 
-    /// Resolves a pic's raw bytes, preferring the externalized image file, then the
-    /// iCloud Drive original, the legacy blob, and finally the thumbnail. Skips
-    /// items larger than `maxBlobSize` to stay within the widget's memory limit.
     private static func rawPicData(forID id: String, using database: Connection, libraryID: String) -> Data? {
         let query = picsTable.filter(picId == id)
             .select(picData, picFilePath, picMediaType, picThumbnailData)

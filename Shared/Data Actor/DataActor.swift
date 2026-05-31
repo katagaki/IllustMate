@@ -7,8 +7,6 @@ actor DataActor {
     nonisolated(unsafe) private static var _shared = DataActor(collectionID: PicLibrary.defaultID)
     static var shared: DataActor { _shared }
 
-    /// Cache of actors for non-active libraries, so routing sync changes doesn't
-    /// open a fresh SQLite connection per record. Guarded by `instancesLock`.
     nonisolated(unsafe) private static var instances: [String: DataActor] = [:]
     private static let instancesLock = NSLock()
 
@@ -19,11 +17,6 @@ actor DataActor {
         _shared = DataActor(collectionID: collectionID)
     }
 
-    /// Returns the shared actor if it serves `collectionID`, else a cached
-    /// dedicated actor for that library (used to route incoming sync changes).
-    /// Caching keeps a single connection per library — applying or building
-    /// thousands of records for a non-active library would otherwise open a new
-    /// connection (and re-run schema setup) on every call.
     static func instance(for collectionID: String) -> DataActor {
         if _shared.collectionID == collectionID { return _shared }
         instancesLock.lock()
@@ -66,20 +59,16 @@ actor DataActor {
     let prefPicColumnCount = Expression<Int>("pic_column_count")
     let prefHideSectionHeaders = Expression<Bool>("hide_section_headers")
 
-    // Sync bookkeeping columns (shared by albums + pics)
     let syncDirty = Expression<Bool>("dirty")
     let syncLastModified = Expression<Double>("last_modified")
     let syncCKSystemFields = Expression<Data?>("ck_system_fields")
-    // Whether a pic's full-resolution original has been mirrored to iCloud Drive.
     let syncOriginalSynced = Expression<Bool>("original_synced")
 
-    // Tombstones (deleted records, so deletions propagate during sync)
     let tombstonesTable = Table("tombstones")
     let tombstoneId = Expression<String>("id")
     let tombstoneRecordType = Expression<String>("record_type")
     let tombstoneDeletedAt = Expression<Double>("deleted_at")
 
-    // Per-library migration bookkeeping (e.g. the "LibraryV2" image-blob migration).
     let migrationsTable = Table("migrations")
     let migrationName = Expression<String>("migration_name")
     let migrationAppVersion = Expression<String>("app_version")
@@ -112,9 +101,6 @@ actor DataActor {
             fatalError("Could not open SQLite database: \(error)")
         }
         self.database = database
-        // Enable incremental vacuum so space freed by the image-blob migration
-        // can be reclaimed in batches. Takes effect on new databases here, and
-        // on existing ones after the migration's final VACUUM.
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
             try database.run(albumsTable.create(ifNotExists: true) { table in

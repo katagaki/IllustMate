@@ -12,10 +12,6 @@ enum SampleDataGenerator {
         let date: Date
     }
 
-    /// Seeds `picCount` pics and `albumCount` albums into `dataActor`.
-    /// Albums are created first (needed for nesting + assignment); pics are
-    /// rendered concurrently in a bounded task group so CPU-bound drawing
-    /// spreads across cores instead of running one-by-one.
     static func generate(
         picCount: Int,
         albumCount: Int,
@@ -126,8 +122,6 @@ enum SampleDataGenerator {
         return UIImage(cgImage: cgImage).data()
     }
 
-    /// Mesh-gradient look: a tiny random color grid upscaled with smooth
-    /// interpolation (renderable off the main actor, unlike SwiftUI MeshGradient).
     private static func drawMeshGradient(in context: CGContext, width: Int, height: Int,
                                          colorSpace: CGColorSpace) {
         let grid = Int.random(in: 3...4)

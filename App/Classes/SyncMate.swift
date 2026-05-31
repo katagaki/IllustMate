@@ -2,11 +2,7 @@
 import Foundation
 
 extension Notification.Name {
-    /// Posted (on the main actor) after sync applies remote record changes,
-    /// so data-backed views can refresh.
     static let syncDidApplyRemoteChanges = Notification.Name("SyncDidApplyRemoteChanges")
-    /// Posted after sync applies remote library-registry changes, so the
-    /// library list can refresh.
     static let syncDidApplyLibraryChanges = Notification.Name("SyncDidApplyLibraryChanges")
 }
 
@@ -26,8 +22,6 @@ actor SyncMate {
 
     var isRunning: Bool { engine != nil }
 
-    /// Creates the sync engine (idempotent). Pending changes the engine had
-    /// persisted resume automatically from the saved state.
     func start() {
         guard engine == nil else { return }
         let configuration = CKSyncEngine.Configuration(
@@ -42,8 +36,6 @@ actor SyncMate {
         engine = nil
     }
 
-    /// Scans a library for dirty records and tombstones and queues them for
-    /// upload (also ensuring the library's zone exists).
     func enqueueChanges(forLibrary collectionID: String) async {
         guard let engine else { return }
         let zoneID = Self.zoneID(for: collectionID)
@@ -70,8 +62,6 @@ actor SyncMate {
         engine.state.add(pendingRecordZoneChanges: pending)
     }
 
-    /// Scans the library registry (custom libraries only) and queues
-    /// create/rename/delete changes for the shared Libraries zone.
     func enqueueLibraryChanges() async {
         guard let engine else { return }
         engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.librariesZoneID))])

@@ -14,7 +14,6 @@ struct LibraryEntity: AppEntity {
         DisplayRepresentation(title: "\(name)")
     }
 
-    /// The default library has an empty stored name and is shown as "Collection".
     static func displayName(forID id: String, name: String) -> String {
         if id == PhotostandDatabase.defaultLibraryID || name.isEmpty {
             return String(localized: "Library.Default", table: "Widgets")
@@ -38,7 +37,6 @@ struct LibraryEntityQuery: EntityQuery {
         sorted(PhotostandDatabase.fetchAllLibraries()).map { LibraryEntity.entity(from: $0) }
     }
 
-    /// Default library first, then alphabetical.
     private func sorted(_ records: [PhotostandDatabase.LibraryRecord]) -> [PhotostandDatabase.LibraryRecord] {
         records.sorted { lhs, rhs in
             if lhs.id == PhotostandDatabase.defaultLibraryID { return true }

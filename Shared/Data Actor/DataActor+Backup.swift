@@ -9,18 +9,12 @@ enum BackupError: Error {
 
 extension DataActor {
 
-    /// A pic in a backup whose original bytes still need to be inlined.
     private struct BackupOriginal {
         let id: String
         let mediaType: Int
         let path: String?
     }
 
-    /// Produces a self-contained `.pics` backup that always includes every
-    /// original. `originalProvider`/`sizeProvider` (supplied by the app layer)
-    /// fetch a pic's bytes and size from iCloud Drive when the local copy has
-    /// been reclaimed. Throws if the destination can't fit the backup or if any
-    /// original can't be obtained, so a finished `.pics` is never incomplete.
     func backupDatabase(to destinationDirectoryURL: URL, libraryName: String,
                         originalProvider: (@Sendable (String) async -> Data?)? = nil,
                         sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
@@ -39,10 +33,6 @@ extension DataActor {
         let destinationURL = destinationDirectoryURL
             .appendingPathComponent(backupFileName(for: libraryName))
         try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
-        // Originals live outside the DB (in local files and/or iCloud Drive), so
-        // re-inline every image and video into the copy to make a self-contained
-        // `.pics`. On any failure the partial file is removed so it can't be
-        // mistaken for a complete backup.
         do {
             try await inlineOriginals(intoBackupAt: destinationURL,
                                       originalProvider: originalProvider, progress: progress)
@@ -52,8 +42,6 @@ extension DataActor {
         }
     }
 
-    /// Throws `BackupError.insufficientSpace` unless the destination volume can
-    /// hold the whole backup, checked before anything is downloaded or copied.
     private func ensureFreeSpace(at directory: URL,
                                  sizeProvider: (@Sendable (String) async -> Int64?)?) async throws {
         let payload = await backupEstimate(sizeProvider: sizeProvider).bytes
@@ -80,12 +68,6 @@ extension DataActor {
         return "Backup-\(sanitized)-\(timestamp).pics"
     }
 
-    /// Writes every pic's original bytes (image or video) into the backup
-    /// database's `data` column, so the resulting `.pics` is a blob-based,
-    /// self-contained file. Originals are read from the local Images/Videos
-    /// cache when present, or downloaded from iCloud Drive when evicted. Image
-    /// `file_path`s are cleared (the extension is irrelevant); video `file_path`s
-    /// are kept so the original extension survives for restore.
     private func inlineOriginals(intoBackupAt url: URL,
                                  originalProvider: (@Sendable (String) async -> Data?)?,
                                  progress: (@MainActor (Int, Int) -> Void)?) async throws {
@@ -117,9 +99,6 @@ extension DataActor {
         }
     }
 
-    /// Returns a pic's original bytes, preferring the local Images/Videos cache
-    /// and falling back to `originalProvider` (iCloud Drive) when the original
-    /// has been evicted to the cloud.
     private func originalBytes(picID: String, mediaType: Int, filePath: String?,
                                originalProvider: (@Sendable (String) async -> Data?)?) async -> Data? {
         let isVideo = mediaType == MediaType.video.rawValue
@@ -135,9 +114,6 @@ extension DataActor {
         return await originalProvider?(picID)
     }
 
-    /// Estimated item count and total bytes the finished `.pics` will occupy
-    /// (DB metadata plus every original inlined). Drives the free-space check
-    /// and the confirmation summary.
     func backupEstimate(sizeProvider: (@Sendable (String) async -> Int64?)?) async -> (count: Int, bytes: Int64) {
         var bytes = fileSize(at: databaseURL)
         var rows: [(id: String, mediaType: Int, path: String?)] = []
@@ -163,8 +139,6 @@ extension DataActor {
         return (rows.count, bytes)
     }
 
-    /// Free space needed to safely write a backup whose inlined payload is
-    /// `payloadBytes`, including headroom for SQLite write overhead.
     static func requiredFreeSpace(forBackupPayload payloadBytes: Int64) -> Int64 {
         payloadBytes + payloadBytes / 10 + 50_000_000
     }
@@ -195,7 +169,6 @@ extension DataActor {
             let newID = UUID().uuidString
             albumIDMap[oldID] = newID
             let oldParentID = try? foreignAlbum.get(albumParentId)
-            // Top-level albums go under the target album; nested ones are re-mapped next.
             _ = try? database.run(albumsTable.insert(
                 albumId <- newID,
                 albumName <- (try? foreignAlbum.get(albumName)) ?? "",
@@ -231,22 +204,12 @@ extension DataActor {
         }
         for foreignPic in try foreignDB.prepare(picsTable) {
             let id = (try? foreignPic.get(picId)) ?? UUID().uuidString
-            // Skip pics that already exist: importForeignPic writes the original
-            // to disk before its INSERT OR IGNORE, so without this an existing
-            // pic's on-disk file would be overwritten while its row is ignored.
             if ((try? database.scalar(picsTable.filter(picId == id).count)) ?? 0) > 0 { continue }
             let albumID = try? foreignPic.get(picAlbumId)
             importForeignPic(foreignPic, newID: id, albumID: albumID)
         }
     }
 
-    /// Restores one pic from a backup row into the externalized layout: the
-    /// inlined blob is written out to an image or video file (kept inline only
-    /// if the write fails). Video originals are reconstructed using the
-    /// extension carried in the backup's `file_path`. Uses INSERT OR IGNORE so
-    /// merges skip pics that already exist; for album imports the IDs are fresh
-    /// so it never conflicts. Rows without inlined bytes (e.g. videos from
-    /// older backups that excluded them) are skipped.
     private func importForeignPic(_ row: Row, newID: String, albumID: String?) {
         let mediaType = (try? row.get(picMediaType)) ?? 0
         let foreignFilePath = try? row.get(picFilePath)

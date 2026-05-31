@@ -13,14 +13,8 @@ class ViewerManager {
     var displayedThumbnail: UIImage?
     var displayedImage: UIImage?
     var isFullImageLoaded: Bool = false
-    /// Pic whose original is downloading from iCloud Drive (drives the viewer's
-    /// download indicator); nil when nothing is downloading.
     var downloadingOriginalPicID: String?
-    /// Download progress (0...1) for `downloadingOriginalPicID`, or nil while the
-    /// percentage isn't known yet (e.g. before bytes start arriving).
     var downloadProgress: Double?
-    /// Pic whose original download failed (e.g. the original isn't available yet
-    /// or iCloud was unreachable); drives the viewer's failure indicator.
     var failedDownloadPicID: String?
     var displayedVideoURL: URL?
     var videoPlayer: AVPlayer?
@@ -165,8 +159,6 @@ class ViewerManager {
         }
     }
 
-    /// Loads a video's playable URL, preferring the local copy and falling back
-    /// to the iCloud Drive original (downloading it) when none exists locally.
     private func loadVideo(for pic: Pic) {
         Task {
             var url = await DataActor.shared.videoURL(forPicWithID: pic.id)
@@ -199,9 +191,6 @@ class ViewerManager {
                 }
                 data = await OriginalsManager.shared.fetchOriginal(picID: picID,
                                                                    in: DataActor.shared.collectionID)
-                // Only tear down the (shared) monitor if it's still ours: if the
-                // user swiped to another undownloaded pic, that newer load now
-                // owns the monitor and stopping it here would freeze its donut.
                 if self.downloadingOriginalPicID == picID {
                     self.downloadMonitor.stop()
                     withAnimation(.smooth.speed(2.0)) {

@@ -7,11 +7,6 @@ struct DatabaseMigrator {
     private static let migratedVersionKey = "DatabaseMigratedVersion"
     private static let libraryV2CompletedKey = "LibraryV2MigrationsCompleted"
 
-    /// Gates the one-time, all-libraries LibraryV2 image-blob migration sweep.
-    /// Defaults to needed (flag absent) so every user updating from a build
-    /// older than 1.4 runs it once; cleared once every library is migrated.
-    /// Per-library state lives authoritatively in each library's `migrations`
-    /// table — this flag only decides whether to bother sweeping on launch.
     static func needsLibraryV2Migration() -> Bool {
         let defaults = UserDefaults(suiteName: appGroupID)
         return !(defaults?.bool(forKey: libraryV2CompletedKey) ?? false)

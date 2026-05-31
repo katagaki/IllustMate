@@ -71,8 +71,6 @@ struct IllustMateApp: App {
             pipManager.setup()
         }
         .task {
-            // Determine the active library and surface the migration screen
-            // first, before slower startup work, so it appears right away.
             await libraryManager.loadLibraries()
             await imageMigration.runPendingMigrations()
             do {
@@ -161,7 +159,6 @@ struct IllustMateApp: App {
         }
         let picCount = count("pics") ?? Int.random(in: 11000...15000)
         let albumCount = count("albums") ?? Int.random(in: 20...60)
-        // ?legacy=1 stores bytes as blobs so the image-blob migration can be tested.
         let legacyBlobs = (count("legacy") ?? 0) != 0
         Task { @MainActor in
             seedCurrent = 0

@@ -76,7 +76,6 @@ struct PhotostandProvider: AppIntentTimelineProvider {
         return Timeline(entries: entries, policy: .atEnd)
     }
 
-    /// Widgets render at 2x-3x scale, so target ~2x the point size.
     private func maxDimension(for family: WidgetFamily) -> CGFloat {
         switch family {
         case .systemSmall:
