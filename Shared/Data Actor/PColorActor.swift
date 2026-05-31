@@ -10,10 +10,6 @@ actor PColorActor {
         _shared = PColorActor(collectionID: collectionID)
     }
 
-    /// Returns the shared instance when it already targets the requested library, otherwise a
-    /// transient instance bound to that library's color database. Mirrors `DataActor.instance(for:)`
-    /// so callers (e.g. sync) can address a non-active library's cache without disturbing the
-    /// active one's connection.
     static func instance(for collectionID: String) -> PColorActor {
         if collectionID == _shared.collectionID {
             return _shared

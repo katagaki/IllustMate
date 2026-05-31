@@ -129,9 +129,7 @@ extension SyncMate: CKSyncEngineDelegate {
                     .append(deletion.recordID.recordName)
             }
         }
-        // Purge the local-only derived caches (perceptual hashes for duplicate scanning, prominent
-        // colors for color sort) for remotely-deleted pics. These caches aren't synced, so without
-        // this their rows would orphan and accumulate forever as deletions arrive from other devices.
+        // Purge local-only derived caches (hashes, colors) for remotely-deleted pics.
         for (collectionID, picIDs) in deletedPicIDsByCollection {
             await HashActor.instance(for: collectionID).deleteHashes(forPicIDs: picIDs)
             await PColorActor.instance(for: collectionID).deleteColors(forPicIDs: picIDs)

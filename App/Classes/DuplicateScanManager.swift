@@ -70,11 +70,7 @@ class DuplicateScanManager {
 
         scanTotal = uncachedIDs.count
 
-        // Hash from the thumbnail, not the full-resolution original. Thumbnails are stored in the
-        // synced database row and are never evicted, whereas originals are routinely absent locally
-        // once iCloud sync is on (Optimize storage evicts them after upload, and pics arriving from
-        // other devices only download their originals on demand). DHash downscales to 9x8 anyway, so
-        // the thumbnail yields an effectively identical hash while keeping the scan complete offline.
+        // Hash the synced thumbnail, not the original (which sync may evict or never download).
         for picID in uncachedIDs {
             if let data = await dataActor.thumbnailData(forPicWithID: picID),
                let image = UIImage(data: data),

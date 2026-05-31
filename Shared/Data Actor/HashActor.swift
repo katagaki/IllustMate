@@ -6,19 +6,14 @@ actor HashActor {
     nonisolated(unsafe) private static var _shared = HashActor(collectionID: PicLibrary.defaultID)
     static var shared: HashActor { _shared }
 
-    /// Bumped to 2 when duplicate scanning switched from hashing full-resolution originals to
-    /// hashing the (always-present, synced) thumbnail. Hashes stored under an older version are
-    /// treated as uncached so they get recomputed from the thumbnail on the next scan.
+    /// Bumped to 2 when scanning switched from hashing originals to hashing thumbnails; older
+    /// hashes are treated as uncached and recomputed.
     static let currentHashVersion = 2
 
     static func switchLibrary(to collectionID: String) {
         _shared = HashActor(collectionID: collectionID)
     }
 
-    /// Returns the shared instance when it already targets the requested library, otherwise a
-    /// transient instance bound to that library's hash database. Mirrors `DataActor.instance(for:)`
-    /// so callers (e.g. sync) can address a non-active library's cache without disturbing the
-    /// active one's connection.
     static func instance(for collectionID: String) -> HashActor {
         if collectionID == _shared.collectionID {
             return _shared
