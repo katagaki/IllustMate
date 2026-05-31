@@ -128,7 +128,7 @@ struct MoreBackupView: View {
 
     private func prepare() async {
         guard phase == .preparing else { return }
-        let dataActor = DataActor(collectionID: collectionID)
+        let dataActor = DataActor.instance(for: collectionID)
         let cid = collectionID
         let estimate = await dataActor.backupEstimate(sizeProvider: { picID in
             await OriginalsManager.shared.originalSize(picID: picID, in: cid)
@@ -155,7 +155,7 @@ struct MoreBackupView: View {
         phase = .exporting
         UIApplication.shared.isIdleTimerDisabled = true
         defer { UIApplication.shared.isIdleTimerDisabled = false }
-        let dataActor = DataActor(collectionID: collectionID)
+        let dataActor = DataActor.instance(for: collectionID)
         let cid = collectionID
         do {
             try await dataActor.backupDatabase(

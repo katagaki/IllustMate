@@ -11,15 +11,19 @@ class LibraryManager: ObservableObject {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var currentLibraryID: String = PicLibrary.defaultID
 
-    func loadLibraries() async {
-        let allLibraries = await LibrariesActor.shared.allLibraries()
-        let sorted = allLibraries.sorted { lhs, rhs in
+    /// Default library first, then alphabetical by name.
+    private func sortedByName(_ libraries: [PicLibrary]) -> [PicLibrary] {
+        libraries.sorted { lhs, rhs in
             if lhs.isDefault { return true }
             if rhs.isDefault { return false }
             return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
         }
+    }
+
+    func loadLibraries() async {
+        let allLibraries = await LibrariesActor.shared.allLibraries()
         withAnimation(.smooth.speed(2.0)) {
-            libraries = sorted
+            libraries = sortedByName(allLibraries)
         }
 
         if let saved = allLibraries.first(where: { $0.id == currentLibraryID }) {
@@ -35,13 +39,8 @@ class LibraryManager: ObservableObject {
     /// without changing the active library.
     func reloadList() async {
         let allLibraries = await LibrariesActor.shared.allLibraries()
-        let sorted = allLibraries.sorted { lhs, rhs in
-            if lhs.isDefault { return true }
-            if rhs.isDefault { return false }
-            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-        }
         withAnimation(.smooth.speed(2.0)) {
-            libraries = sorted
+            libraries = sortedByName(allLibraries)
         }
     }
 

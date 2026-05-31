@@ -10,7 +10,6 @@ struct LibraryManagerSheet: View {
     @State var newLibraryName: String = ""
     @State var libraryToEdit: PicLibrary?
 
-
     var body: some View {
         NavigationStack {
             libraryList
