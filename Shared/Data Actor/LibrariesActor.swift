@@ -269,10 +269,12 @@ extension LibrariesActor {
         ensureFolder(for: snapshot.id)
         let exists = ((try? database.scalar(librariesTable.filter(libraryId == snapshot.id).count)) ?? 0) > 0
         if exists {
+            // Preserve the local sync toggle: re-enabling here would override a
+            // library the user deliberately turned sync off for whenever any
+            // remote change (e.g. a rename from another device) arrives.
             _ = try? database.run(librariesTable.filter(libraryId == snapshot.id).update(
                 libraryName <- snapshot.name,
                 libraryDirty <- false,
-                librarySyncEnabled <- true,
                 libraryCKSystemFields <- snapshot.systemFields,
                 libraryLastModified <- snapshot.lastModified
             ))
