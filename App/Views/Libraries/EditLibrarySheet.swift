@@ -372,6 +372,7 @@ struct EditLibrarySheet: View {
             UIApplication.shared.isIdleTimerDisabled = true
             isFreeingUpSpace = true
         }
+        await dataActor.purgeMigratedBlobs()
         let reclaimed = await dataActor.reclaimDiskSpace()
         if !reclaimed {
             debugPrint("Free up space: no disk space was reclaimed")
