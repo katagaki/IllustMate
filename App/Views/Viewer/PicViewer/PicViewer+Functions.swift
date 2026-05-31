@@ -88,7 +88,35 @@ extension PicViewer {
                 }
             }
             .overlay(alignment: .bottomTrailing) {
-                if viewer.isDownloadingDisplayedOriginal {
+                if viewer.didDisplayedOriginalDownloadFail {
+                    Button {
+                        showDownloadFailedPopover = true
+                    } label: {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, .orange)
+                            .frame(width: 20.0, height: 20.0)
+                            .shadow(color: .black.opacity(0.4), radius: 2.0)
+                            .padding(8.0)
+                    }
+                    .buttonStyle(.plain)
+                    .transition(.opacity)
+                    .popover(isPresented: $showDownloadFailedPopover) {
+                        VStack(alignment: .leading, spacing: 8.0) {
+                            Label("Shared.OriginalUnavailable.Title", systemImage: "exclamationmark.circle")
+                                .font(.headline)
+                            Text("Shared.OriginalUnavailable.Description")
+                                .font(.subheadline)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(width: 260.0, alignment: .leading)
+                        .padding()
+                        .presentationCompactAdaptation(.popover)
+                    }
+                } else if viewer.isDownloadingDisplayedOriginal {
                     Group {
                         if let progress = viewer.downloadProgress {
                             ZStack {

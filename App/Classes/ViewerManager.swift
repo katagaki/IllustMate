@@ -19,6 +19,9 @@ class ViewerManager {
     /// Download progress (0...1) for `downloadingOriginalPicID`, or nil while the
     /// percentage isn't known yet (e.g. before bytes start arriving).
     var downloadProgress: Double?
+    /// Pic whose original download failed (e.g. the original isn't available yet
+    /// or iCloud was unreachable); drives the viewer's failure indicator.
+    var failedDownloadPicID: String?
     var displayedVideoURL: URL?
     var videoPlayer: AVPlayer?
 
@@ -30,6 +33,10 @@ class ViewerManager {
 
     var isDownloadingDisplayedOriginal: Bool {
         downloadingOriginalPicID != nil && downloadingOriginalPicID == displayedPicID
+    }
+
+    var didDisplayedOriginalDownloadFail: Bool {
+        failedDownloadPicID != nil && failedDownloadPicID == displayedPicID
     }
 
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
@@ -47,6 +54,7 @@ class ViewerManager {
         isFullImageLoaded = false
         downloadingOriginalPicID = nil
         downloadProgress = nil
+        failedDownloadPicID = nil
         downloadMonitor.stop()
         videoPlayer?.pause()
         videoPlayer = nil
@@ -179,7 +187,10 @@ class ViewerManager {
             var data = await DataActor.shared.imageData(forPicWithID: picID)
             if data == nil {
                 if self.displayedPicID == picID {
-                    withAnimation(.smooth.speed(2.0)) { self.downloadingOriginalPicID = picID }
+                    withAnimation(.smooth.speed(2.0)) {
+                        self.downloadingOriginalPicID = picID
+                        self.failedDownloadPicID = nil
+                    }
                     self.downloadProgress = nil
                     self.downloadMonitor.start(fileName: picID) { [weak self] fraction in
                         guard let self, self.downloadingOriginalPicID == picID else { return }
@@ -193,6 +204,9 @@ class ViewerManager {
                     withAnimation(.smooth.speed(2.0)) {
                         self.downloadingOriginalPicID = nil
                         self.downloadProgress = nil
+                        if data == nil {
+                            self.failedDownloadPicID = picID
+                        }
                     }
                 }
             }

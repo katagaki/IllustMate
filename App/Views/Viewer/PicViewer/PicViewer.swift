@@ -16,6 +16,7 @@ struct PicViewer: View {
     @State var magnificationAnchor: UnitPoint = .center
     @State var containingAlbumName: String?
     @State var showImageSize: Bool = true
+    @State var showDownloadFailedPopover: Bool = false
     @State var isRenamePicPresented: Bool = false
     @State var renamePicText: String = ""
     @State var displayedPicName: String = ""

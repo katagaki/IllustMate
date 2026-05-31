@@ -1955,6 +1955,88 @@
         }
       }
     },
+    "Shared.OriginalUnavailable.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Original wurde möglicherweise noch nicht vollständig synchronisiert oder dein Gerät konnte iCloud nicht erreichen. Überprüfe deine Internetverbindung und versuche es später erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The original may not have finished syncing yet, or your device couldn’t reach iCloud. Check your internet connection and try again later."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オリジナルの同期がまだ完了していないか、デバイスがiCloudに接続できませんでした。インターネット接続を確認して、後でもう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본 동기화가 아직 완료되지 않았거나 기기가 iCloud에 연결하지 못했습니다. 인터넷 연결을 확인하고 나중에 다시 시도하십시오."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原图可能尚未同步完成，或者您的设备无法连接到 iCloud。请检查网络连接，稍后再试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原圖可能尚未同步完成，或者您的裝置無法連線至 iCloud。請檢查網路連線，稍後再試。"
+          }
+        }
+      }
+    },
+    "Shared.OriginalUnavailable.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original nicht verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original Unavailable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オリジナルを利用できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "원본을 사용할 수 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法获取原图"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法取得原圖"
+          }
+        }
+      }
+    },
     "Shared.Pics" : {
       "extractionState" : "manual",
       "localizations" : {

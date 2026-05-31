@@ -81,7 +81,9 @@ actor OriginalsManager {
     }
 
     private func downloadingStatus(_ url: URL) -> URLUbiquitousItemDownloadingStatus? {
-        try? url.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
+        var url = url
+        url.removeAllCachedResourceValues()
+        return try? url.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
             .ubiquitousItemDownloadingStatus
     }
 
@@ -363,7 +365,7 @@ actor OriginalsManager {
         }
     }
 
-    private func waitForDownload(_ url: URL, timeoutSeconds: Int = 30) async -> Bool {
+    private func waitForDownload(_ url: URL, timeoutSeconds: Int = 10) async -> Bool {
         for _ in 0..<(timeoutSeconds * 2) {
             if downloadingStatus(url) == .current { return true }
             try? FileManager.default.startDownloadingUbiquitousItem(at: url)
