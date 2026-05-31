@@ -115,7 +115,7 @@ enum SampleDataGenerator {
             return Data()
         }
         drawMeshGradient(in: context, width: width, height: height, colorSpace: colorSpace)
-        for _ in 0..<Int.random(in: 0...5) {
+        for _ in 0..<Int.random(in: 2...10) {
             drawRandomShape(in: context, width: width, height: height)
         }
         guard let cgImage = context.makeImage() else { return Data() }
@@ -124,7 +124,25 @@ enum SampleDataGenerator {
 
     private static func drawMeshGradient(in context: CGContext, width: Int, height: Int,
                                          colorSpace: CGColorSpace) {
-        let grid = Int.random(in: 3...4)
+        // Stack several increasingly fine meshes on top of each other. A denser
+        // grid means more colour cells, and layering blends even more colours in,
+        // so the result has many more transitions across the frame. Those extra
+        // transitions give the JPEG encoder more high-frequency detail to store,
+        // raising the encoded file size without changing the output resolution.
+        context.interpolationQuality = .high
+        let layers = Int.random(in: 2...3)
+        for layer in 0..<layers {
+            let grid = Int.random(in: 10...20) + layer * 6
+            guard let mesh = makeMeshImage(grid: grid, colorSpace: colorSpace) else { continue }
+            context.setAlpha(layer == 0 ? 1.0 : CGFloat.random(in: 0.35...0.6))
+            context.setBlendMode(layer == 0 ? .normal : .overlay)
+            context.draw(mesh, in: CGRect(x: 0, y: 0, width: width, height: height))
+        }
+        context.setAlpha(1.0)
+        context.setBlendMode(.normal)
+    }
+
+    private static func makeMeshImage(grid: Int, colorSpace: CGColorSpace) -> CGImage? {
         var pixels = [UInt8]()
         pixels.reserveCapacity(grid * grid * 4)
         for _ in 0..<(grid * grid) {
@@ -133,17 +151,13 @@ enum SampleDataGenerator {
             pixels.append(.random(in: 0...255))
             pixels.append(255)
         }
-        guard let provider = CGDataProvider(data: Data(pixels) as CFData),
-              let small = CGImage(
-                  width: grid, height: grid, bitsPerComponent: 8, bitsPerPixel: 32,
-                  bytesPerRow: grid * 4, space: colorSpace,
-                  bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
-                  provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent
-              ) else {
-            return
-        }
-        context.interpolationQuality = .high
-        context.draw(small, in: CGRect(x: 0, y: 0, width: width, height: height))
+        guard let provider = CGDataProvider(data: Data(pixels) as CFData) else { return nil }
+        return CGImage(
+            width: grid, height: grid, bitsPerComponent: 8, bitsPerPixel: 32,
+            bytesPerRow: grid * 4, space: colorSpace,
+            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+            provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent
+        )
     }
 
     private static func drawRandomShape(in context: CGContext, width: Int, height: Int) {
