@@ -226,7 +226,9 @@ extension DataActor {
            let path = try? row.get(picFilePath) {
             deleteMediaFile(atRelativePath: path)
         }
-        recordTombstone(id: picID, recordType: SyncRecordType.pic)
+        if picWasSynced(id: picID) {
+            recordTombstone(id: picID, recordType: SyncRecordType.pic)
+        }
         let query = picsTable.filter(picId == picID)
         _ = try? database.run(query.delete())
     }
@@ -241,7 +243,7 @@ extension DataActor {
                 }
             }
         }
-        recordTombstones(ids: picIDs, recordType: SyncRecordType.pic)
+        recordTombstones(ids: syncedPicIDs(among: picIDs), recordType: SyncRecordType.pic)
         let query = picsTable.filter(picIDs.contains(picId))
         _ = try? database.run(query.delete())
     }

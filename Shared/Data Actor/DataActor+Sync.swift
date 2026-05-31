@@ -63,6 +63,31 @@ extension DataActor {
         }
     }
 
+    /// Whether a pic was ever confirmed in CloudKit. A never-synced record's
+    /// deletion needs no tombstone (the cloud never saw it), so gating on this
+    /// keeps the tombstones table from growing forever for non-sync users.
+    func picWasSynced(id: String) -> Bool {
+        let query = picsTable.filter(picId == id).select(syncCKSystemFields)
+        guard let row = try? database.pluck(query) else { return false }
+        return ((try? row.get(syncCKSystemFields)) ?? nil) != nil
+    }
+
+    /// Subset of `ids` whose pics were confirmed in CloudKit (see `picWasSynced`).
+    func syncedPicIDs(among ids: [String]) -> [String] {
+        guard !ids.isEmpty else { return [] }
+        let query = picsTable
+            .filter(ids.contains(picId) && syncCKSystemFields != nil)
+            .select(picId)
+        return (try? database.prepare(query).map { $0[picId] }) ?? []
+    }
+
+    /// Whether an album was ever confirmed in CloudKit (see `picWasSynced`).
+    func albumWasSynced(id: String) -> Bool {
+        let query = albumsTable.filter(albumId == id).select(syncCKSystemFields)
+        guard let row = try? database.pluck(query) else { return false }
+        return ((try? row.get(syncCKSystemFields)) ?? nil) != nil
+    }
+
     // MARK: - Upload: dirty records + tombstones
 
     func dirtyAlbumIDs() -> [String] {

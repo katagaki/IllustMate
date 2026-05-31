@@ -222,8 +222,11 @@ extension DataActor {
             albumParentId <- parentID, syncDirty <- true, syncLastModified <- now
         ))
 
-        // Delete the album itself, leaving a tombstone so the delete syncs
-        recordTombstone(id: albumID, recordType: SyncRecordType.album)
+        // Delete the album itself, leaving a tombstone so the delete syncs —
+        // but only if it was ever synced, else the tombstone is dead weight.
+        if albumWasSynced(id: albumID) {
+            recordTombstone(id: albumID, recordType: SyncRecordType.album)
+        }
         let albumQuery = albumsTable.filter(albumId == albumID)
         _ = try? database.run(albumQuery.delete())
 
