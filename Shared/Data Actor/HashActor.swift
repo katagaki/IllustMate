@@ -6,9 +6,22 @@ actor HashActor {
     nonisolated(unsafe) private static var _shared = HashActor(collectionID: PicLibrary.defaultID)
     static var shared: HashActor { _shared }
 
+    /// Bumped to 2 when scanning switched from hashing originals to hashing thumbnails; older
+    /// hashes are treated as uncached and recomputed.
+    static let currentHashVersion = 2
+
     static func switchLibrary(to collectionID: String) {
         _shared = HashActor(collectionID: collectionID)
     }
+
+    static func instance(for collectionID: String) -> HashActor {
+        if collectionID == _shared.collectionID {
+            return _shared
+        }
+        return HashActor(collectionID: collectionID)
+    }
+
+    nonisolated let collectionID: String
 
     let database: Connection
 
@@ -19,6 +32,7 @@ actor HashActor {
     let hashVersion = Expression<Int>("hash_version")
 
     init(collectionID: String) {
+        self.collectionID = collectionID
         let databaseFileName = "Hashes.db"
         let fileManager = FileManager.default
 
@@ -68,7 +82,9 @@ actor HashActor {
     }
 
     func allCachedHashes() -> [(String, UInt64)] {
-        let query = picHashesTable.select(hashPicId, hashValue)
+        let query = picHashesTable
+            .filter(hashVersion == Self.currentHashVersion)
+            .select(hashPicId, hashValue)
         guard let rows = try? database.prepare(query) else { return [] }
         return rows.compactMap { row in
             guard let picID = try? row.get(hashPicId),
@@ -78,7 +94,9 @@ actor HashActor {
     }
 
     func picIDsWithCachedHash() -> Set<String> {
-        let query = picHashesTable.select(hashPicId)
+        let query = picHashesTable
+            .filter(hashVersion == Self.currentHashVersion)
+            .select(hashPicId)
         guard let rows = try? database.prepare(query) else { return [] }
         var ids = Set<String>()
         for row in rows {
@@ -96,7 +114,7 @@ actor HashActor {
         _ = try? database.run(picHashesTable.insert(or: .replace,
             hashPicId <- picID,
             hashValue <- signedHash,
-            hashVersion <- 1
+            hashVersion <- Self.currentHashVersion
         ))
     }
 
@@ -104,6 +122,12 @@ actor HashActor {
 
     func deleteHash(forPicWithID picID: String) {
         let query = picHashesTable.filter(hashPicId == picID)
+        _ = try? database.run(query.delete())
+    }
+
+    func deleteHashes(forPicIDs picIDs: [String]) {
+        guard !picIDs.isEmpty else { return }
+        let query = picHashesTable.filter(picIDs.contains(hashPicId))
         _ = try? database.run(query.delete())
     }
 

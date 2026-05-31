@@ -70,8 +70,9 @@ class DuplicateScanManager {
 
         scanTotal = uncachedIDs.count
 
+        // Hash the synced thumbnail, not the original (which sync may evict or never download).
         for picID in uncachedIDs {
-            if let data = await dataActor.imageData(forPicWithID: picID),
+            if let data = await dataActor.thumbnailData(forPicWithID: picID),
                let image = UIImage(data: data),
                let hash = DHash.compute(from: image) {
                 await HashActor.shared.storeHash(hash, forPicWithID: picID)
