@@ -15,11 +15,6 @@ final class ImageMigrationManager {
     func runPendingMigrations() async {
         guard !isMigrating else { return }
         guard DatabaseMigrator.needsLibraryV2Migration() else { return }
-        // Present the cover up front. Scanning each library to learn whether it
-        // needs migrating takes time, and the collection UI behind us renders
-        // against half-migrated data during that check. Showing the cover
-        // immediately keeps that broken state hidden while we determine what (if
-        // anything) actually needs to be migrated.
         beginMigration()
         for id in await LibrariesActor.shared.allLibraryIDs() {
             await migrate(libraryID: id)
@@ -31,8 +26,6 @@ final class ImageMigrationManager {
     func runIfNeeded(for libraryID: String) async {
         guard !isMigrating else { return }
         let dataActor = DataActor.instance(for: libraryID)
-        // Only reveal the cover once we know this library genuinely needs work,
-        // so switching between already-migrated libraries never flashes it.
         guard await !dataActor.isLibraryV2MigrationComplete() else {
             await LibrariesActor.shared.setLibraryMigrated(true, forID: libraryID)
             return

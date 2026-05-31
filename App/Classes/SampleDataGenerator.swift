@@ -123,11 +123,6 @@ enum SampleDataGenerator {
 
     private static func drawMeshGradient(in context: CGContext, width: Int, height: Int,
                                          colorSpace: CGColorSpace) {
-        // Stack several increasingly fine meshes on top of each other. A denser
-        // grid means more colour cells, and layering blends even more colours in,
-        // so the result has many more transitions across the frame. Those extra
-        // transitions give the JPEG encoder more high-frequency detail to store,
-        // raising the encoded file size without changing the output resolution.
         context.interpolationQuality = .high
         let layers = Int.random(in: 2...3)
         for layer in 0..<layers {
