@@ -3,6 +3,7 @@ import Foundation
 @preconcurrency import SQLite
 
 enum ImageMigrationPhase: Sendable {
+    case preparing
     case copying
     case verifying
     case reclaiming
@@ -172,7 +173,6 @@ extension DataActor {
     }
 }
 
-#if DEBUG
 extension DataActor {
     func createImageBlobPic(_ name: String, data: Data,
                             inAlbumWithID albumID: String? = nil, dateAdded: Date? = nil) {
@@ -189,4 +189,3 @@ extension DataActor {
         ))
     }
 }
-#endif

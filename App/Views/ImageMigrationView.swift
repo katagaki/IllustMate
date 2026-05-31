@@ -71,6 +71,7 @@ struct ImageMigrationView: View {
     @ViewBuilder
     private var phaseLabel: some View {
         switch manager.phase {
+        case .preparing: Text("Migration.Phase.Preparing", tableName: "More")
         case .copying: Text("Migration.Phase.Copying", tableName: "More")
         case .verifying: Text("Migration.Phase.Verifying", tableName: "More")
         case .reclaiming: Text("Migration.Phase.Reclaiming", tableName: "More")
