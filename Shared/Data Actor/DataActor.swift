@@ -163,8 +163,60 @@ actor DataActor {
         }
     }
 
-    func vacuum() {
-        _ = try? self.database.vacuum()
+    /// Current auto_vacuum mode: 0 = NONE, 1 = FULL, 2 = INCREMENTAL.
+    func autoVacuumMode() -> Int64 {
+        ((try? database.scalar("PRAGMA auto_vacuum")) as? Int64) ?? 0
+    }
+
+    @discardableResult
+    func ensureIncrementalAutoVacuum() -> Bool {
+        if autoVacuumMode() == 2 { return true }
+        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
+        // The mode change only takes effect after a full VACUUM.
+        guard freeBytesAtDatabaseLocation() > databaseFileSizeBytes() else { return false }
+        do {
+            try database.vacuum()
+        } catch {
+            debugPrint("Auto-vacuum conversion VACUUM failed: \(error)")
+        }
+        return autoVacuumMode() == 2
+    }
+
+    @discardableResult
+    func reclaimDiskSpace() -> Bool {
+        if ensureIncrementalAutoVacuum() {
+            do {
+                try database.execute("PRAGMA incremental_vacuum;")
+                return true
+            } catch {
+                debugPrint("Incremental vacuum failed: \(error)")
+                return false
+            }
+        }
+        do {
+            try database.vacuum()
+            return true
+        } catch {
+            debugPrint("VACUUM failed: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func vacuum() -> Bool {
+        reclaimDiskSpace()
+    }
+
+    func databaseFileSizeBytes() -> Int64 {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: databaseURL.path)
+        return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
+    }
+
+    func freeBytesAtDatabaseLocation() -> Int64 {
+        let values = try? databaseURL.resourceValues(
+            forKeys: [.volumeAvailableCapacityForImportantUsageKey]
+        )
+        return values?.volumeAvailableCapacityForImportantUsage ?? Int64.max
     }
 
     // MARK: - Row to Model Helpers
