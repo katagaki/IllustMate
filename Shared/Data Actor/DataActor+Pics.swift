@@ -116,26 +116,39 @@ extension DataActor {
         return try? database.pluck(query).flatMap { try? $0.get(picData) }
     }
 
-    func createPic(_ name: String, data: Data, inAlbumWithID albumID: String? = nil, dateAdded: Date? = nil) {
+    @discardableResult
+    func createPic(_ name: String, data: Data, inAlbumWithID albumID: String? = nil, dateAdded: Date? = nil) -> Bool {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         let thumbnailData = Pic.makeThumbnail(data)
         let relativePath = saveImageFile(data, id: id)
-        _ = try? database.run(picsTable.insert(
-            picId <- id,
-            picName <- name,
-            picAlbumId <- albumID,
-            picDateAdded <- now.timeIntervalSince1970,
-            picData <- relativePath == nil ? data : nil,
-            picThumbnailData <- thumbnailData,
-            picMediaType <- MediaType.pic.rawValue,
-            picFilePath <- relativePath,
-            syncDirty <- true,
-            syncLastModified <- now.timeIntervalSince1970
-        ))
+        if relativePath == nil {
+            DataActor.logger.error(
+                "createPic: image file write failed for \(id, privacy: .public), storing blob fallback")
+        }
+        do {
+            try database.run(picsTable.insert(
+                picId <- id,
+                picName <- name,
+                picAlbumId <- albumID,
+                picDateAdded <- now.timeIntervalSince1970,
+                picData <- relativePath == nil ? data : nil,
+                picThumbnailData <- thumbnailData,
+                picMediaType <- MediaType.pic.rawValue,
+                picFilePath <- relativePath,
+                syncDirty <- true,
+                syncLastModified <- now.timeIntervalSince1970
+            ))
+        } catch {
+            DataActor.logger.error(
+                "createPic: insert failed for \(id, privacy: .public) in collection \(self.collectionID, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            return false
+        }
         notifyLocalMutation()
+        return true
     }
 
+    @discardableResult
     func createVideo(
         _ name: String,
         data: Data,
@@ -143,28 +156,36 @@ extension DataActor {
         fileExtension: String,
         inAlbumWithID albumID: String? = nil,
         dateAdded: Date? = nil
-    ) async {
+    ) async -> Bool {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         guard let relativePath = saveVideoFile(data, id: id, fileExtension: fileExtension) else {
-            return
+            DataActor.logger.error("createVideo: video file write failed for \(id, privacy: .public)")
+            return false
         }
         let videoURL = videoFileURL(forRelativePath: relativePath)
         let thumbnailData = await Pic.makeVideoThumbnail(videoURL)
-        _ = try? database.run(picsTable.insert(
-            picId <- id,
-            picName <- name,
-            picAlbumId <- albumID,
-            picDateAdded <- now.timeIntervalSince1970,
-            picData <- Data(),
-            picThumbnailData <- thumbnailData,
-            picMediaType <- MediaType.video.rawValue,
-            picDuration <- duration,
-            picFilePath <- relativePath,
-            syncDirty <- true,
-            syncLastModified <- now.timeIntervalSince1970
-        ))
+        do {
+            try database.run(picsTable.insert(
+                picId <- id,
+                picName <- name,
+                picAlbumId <- albumID,
+                picDateAdded <- now.timeIntervalSince1970,
+                picData <- Data(),
+                picThumbnailData <- thumbnailData,
+                picMediaType <- MediaType.video.rawValue,
+                picDuration <- duration,
+                picFilePath <- relativePath,
+                syncDirty <- true,
+                syncLastModified <- now.timeIntervalSince1970
+            ))
+        } catch {
+            DataActor.logger.error(
+                "createVideo: insert failed for \(id, privacy: .public) in collection \(self.collectionID, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            return false
+        }
         notifyLocalMutation()
+        return true
     }
 
     func addPics(withIDs picIDs: [String], toAlbumWithID albumID: String) {

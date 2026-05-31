@@ -188,6 +188,8 @@ struct ShareView: View {
 
     private func importItems(to albumID: String?) {
         Task {
+            importerLogger.debug(
+                "Importing \(itemsManager.items.count) item(s) to album \(albumID ?? "<collection root>", privacy: .public)")
             for item in itemsManager.items {
                 await importItem(item, to: albumID, named: Pic.newFilename())
                 await MainActor.run {
@@ -195,6 +197,8 @@ struct ShareView: View {
                 }
             }
             await MainActor.run {
+                importerLogger.debug(
+                    "Import finished with \(itemsManager.failedItemCount) failure(s) of \(Int(total)) item(s)")
                 if !showAnimationWhenSaving {
                     if itemsManager.failedItemCount == 0 {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -245,13 +249,18 @@ struct ShareView: View {
             }
             return
         }
+        importerLogger.error(
+            "Unsupported shared item of type \(String(describing: type(of: file)), privacy: .public)")
         await MainActor.run {
             itemsManager.failedItemCount += 1
         }
     }
 
     func importPic(_ name: String, data: Data, to albumID: String?) async {
-        await DataActor.shared.createPic(name, data: data, inAlbumWithID: albumID)
+        let success = await DataActor.shared.createPic(name, data: data, inAlbumWithID: albumID)
+        if !success {
+            await MainActor.run { itemsManager.failedItemCount += 1 }
+        }
     }
 
     func importVideo(_ url: URL, to albumID: String?, named name: String) async {
@@ -262,12 +271,15 @@ struct ShareView: View {
         let asset = AVURLAsset(url: url)
         let duration = (try? await asset.load(.duration))?.seconds ?? 0
         let ext = (name as NSString).pathExtension.lowercased()
-        await DataActor.shared.createVideo(
+        let success = await DataActor.shared.createVideo(
             name,
             data: videoData,
             duration: duration,
             fileExtension: ext.isEmpty ? "mov" : ext,
             inAlbumWithID: albumID
         )
+        if !success {
+            await MainActor.run { itemsManager.failedItemCount += 1 }
+        }
     }
 }

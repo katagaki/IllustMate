@@ -1,8 +1,11 @@
 import Foundation
+import os
 @preconcurrency import SQLite
 import SwiftUI
 
 actor DataActor {
+
+    static let logger = Logger(subsystem: "com.tsubuzaki.IllustMate", category: "DataActor")
 
     nonisolated(unsafe) private static var _shared = DataActor(collectionID: PicLibrary.defaultID)
     static var shared: DataActor { _shared }
@@ -91,6 +94,7 @@ actor DataActor {
                 self.databaseURL = folderURL.appendingPathComponent(databaseFileName)
             }
         } else {
+            Self.logger.fault("App group container unavailable for group.com.tsubuzaki.IllustMate")
             fatalError()
         }
 
@@ -98,8 +102,10 @@ actor DataActor {
         do {
             database = try Connection(self.databaseURL.path)
         } catch {
+            Self.logger.fault("Could not open SQLite database at \(self.databaseURL.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
             fatalError("Could not open SQLite database: \(error)")
         }
+        Self.logger.debug("Opened database for collection \(collectionID, privacy: .public) at \(self.databaseURL.path, privacy: .public)")
         self.database = database
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {

@@ -1,6 +1,9 @@
+import os
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
+
+let importerLogger = Logger(subsystem: "com.tsubuzaki.IllustMate", category: "Importer")
 
 class ShareViewController: UIViewController {
 
@@ -39,6 +42,7 @@ class ShareViewController: UIViewController {
     static func switchToCurrentLibrary() {
         let collectionID = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")?
             .string(forKey: "CurrentCollectionID") ?? PicLibrary.defaultID
+        importerLogger.debug("Switching importer to collection \(collectionID, privacy: .public)")
         DataActor.switchLibrary(to: collectionID)
         HashActor.switchLibrary(to: collectionID)
         CoverCacheActor.switchLibrary(to: collectionID)
