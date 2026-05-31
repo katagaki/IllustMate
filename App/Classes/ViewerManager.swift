@@ -199,8 +199,11 @@ class ViewerManager {
                 }
                 data = await OriginalsManager.shared.fetchOriginal(picID: picID,
                                                                    in: DataActor.shared.collectionID)
-                self.downloadMonitor.stop()
+                // Only tear down the (shared) monitor if it's still ours: if the
+                // user swiped to another undownloaded pic, that newer load now
+                // owns the monitor and stopping it here would freeze its donut.
                 if self.downloadingOriginalPicID == picID {
+                    self.downloadMonitor.stop()
                     withAnimation(.smooth.speed(2.0)) {
                         self.downloadingOriginalPicID = nil
                         self.downloadProgress = nil
