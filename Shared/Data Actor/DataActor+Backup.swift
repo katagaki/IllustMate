@@ -231,6 +231,10 @@ extension DataActor {
         }
         for foreignPic in try foreignDB.prepare(picsTable) {
             let id = (try? foreignPic.get(picId)) ?? UUID().uuidString
+            // Skip pics that already exist: importForeignPic writes the original
+            // to disk before its INSERT OR IGNORE, so without this an existing
+            // pic's on-disk file would be overwritten while its row is ignored.
+            if ((try? database.scalar(picsTable.filter(picId == id).count)) ?? 0) > 0 { continue }
             let albumID = try? foreignPic.get(picAlbumId)
             importForeignPic(foreignPic, newID: id, albumID: albumID)
         }
