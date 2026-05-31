@@ -107,6 +107,25 @@ extension DataActor {
         }
     }
 
+    @discardableResult
+    func purgeMigratedBlobs() -> Int {
+        guard isLibraryV2MigrationComplete() else { return 0 }
+        let query = picsTable
+            .filter(picFilePath != nil && picData != nil)
+            .select(picId)
+        let ids = (try? database.prepare(query).map { $0[picId] }) ?? []
+        var purged = 0
+        for id in ids where verifyMigratedFile(id: id) {
+            do {
+                try database.run(picsTable.filter(picId == id).update(picData <- nil))
+                purged += 1
+            } catch {
+                debugPrint("Failed to purge migrated blob for \(id): \(error)")
+            }
+        }
+        return purged
+    }
+
     // MARK: - Helpers
 
     private func pendingMigrationIDs() -> [String] {
