@@ -3560,329 +3560,166 @@
         }
       }
     },
-    "Troubleshooting.FreeUpSpace" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speicherplatz freigeben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Free Up Space"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "空き領域を増やす"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "공간 확보"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "释放空间"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "釋放空間"
-          }
-        }
-      }
-    },
-    "Troubleshooting.FreeUpSpace.Confirm.Message" : {
+    "Troubleshooting.VerifyConsistency" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Bibliothek wird optimiert, um Speicherplatz freizugeben. Dies kann einige Minuten dauern. Sind Sie sicher?"
+            "value" : "Konsistenz prüfen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This will optimize this library to free up space, and may take a few minutes to complete. Are you sure?"
+            "value" : "Verify Consistency"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このライブラリを最適化して空き領域を増やします。完了までに数分かかる場合があります。よろしいですか？"
+            "value" : "整合性を確認"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이 라이브러리를 최적화하여 공간을 확보합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
+            "value" : "일관성 확인"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这将优化此资料库以释放空间，可能需要几分钟才能完成。确定要继续吗？"
+            "value" : "验证一致性"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "這將優化此資料庫以釋放空間，可能需要幾分鐘才能完成。確定要繼續嗎？"
+            "value" : "驗證一致性"
           }
         }
       }
     },
-    "Troubleshooting.FreeUpSpace.Confirm.Title" : {
+    "Troubleshooting.VerifyConsistency.Confirm.Message" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Speicherplatz freigeben"
+            "value" : "Verbleibende Originale werden aus der Datenbank ausgelagert, jede Kopie wird per Hash überprüft und anschließend wird die Datenbank komprimiert, um Speicherplatz freizugeben. Dies kann einige Minuten dauern. Sind Sie sicher?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Free Up Space"
+            "value" : "This will move any remaining originals out of the database, verify each copy by its hash, then compact the database to free up space. This may take a few minutes to complete. Are you sure?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "空き容量を増やす"
+            "value" : "データベースに残っているオリジナルをファイルへ移行し、ハッシュで各コピーを検証してから、データベースを最適化して空き領域を増やします。完了までに数分かかる場合があります。よろしいですか？"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "공간 확보"
+            "value" : "데이터베이스에 남아 있는 원본을 파일로 옮기고 해시로 각 사본을 검증한 다음 데이터베이스를 압축하여 공간을 확보합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "释放空间"
+            "value" : "这会将数据库中剩余的原图移出到文件，通过哈希校验每个副本，然后压缩数据库以释放空间。可能需要几分钟才能完成。确定要继续吗？"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "釋放空間"
+            "value" : "這會將資料庫中剩餘的原圖移出到檔案，透過雜湊校驗每個副本，然後壓縮資料庫以釋放空間。可能需要幾分鐘才能完成。確定要繼續嗎？"
           }
         }
       }
     },
-    "Troubleshooting.FreeUpSpace.Freeing" : {
+    "Troubleshooting.VerifyConsistency.Confirm.Title" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Speicherplatz wird freigegeben …"
+            "value" : "Konsistenz prüfen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Freeing up disk space..."
+            "value" : "Verify Consistency"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データベースを最適化中…"
+            "value" : "整合性を確認"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "디스크 공간 확보 중…"
+            "value" : "일관성 확인"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在释放磁盘空间…"
+            "value" : "验证一致性"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在釋放磁碟空間⋯"
+            "value" : "驗證一致性"
           }
         }
       }
     },
-    "Troubleshooting.RebuildThumbnails" : {
+    "Troubleshooting.VerifyConsistency.Verifying" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Miniaturbilder neu erstellen"
+            "value" : "Konsistenz wird geprüft …"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recreate All Thumbnails"
+            "value" : "Verifying consistency..."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべてのサムネイルを再生成"
+            "value" : "整合性を確認中…"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "모든 썸네일 재생성"
+            "value" : "일관성 확인 중…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重新创建所有缩略图"
+            "value" : "正在验证一致性…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重新建立所有縮圖"
-          }
-        }
-      }
-    },
-    "Troubleshooting.RebuildThumbnails.Confirm.Message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Miniaturbilder dieser Bibliothek werden neu erstellt. Dies kann einige Minuten dauern. Sind Sie sicher?"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This will regenerate all thumbnails for this library, and may take a few minutes to complete. Are you sure?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このライブラリのすべてのサムネイルを再生成します。完了までに数分かかる場合があります。よろしいですか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 라이브러리의 모든 썸네일을 다시 생성합니다. 완료하는 데 몇 분 정도 걸릴 수 있습니다. 계속하시겠습니까?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这将重新生成此资料库的所有缩略图，可能需要几分钟才能完成。确定要继续吗？"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "這將重新產生此資料庫的所有縮圖，可能需要幾分鐘才能完成。確定要繼續嗎？"
-          }
-        }
-      }
-    },
-    "Troubleshooting.RebuildThumbnails.Confirm.Title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Miniaturbilder neu erstellen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rebuild Thumbnails"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルを再構築"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "썸네일 재생성"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新创建缩略图"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新建立縮圖"
-          }
-        }
-      }
-    },
-    "Troubleshooting.RebuildThumbnails.Rebuilding" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Miniaturbilder werden neu erstellt …"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recreating thumbnails..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サムネイルを再生成中…"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "썸네일 재생성 중…"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在重新创建缩略图…"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在重新建立縮圖⋯"
+            "value" : "正在驗證一致性⋯"
           }
         }
       }
