@@ -4,3 +4,15 @@
   requirement or gotcha (e.g. a surprising API behavior or workaround).
 - Never comment to explain *what* the code does, restate logic, or justify a
   design choice. No multi-line blocks, no doc comments.
+
+# Concurrency
+
+- Respect Swift 6 strict concurrency. Code must compile cleanly under the
+  Swift 6 language mode without data-race or actor-isolation errors.
+- In an `actor`'s `init`, only assign to stored properties; never read an
+  isolated property back (e.g. `self.foo`) before init completes, or the
+  compiler treats `self` as fully initialized and rejects later assignments.
+  Use a local variable and assign once.
+- Keep `Sendable` correct: don't capture non-`Sendable` values across
+  isolation boundaries, and prefer marking types `Sendable` over reaching for
+  `@unchecked Sendable` or `nonisolated(unsafe)`.
