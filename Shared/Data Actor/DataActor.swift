@@ -30,6 +30,7 @@ actor DataActor {
     nonisolated let collectionID: String
     let database: Connection
     let databaseURL: URL
+    private var isIncrementalAutoVacuumActive: Bool
 
     let albumsTable = Table("albums")
     let picsTable = Table("pics")
@@ -101,6 +102,10 @@ actor DataActor {
             fatalError("Could not open SQLite database: \(error)")
         }
         self.database = database
+        // PRAGMA auto_vacuum reports the requested value immediately, even before
+        // a VACUUM applies it, so read the real mode before requesting the change.
+        let activeAutoVacuumMode = (try? database.scalar("PRAGMA auto_vacuum")) as? Int64 ?? 0
+        self.isIncrementalAutoVacuumActive = activeAutoVacuumMode == 2
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
             try database.run(albumsTable.create(ifNotExists: true) { table in
@@ -170,16 +175,17 @@ actor DataActor {
 
     @discardableResult
     func ensureIncrementalAutoVacuum() -> Bool {
-        if autoVacuumMode() == 2 { return true }
-        _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
-        // The mode change only takes effect after a full VACUUM.
+        if isIncrementalAutoVacuumActive { return true }
+        // The auto_vacuum = INCREMENTAL requested at init only takes effect once
+        // a full VACUUM rewrites the database into incremental mode.
         guard freeBytesAtDatabaseLocation() > databaseFileSizeBytes() else { return false }
         do {
             try database.vacuum()
         } catch {
             debugPrint("Auto-vacuum conversion VACUUM failed: \(error)")
         }
-        return autoVacuumMode() == 2
+        isIncrementalAutoVacuumActive = autoVacuumMode() == 2
+        return isIncrementalAutoVacuumActive
     }
 
     @discardableResult
