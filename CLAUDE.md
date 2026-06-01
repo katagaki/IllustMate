@@ -1,6 +1,6 @@
 # Code style
 
-- If the code is self-explanatory, write no comment at all.
-- Only comment to explain *why* something non-obvious is done (e.g. a
-  surprising API requirement or workaround), never to restate *what* the code
-  does. No multi-line explanatory blocks or doc comments that echo the code.
+- Do not write comments at all, unless it documents an unexpected API
+  requirement or gotcha (e.g. a surprising API behavior or workaround).
+- Never comment to explain *what* the code does, restate logic, or justify a
+  design choice. No multi-line blocks, no doc comments.
