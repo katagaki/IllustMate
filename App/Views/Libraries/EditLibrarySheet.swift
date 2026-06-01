@@ -30,6 +30,7 @@ struct EditLibrarySheet: View {
     @State var libraryToDelete: PicLibrary?
     @State var deleteConfirmationCode: String = ""
     @State var expectedDeleteCode: String = ""
+    @State var isShowingActiveLibraryAlert: Bool = false
 
     @State var syncEnabled: Bool = false
     @State var iCloudAvailable: Bool = true
@@ -156,6 +157,10 @@ struct EditLibrarySheet: View {
                 if !library.isDefault {
                     Section {
                         Button(role: .destructive) {
+                            if library.id == libraryManager.currentLibrary.id {
+                                isShowingActiveLibraryAlert = true
+                                return
+                            }
                             expectedDeleteCode = String(format: "%06d", Int.random(in: 0...999_999))
                             deleteConfirmationCode = ""
                             libraryToDelete = library
@@ -296,6 +301,12 @@ struct EditLibrarySheet: View {
             }
         } message: {
             Text("Libraries.Delete.Message \(expectedDeleteCode)", tableName: "Libraries")
+        }
+        .alert(String(localized: "Libraries.Delete.Active.Title", table: "Libraries"),
+               isPresented: $isShowingActiveLibraryAlert) {
+            Button("Shared.OK", role: .cancel) { }
+        } message: {
+            Text("Libraries.Delete.Active.Message", tableName: "Libraries")
         }
         .sheet(isPresented: $isVerifyingConsistency) {
             StatusView(

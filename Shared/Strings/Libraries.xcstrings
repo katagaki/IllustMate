@@ -124,6 +124,88 @@
         }
       }
     },
+    "Libraries.Delete.Active.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Bibliothek ist derzeit aktiv und kann nicht gelöscht werden. Wechseln Sie zuerst zu einer anderen Bibliothek und versuchen Sie es erneut."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This library is currently active and cannot be deleted. Switch to another library first, then try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このライブラリは現在使用中のため削除できません。先に別のライブラリに切り替えてから、もう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 라이브러리는 현재 활성 상태이므로 삭제할 수 없습니다. 먼저 다른 라이브러리로 전환한 후 다시 시도하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此资料库当前处于活跃状态，无法删除。请先切换到其他资料库，然后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此資料庫目前正在使用中，無法刪除。請先切換到其他資料庫，然後再試一次。"
+          }
+        }
+      }
+    },
+    "Libraries.Delete.Active.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktive Bibliothek kann nicht gelöscht werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot Delete Active Library"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用中のライブラリは削除できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "활성 라이브러리는 삭제할 수 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法删除活跃资料库"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法刪除使用中的資料庫"
+          }
+        }
+      }
+    },
     "Libraries.Delete.Message %@" : {
       "extractionState" : "manual",
       "localizations" : {
