@@ -17,17 +17,21 @@ struct DatabaseMigrator {
         defaults?.set(true, forKey: libraryV2CompletedKey)
     }
 
+    static func currentVersionToken() -> String {
+        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+        return "\(short) (\(build))"
+    }
+
     static func migrationNeeded() -> Bool {
-        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
         let defaults = UserDefaults(suiteName: appGroupID)
         let migratedVersion = defaults?.string(forKey: migratedVersionKey)
-        return migratedVersion != currentVersion
+        return migratedVersion != currentVersionToken()
     }
 
     static func markMigrationComplete() {
-        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
         let defaults = UserDefaults(suiteName: appGroupID)
-        defaults?.set(currentVersion, forKey: migratedVersionKey)
+        defaults?.set(currentVersionToken(), forKey: migratedVersionKey)
     }
 
     // MARK: - Collection DB (albums + pics + preferences)
