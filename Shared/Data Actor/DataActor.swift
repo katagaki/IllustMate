@@ -84,29 +84,31 @@ actor DataActor {
         let databaseFileName = "Collection.db"
         let fileManager = FileManager.default
 
+        let databaseURL: URL
         if let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.IllustMate"
         ) {
             if collectionID == PicLibrary.defaultID {
-                self.databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
+                databaseURL = appGroupURL.appendingPathComponent(databaseFileName)
             } else {
                 let folderURL = appGroupURL.appendingPathComponent(collectionID)
                 try? fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true)
-                self.databaseURL = folderURL.appendingPathComponent(databaseFileName)
+                databaseURL = folderURL.appendingPathComponent(databaseFileName)
             }
         } else {
             Self.logger.fault("App group container unavailable for group.com.tsubuzaki.IllustMate")
             fatalError()
         }
+        self.databaseURL = databaseURL
 
         let database: Connection
         do {
-            database = try Connection(self.databaseURL.path)
+            database = try Connection(databaseURL.path)
         } catch {
-            Self.logger.fault("Could not open SQLite database at \(self.databaseURL.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            Self.logger.fault("Could not open SQLite database at \(databaseURL.path, privacy: .public): \(error.localizedDescription, privacy: .public)")
             fatalError("Could not open SQLite database: \(error)")
         }
-        Self.logger.debug("Opened database for collection \(collectionID, privacy: .public) at \(self.databaseURL.path, privacy: .public)")
+        Self.logger.debug("Opened database for collection \(collectionID, privacy: .public) at \(databaseURL.path, privacy: .public)")
         self.database = database
         // PRAGMA auto_vacuum reports the requested value immediately, even before
         // a VACUUM applies it, so read the real mode before requesting the change.
