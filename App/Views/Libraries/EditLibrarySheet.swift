@@ -5,6 +5,7 @@ struct EditLibrarySheet: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(ConcurrencyManager.self) var concurrency
+    @Environment(ImageMigrationManager.self) var imageMigration
     @EnvironmentObject var libraryManager: LibraryManager
     @EnvironmentObject var navigation: NavigationManager
 
@@ -26,6 +27,7 @@ struct EditLibrarySheet: View {
     @State var isConfirmingFreeUpSpace: Bool = false
     @State var isFreeingUpSpace: Bool = false
     @State var isConfirmingClearCache: Bool = false
+    @State var migrationIncomplete: Bool = false
 
     @State var libraryToDelete: PicLibrary?
     @State var deleteConfirmationCode: String = ""
@@ -79,6 +81,7 @@ struct EditLibrarySheet: View {
                     )) {
                         Text("Sync.Title", tableName: "More")
                     }
+                    .disabled(migrationIncomplete)
                     if syncEnabled {
                         Picker(selection: Binding(
                             get: { storageMode },
@@ -119,6 +122,11 @@ struct EditLibrarySheet: View {
                     }
                     Button(String(localized: "Troubleshooting.FreeUpSpace", table: "More")) {
                         isConfirmingFreeUpSpace = true
+                    }
+                    if migrationIncomplete {
+                        Button(String(localized: "Troubleshooting.FinishMigration", table: "More")) {
+                            Task { await finishMigration() }
+                        }
                     }
                     Button(String(localized: "Troubleshooting.ClearCache", table: "More")) {
                         isConfirmingClearCache = true
@@ -191,6 +199,7 @@ struct EditLibrarySheet: View {
         }
         .task {
             await loadCounts()
+            migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
             syncEnabled = await LibrariesActor.shared.isSyncEnabled(id: library.id)
             iCloudAvailable = await SyncManager.shared.canEnableSync()
             storageMode = StorageMode(rawValue: await LibrariesActor.shared.storageMode(forID: library.id))
@@ -366,13 +375,22 @@ struct EditLibrarySheet: View {
         }
     }
 
+    func finishMigration() async {
+        await imageMigration.runIfNeeded(for: library.id)
+        migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
+    }
+
     func freeUpSpace() async {
         let dataActor = DataActor(collectionID: library.id)
         await MainActor.run {
             UIApplication.shared.isIdleTimerDisabled = true
             isFreeingUpSpace = true
         }
-        await dataActor.vacuum()
+        await dataActor.purgeMigratedBlobs()
+        let reclaimed = await dataActor.reclaimDiskSpace()
+        if !reclaimed {
+            debugPrint("Free up space: no disk space was reclaimed")
+        }
         await MainActor.run {
             isFreeingUpSpace = false
             UIApplication.shared.isIdleTimerDisabled = false

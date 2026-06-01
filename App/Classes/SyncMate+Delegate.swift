@@ -110,6 +110,7 @@ extension SyncMate: CKSyncEngineDelegate {
             }
             await applyRecord(modification.record)
         }
+        var deletedPicIDsByCollection: [String: [String]] = [:]
         for deletion in changes.deletions {
             if deletion.recordID.zoneID.zoneName == Self.librariesZoneName {
                 libraryChanged = true
@@ -124,7 +125,14 @@ extension SyncMate: CKSyncEngineDelegate {
                 await OriginalsManager.shared.deleteCloudOriginal(
                     picID: deletion.recordID.recordName, in: dataActor.collectionID
                 )
+                deletedPicIDsByCollection[dataActor.collectionID, default: []]
+                    .append(deletion.recordID.recordName)
             }
+        }
+        // Purge local-only derived caches (hashes, colors) for remotely-deleted pics.
+        for (collectionID, picIDs) in deletedPicIDsByCollection {
+            await HashActor.instance(for: collectionID).deleteHashes(forPicIDs: picIDs)
+            await PColorActor.instance(for: collectionID).deleteColors(forPicIDs: picIDs)
         }
         if !changes.modifications.isEmpty || !changes.deletions.isEmpty {
             await MainActor.run {

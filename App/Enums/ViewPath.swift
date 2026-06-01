@@ -13,6 +13,8 @@ enum ViewPath: Hashable {
     case moreDebug
     case moreTroubleshooting
     case moreAttributions
+    case moreLabsFileExplorer
+    case moreLabsTestData
     case photosFolder(folder: PHCollectionListWrapper)
     case photosAlbum(album: PHAssetCollectionWrapper)
     case photosAssetViewer(asset: PHAssetWrapper, namespace: Namespace.ID)

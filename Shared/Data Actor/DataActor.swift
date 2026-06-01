@@ -33,6 +33,7 @@ actor DataActor {
     nonisolated let collectionID: String
     let database: Connection
     let databaseURL: URL
+    private var isIncrementalAutoVacuumActive: Bool
 
     let albumsTable = Table("albums")
     let picsTable = Table("pics")
@@ -107,6 +108,10 @@ actor DataActor {
         }
         Self.logger.debug("Opened database for collection \(collectionID, privacy: .public) at \(self.databaseURL.path, privacy: .public)")
         self.database = database
+        // PRAGMA auto_vacuum reports the requested value immediately, even before
+        // a VACUUM applies it, so read the real mode before requesting the change.
+        let activeAutoVacuumMode = (try? database.scalar("PRAGMA auto_vacuum")) as? Int64 ?? 0
+        self.isIncrementalAutoVacuumActive = activeAutoVacuumMode == 2
         _ = try? database.execute("PRAGMA auto_vacuum = INCREMENTAL;")
         do {
             try database.run(albumsTable.create(ifNotExists: true) { table in
@@ -169,8 +174,61 @@ actor DataActor {
         }
     }
 
-    func vacuum() {
-        _ = try? self.database.vacuum()
+    /// Current auto_vacuum mode: 0 = NONE, 1 = FULL, 2 = INCREMENTAL.
+    func autoVacuumMode() -> Int64 {
+        ((try? database.scalar("PRAGMA auto_vacuum")) as? Int64) ?? 0
+    }
+
+    @discardableResult
+    func ensureIncrementalAutoVacuum() -> Bool {
+        if isIncrementalAutoVacuumActive { return true }
+        // The auto_vacuum = INCREMENTAL requested at init only takes effect once
+        // a full VACUUM rewrites the database into incremental mode.
+        guard freeBytesAtDatabaseLocation() > databaseFileSizeBytes() else { return false }
+        do {
+            try database.vacuum()
+        } catch {
+            debugPrint("Auto-vacuum conversion VACUUM failed: \(error)")
+        }
+        isIncrementalAutoVacuumActive = autoVacuumMode() == 2
+        return isIncrementalAutoVacuumActive
+    }
+
+    @discardableResult
+    func reclaimDiskSpace() -> Bool {
+        if ensureIncrementalAutoVacuum() {
+            do {
+                try database.execute("PRAGMA incremental_vacuum;")
+                return true
+            } catch {
+                debugPrint("Incremental vacuum failed: \(error)")
+                return false
+            }
+        }
+        do {
+            try database.vacuum()
+            return true
+        } catch {
+            debugPrint("VACUUM failed: \(error)")
+            return false
+        }
+    }
+
+    @discardableResult
+    func vacuum() -> Bool {
+        reclaimDiskSpace()
+    }
+
+    func databaseFileSizeBytes() -> Int64 {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: databaseURL.path)
+        return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
+    }
+
+    func freeBytesAtDatabaseLocation() -> Int64 {
+        let values = try? databaseURL.resourceValues(
+            forKeys: [.volumeAvailableCapacityForImportantUsageKey]
+        )
+        return values?.volumeAvailableCapacityForImportantUsage ?? Int64.max
     }
 
     // MARK: - Row to Model Helpers

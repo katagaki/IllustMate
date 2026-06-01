@@ -10,6 +10,15 @@ actor PColorActor {
         _shared = PColorActor(collectionID: collectionID)
     }
 
+    static func instance(for collectionID: String) -> PColorActor {
+        if collectionID == _shared.collectionID {
+            return _shared
+        }
+        return PColorActor(collectionID: collectionID)
+    }
+
+    nonisolated let collectionID: String
+
     let database: Connection
 
     let picColorsTable = Table("pic_colors")
@@ -20,6 +29,7 @@ actor PColorActor {
     let colorBlue = Expression<Int>("blue")
 
     init(collectionID: String) {
+        self.collectionID = collectionID
         let databaseFileName = "PColors.db"
         let fileManager = FileManager.default
 

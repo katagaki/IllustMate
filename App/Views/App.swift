@@ -57,6 +57,7 @@ struct IllustMateApp: App {
         .environment(auth)
         .environment(pipManager)
         .environment(webServer)
+        .environment(imageMigration)
         .overlay(alignment: .bottomLeading) {
             PictureInPictureLayerView(pipManager: pipManager)
                 .frame(width: 1, height: 1)
