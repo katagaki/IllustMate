@@ -76,8 +76,6 @@ struct DatabaseMigrator {
         _ = try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
     }
 
-    // SQLite cannot drop a NOT NULL constraint via ALTER COLUMN, so older databases that
-    // created "data" as non-null are rebuilt to make image-blob purging possible.
     static func forceNullableImageColumn(_ database: Connection) {
         guard isColumnNotNull("data", inTable: "pics", database) else { return }
         let storedSQL = try? database.scalar(
