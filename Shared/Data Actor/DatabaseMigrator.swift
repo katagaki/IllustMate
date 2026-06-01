@@ -60,6 +60,8 @@ struct DatabaseMigrator {
         _ = try? database.run(picsTable.addColumn(picDuration))
         _ = try? database.run(picsTable.addColumn(picFilePath))
 
+        forceNullableImageColumn(database)
+
         let prefAlbumSort = Expression<String>("album_sort")
         let prefAlbumViewStyle = Expression<String>("album_view_style")
         let prefAlbumColumnCount = Expression<Int>("album_column_count")
@@ -72,6 +74,37 @@ struct DatabaseMigrator {
         _ = try? database.run(preferencesTable.addColumn(prefPicSort, defaultValue: "dateAddedDescending"))
         _ = try? database.run(preferencesTable.addColumn(prefPicColumnCount, defaultValue: 4))
         _ = try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
+    }
+
+    static func forceNullableImageColumn(_ database: Connection) {
+        guard isColumnNotNull("data", inTable: "pics", database) else { return }
+        let storedSQL = try? database.scalar(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='pics'"
+        )
+        guard let createSQL = storedSQL as? String,
+              let rebuiltSQL = createSQL.byRemovingNotNull(fromColumn: "data",
+                                                            renamingTableTo: "pics_nullable_migration")
+        else { return }
+        do {
+            try database.transaction {
+                try database.execute(rebuiltSQL)
+                try database.execute("INSERT INTO \"pics_nullable_migration\" SELECT * FROM \"pics\"")
+                try database.execute("DROP TABLE \"pics\"")
+                try database.execute("ALTER TABLE \"pics_nullable_migration\" RENAME TO \"pics\"")
+            }
+        } catch {
+            debugPrint("Failed to force nullable data column: \(error)")
+            _ = try? database.execute("DROP TABLE IF EXISTS \"pics_nullable_migration\"")
+        }
+    }
+
+    private static func isColumnNotNull(_ column: String, inTable table: String,
+                                        _ database: Connection) -> Bool {
+        guard let rows = try? database.prepare("PRAGMA table_info(\(table))") else { return false }
+        for row in rows where (row[1] as? String) == column {
+            return (row[3] as? Int64) == 1
+        }
+        return false
     }
 
     // MARK: - Hashes DB
@@ -112,5 +145,18 @@ struct DatabaseMigrator {
     static func migrateLibrariesDatabase(_ database: Connection, librariesTable: Table) {
         let libraryName = Expression<String>("name")
         _ = try? database.run(librariesTable.addColumn(libraryName, defaultValue: ""))
+    }
+}
+
+private extension String {
+    func byRemovingNotNull(fromColumn column: String, renamingTableTo newName: String) -> String? {
+        guard let tableNameRange = range(of: "\"pics\"") else { return nil }
+        let renamed = replacingCharacters(in: tableNameRange, with: "\"\(newName)\"")
+        let pattern = "(\"\(column)\"\\s+[A-Za-z]+)\\s+NOT\\s+NULL"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
+            return renamed
+        }
+        let range = NSRange(renamed.startIndex..., in: renamed)
+        return regex.stringByReplacingMatches(in: renamed, range: range, withTemplate: "$1")
     }
 }
