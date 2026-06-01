@@ -46,7 +46,6 @@ struct DatabaseMigrator {
         let picName = Expression<String>("name")
         let picAlbumId = Expression<String?>("containing_album_id")
         let picDateAdded = Expression<Double>("date_added")
-        let picData = Expression<Data?>("data")
         let picThumbnailData = Expression<Data?>("thumbnail_data")
         let picMediaType = Expression<Int>("media_type")
         let picDuration = Expression<Double?>("duration")
@@ -54,13 +53,10 @@ struct DatabaseMigrator {
         _ = try? database.run(picsTable.addColumn(picName, defaultValue: ""))
         _ = try? database.run(picsTable.addColumn(picAlbumId))
         _ = try? database.run(picsTable.addColumn(picDateAdded, defaultValue: 0))
-        _ = try? database.run(picsTable.addColumn(picData))
         _ = try? database.run(picsTable.addColumn(picThumbnailData))
         _ = try? database.run(picsTable.addColumn(picMediaType, defaultValue: 0))
         _ = try? database.run(picsTable.addColumn(picDuration))
         _ = try? database.run(picsTable.addColumn(picFilePath))
-
-        forceNullableImageColumn(database)
 
         let prefAlbumSort = Expression<String>("album_sort")
         let prefAlbumViewStyle = Expression<String>("album_view_style")
@@ -76,35 +72,13 @@ struct DatabaseMigrator {
         _ = try? database.run(preferencesTable.addColumn(prefHideSectionHeaders, defaultValue: false))
     }
 
-    static func forceNullableImageColumn(_ database: Connection) {
-        guard isColumnNotNull("data", inTable: "pics", database) else { return }
-        let storedSQL = try? database.scalar(
-            "SELECT sql FROM sqlite_master WHERE type='table' AND name='pics'"
-        )
-        guard let createSQL = storedSQL as? String,
-              let rebuiltSQL = createSQL.byRemovingNotNull(fromColumn: "data",
-                                                            renamingTableTo: "pics_nullable_migration")
+    static func stampSchemaVersionIfMigrated(_ database: Connection) {
+        let hasDataColumn = ((try? database.prepare("PRAGMA table_info(\"pics\")"))?
+            .contains { ($0[1] as? String) == "data" }) ?? false
+        guard !hasDataColumn,
+              ((try? database.scalar("PRAGMA user_version") as? Int64) ?? 0) < DataActor.schemaVersion
         else { return }
-        do {
-            try database.transaction {
-                try database.execute(rebuiltSQL)
-                try database.execute("INSERT INTO \"pics_nullable_migration\" SELECT * FROM \"pics\"")
-                try database.execute("DROP TABLE \"pics\"")
-                try database.execute("ALTER TABLE \"pics_nullable_migration\" RENAME TO \"pics\"")
-            }
-        } catch {
-            debugPrint("Failed to force nullable data column: \(error)")
-            _ = try? database.execute("DROP TABLE IF EXISTS \"pics_nullable_migration\"")
-        }
-    }
-
-    private static func isColumnNotNull(_ column: String, inTable table: String,
-                                        _ database: Connection) -> Bool {
-        guard let rows = try? database.prepare("PRAGMA table_info(\(table))") else { return false }
-        for row in rows where (row[1] as? String) == column {
-            return (row[3] as? Int64) == 1
-        }
-        return false
+        _ = try? database.execute("PRAGMA user_version = \(DataActor.schemaVersion);")
     }
 
     // MARK: - Hashes DB
@@ -145,18 +119,5 @@ struct DatabaseMigrator {
     static func migrateLibrariesDatabase(_ database: Connection, librariesTable: Table) {
         let libraryName = Expression<String>("name")
         _ = try? database.run(librariesTable.addColumn(libraryName, defaultValue: ""))
-    }
-}
-
-private extension String {
-    func byRemovingNotNull(fromColumn column: String, renamingTableTo newName: String) -> String? {
-        guard let tableNameRange = range(of: "\"pics\"") else { return nil }
-        let renamed = replacingCharacters(in: tableNameRange, with: "\"\(newName)\"")
-        let pattern = "(\"\(column)\"\\s+[A-Za-z]+)\\s+NOT\\s+NULL"
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) else {
-            return renamed
-        }
-        let range = NSRange(renamed.startIndex..., in: renamed)
-        return regex.stringByReplacingMatches(in: renamed, range: range, withTemplate: "$1")
     }
 }

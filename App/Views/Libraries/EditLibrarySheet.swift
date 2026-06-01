@@ -10,6 +10,7 @@ struct EditLibrarySheet: View {
     @EnvironmentObject var navigation: NavigationManager
 
     var library: PicLibrary
+    var dismissAll: (() -> Void)?
 
     @State var editedName: String = ""
     @State var picCount: Int = 0
@@ -20,10 +21,6 @@ struct EditLibrarySheet: View {
     @State var backupFolderURL: URL?
     @State var isDuplicateCheckerPresented: Bool = false
 
-    @State var isConfirmingVerifyConsistency: Bool = false
-    @State var isVerifyingConsistency: Bool = false
-    @State var verifyProgress: Int = 0
-    @State var verifyTotal: Int = 0
     @State var isConfirmingClearCache: Bool = false
     @State var migrationIncomplete: Bool = false
 
@@ -115,12 +112,11 @@ struct EditLibrarySheet: View {
                     Text("Tools", tableName: "More")
                 }
                 Section {
-                    Button(String(localized: "Troubleshooting.VerifyConsistency", table: "More")) {
-                        isConfirmingVerifyConsistency = true
-                    }
                     if migrationIncomplete {
-                        Button(String(localized: "Troubleshooting.FinishMigration", table: "More")) {
-                            Task { await finishMigration() }
+                        Button(String(localized: "Troubleshooting.Optimize", table: "More")) {
+                            let libraryID = library.id
+                            dismissAll?()
+                            Task { await imageMigration.runIfNeeded(for: libraryID) }
                         }
                     }
                     Button(String(localized: "Troubleshooting.ClearCache", table: "More")) {
@@ -248,15 +244,6 @@ struct EditLibrarySheet: View {
         .sheet(isPresented: $isDuplicateCheckerPresented) {
             DuplicateScanView(scanScope: .entireCollection, collectionID: library.id)
         }
-        .alert(Text("Troubleshooting.VerifyConsistency.Confirm.Title", tableName: "More"),
-               isPresented: $isConfirmingVerifyConsistency) {
-            Button("Shared.Yes", role: .destructive) {
-                Task { await verifyConsistency() }
-            }
-            Button("Shared.No", role: .cancel) { }
-        } message: {
-            Text("Troubleshooting.VerifyConsistency.Confirm.Message", tableName: "More")
-        }
         .alert(Text("Troubleshooting.ClearCache.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingClearCache) {
             Button("Shared.Yes", role: .destructive) {
@@ -297,16 +284,6 @@ struct EditLibrarySheet: View {
         } message: {
             Text("Libraries.Delete.Message \(expectedDeleteCode)", tableName: "Libraries")
         }
-        .sheet(isPresented: $isVerifyingConsistency) {
-            StatusView(
-                type: .inProgress,
-                title: .troubleshootingVerifyingConsistency,
-                currentCount: verifyTotal > 0 ? verifyProgress : nil,
-                totalCount: verifyTotal > 0 ? verifyTotal : nil
-            )
-            .phonePresentationDetents([.medium])
-            .interactiveDismissDisabled()
-        }
     }
 
     func loadCounts() async {
@@ -317,31 +294,6 @@ struct EditLibrarySheet: View {
             albumCount = albums
             picCount = pics
         }
-    }
-
-    func finishMigration() async {
-        await imageMigration.runIfNeeded(for: library.id)
-        migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
-    }
-
-    func verifyConsistency() async {
-        let dataActor = DataActor(collectionID: library.id)
-        await MainActor.run {
-            UIApplication.shared.isIdleTimerDisabled = true
-            verifyProgress = 0
-            verifyTotal = 0
-            isVerifyingConsistency = true
-        }
-        await dataActor.verifyConsistency { progress in
-            verifyProgress = progress.completed
-            verifyTotal = progress.total
-        }
-        await MainActor.run {
-            isVerifyingConsistency = false
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-        await loadCounts()
-        migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
     }
 
     func downloadAll() async {

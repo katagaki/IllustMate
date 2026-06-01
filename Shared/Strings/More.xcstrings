@@ -3519,43 +3519,43 @@
         }
       }
     },
-    "Troubleshooting.FinishMigration" : {
+    "Troubleshooting.Optimize" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Migration abschließen"
+            "value" : "Bibliothek optimieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Finish Migration"
+            "value" : "Optimize Library"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "移行を完了"
+            "value" : "ライブラリを最適化"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "마이그레이션 완료"
+            "value" : "라이브러리 최적화"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "完成迁移"
+            "value" : "优化资料库"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "完成遷移"
+            "value" : "最佳化資料庫"
           }
         }
       }

@@ -147,7 +147,7 @@ struct PhotostandDatabase {
 
     private static func rawPicData(forID id: String, using database: Connection, libraryID: String) -> Data? {
         let query = picsTable.filter(picId == id)
-            .select(picData, picFilePath, picMediaType, picThumbnailData)
+            .select(picFilePath, picMediaType, picThumbnailData)
         guard let row = try? database.pluck(query) else { return nil }
         if let path = try? row.get(picFilePath),
            let baseURL = libraryBaseURL(forLibraryID: libraryID),
@@ -157,10 +157,17 @@ struct PhotostandDatabase {
         if (try? row.get(picMediaType)) == 0, let data = ubiquityImageData(forID: id, libraryID: libraryID) {
             return data
         }
-        if let blob = try? row.get(picData), blob.count <= maxBlobSize {
+        if let blob = legacyBlob(forID: id, using: database), blob.count <= maxBlobSize {
             return blob
         }
         return try? row.get(picThumbnailData)
+    }
+
+    private static func legacyBlob(forID id: String, using database: Connection) -> Data? {
+        let query = picsTable.filter(picId == id).select(picData)
+        guard let blob = try? database.pluck(query).flatMap({ try? $0.get(picData) }),
+              !blob.isEmpty else { return nil }
+        return blob
     }
 
     private static func cappedData(at fileURL: URL) -> Data? {

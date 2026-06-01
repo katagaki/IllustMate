@@ -26,7 +26,6 @@ struct StatusView: View {
         // More table
         case backupExporting
         case backupExportCompleted
-        case troubleshootingVerifyingConsistency
         case backupRestoring
         case backupRestoreCompleted
         case backupRestoreError
@@ -48,8 +47,6 @@ struct StatusView: View {
                 Text("Backup.Exporting", tableName: "More")
             case .backupExportCompleted:
                 Text("Backup.Export.Completed", tableName: "More")
-            case .troubleshootingVerifyingConsistency:
-                Text("Troubleshooting.VerifyConsistency.Verifying", tableName: "More")
             case .backupRestoring:
                 Text("Backup.Restoring", tableName: "More")
             case .backupRestoreCompleted:

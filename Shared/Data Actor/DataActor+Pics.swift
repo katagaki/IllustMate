@@ -120,13 +120,12 @@ extension DataActor {
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         let thumbnailData = Pic.makeThumbnail(data)
-        let relativePath = saveImageFile(data, id: id)
+        guard let relativePath = saveImageFile(data, id: id) else { return }
         _ = try? database.run(picsTable.insert(
             picId <- id,
             picName <- name,
             picAlbumId <- albumID,
             picDateAdded <- now.timeIntervalSince1970,
-            picData <- relativePath == nil ? data : nil,
             picThumbnailData <- thumbnailData,
             picMediaType <- MediaType.pic.rawValue,
             picFilePath <- relativePath,
@@ -156,7 +155,6 @@ extension DataActor {
             picName <- name,
             picAlbumId <- albumID,
             picDateAdded <- now.timeIntervalSince1970,
-            picData <- Data(),
             picThumbnailData <- thumbnailData,
             picMediaType <- MediaType.video.rawValue,
             picDuration <- duration,

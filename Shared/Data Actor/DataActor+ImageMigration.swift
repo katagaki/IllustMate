@@ -18,10 +18,11 @@ struct ImageMigrationProgress: Sendable {
 extension DataActor {
 
     static let libraryV2MigrationName = "LibraryV2"
+    static let schemaVersion: Int64 = 2
 
     func needsImageMigration() -> Bool {
-        let query = picsTable.filter(picMediaType == MediaType.pic.rawValue && picData != nil)
-        return ((try? database.scalar(query.count)) ?? 0) > 0
+        guard dataColumnExists() else { return false }
+        return nonEmptyImageBlobCount() > 0
     }
 
     func isLibraryV2MigrationComplete() -> Bool {
@@ -42,105 +43,118 @@ extension DataActor {
     func migrateImageBlobsToFiles(
         progress: @escaping @MainActor (ImageMigrationProgress) -> Void
     ) async {
-        let purged = purgeMigratedBlobs()
+        guard dataColumnExists() else {
+            markSchemaVersionCurrent()
+            return
+        }
         let pending = pendingMigrationIDs()
         let total = pending.count
         guard total > 0 else {
-            if purged > 0 { reclaimDiskSpace() }
+            dropDataColumnIfMigrated()
+            compactDatabase()
             return
         }
         await progress(ImageMigrationProgress(phase: .copying, completed: 0,
                                               total: total, latestThumbnail: nil))
 
-        let batchSize = chosenBatchSize(total: total)
-        let singleBatch = batchSize >= total
-        ensureIncrementalAutoVacuum()
         var copied = 0
+        for id in pending {
+            copyBlobToFile(id: id)
+            copied += 1
+            await progress(ImageMigrationProgress(phase: .copying, completed: copied,
+                                                  total: total,
+                                                  latestThumbnail: thumbnailData(forPicWithID: id)))
+        }
+        var verifiedIDs: [String] = []
         var verified = 0
-        var start = 0
-        while start < pending.count {
-            let batch = Array(pending[start..<min(start + batchSize, pending.count)])
-            for id in batch {
-                copyBlobToFile(id: id)
-                copied += 1
-                await progress(ImageMigrationProgress(phase: .copying, completed: copied,
-                                                      total: total,
-                                                      latestThumbnail: thumbnailData(forPicWithID: id)))
-            }
-            var verifiedIDs: [String] = []
-            for id in batch {
+        for id in pending {
+            if !blobIsEmpty(id: id) {
                 if verifyMigratedFile(id: id) {
                     verifiedIDs.append(id)
                 } else {
                     revertMigratedFile(id: id)
                 }
-                verified += 1
-                await progress(ImageMigrationProgress(phase: .verifying, completed: verified,
-                                                      total: total,
-                                                      latestThumbnail: thumbnailData(forPicWithID: id)))
             }
-            for id in verifiedIDs {
-                do {
-                    try database.run(picsTable.filter(picId == id).update(picData <- nil))
-                } catch {
-                    debugPrint("Failed to clear migrated blob for \(id): \(error)")
-                }
-            }
-            if !singleBatch {
-                await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
-                                                      total: 0, latestThumbnail: nil))
-                reclaimSpaceIncrementally()
-            }
-            start += batchSize
+            verified += 1
+            await progress(ImageMigrationProgress(phase: .verifying, completed: verified,
+                                                  total: total,
+                                                  latestThumbnail: thumbnailData(forPicWithID: id)))
+        }
+        for id in verifiedIDs {
+            zeroBlob(id: id)
         }
         await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
                                               total: 0, latestThumbnail: nil))
-        try? await Task.sleep(for: .seconds(1))
-        if !reclaimDiskSpace() {
+        dropDataColumnIfMigrated()
+        if !compactDatabase() {
             debugPrint("Image migration: final disk space reclamation freed no space")
         }
     }
 
-    func verifyConsistency(
-        progress: @escaping @MainActor (ImageMigrationProgress) -> Void
-    ) async {
-        DatabaseMigrator.forceNullableImageColumn(database)
-        await migrateImageBlobsToFiles(progress: progress)
-        purgeMigratedBlobs()
-        await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
-                                              total: 0, latestThumbnail: nil))
-        reclaimDiskSpace()
+    // MARK: - Schema
+
+    func dataColumnExists() -> Bool {
+        guard let rows = try? database.prepare("PRAGMA table_info(\"pics\")") else { return false }
+        for row in rows where (row[1] as? String) == "data" { return true }
+        return false
     }
 
-    @discardableResult
-    func purgeMigratedBlobs() -> Int {
-        let query = picsTable
-            .filter(picFilePath != nil && picData != nil)
-            .select(picId)
-        let ids = (try? database.prepare(query).map { $0[picId] }) ?? []
-        var purged = 0
-        for id in ids {
-            if !verifyMigratedFile(id: id) {
-                copyBlobToFile(id: id)
-                guard verifyMigratedFile(id: id) else { continue }
-            }
-            do {
-                try database.run(picsTable.filter(picId == id).update(picData <- nil))
-                purged += 1
-            } catch {
-                debugPrint("Failed to purge migrated blob for \(id): \(error)")
-            }
+    func dropDataColumnIfMigrated() {
+        guard dataColumnExists() else {
+            markSchemaVersionCurrent()
+            return
         }
-        return purged
+        let remaining = (try? database.scalar(
+            "SELECT COUNT(*) FROM \"pics\" WHERE \"data\" IS NOT NULL AND length(\"data\") > 0"
+        ) as? Int64) ?? 1
+        guard remaining == 0 else { return }
+        do {
+            try database.execute("ALTER TABLE \"pics\" DROP COLUMN \"data\"")
+        } catch {
+            debugPrint("Failed to drop data column: \(error)")
+            return
+        }
+        markSchemaVersionCurrent()
+    }
+
+    private func markSchemaVersionCurrent() {
+        let current = (try? database.scalar("PRAGMA user_version") as? Int64) ?? 0
+        guard current < Self.schemaVersion else { return }
+        _ = try? database.execute("PRAGMA user_version = \(Self.schemaVersion);")
+    }
+
+    private func nonEmptyImageBlobCount() -> Int64 {
+        (try? database.scalar(
+            "SELECT COUNT(*) FROM \"pics\" WHERE \"media_type\" = \(MediaType.pic.rawValue) " +
+            "AND \"data\" IS NOT NULL AND length(\"data\") > 0"
+        ) as? Int64) ?? 0
     }
 
     // MARK: - Helpers
 
     private func pendingMigrationIDs() -> [String] {
-        let query = picsTable
-            .filter(picMediaType == MediaType.pic.rawValue && picData != nil)
-            .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
+        guard dataColumnExists() else { return [] }
+        let sql = "SELECT \"id\" FROM \"pics\" WHERE \"media_type\" = \(MediaType.pic.rawValue) " +
+                  "AND \"data\" IS NOT NULL AND length(\"data\") > 0"
+        guard let statement = try? database.prepare(sql) else { return [] }
+        var ids: [String] = []
+        for row in statement {
+            if let id = row[0] as? String { ids.append(id) }
+        }
+        return ids
+    }
+
+    private func blobIsEmpty(id: String) -> Bool {
+        guard let blob = rawBlobData(forPicWithID: id) else { return true }
+        return blob.isEmpty
+    }
+
+    private func zeroBlob(id: String) {
+        do {
+            try database.run(picsTable.filter(picId == id).update(picData <- Data()))
+        } catch {
+            debugPrint("Failed to clear migrated blob for \(id): \(error)")
+        }
     }
 
     private func copyBlobToFile(id: String) {
@@ -169,31 +183,12 @@ extension DataActor {
         return fileData == blob
     }
 
-    private func chosenBatchSize(total: Int) -> Int {
-        let free = freeBytesAtDatabaseLocation()
-        let payload = databaseFileSizeBytes()
-        guard payload > 0, free > 0 else { return total }
-        if free > 2 * payload { return total }
-        let averageEntry = payload / Int64(max(total, 1))
-        if free < averageEntry * 2 { return 1 }
-        let batchCount = max(2, Int((Double(payload) / Double(free)).rounded(.up)))
-        return max(1, Int((Double(total) / Double(batchCount)).rounded(.up)))
-    }
-
-    private func reclaimSpaceIncrementally() {
-        // incremental_vacuum is a no-op outside incremental mode.
-        guard autoVacuumMode() == 2 else { return }
-        do {
-            try database.execute("PRAGMA incremental_vacuum;")
-        } catch {
-            debugPrint("Incremental vacuum failed: \(error)")
-        }
-    }
 }
 
 extension DataActor {
     func createImageBlobPic(_ name: String, data: Data,
                             inAlbumWithID albumID: String? = nil, dateAdded: Date? = nil) {
+        _ = try? database.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
         let id = UUID().uuidString
         let now = dateAdded ?? Date.now
         _ = try? database.run(picsTable.insert(

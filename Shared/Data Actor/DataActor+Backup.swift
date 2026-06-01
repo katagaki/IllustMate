@@ -72,6 +72,7 @@ extension DataActor {
                                  originalProvider: (@Sendable (String) async -> Data?)?,
                                  progress: (@MainActor (Int, Int) -> Void)?) async throws {
         let backupDB = try Connection(url.path)
+        _ = try? backupDB.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
         let query = picsTable
             .filter(picData == nil)
             .select(picId, picMediaType, picFilePath)
@@ -223,12 +224,12 @@ extension DataActor {
         } else {
             relativePath = saveImageFile(blob, id: newID)
         }
+        guard let relativePath else { return }
         _ = try? database.run(picsTable.insert(or: .ignore,
             picId <- newID,
             picName <- (try? row.get(picName)) ?? Pic.newFilename(),
             picAlbumId <- albumID,
             picDateAdded <- (try? row.get(picDateAdded)) ?? Date.now.timeIntervalSince1970,
-            picData <- relativePath == nil ? blob : nil,
             picThumbnailData <- (try? row.get(picThumbnailData)),
             picMediaType <- mediaType,
             picDuration <- (try? row.get(picDuration)) ?? nil,

@@ -35,7 +35,10 @@ struct LibraryManagerSheet: View {
                     createLibraryAlertContent
                 }
                 .sheet(item: $libraryToEdit) { library in
-                    EditLibrarySheet(library: library)
+                    EditLibrarySheet(library: library, dismissAll: {
+                        libraryToEdit = nil
+                        dismiss()
+                    })
                         .environmentObject(libraryManager)
                         .environmentObject(navigation)
                 }

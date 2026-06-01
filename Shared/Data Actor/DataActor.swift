@@ -121,7 +121,6 @@ actor DataActor {
                 table.column(picName)
                 table.column(picAlbumId)
                 table.column(picDateAdded)
-                table.column(picData)
                 table.column(picThumbnailData)
                 table.column(picMediaType, defaultValue: 0)
                 table.column(picDuration)
@@ -163,6 +162,8 @@ actor DataActor {
 
             try database.run(albumsTable.createIndex(albumParentId, ifNotExists: true))
             try database.run(picsTable.createIndex(picAlbumId, ifNotExists: true))
+
+            DatabaseMigrator.stampSchemaVersionIfMigrated(database)
         } catch {
             debugPrint("Database setup error: \(error)")
         }
@@ -211,6 +212,18 @@ actor DataActor {
     @discardableResult
     func vacuum() -> Bool {
         reclaimDiskSpace()
+    }
+
+    @discardableResult
+    func compactDatabase() -> Bool {
+        do {
+            try database.vacuum()
+            isIncrementalAutoVacuumActive = autoVacuumMode() == 2
+            return true
+        } catch {
+            debugPrint("VACUUM failed: \(error)")
+            return false
+        }
     }
 
     func databaseFileSizeBytes() -> Int64 {
