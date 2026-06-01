@@ -20,12 +20,10 @@ struct EditLibrarySheet: View {
     @State var backupFolderURL: URL?
     @State var isDuplicateCheckerPresented: Bool = false
 
-    @State var isConfirmingRebuildThumbnails: Bool = false
-    @State var isRebuildingThumbnails: Bool = false
-    @State var rebuildProgress: Int = 0
-    @State var rebuildTotal: Int = 0
-    @State var isConfirmingFreeUpSpace: Bool = false
-    @State var isFreeingUpSpace: Bool = false
+    @State var isConfirmingVerifyConsistency: Bool = false
+    @State var isVerifyingConsistency: Bool = false
+    @State var verifyProgress: Int = 0
+    @State var verifyTotal: Int = 0
     @State var isConfirmingClearCache: Bool = false
     @State var migrationIncomplete: Bool = false
 
@@ -117,11 +115,8 @@ struct EditLibrarySheet: View {
                     Text("Tools", tableName: "More")
                 }
                 Section {
-                    Button(String(localized: "Troubleshooting.RebuildThumbnails", table: "More")) {
-                        isConfirmingRebuildThumbnails = true
-                    }
-                    Button(String(localized: "Troubleshooting.FreeUpSpace", table: "More")) {
-                        isConfirmingFreeUpSpace = true
+                    Button(String(localized: "Troubleshooting.VerifyConsistency", table: "More")) {
+                        isConfirmingVerifyConsistency = true
                     }
                     if migrationIncomplete {
                         Button(String(localized: "Troubleshooting.FinishMigration", table: "More")) {
@@ -253,23 +248,14 @@ struct EditLibrarySheet: View {
         .sheet(isPresented: $isDuplicateCheckerPresented) {
             DuplicateScanView(scanScope: .entireCollection, collectionID: library.id)
         }
-        .alert(Text("Troubleshooting.RebuildThumbnails.Confirm.Title", tableName: "More"),
-               isPresented: $isConfirmingRebuildThumbnails) {
+        .alert(Text("Troubleshooting.VerifyConsistency.Confirm.Title", tableName: "More"),
+               isPresented: $isConfirmingVerifyConsistency) {
             Button("Shared.Yes", role: .destructive) {
-                Task { await rebuildThumbnails() }
+                Task { await verifyConsistency() }
             }
             Button("Shared.No", role: .cancel) { }
         } message: {
-            Text("Troubleshooting.RebuildThumbnails.Confirm.Message", tableName: "More")
-        }
-        .alert(Text("Troubleshooting.FreeUpSpace.Confirm.Title", tableName: "More"),
-               isPresented: $isConfirmingFreeUpSpace) {
-            Button("Shared.Yes", role: .destructive) {
-                Task { await freeUpSpace() }
-            }
-            Button("Shared.No", role: .cancel) { }
-        } message: {
-            Text("Troubleshooting.FreeUpSpace.Confirm.Message", tableName: "More")
+            Text("Troubleshooting.VerifyConsistency.Confirm.Message", tableName: "More")
         }
         .alert(Text("Troubleshooting.ClearCache.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingClearCache) {
@@ -311,20 +297,15 @@ struct EditLibrarySheet: View {
         } message: {
             Text("Libraries.Delete.Message \(expectedDeleteCode)", tableName: "Libraries")
         }
-        .sheet(isPresented: $isRebuildingThumbnails) {
+        .sheet(isPresented: $isVerifyingConsistency) {
             StatusView(
                 type: .inProgress,
-                title: .troubleshootingRebuildingThumbnails,
-                currentCount: rebuildProgress,
-                totalCount: rebuildTotal
+                title: .troubleshootingVerifyingConsistency,
+                currentCount: verifyTotal > 0 ? verifyProgress : nil,
+                totalCount: verifyTotal > 0 ? verifyTotal : nil
             )
             .phonePresentationDetents([.medium])
             .interactiveDismissDisabled()
-        }
-        .sheet(isPresented: $isFreeingUpSpace) {
-            StatusView(type: .inProgress, title: .troubleshootingFreeingUpSpace)
-                .phonePresentationDetents([.medium])
-                .interactiveDismissDisabled()
         }
     }
 
@@ -338,63 +319,29 @@ struct EditLibrarySheet: View {
         }
     }
 
-    func rebuildThumbnails() async {
-        let dataActor = DataActor(collectionID: library.id)
-        await MainActor.run {
-            UIApplication.shared.isIdleTimerDisabled = true
-            isRebuildingThumbnails = true
-            rebuildProgress = 0
-            rebuildTotal = 0
-        }
-        do {
-            let pics = try await dataActor.pics()
-            await MainActor.run {
-                rebuildTotal = pics.count
-            }
-            await dataActor.deleteAllThumbnails()
-            for pic in pics {
-                if let data = await dataActor.imageData(forPicWithID: pic.id) {
-                    let thumbnailData = Pic.makeThumbnail(data)
-                    await dataActor.updateThumbnail(forPicWithID: pic.id,
-                                                    thumbnailData: thumbnailData)
-                }
-                await MainActor.run {
-                    rebuildProgress += 1
-                }
-            }
-            await MainActor.run {
-                UIApplication.shared.isIdleTimerDisabled = false
-                isRebuildingThumbnails = false
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-            await MainActor.run {
-                UIApplication.shared.isIdleTimerDisabled = false
-                isRebuildingThumbnails = false
-            }
-        }
-    }
-
     func finishMigration() async {
         await imageMigration.runIfNeeded(for: library.id)
         migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
     }
 
-    func freeUpSpace() async {
+    func verifyConsistency() async {
         let dataActor = DataActor(collectionID: library.id)
         await MainActor.run {
             UIApplication.shared.isIdleTimerDisabled = true
-            isFreeingUpSpace = true
+            verifyProgress = 0
+            verifyTotal = 0
+            isVerifyingConsistency = true
         }
-        await dataActor.purgeMigratedBlobs()
-        let reclaimed = await dataActor.reclaimDiskSpace()
-        if !reclaimed {
-            debugPrint("Free up space: no disk space was reclaimed")
+        await dataActor.verifyConsistency { progress in
+            verifyProgress = progress.completed
+            verifyTotal = progress.total
         }
         await MainActor.run {
-            isFreeingUpSpace = false
+            isVerifyingConsistency = false
             UIApplication.shared.isIdleTimerDisabled = false
         }
+        await loadCounts()
+        migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
     }
 
     func downloadAll() async {

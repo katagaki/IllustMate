@@ -107,9 +107,18 @@ extension DataActor {
         }
     }
 
+    func verifyConsistency(
+        progress: @escaping @MainActor (ImageMigrationProgress) -> Void
+    ) async {
+        await migrateImageBlobsToFiles(progress: progress)
+        purgeMigratedBlobs()
+        await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
+                                              total: 0, latestThumbnail: nil))
+        reclaimDiskSpace()
+    }
+
     @discardableResult
     func purgeMigratedBlobs() -> Int {
-        guard isLibraryV2MigrationComplete() else { return 0 }
         let query = picsTable
             .filter(picFilePath != nil && picData != nil)
             .select(picId)
