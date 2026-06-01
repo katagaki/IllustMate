@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 @preconcurrency import SQLite
 
@@ -169,7 +168,7 @@ extension DataActor {
               let fileData = try? Data(contentsOf: imageFileURL(forRelativePath: path)) else {
             return false
         }
-        return SHA256.hash(data: fileData) == SHA256.hash(data: blob)
+        return fileData == blob
     }
 
     private func chosenBatchSize(total: Int) -> Int {
