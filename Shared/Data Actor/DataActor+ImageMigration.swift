@@ -118,7 +118,11 @@ extension DataActor {
             .select(picId)
         let ids = (try? database.prepare(query).map { $0[picId] }) ?? []
         var purged = 0
-        for id in ids where verifyMigratedFile(id: id) {
+        for id in ids {
+            if !verifyMigratedFile(id: id) {
+                copyBlobToFile(id: id)
+                guard verifyMigratedFile(id: id) else { continue }
+            }
             do {
                 try database.run(picsTable.filter(picId == id).update(picData <- nil))
                 purged += 1
