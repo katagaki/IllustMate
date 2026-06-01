@@ -25,7 +25,6 @@ extension DataActor {
     }
 
     func isLibraryV2MigrationComplete() -> Bool {
-        // Leftover blobs, not the one-shot flag, decide completion.
         guard !needsImageMigration() else { return false }
         markLibraryV2MigrationComplete()
         return true
@@ -43,7 +42,6 @@ extension DataActor {
     func migrateImageBlobsToFiles(
         progress: @escaping @MainActor (ImageMigrationProgress) -> Void
     ) async {
-        // Reclaim already-migrated blobs without rewriting their files.
         let purged = purgeMigratedBlobs()
         let pending = pendingMigrationIDs()
         let total = pending.count
