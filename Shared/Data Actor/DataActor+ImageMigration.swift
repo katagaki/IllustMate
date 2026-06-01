@@ -104,6 +104,7 @@ extension DataActor {
     func verifyConsistency(
         progress: @escaping @MainActor (ImageMigrationProgress) -> Void
     ) async {
+        DatabaseMigrator.forceNullableImageColumn(database)
         await migrateImageBlobsToFiles(progress: progress)
         purgeMigratedBlobs()
         await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
