@@ -9,6 +9,8 @@ class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        switchToActiveLibrary()
+
         let shareView = UIHostingController(rootView: ShareView(itemsManager: itemsManager))
         addChild(shareView)
         view.addSubview(shareView.view)
@@ -60,6 +62,13 @@ class ShareViewController: UIViewController {
                 }
             }
         }
+    }
+
+    func switchToActiveLibrary() {
+        let store = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+        let libraryID = store?.string(forKey: "CurrentCollectionID") ?? PicLibrary.defaultID
+        DataActor.switchLibrary(to: libraryID)
+        CoverCacheActor.switchLibrary(to: libraryID)
     }
 
     func close() {
