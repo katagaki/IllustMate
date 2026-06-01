@@ -3,6 +3,8 @@ import SwiftUI
 struct LibraryManagerSheet: View {
 
     @Environment(\.dismiss) var dismiss
+    @Environment(ConcurrencyManager.self) var concurrency
+    @Environment(ImageMigrationManager.self) var imageMigration
     @EnvironmentObject var libraryManager: LibraryManager
     @EnvironmentObject var navigation: NavigationManager
 
@@ -41,6 +43,8 @@ struct LibraryManagerSheet: View {
                     })
                         .environmentObject(libraryManager)
                         .environmentObject(navigation)
+                        .environment(concurrency)
+                        .environment(imageMigration)
                 }
         }
         .phonePresentationDetents([.medium, .large])

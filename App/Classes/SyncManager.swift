@@ -42,14 +42,16 @@ final class SyncManager {
             }
         }
 
-        let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
-        #if DEBUG
-        SyncDebugMonitor.shared.enabled = !enabledIDs.isEmpty
-        #endif
-        guard !enabledIDs.isEmpty else {
+        guard await SyncMate.shared.isAccountAvailable() else {
             await SyncMate.shared.stop()
             return
         }
+
+        let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
+        #if DEBUG
+        SyncDebugMonitor.shared.enabled = true
+        #endif
+
         await SyncMate.shared.start()
         await SyncMate.shared.reportAccountStatus()
         await SyncMate.shared.enqueueLibraryChanges()
@@ -57,6 +59,9 @@ final class SyncManager {
             await SyncMate.shared.enqueueChanges(forLibrary: id)
         }
         await SyncMate.shared.fetchChanges()
+
+        guard !enabledIDs.isEmpty else { return }
+
         await OriginalsManager.shared.resetSyncStateIfContainerChanged()
         for id in enabledIDs {
             Task.detached(priority: .utility) {

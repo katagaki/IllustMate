@@ -7,6 +7,8 @@ struct CollectionView: View {
     @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
     @Environment(PhotosViewerManager.self) var photosViewer
+    @Environment(ConcurrencyManager.self) var concurrency
+    @Environment(ImageMigrationManager.self) var imageMigration
     @State var isMoreViewPresenting: Bool = false
     @State var isLibraryManagerPresented: Bool = false
     @Namespace var sheetNamespace
@@ -56,6 +58,8 @@ struct CollectionView: View {
                 LibraryManagerSheet()
                     .environmentObject(libraryManager)
                     .environmentObject(navigation)
+                    .environment(concurrency)
+                    .environment(imageMigration)
                     .navigationTransition(.zoom(sourceID: "libraryManager", in: sheetNamespace))
             }
             .navigationDestination(for: ViewPath.self, destination: { viewPath in

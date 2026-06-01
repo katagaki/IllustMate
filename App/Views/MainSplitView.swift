@@ -8,6 +8,8 @@ struct MainSplitView: View {
     @Environment(ViewerManager.self) var viewer
     @Environment(PhotosManager.self) var photosManager
     @Environment(PhotosViewerManager.self) var photosViewer
+    @Environment(ConcurrencyManager.self) var concurrency
+    @Environment(ImageMigrationManager.self) var imageMigration
     @Namespace var namespace
 
     @AppStorage("PhotosModeEnabled",
@@ -207,6 +209,8 @@ struct MainSplitView: View {
             LibraryManagerSheet()
                 .environmentObject(libraryManager)
                 .environmentObject(navigation)
+                .environment(concurrency)
+                .environment(imageMigration)
         }
     }
 }
