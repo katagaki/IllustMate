@@ -25,11 +25,7 @@ extension DataActor {
     }
 
     func isLibraryV2MigrationComplete() -> Bool {
-        // The on-disk flag is only a record; the source of truth is whether any
-        // pic blob is still present. Trusting the flag alone left blobs that a
-        // single migration pass failed to clear (verification failure, disk
-        // pressure mid-copy, or a swallowed clear) orphaned forever, since the
-        // migration would never revisit them.
+        // Leftover blobs, not the one-shot flag, decide completion.
         guard !needsImageMigration() else { return false }
         markLibraryV2MigrationComplete()
         return true
@@ -47,8 +43,7 @@ extension DataActor {
     func migrateImageBlobsToFiles(
         progress: @escaping @MainActor (ImageMigrationProgress) -> Void
     ) async {
-        // Clear blobs whose file already exists on disk so leftovers from an
-        // earlier interrupted pass are reclaimed without rewriting their files.
+        // Reclaim already-migrated blobs without rewriting their files.
         let purged = purgeMigratedBlobs()
         let pending = pendingMigrationIDs()
         let total = pending.count
