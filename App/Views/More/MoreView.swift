@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct MoreView: View {
 
@@ -7,12 +6,8 @@ struct MoreView: View {
     @Environment(AuthenticationManager.self) var auth
     @EnvironmentObject var navigation: NavigationManager
 
-    @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
-    var isPhotosModeEnabled: Bool = false
     @AppStorage("AppLockEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var isAppLockEnabled: Bool = false
-    @AppStorage("PhotosNestedAlbumsEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
-    var isNestedAlbumsEnabled: Bool = false
     @AppStorage("ShareSheetOpenSearch", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var openSearchWhenSharing: Bool = false
     @AppStorage("ShareSheetShowAnimation", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
@@ -26,25 +21,6 @@ struct MoreView: View {
 
     private var listContent: some View {
         List {
-            Section {
-                Toggle(String(localized: "PhotosMode", table: "More"), isOn: $isPhotosModeEnabled)
-                if isPhotosModeEnabled {
-                    Toggle(String(localized: "Experiments.NestedAlbums", table: "More"), isOn: $isNestedAlbumsEnabled)
-                    Button(String(localized: "Experiments.NestedAlbums.CopyPrefix", table: "More")) {
-                        UIPasteboard.general.string = "▶︎ "
-                    }
-                    .tint(.primary)
-                    .disabled(!isNestedAlbumsEnabled)
-                }
-            } header: {
-                Text("PhotosMode.Header", tableName: "More")
-            } footer: {
-                if isPhotosModeEnabled {
-                    Text("Experiments.NestedAlbums.Description", tableName: "More")
-                } else {
-                    Text("PhotosMode.Description", tableName: "More")
-                }
-            }
             Section {
                 Toggle(String(localized: "AppLock", table: "More"), isOn: $isAppLockEnabled)
                     .disabled(auth.biometryType == .none)

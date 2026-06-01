@@ -24,12 +24,10 @@ struct MainSplitView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedView) {
-                if !isPhotosModeEnabled {
-                    Section {
-                        LibrarySwitcherMenu(
-                            isLibraryManagerPresented: $isLibraryManagerPresented
-                        )
-                    }
+                Section {
+                    LibrarySwitcherMenu(
+                        isLibraryManagerPresented: $isLibraryManagerPresented
+                    )
                 }
                 Section {
                     NavigationLink(value: ViewPath.collection) {
