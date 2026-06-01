@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 struct LabsFileEntry: Identifiable, Hashable {
 
@@ -74,6 +75,7 @@ private struct LabsFileEntryRow: View {
     @State private var children: [LabsFileEntry] = []
     @State private var isExpanded: Bool = false
     @State private var didLoad: Bool = false
+    @State private var isExportPresented: Bool = false
 
     var body: some View {
         if entry.isDirectory {
@@ -96,19 +98,38 @@ private struct LabsFileEntryRow: View {
                 }
             }
         } else {
-            Label {
-                VStack(alignment: .leading, spacing: 2.0) {
-                    Text(entry.name)
-                    Text(entry.size.formatted(.byteCount(style: .file)))
-                        .font(.caption)
+            Button {
+                isExportPresented = true
+            } label: {
+                Label {
+                    VStack(alignment: .leading, spacing: 2.0) {
+                        Text(entry.name)
+                        Text(entry.size.formatted(.byteCount(style: .file)))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                } icon: {
+                    Image(systemName: "doc")
                         .foregroundStyle(.secondary)
-                        .monospacedDigit()
                 }
-            } icon: {
-                Image(systemName: "doc")
-                    .foregroundStyle(.secondary)
             }
-            .textSelection(.enabled)
+            .buttonStyle(.plain)
+            .sheet(isPresented: $isExportPresented) {
+                DocumentExporter(url: entry.url)
+                    .ignoresSafeArea()
+            }
         }
     }
+}
+
+private struct DocumentExporter: UIViewControllerRepresentable {
+
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        UIDocumentPickerViewController(forExporting: [url], asCopy: true)
+    }
+
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
 }

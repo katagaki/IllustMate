@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 @preconcurrency import SQLite
 
@@ -26,12 +25,9 @@ extension DataActor {
     }
 
     func isLibraryV2MigrationComplete() -> Bool {
-        if migrationCompletedFlag(Self.libraryV2MigrationName) { return true }
-        guard needsImageMigration() else {
-            markLibraryV2MigrationComplete()
-            return true
-        }
-        return false
+        guard !needsImageMigration() else { return false }
+        markLibraryV2MigrationComplete()
+        return true
     }
 
     func markLibraryV2MigrationComplete() {
@@ -43,18 +39,16 @@ extension DataActor {
         ))
     }
 
-    private func migrationCompletedFlag(_ name: String) -> Bool {
-        let query = migrationsTable.filter(migrationName == name)
-        guard let row = try? database.pluck(query) else { return false }
-        return (try? row.get(migrationCompleted)) ?? false
-    }
-
     func migrateImageBlobsToFiles(
         progress: @escaping @MainActor (ImageMigrationProgress) -> Void
     ) async {
+        let purged = purgeMigratedBlobs()
         let pending = pendingMigrationIDs()
         let total = pending.count
-        guard total > 0 else { return }
+        guard total > 0 else {
+            if purged > 0 { reclaimDiskSpace() }
+            return
+        }
         await progress(ImageMigrationProgress(phase: .copying, completed: 0,
                                               total: total, latestThumbnail: nil))
 
@@ -107,9 +101,18 @@ extension DataActor {
         }
     }
 
+    func verifyConsistency(
+        progress: @escaping @MainActor (ImageMigrationProgress) -> Void
+    ) async {
+        await migrateImageBlobsToFiles(progress: progress)
+        purgeMigratedBlobs()
+        await progress(ImageMigrationProgress(phase: .reclaiming, completed: 0,
+                                              total: 0, latestThumbnail: nil))
+        reclaimDiskSpace()
+    }
+
     @discardableResult
     func purgeMigratedBlobs() -> Int {
-        guard isLibraryV2MigrationComplete() else { return 0 }
         let query = picsTable
             .filter(picFilePath != nil && picData != nil)
             .select(picId)
@@ -158,7 +161,7 @@ extension DataActor {
               let fileData = try? Data(contentsOf: imageFileURL(forRelativePath: path)) else {
             return false
         }
-        return SHA256.hash(data: fileData) == SHA256.hash(data: blob)
+        return fileData == blob
     }
 
     private func chosenBatchSize(total: Int) -> Int {
