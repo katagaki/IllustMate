@@ -40,9 +40,7 @@ class ShareViewController: UIViewController {
             .string(forKey: "CurrentCollectionID") ?? PicLibrary.defaultID
         importerLogger.debug("Switching importer to collection \(collectionID, privacy: .public)")
         DataActor.switchLibrary(to: collectionID)
-        HashActor.switchLibrary(to: collectionID)
         CoverCacheActor.switchLibrary(to: collectionID)
-        PColorActor.switchLibrary(to: collectionID)
     }
 
     func loadItems() {
