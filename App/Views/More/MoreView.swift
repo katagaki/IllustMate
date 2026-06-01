@@ -85,6 +85,7 @@ struct MoreView: View {
                 }
             }
             WebServerView()
+            #if DEBUG
             Section {
                 NavigationLink(String(localized: "Labs.FileExplorer", table: "More"),
                                value: ViewPath.moreLabsFileExplorer)
@@ -95,6 +96,7 @@ struct MoreView: View {
             } footer: {
                 Text("Labs.Description", tableName: "More")
             }
+            #endif
             Section {
                 Link(destination: URL(string: "https://github.com/katagaki/IllustMate")!) {
                     HStack {

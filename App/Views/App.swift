@@ -25,11 +25,10 @@ struct IllustMateApp: App {
     @State var importedURL: URL?
     @State var showLockCover: Bool = false
 
-    #if DEBUG
+    @State var isShowingInternals: Bool = false
     @State var isSeedingData: Bool = false
     @State var seedCurrent: Int = 0
     @State var seedTotal: Int = 0
-    #endif
 
     @AppStorage("AppLockEnabled",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var isAppLockEnabled: Bool = false
@@ -120,11 +119,12 @@ struct IllustMateApp: App {
                     }
                 }
             }
-            #if DEBUG
+            if url.scheme == "picmate", url.host == "internals" {
+                isShowingInternals = true
+            }
             if url.scheme == "picmate", url.host == "entrophyrocks" {
                 handleSampleDataURL(url)
             }
-            #endif
         }
         .onChange(of: importedURL) { _, newValue in
             if newValue != nil {
@@ -141,7 +141,18 @@ struct IllustMateApp: App {
                 ProgressView()
             }
         }
-        #if DEBUG
+        .sheet(isPresented: $isShowingInternals) {
+            NavigationStack {
+                LabsFileExplorerView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(role: .close) {
+                                isShowingInternals = false
+                            }
+                        }
+                    }
+            }
+        }
         .sheet(isPresented: $isSeedingData) {
             StatusView(type: .inProgress,
                        title: .custom("Generating sample data…"),
@@ -150,7 +161,6 @@ struct IllustMateApp: App {
                 .phonePresentationDetents([.medium])
                 .interactiveDismissDisabled()
         }
-        #endif
         .fullScreenCover(isPresented: Binding(
             get: { imageMigration.isMigrating },
             set: { _ in }
@@ -159,7 +169,6 @@ struct IllustMateApp: App {
         }
     }
 
-    #if DEBUG
     func handleSampleDataURL(_ url: URL) {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         func count(_ name: String) -> Int? {
@@ -185,7 +194,6 @@ struct IllustMateApp: App {
             navigation.signalDataDeleted()
         }
     }
-    #endif
 
     func migratePreferencesFromUserDefaults() async {
         let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
