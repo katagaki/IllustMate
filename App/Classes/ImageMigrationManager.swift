@@ -15,9 +15,21 @@ final class ImageMigrationManager {
     func runPendingMigrations() async {
         guard !isMigrating else { return }
         guard DatabaseMigrator.needsLibraryV2Migration() else { return }
-        beginMigration()
+        var pendingIDs: [String] = []
         for id in await LibrariesActor.shared.allLibraryIDs() {
-            await migrate(libraryID: id)
+            if await DataActor.instance(for: id).isLibraryV2MigrationComplete() {
+                await LibrariesActor.shared.setLibraryMigrated(true, forID: id)
+            } else {
+                pendingIDs.append(id)
+            }
+        }
+        guard !pendingIDs.isEmpty else {
+            DatabaseMigrator.markLibraryV2MigrationComplete()
+            return
+        }
+        beginMigration()
+        for id in pendingIDs {
+            await migrate(libraryID: id, alreadyChecked: true)
         }
         DatabaseMigrator.markLibraryV2MigrationComplete()
         endMigration()
