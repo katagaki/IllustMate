@@ -225,7 +225,20 @@ extension SyncMate: CKSyncEngineDelegate {
         let error = failure.error
         if error.code == .serverRecordChanged,
            let serverRecord = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
-            await applyRecord(serverRecord)
+            let collectionID = Self.collectionID(forZone: recordID.zoneID)
+            if recordID.zoneID.zoneName != Self.librariesZoneName,
+               isForcePushing(collectionID) {
+                let serverFields = Self.encodeSystemFields(serverRecord)
+                let dataActor = DataActor.instance(for: collectionID)
+                if failure.record.recordType == SyncRecordType.album {
+                    await dataActor.markAlbumSynced(id: recordID.recordName, systemFields: serverFields)
+                } else {
+                    await dataActor.markPicSynced(id: recordID.recordName, systemFields: serverFields)
+                }
+                syncEngine.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+            } else {
+                await applyRecord(serverRecord)
+            }
         } else if error.code == .zoneNotFound {
             syncEngine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: recordID.zoneID))])
             syncEngine.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])

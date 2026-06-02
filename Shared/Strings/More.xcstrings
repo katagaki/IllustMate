@@ -2904,6 +2904,129 @@
         }
       }
     },
+    "Sync.Force.Confirm.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Inhalte dieser Bibliothek werden zu iCloud hochgeladen und überschreiben dort vorhandene Inhalte. In iCloud wird nichts gelöscht."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This uploads everything in this library to iCloud, overwriting what's already there. Nothing in iCloud will be deleted."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このライブラリのすべての内容をiCloudにアップロードし、iCloud上の内容を上書きします。iCloud上の項目が削除されることはありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 라이브러리의 모든 콘텐츠를 iCloud에 업로드하여 기존 콘텐츠를 덮어씁니다. iCloud의 항목은 삭제되지 않습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这会将此图库中的所有内容上传到 iCloud，覆盖其中已有的内容。iCloud 中的任何内容都不会被删除。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這會將此圖庫中的所有內容上傳到 iCloud，覆蓋其中已有的內容。iCloud 中的任何內容都不會被刪除。"
+          }
+        }
+      }
+    },
+    "Sync.Force.Confirm.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-Sync erzwingen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force iCloud Sync?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud同期を強制しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 동기화를 강제하시겠습니까?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强制 iCloud 同步？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "強制 iCloud 同步？"
+          }
+        }
+      }
+    },
+    "Sync.Force.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-Sync erzwingen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force iCloud Sync"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud同期を強制"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 동기화 강제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强制 iCloud 同步"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "強制 iCloud 同步"
+          }
+        }
+      }
+    },
     "Sync.EnableConfirm.Message" : {
       "extractionState" : "manual",
       "localizations" : {

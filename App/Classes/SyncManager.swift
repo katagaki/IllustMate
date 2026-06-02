@@ -43,6 +43,26 @@ final class SyncManager {
         await SyncMate.shared.sendChanges()
     }
 
+    func forcePush(forLibrary collectionID: String) async {
+        guard await SyncMate.shared.isAccountAvailable() else { return }
+        let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
+        guard enabledIDs.contains(collectionID) else { return }
+
+        await SyncMate.shared.start()
+        await SyncMate.shared.setForcePush(true, forLibrary: collectionID)
+        await SyncMate.shared.enqueueAllChanges(forLibrary: collectionID)
+
+        var attempts = 0
+        repeat {
+            await SyncMate.shared.sendChanges()
+            attempts += 1
+        } while await SyncMate.shared.hasPendingChanges() && attempts < 8
+
+        await SyncMate.shared.setForcePush(false, forLibrary: collectionID)
+        await OriginalsManager.shared.resetSyncStateIfContainerChanged()
+        await OriginalsManager.shared.uploadMissingOriginals(in: collectionID)
+    }
+
     func refresh() async {
         for id in await LibrariesActor.shared.unmigratedLibraryIDs() {
             if await DataActor.instance(for: id).isLibraryV2MigrationComplete() {

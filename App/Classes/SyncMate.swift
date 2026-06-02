@@ -16,6 +16,8 @@ actor SyncMate {
     private let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
     private let stateKey = "CKSyncEngineState"
 
+    private var forcePushLibraries: Set<String> = []
+
     init() {
         container = CKContainer(identifier: Self.containerID)
     }
@@ -85,6 +87,41 @@ actor SyncMate {
     func deleteLibraryZone(forLibrary collectionID: String) async {
         guard let engine else { return }
         engine.state.add(pendingDatabaseChanges: [.deleteZone(Self.zoneID(for: collectionID))])
+    }
+
+    func enqueueAllChanges(forLibrary collectionID: String) async {
+        guard let engine else { return }
+        let zoneID = Self.zoneID(for: collectionID)
+        engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: zoneID))])
+
+        let dataActor = DataActor.instance(for: collectionID)
+        let albumIDs = await dataActor.allAlbumIDs()
+        let picIDs = await dataActor.allOriginalPicIDs()
+
+        var pending: [CKSyncEngine.PendingRecordZoneChange] = []
+        for id in albumIDs + picIDs {
+            pending.append(.saveRecord(CKRecord.ID(recordName: id, zoneID: zoneID)))
+        }
+        await debugLog("force scan \(albumIDs.count)A \(picIDs.count)P")
+        guard !pending.isEmpty else { return }
+        engine.state.add(pendingRecordZoneChanges: pending)
+    }
+
+    func setForcePush(_ enabled: Bool, forLibrary collectionID: String) {
+        if enabled {
+            forcePushLibraries.insert(collectionID)
+        } else {
+            forcePushLibraries.remove(collectionID)
+        }
+    }
+
+    func isForcePushing(_ collectionID: String) -> Bool {
+        forcePushLibraries.contains(collectionID)
+    }
+
+    func hasPendingChanges() -> Bool {
+        guard let engine else { return false }
+        return !engine.state.pendingRecordZoneChanges.isEmpty
     }
 
     func fetchChanges() async {

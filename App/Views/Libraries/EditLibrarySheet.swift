@@ -38,6 +38,8 @@ struct EditLibrarySheet: View {
     @State var isDownloadingAll: Bool = false
     @State var downloadProgress: Int = 0
     @State var downloadTotal: Int = 0
+    @State var isConfirmingForceSync: Bool = false
+    @State var isForceSyncing: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -95,6 +97,18 @@ struct EditLibrarySheet: View {
                         } label: {
                             Text("Sync.Storage", tableName: "More")
                         }
+                        Button {
+                            isConfirmingForceSync = true
+                        } label: {
+                            HStack {
+                                Text("Sync.Force.Title", tableName: "More")
+                                if isForceSyncing {
+                                    Spacer()
+                                    ProgressView()
+                                }
+                            }
+                        }
+                        .disabled(isForceSyncing)
                     }
                 } footer: {
                     Text("Sync.Footer", tableName: "More")
@@ -230,6 +244,19 @@ struct EditLibrarySheet: View {
             Button("Shared.No", role: .cancel) { }
         } message: {
             Text("Sync.DownloadAll.Confirm.Message", tableName: "More")
+        }
+        .alert(Text("Sync.Force.Confirm.Title", tableName: "More"),
+               isPresented: $isConfirmingForceSync) {
+            Button("Shared.Yes") {
+                isForceSyncing = true
+                Task {
+                    await SyncManager.shared.forcePush(forLibrary: library.id)
+                    await MainActor.run { isForceSyncing = false }
+                }
+            }
+            Button("Shared.No", role: .cancel) { }
+        } message: {
+            Text("Sync.Force.Confirm.Message", tableName: "More")
         }
         .sheet(isPresented: $isDownloadingAll) {
             StatusView(type: .inProgress,
