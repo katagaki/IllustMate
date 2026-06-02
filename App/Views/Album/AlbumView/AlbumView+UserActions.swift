@@ -100,6 +100,21 @@ extension AlbumView {
         }
     }
 
+    @discardableResult
+    func importDrops(_ items: [Drop]) -> Bool {
+        let fileURLs = items.compactMap(\.file)
+        if !fileURLs.isEmpty {
+            importFiles(fileURLs)
+            return true
+        }
+        let images = items.compactMap(\.importedPhoto)
+        if !images.isEmpty {
+            importDroppedImages(images)
+            return true
+        }
+        return false
+    }
+
     func moveDropToAlbum(_ drop: Drop, to album: Album) {
         Task {
             if let transferable = drop.pic {

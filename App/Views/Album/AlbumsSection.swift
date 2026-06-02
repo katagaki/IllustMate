@@ -16,6 +16,7 @@ struct AlbumsSection<Content: View>: View {
     var onRename: ((Album) -> Void)?
     var onDelete: ((Album) -> Void)?
     var onDrop: ((Drop, Album) -> Void)?
+    var onDropFiles: (([URL], Album) -> Void)?
     @ViewBuilder var moveMenu: (Album) -> Content
 
     var body: some View {
@@ -29,7 +30,7 @@ struct AlbumsSection<Content: View>: View {
                             if enablesContextMenu {
                                 AlbumGridLabel(namespace: albumTransitionNamespace, album: album)
                                 .draggable(AlbumTransferable(id: album.id))
-                                .albumDropDestination(onDrop: onDrop, album: album)
+                                .albumDropDestination(onDrop: onDrop, onDropFiles: onDropFiles, album: album)
                             } else {
                                 AlbumGridLabel(namespace: albumTransitionNamespace,
                                                album: album)
@@ -51,7 +52,7 @@ struct AlbumsSection<Content: View>: View {
                         NavigationLink(value: ViewPath.album(album: album)) {
                             AlbumListRow(namespace: albumTransitionNamespace, album: album)
                                 .draggable(AlbumTransferable(id: album.id))
-                                .albumDropDestination(onDrop: onDrop, album: album)
+                                .albumDropDestination(onDrop: onDrop, onDropFiles: onDropFiles, album: album)
                         }
                         .id("\(album.identifiableString())")
                         .contextMenu {
@@ -71,7 +72,7 @@ struct AlbumsSection<Content: View>: View {
                             NavigationLink(value: ViewPath.album(album: album)) {
                                 AlbumGridLabel(namespace: albumTransitionNamespace, album: album, length: 80.0)
                                     .draggable(AlbumTransferable(id: album.id))
-                                    .albumDropDestination(onDrop: onDrop, album: album)
+                                    .albumDropDestination(onDrop: onDrop, onDropFiles: onDropFiles, album: album)
                             }
                             .id("\(album.identifiableString())")
                             .contextMenu {

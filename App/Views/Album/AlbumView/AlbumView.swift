@@ -276,5 +276,8 @@ struct AlbumView: View {
                 }
             }
         }
+        .dropDestination(for: Drop.self) { items, _ in
+            importDrops(items)
+        }
     }
 }

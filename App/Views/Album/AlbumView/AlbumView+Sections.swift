@@ -69,6 +69,8 @@ extension AlbumView {
                     deleteAlbum(album)
                 } onDrop: { transferable, album in
                     moveDropToAlbum(transferable, to: album)
+                } onDropFiles: { urls, album in
+                    importFiles(urls, into: album)
                 } moveMenu: { album in
                     AlbumMoveMenu(album: album, totalAlbumCount: totalAlbumCount) {
                         refreshAlbumsAndSet()

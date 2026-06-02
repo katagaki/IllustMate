@@ -3,20 +3,30 @@ import SwiftUI
 struct AlbumDropModifier: ViewModifier {
 
     var onDrop: ((Drop, Album) -> Void)?
+    var onDropFiles: (([URL], Album) -> Void)?
     var album: Album
 
-    init(onDrop: ((Drop, Album) -> Void)? = nil, album: Album) {
+    init(onDrop: ((Drop, Album) -> Void)? = nil,
+         onDropFiles: (([URL], Album) -> Void)? = nil,
+         album: Album) {
         self.onDrop = onDrop
+        self.onDropFiles = onDropFiles
         self.album = album
     }
 
     func body(content: Content) -> some View {
         content
             .dropDestination(for: Drop.self) { items, _ in
+                var fileURLs: [URL] = []
                 for item in items {
-                    if let onDrop {
+                    if let url = item.file {
+                        fileURLs.append(url)
+                    } else if let onDrop {
                         onDrop(item, album)
                     }
+                }
+                if !fileURLs.isEmpty, let onDropFiles {
+                    onDropFiles(fileURLs, album)
                 }
                 return true
             }
@@ -24,7 +34,9 @@ struct AlbumDropModifier: ViewModifier {
 }
 
 extension View {
-    func albumDropDestination(onDrop: ((Drop, Album) -> Void)? = nil, album: Album) -> some View {
-        modifier(AlbumDropModifier(onDrop: onDrop, album: album))
+    func albumDropDestination(onDrop: ((Drop, Album) -> Void)? = nil,
+                              onDropFiles: (([URL], Album) -> Void)? = nil,
+                              album: Album) -> some View {
+        modifier(AlbumDropModifier(onDrop: onDrop, onDropFiles: onDropFiles, album: album))
     }
 }

@@ -38,7 +38,7 @@ struct PicsGrid<Content: View>: View {
                     .onTapGesture {
                         onSelect(pic)
                     }
-                    .draggable(PicTransferable(id: pic.id))
+                    .modifier(PicExportDraggableModifier(pic: pic))
                     .matchedTransitionSource(id: pic.id, in: namespace)
                     .contextMenu {
                     if !isSelecting {

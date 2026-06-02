@@ -158,8 +158,42 @@ extension AlbumView {
         }
     }
 
+    func importDroppedImages(_ images: [Image], into album: Album? = nil) {
+        let targetAlbumID = (album ?? currentAlbum)?.id
+        isImportingPhotos = true
+        importTotalCount = images.count
+        importCurrentCount = 0
+        UIApplication.shared.isIdleTimerDisabled = true
+        Task {
+            var importedCount = 0
+            for image in images {
+                let data = await MainActor.run { image.render()?.data() }
+                if let data {
+                    await DataActor.shared.createPic(Pic.newFilename(), data: data,
+                                                     inAlbumWithID: targetAlbumID)
+                    importedCount += 1
+                }
+                await MainActor.run {
+                    importCurrentCount += 1
+                }
+            }
+            await MainActor.run {
+                if let targetAlbumID {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: targetAlbumID)
+                }
+                UIApplication.shared.isIdleTimerDisabled = false
+                importCompletedCount = importedCount
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                doWithAnimation {
+                    isImportCompleted = true
+                }
+            }
+        }
+    }
+
     // swiftlint:disable:next function_body_length
-    func importFiles(_ urls: [URL]) {
+    func importFiles(_ urls: [URL], into album: Album? = nil) {
+        let targetAlbumID = (album ?? currentAlbum)?.id
         isImportingPhotos = true
         importTotalCount = urls.count
         importCurrentCount = 0
@@ -185,7 +219,7 @@ extension AlbumView {
             }
             for file in loadedImageFiles {
                 await DataActor.shared.createPic(file.filename, data: file.data,
-                                                 inAlbumWithID: currentAlbum?.id)
+                                                 inAlbumWithID: targetAlbumID)
                 await MainActor.run {
                     importCurrentCount += 1
                 }
@@ -195,15 +229,15 @@ extension AlbumView {
                 await DataActor.shared.createVideo(
                     file.filename, data: file.data, duration: file.duration,
                     fileExtension: ext.isEmpty ? "mov" : ext,
-                    inAlbumWithID: currentAlbum?.id
+                    inAlbumWithID: targetAlbumID
                 )
                 await MainActor.run {
                     importCurrentCount += 1
                 }
             }
             await MainActor.run {
-                if let currentAlbum {
-                    AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
+                if let targetAlbumID {
+                    AlbumCoverCache.shared.removeImages(forAlbumID: targetAlbumID)
                 }
                 UIApplication.shared.isIdleTimerDisabled = false
                 importCompletedCount = loadedImageFiles.count + loadedVideoFiles.count
