@@ -183,6 +183,14 @@ actor OriginalsManager {
         }
     }
 
+    func startAlbumOfflineDownloads(albumID: String, in collectionID: String) async {
+        let ids = await DataActor.instance(for: collectionID).allOriginalPicIDs(inAlbum: albumID)
+        for id in ids {
+            guard let url = cloudURL(forPicID: id, in: collectionID), !isMaterialized(url) else { continue }
+            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        }
+    }
+
     func keepAlbumOffline(albumID: String, in collectionID: String) async {
         let allIDs = await DataActor.instance(for: collectionID).allOriginalPicIDs(inAlbum: albumID)
         let pending = allIDs.filter { id in

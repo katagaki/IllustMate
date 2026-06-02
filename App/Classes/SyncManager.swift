@@ -81,4 +81,41 @@ final class SyncManager {
             }
         }
     }
+
+    func backgroundSync() async {
+        for id in await LibrariesActor.shared.unmigratedLibraryIDs() {
+            if await DataActor.instance(for: id).isLibraryV2MigrationComplete() {
+                await LibrariesActor.shared.setLibraryMigrated(true, forID: id)
+            }
+        }
+
+        guard await SyncMate.shared.isAccountAvailable() else {
+            await SyncMate.shared.stop()
+            return
+        }
+
+        let enabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
+        await SyncMate.shared.start()
+        await SyncMate.shared.enqueueLibraryChanges()
+        for id in enabledIDs {
+            await SyncMate.shared.enqueueChanges(forLibrary: id)
+        }
+        await SyncMate.shared.fetchChanges()
+        await SyncMate.shared.sendChanges()
+
+        guard !enabledIDs.isEmpty else { return }
+
+        await OriginalsManager.shared.resetSyncStateIfContainerChanged()
+        for id in enabledIDs {
+            await OriginalsManager.shared.uploadMissingOriginals(in: id)
+            await OriginalsManager.shared.reclaimUploadedOriginals(in: id)
+        }
+        for id in await LibrariesActor.shared.downloadAllLibraryIDs() {
+            await OriginalsManager.shared.downloadAllOriginals(in: id)
+        }
+        let enabled = Set(enabledIDs)
+        for (albumID, collectionID) in OfflineAlbums.all() where enabled.contains(collectionID) {
+            await OriginalsManager.shared.startAlbumOfflineDownloads(albumID: albumID, in: collectionID)
+        }
+    }
 }
