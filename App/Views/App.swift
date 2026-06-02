@@ -86,8 +86,8 @@ struct IllustMateApp: App {
             }
             await migratePreferencesFromUserDefaults()
             DatabaseMigrator.markMigrationComplete()
-            await SyncManager.shared.refresh()
             await libraryManager.reconcileWithICloud()
+            await SyncManager.shared.refresh()
         }
         .onChange(of: libraryManager.currentLibrary.id) { _, newID in
             Task {

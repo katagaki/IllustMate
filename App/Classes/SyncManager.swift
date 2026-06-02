@@ -60,10 +60,11 @@ final class SyncManager {
         }
         await SyncMate.shared.fetchChanges()
 
-        guard !enabledIDs.isEmpty else { return }
+        let downloadEnabledIDs = await LibrariesActor.shared.syncEnabledLibraryIDs()
+        guard !downloadEnabledIDs.isEmpty else { return }
 
         await OriginalsManager.shared.resetSyncStateIfContainerChanged()
-        for id in enabledIDs {
+        for id in downloadEnabledIDs {
             Task.detached(priority: .utility) {
                 await OriginalsManager.shared.uploadMissingOriginals(in: id)
                 await OriginalsManager.shared.reclaimUploadedOriginals(in: id)
@@ -74,7 +75,7 @@ final class SyncManager {
                 await OriginalsManager.shared.downloadAllOriginals(in: id)
             }
         }
-        let enabled = Set(enabledIDs)
+        let enabled = Set(downloadEnabledIDs)
         for (albumID, collectionID) in OfflineAlbums.all() where enabled.contains(collectionID) {
             Task.detached(priority: .utility) {
                 await OriginalsManager.shared.keepAlbumOffline(albumID: albumID, in: collectionID)
