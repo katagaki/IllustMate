@@ -124,6 +124,12 @@ actor SyncMate {
         return PicLibrary.defaultID
     }
 
+    static func libraryCollectionIDs(fromZoneNames zoneNames: Set<String>) -> [String] {
+        zoneNames.compactMap { name in
+            name.hasPrefix("Library-") ? String(name.dropFirst("Library-".count)) : nil
+        }
+    }
+
     // MARK: - State persistence
 
     private func loadState() -> CKSyncEngine.State.Serialization? {

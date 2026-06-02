@@ -52,6 +52,12 @@ class LibraryManager: ObservableObject {
             await LibrariesActor.shared.setSyncEnabled(true, forID: PicLibrary.defaultID)
         }
 
+        let localIDs = Set(await LibrariesActor.shared.allLibraryIDs())
+        for id in SyncMate.libraryCollectionIDs(fromZoneNames: remoteZoneNames)
+        where !localIDs.contains(id) {
+            await LibrariesActor.shared.insertRemoteLibraryStub(id: id)
+        }
+
         for id in await LibrariesActor.shared.confirmedSyncedLibraryIDs()
         where !remoteZoneNames.contains(SyncMate.zoneName(for: id)) {
             await LibrariesActor.shared.removeLibraryForRemoteDelete(id: id)

@@ -166,7 +166,8 @@ extension LibrariesActor {
     func unsyncedLibraryIDs() -> [String] {
         let query = librariesTable
             .filter(libraryCKSystemFields == nil && librarySyncEnabled == true
-                    && libraryMigratedV2 == true && libraryId != PicLibrary.defaultID)
+                    && libraryMigratedV2 == true && libraryId != PicLibrary.defaultID
+                    && libraryName != "")
             .select(libraryId)
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
@@ -258,6 +259,19 @@ extension LibrariesActor {
     func markLibrarySynced(id: String, systemFields: Data?) {
         _ = try? database.run(librariesTable.filter(libraryId == id)
             .update(libraryDirty <- false, libraryCKSystemFields <- systemFields))
+    }
+
+    func insertRemoteLibraryStub(id: String) {
+        guard id != PicLibrary.defaultID else { return }
+        ensureFolder(for: id)
+        _ = try? database.run(librariesTable.insert(or: .ignore,
+            libraryId <- id,
+            libraryName <- "",
+            libraryDirty <- false,
+            librarySyncEnabled <- true,
+            libraryMigratedV2 <- true,
+            libraryLastModified <- 0
+        ))
     }
 
     func applyRemoteLibrary(_ snapshot: LibrarySyncSnapshot) {
