@@ -171,6 +171,14 @@ extension LibrariesActor {
         return (try? database.prepare(query).map { $0[libraryId] }) ?? []
     }
 
+    func confirmedSyncedLibraryIDs() -> [String] {
+        let query = librariesTable
+            .filter(librarySyncEnabled == true && libraryCKSystemFields != nil
+                    && libraryId != PicLibrary.defaultID)
+            .select(libraryId)
+        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+    }
+
     func syncEnabledLibraryIDs() -> [String] {
         let query = librariesTable
             .filter(librarySyncEnabled == true && libraryMigratedV2 == true)

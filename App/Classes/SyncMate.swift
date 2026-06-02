@@ -96,6 +96,11 @@ actor SyncMate {
         (try? await container.accountStatus()) == .available
     }
 
+    func remoteZoneNames() async -> Set<String>? {
+        guard let zones = try? await container.privateCloudDatabase.allRecordZones() else { return nil }
+        return Set(zones.map { $0.zoneID.zoneName })
+    }
+
     // MARK: - Zone <-> library mapping
 
     static let librariesZoneName = "Libraries"

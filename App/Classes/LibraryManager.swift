@@ -39,6 +39,28 @@ class LibraryManager: ObservableObject {
         withAnimation(.smooth.speed(2.0)) {
             libraries = sortedByName(allLibraries)
         }
+        if !currentLibrary.isDefault,
+           !allLibraries.contains(where: { $0.id == currentLibrary.id }) {
+            switchLibrary(to: PicLibrary())
+        }
+    }
+
+    func reconcileWithICloud() async {
+        guard let remoteZoneNames = await SyncMate.shared.remoteZoneNames() else { return }
+
+        if remoteZoneNames.contains(SyncMate.zoneName(for: PicLibrary.defaultID)) {
+            await LibrariesActor.shared.setSyncEnabled(true, forID: PicLibrary.defaultID)
+        }
+
+        for id in await LibrariesActor.shared.confirmedSyncedLibraryIDs()
+        where !remoteZoneNames.contains(SyncMate.zoneName(for: id)) {
+            await LibrariesActor.shared.removeLibraryForRemoteDelete(id: id)
+            if currentLibrary.id == id {
+                switchLibrary(to: PicLibrary())
+            }
+        }
+
+        await loadLibraries()
     }
 
     func switchLibrary(to library: PicLibrary) {
