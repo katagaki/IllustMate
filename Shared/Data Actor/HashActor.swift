@@ -85,7 +85,7 @@ actor HashActor {
         let query = picHashesTable
             .filter(hashVersion == Self.currentHashVersion)
             .select(hashPicId, hashValue)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { row in
             guard let picID = try? row.get(hashPicId),
                   let value = try? row.get(hashValue) else { return nil }
@@ -97,7 +97,7 @@ actor HashActor {
         let query = picHashesTable
             .filter(hashVersion == Self.currentHashVersion)
             .select(hashPicId)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         var ids = Set<String>()
         for row in rows {
             if let picID = try? row.get(hashPicId) {

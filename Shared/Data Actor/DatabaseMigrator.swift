@@ -73,7 +73,7 @@ struct DatabaseMigrator {
     }
 
     static func stampSchemaVersionIfMigrated(_ database: Connection) {
-        let hasDataColumn = ((try? database.prepare("PRAGMA table_info(\"pics\")"))?
+        let hasDataColumn = ((try? database.safeRows("PRAGMA table_info(\"pics\")"))?
             .contains { ($0[1] as? String) == "data" }) ?? false
         guard !hasDataColumn,
               ((try? database.scalar("PRAGMA user_version") as? Int64) ?? 0) < DataActor.schemaVersion

@@ -3,7 +3,7 @@ import Foundation
 
 extension DataActor {
     func albumsWithCounts(sortedBy sortType: SortType) throws -> [Album] {
-        let rows = try database.prepare(albumsTable)
+        let rows = try database.safeRows(albumsTable)
         let albums = rows.map { row -> Album in
             albumFrom(row: row, loadChildren: false)
         }
@@ -23,7 +23,7 @@ extension DataActor {
             sql = "SELECT id, name, cover_photo IS NOT NULL, parent_album_id, date_created FROM albums WHERE parent_album_id IS NULL"
             bindings = []
         }
-        let stmt = try database.prepare(sql, bindings)
+        let stmt = try database.safeRows(sql, bindings)
         let albums = stmt.map { row -> Album in
             let id = row[0] as? String ?? ""
             let name = row[1] as? String ?? ""
@@ -47,7 +47,7 @@ extension DataActor {
         var albumCounts: [String: Int] = [:]
         // swiftlint:disable:next line_length
         let albumCountSQL = "SELECT parent_album_id, COUNT(*) FROM albums WHERE parent_album_id IN (\(placeholders)) GROUP BY parent_album_id"
-        if let stmt = try? database.prepare(albumCountSQL, bindings) {
+        if let stmt = try? database.safeRows(albumCountSQL, bindings) {
             for row in stmt {
                 if let parentId = row[0] as? String,
                    let count = row[1] as? Int64 {
@@ -59,7 +59,7 @@ extension DataActor {
         var picCounts: [String: Int] = [:]
         // swiftlint:disable:next line_length
         let picCountSQL = "SELECT containing_album_id, COUNT(*) FROM pics WHERE containing_album_id IN (\(placeholders)) GROUP BY containing_album_id"
-        if let stmt = try? database.prepare(picCountSQL, bindings) {
+        if let stmt = try? database.safeRows(picCountSQL, bindings) {
             for row in stmt {
                 if let albumId = row[0] as? String,
                    let count = row[1] as? Int64 {
@@ -80,7 +80,7 @@ extension DataActor {
             .select(picThumbnailData)
             .order(picDateAdded.desc)
             .limit(limit)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { try? $0.get(picThumbnailData) }
     }
 
@@ -108,7 +108,7 @@ extension DataActor {
                 .select(picThumbnailData)
                 .order(picDateAdded.desc)
                 .limit(limit)
-            guard let rows = try? database.prepare(query) else { continue }
+            guard let rows = try? database.safeRows(query) else { continue }
             let thumbnails = rows.compactMap { try? $0.get(picThumbnailData) }
             if !thumbnails.isEmpty {
                 result[albumID] = thumbnails
@@ -242,7 +242,7 @@ extension DataActor {
         var queue = [albumID]
         while let current = queue.popLast() {
             let childQuery = albumsTable.filter(albumParentId == current).select(albumId)
-            if let rows = try? database.prepare(childQuery) {
+            if let rows = try? database.safeRows(childQuery) {
                 for row in rows {
                     if let childID = try? row.get(albumId) {
                         albumIDs.append(childID)
@@ -254,7 +254,7 @@ extension DataActor {
 
         let picsQuery = picsTable.filter(albumIDs.contains(picAlbumId)).select(picId)
         var deletedPicIDs: [String] = []
-        if let rows = try? database.prepare(picsQuery) {
+        if let rows = try? database.safeRows(picsQuery) {
             for row in rows {
                 if let id = try? row.get(picId) {
                     deletedPicIDs.append(id)
@@ -299,7 +299,7 @@ extension DataActor {
     func searchAlbums(matching searchText: String, sortedBy sortType: SortType) throws -> [Album] {
         let pattern = "%\(searchText)%"
         let query = albumsTable.filter(albumName.like(pattern, escape: nil))
-        let rows = try database.prepare(query)
+        let rows = try database.safeRows(query)
         let albums = rows.map { row -> Album in
             albumFrom(row: row, loadChildren: false)
         }
@@ -315,7 +315,7 @@ extension DataActor {
         let query = albumsTable.filter(
             descendantIDs.contains(albumId) && albumName.like(pattern, escape: nil)
         )
-        let rows = try database.prepare(query)
+        let rows = try database.safeRows(query)
         let albums = rows.map { row -> Album in
             albumFrom(row: row, loadChildren: false)
         }
@@ -331,7 +331,7 @@ extension DataActor {
         } else {
             firstQuery = albumsTable.filter(albumParentId == nil).select(albumId)
         }
-        guard let rows = try? database.prepare(firstQuery) else { return [] }
+        guard let rows = try? database.safeRows(firstQuery) else { return [] }
         var currentLevel = rows.compactMap { try? $0.get(albumId) }
         var allIDs = currentLevel
 
@@ -339,7 +339,7 @@ extension DataActor {
             let nextQuery = albumsTable
                 .filter(currentLevel.contains(albumParentId))
                 .select(albumId)
-            guard let nextRows = try? database.prepare(nextQuery) else { break }
+            guard let nextRows = try? database.safeRows(nextQuery) else { break }
             currentLevel = nextRows.compactMap { try? $0.get(albumId) }
             allIDs.append(contentsOf: currentLevel)
         }

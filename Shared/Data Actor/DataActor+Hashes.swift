@@ -5,19 +5,19 @@ extension DataActor {
 
     func allPicIDs() -> [String] {
         let query = picsTable.select(picId)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { try? $0.get(picId) }
     }
 
     func picIDs(inAlbumWithID albumID: String) -> [String] {
         let query = picsTable.filter(picAlbumId == albumID).select(picId)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { try? $0.get(picId) }
     }
 
     func picIDsNotInAnyAlbum() -> [String] {
         let query = picsTable.filter(picAlbumId == nil).select(picId)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { try? $0.get(picId) }
     }
 

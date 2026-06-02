@@ -78,7 +78,7 @@ extension DataActor {
         let query = picsTable
             .filter(ids.contains(picId) && syncCKSystemFields != nil)
             .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
+        return (try? database.safeRows(query).map { $0[picId] }) ?? []
     }
 
     func albumWasSynced(id: String) -> Bool {
@@ -90,27 +90,27 @@ extension DataActor {
     // MARK: - Upload: dirty records + tombstones
 
     func dirtyAlbumIDs() -> [String] {
-        (try? database.prepare(albumsTable.filter(syncDirty == true).select(albumId))
+        (try? database.safeRows(albumsTable.filter(syncDirty == true).select(albumId))
             .map { $0[albumId] }) ?? []
     }
 
     func dirtyPicIDs() -> [String] {
-        (try? database.prepare(picsTable.filter(syncDirty == true).select(picId))
+        (try? database.safeRows(picsTable.filter(syncDirty == true).select(picId))
             .map { $0[picId] }) ?? []
     }
 
     func unsyncedAlbumIDs() -> [String] {
-        (try? database.prepare(albumsTable.filter(syncCKSystemFields == nil).select(albumId))
+        (try? database.safeRows(albumsTable.filter(syncCKSystemFields == nil).select(albumId))
             .map { $0[albumId] }) ?? []
     }
 
     func unsyncedPicIDs() -> [String] {
-        (try? database.prepare(picsTable.filter(syncCKSystemFields == nil).select(picId))
+        (try? database.safeRows(picsTable.filter(syncCKSystemFields == nil).select(picId))
             .map { $0[picId] }) ?? []
     }
 
     func pendingTombstones() -> [(id: String, recordType: String)] {
-        (try? database.prepare(tombstonesTable)
+        (try? database.safeRows(tombstonesTable)
             .map { (id: $0[tombstoneId], recordType: $0[tombstoneRecordType]) }) ?? []
     }
 
@@ -159,7 +159,7 @@ extension DataActor {
         let query = picsTable
             .filter(picFilePath != nil && syncOriginalSynced == false)
             .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
+        return (try? database.safeRows(query).map { $0[picId] }) ?? []
     }
 
     func originalLocation(forPicWithID id: String) -> OriginalLocation? {
@@ -192,21 +192,21 @@ extension DataActor {
         let query = picsTable
             .filter(picAlbumId == albumID && picFilePath != nil)
             .select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
+        return (try? database.safeRows(query).map { $0[picId] }) ?? []
     }
 
     func localOriginalPicIDs() -> [String] {
         let query = picsTable.filter(picFilePath != nil).select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
+        return (try? database.safeRows(query).map { $0[picId] }) ?? []
     }
 
     func allOriginalPicIDs() -> [String] {
-        (try? database.prepare(picsTable.select(picId)).map { $0[picId] }) ?? []
+        (try? database.safeRows(picsTable.select(picId)).map { $0[picId] }) ?? []
     }
 
     func allOriginalPicIDs(inAlbum albumID: String) -> [String] {
         let query = picsTable.filter(picAlbumId == albumID).select(picId)
-        return (try? database.prepare(query).map { $0[picId] }) ?? []
+        return (try? database.safeRows(query).map { $0[picId] }) ?? []
     }
 
     func evictLocalOriginal(picID: String) {

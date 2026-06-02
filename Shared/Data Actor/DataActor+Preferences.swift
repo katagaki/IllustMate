@@ -50,7 +50,7 @@ extension DataActor {
 
     func allAlbumIDs() -> [String] {
         let query = albumsTable.select(albumId)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { try? $0.get(albumId) }
     }
 

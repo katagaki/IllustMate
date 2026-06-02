@@ -77,7 +77,7 @@ extension DataActor {
             .filter(picData == nil)
             .select(picId, picMediaType, picFilePath)
         var work: [BackupOriginal] = []
-        for row in try backupDB.prepare(query) {
+        for row in try backupDB.safeRows(query) {
             work.append(BackupOriginal(id: row[picId],
                                        mediaType: (try? row.get(picMediaType)) ?? 0,
                                        path: (try? row.get(picFilePath)) ?? nil))
@@ -118,7 +118,7 @@ extension DataActor {
     func backupEstimate(sizeProvider: (@Sendable (String) async -> Int64?)?) async -> (count: Int, bytes: Int64) {
         var bytes = fileSize(at: databaseURL)
         var rows: [(id: String, mediaType: Int, path: String?)] = []
-        if let prepared = try? database.prepare(picsTable.select(picId, picMediaType, picFilePath)) {
+        if let prepared = try? database.safeRows(picsTable.select(picId, picMediaType, picFilePath)) {
             for row in prepared {
                 rows.append((row[picId], (try? row.get(picMediaType)) ?? 0,
                              (try? row.get(picFilePath)) ?? nil))
@@ -166,7 +166,7 @@ extension DataActor {
 
     private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws {
         var albumIDMap: [String: String] = [:]
-        for foreignAlbum in try foreignDB.prepare(albumsTable) {
+        for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? UUID().uuidString
             let newID = UUID().uuidString
             albumIDMap[oldID] = newID
@@ -179,7 +179,7 @@ extension DataActor {
                 albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
             ))
         }
-        for foreignAlbum in try foreignDB.prepare(albumsTable) {
+        for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? ""
             guard let oldParentID = try? foreignAlbum.get(albumParentId),
                   let newID = albumIDMap[oldID],
@@ -187,7 +187,7 @@ extension DataActor {
             _ = try? database.run(albumsTable.filter(albumId == newID)
                 .update(albumParentId <- newParentID))
         }
-        for foreignPic in try foreignDB.prepare(picsTable) {
+        for foreignPic in try foreignDB.safeRows(picsTable) {
             let oldAlbumID = try? foreignPic.get(picAlbumId)
             let mappedAlbumID = oldAlbumID.flatMap { albumIDMap[$0] } ?? targetAlbumID
             importForeignPic(foreignPic, newID: UUID().uuidString, albumID: mappedAlbumID)
@@ -195,7 +195,7 @@ extension DataActor {
     }
 
     private func mergeBackup(from foreignDB: Connection) throws {
-        for foreignAlbum in try foreignDB.prepare(albumsTable) {
+        for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             _ = try? database.run(albumsTable.insert(or: .ignore,
                 albumId <- (try? foreignAlbum.get(albumId)) ?? UUID().uuidString,
                 albumName <- (try? foreignAlbum.get(albumName)) ?? "",
@@ -204,7 +204,7 @@ extension DataActor {
                 albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
             ))
         }
-        for foreignPic in try foreignDB.prepare(picsTable) {
+        for foreignPic in try foreignDB.safeRows(picsTable) {
             let id = (try? foreignPic.get(picId)) ?? UUID().uuidString
             if ((try? database.scalar(picsTable.filter(picId == id).count)) ?? 0) > 0 { continue }
             let albumID = try? foreignPic.get(picAlbumId)

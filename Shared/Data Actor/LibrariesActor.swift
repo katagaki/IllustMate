@@ -79,7 +79,7 @@ actor LibrariesActor {
 
     func allLibraries() -> [PicLibrary] {
         let query = librariesTable.order(libraryId.desc)
-        guard let rows = try? database.prepare(query) else { return [] }
+        guard let rows = try? database.safeRows(query) else { return [] }
         return rows.compactMap { row in
             guard let id = try? row.get(libraryId),
                   let name = try? row.get(libraryName) else { return nil }
@@ -160,7 +160,7 @@ extension LibrariesActor {
             .filter(libraryDirty == true && librarySyncEnabled == true
                     && libraryMigratedV2 == true && libraryId != PicLibrary.defaultID)
             .select(libraryId)
-        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+        return (try? database.safeRows(query).map { $0[libraryId] }) ?? []
     }
 
     func unsyncedLibraryIDs() -> [String] {
@@ -169,7 +169,7 @@ extension LibrariesActor {
                     && libraryMigratedV2 == true && libraryId != PicLibrary.defaultID
                     && libraryName != "")
             .select(libraryId)
-        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+        return (try? database.safeRows(query).map { $0[libraryId] }) ?? []
     }
 
     func confirmedSyncedLibraryIDs() -> [String] {
@@ -177,23 +177,23 @@ extension LibrariesActor {
             .filter(librarySyncEnabled == true && libraryCKSystemFields != nil
                     && libraryId != PicLibrary.defaultID)
             .select(libraryId)
-        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+        return (try? database.safeRows(query).map { $0[libraryId] }) ?? []
     }
 
     func syncEnabledLibraryIDs() -> [String] {
         let query = librariesTable
             .filter(librarySyncEnabled == true && libraryMigratedV2 == true)
             .select(libraryId)
-        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+        return (try? database.safeRows(query).map { $0[libraryId] }) ?? []
     }
 
     func allLibraryIDs() -> [String] {
-        (try? database.prepare(librariesTable.select(libraryId)).map { $0[libraryId] }) ?? []
+        (try? database.safeRows(librariesTable.select(libraryId)).map { $0[libraryId] }) ?? []
     }
 
     func unmigratedLibraryIDs() -> [String] {
         let query = librariesTable.filter(libraryMigratedV2 == false).select(libraryId)
-        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+        return (try? database.safeRows(query).map { $0[libraryId] }) ?? []
     }
 
     func setLibraryMigrated(_ migrated: Bool, forID id: String) {
@@ -217,7 +217,7 @@ extension LibrariesActor {
             .filter(librarySyncEnabled == true && libraryMigratedV2 == true
                     && libraryStorageMode == StorageMode.downloadAll.rawValue)
             .select(libraryId)
-        return (try? database.prepare(query).map { $0[libraryId] }) ?? []
+        return (try? database.safeRows(query).map { $0[libraryId] }) ?? []
     }
 
     func isSyncEnabled(id: String) -> Bool {
@@ -239,7 +239,7 @@ extension LibrariesActor {
     }
 
     func pendingLibraryTombstones() -> [String] {
-        (try? database.prepare(tombstonesTable).map { $0[tombstoneId] }) ?? []
+        (try? database.safeRows(tombstonesTable).map { $0[tombstoneId] }) ?? []
     }
 
     func removeLibraryTombstone(id: String) {

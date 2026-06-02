@@ -94,7 +94,7 @@ extension DataActor {
     // MARK: - Schema
 
     func dataColumnExists() -> Bool {
-        guard let rows = try? database.prepare("PRAGMA table_info(\"pics\")") else { return false }
+        guard let rows = try? database.safeRows("PRAGMA table_info(\"pics\")") else { return false }
         for row in rows where (row[1] as? String) == "data" { return true }
         return false
     }
@@ -136,7 +136,7 @@ extension DataActor {
         guard dataColumnExists() else { return [] }
         let sql = "SELECT \"id\" FROM \"pics\" WHERE \"media_type\" = \(MediaType.pic.rawValue) " +
                   "AND \"data\" IS NOT NULL AND length(\"data\") > 0"
-        guard let statement = try? database.prepare(sql) else { return [] }
+        guard let statement = try? database.safeRows(sql) else { return [] }
         var ids: [String] = []
         for row in statement {
             if let id = row[0] as? String { ids.append(id) }

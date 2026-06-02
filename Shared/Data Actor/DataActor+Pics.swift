@@ -15,7 +15,7 @@ extension DataActor {
         let query = picsTable
             .select(picListColumns)
             .order(picDateAdded.desc)
-        return try database.prepare(query).map { picFrom(row: $0) }
+        return try database.safeRows(query).map { picFrom(row: $0) }
     }
 
     func pics(in album: Album?, order: SortOrder) throws -> [Pic] {
@@ -28,7 +28,7 @@ extension DataActor {
         let orderedQuery = (order == .reverse ? baseQuery.order(picDateAdded.desc) :
                                                 baseQuery.order(picDateAdded.asc))
             .select(picListColumns)
-        return try database.prepare(orderedQuery).map { picFrom(row: $0) }
+        return try database.safeRows(orderedQuery).map { picFrom(row: $0) }
     }
 
     func picSkeletons(in album: Album?, order: SortOrder) throws -> [Pic] {
@@ -41,7 +41,7 @@ extension DataActor {
         let orderedQuery = (order == .reverse ? baseQuery.order(picDateAdded.desc) :
                                                 baseQuery.order(picDateAdded.asc))
             .select(picSkeletonColumns)
-        return try database.prepare(orderedQuery).map { picFrom(row: $0) }
+        return try database.safeRows(orderedQuery).map { picFrom(row: $0) }
     }
 
     func picSkeletons(in album: Album?, order: SortOrder, limit: Int, offset: Int) throws -> [Pic] {
@@ -55,7 +55,7 @@ extension DataActor {
                                                 baseQuery.order(picDateAdded.asc))
             .select(picSkeletonColumns)
             .limit(limit, offset: offset)
-        return try database.prepare(orderedQuery).map { picFrom(row: $0) }
+        return try database.safeRows(orderedQuery).map { picFrom(row: $0) }
     }
 
     func picSkeletonsByName(in album: Album?, order: SortOrder) throws -> [Pic] {
@@ -66,7 +66,7 @@ extension DataActor {
             baseQuery = picsTable.filter(picAlbumId == nil)
         }
         let query = baseQuery.select(picSkeletonColumns)
-        let pics = try database.prepare(query).map { picFrom(row: $0) }
+        let pics = try database.safeRows(query).map { picFrom(row: $0) }
         return pics.sorted { lhs, rhs in
             let result = lhs.name.localizedStandardCompare(rhs.name)
             return order == .reverse ? result == .orderedDescending : result == .orderedAscending
@@ -251,7 +251,7 @@ extension DataActor {
     func deletePics(withIDs picIDs: [String]) {
         guard !picIDs.isEmpty else { return }
         let selectQuery = picsTable.filter(picIDs.contains(picId)).select(picFilePath)
-        if let rows = try? database.prepare(selectQuery) {
+        if let rows = try? database.safeRows(selectQuery) {
             for row in rows {
                 if let path = try? row.get(picFilePath) {
                     deleteMediaFile(atRelativePath: path)

@@ -295,7 +295,7 @@ actor DataActor {
 
     func fetchChildAlbums(forAlbumID id: String) -> [Album] {
         let query = albumsTable.filter(albumParentId == id)
-        return (try? database.prepare(query).map { albumFrom(row: $0, loadChildren: false) }) ?? []
+        return (try? database.safeRows(query).map { albumFrom(row: $0, loadChildren: false) }) ?? []
     }
 
     func fetchChildPics(forAlbumID id: String) -> [Pic] {
@@ -304,6 +304,33 @@ actor DataActor {
             .select(picId, picName, picAlbumId,
                     picDateAdded, picThumbnailData,
                     picMediaType, picDuration, picFilePath)
-        return (try? database.prepare(query).map { picFrom(row: $0) }) ?? []
+        return (try? database.safeRows(query).map { picFrom(row: $0) }) ?? []
+    }
+}
+
+extension Connection {
+    // SQLite.swift's row sequences/statements conform to FailableIterator, whose
+    // default IteratorProtocol `next()` force-tries the throwing `failableNext()`.
+    // An error raised while *stepping* a statement (e.g. file I/O on the app-group
+    // container being restricted while the app is backgrounded on iOS) is thrown
+    // out of `failableNext()` and the `try!` traps the whole process — a `try?`
+    // around `prepare(_:)` only guards statement compilation, not stepping.
+    // Draining through `failableNext()` keeps the stepping error catchable.
+    func safeRows(_ query: QueryType) throws -> [Row] {
+        let iterator = try prepareRowIterator(query)
+        var rows: [Row] = []
+        while let row = try iterator.failableNext() {
+            rows.append(row)
+        }
+        return rows
+    }
+
+    func safeRows(_ statement: String, _ bindings: [SQLite.Binding?] = []) throws -> [[SQLite.Binding?]] {
+        let prepared = try prepare(statement, bindings)
+        var rows: [[SQLite.Binding?]] = []
+        while let row = try prepared.failableNext() {
+            rows.append(row)
+        }
+        return rows
     }
 }
