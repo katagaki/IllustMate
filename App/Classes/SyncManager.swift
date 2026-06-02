@@ -35,6 +35,14 @@ final class SyncManager {
         await SyncMate.shared.sendChanges()
     }
 
+    func deleteLibraryFromCloud(_ collectionID: String) async {
+        guard await SyncMate.shared.isAccountAvailable() else { return }
+        await SyncMate.shared.start()
+        await SyncMate.shared.enqueueLibraryChanges()
+        await SyncMate.shared.deleteLibraryZone(forLibrary: collectionID)
+        await SyncMate.shared.sendChanges()
+    }
+
     func refresh() async {
         for id in await LibrariesActor.shared.unmigratedLibraryIDs() {
             if await DataActor.instance(for: id).isLibraryV2MigrationComplete() {

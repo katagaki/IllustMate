@@ -20,11 +20,15 @@ actor OriginalsManager {
 
     // MARK: - Paths
 
-    private func originalsDirectory(for collectionID: String, mediaType: MediaType) -> URL? {
-        let subfolder = mediaType == .video ? "Videos" : "Images"
-        return FileManager.default.url(forUbiquityContainerIdentifier: Self.containerID)?
+    private func libraryOriginalsDirectory(for collectionID: String) -> URL? {
+        FileManager.default.url(forUbiquityContainerIdentifier: Self.containerID)?
             .appendingPathComponent("Originals", isDirectory: true)
             .appendingPathComponent(collectionID, isDirectory: true)
+    }
+
+    private func originalsDirectory(for collectionID: String, mediaType: MediaType) -> URL? {
+        let subfolder = mediaType == .video ? "Videos" : "Images"
+        return libraryOriginalsDirectory(for: collectionID)?
             .appendingPathComponent(subfolder, isDirectory: true)
     }
 
@@ -45,10 +49,7 @@ actor OriginalsManager {
     }
 
     private func legacyOriginalURL(forPicID id: String, in collectionID: String) -> URL? {
-        FileManager.default.url(forUbiquityContainerIdentifier: Self.containerID)?
-            .appendingPathComponent("Originals", isDirectory: true)
-            .appendingPathComponent(collectionID, isDirectory: true)
-            .appendingPathComponent(id)
+        libraryOriginalsDirectory(for: collectionID)?.appendingPathComponent(id)
     }
 
     private func enumerateVideoOriginal(in directory: URL, picID: String) -> URL? {
@@ -349,6 +350,12 @@ actor OriginalsManager {
         for id in picIDs {
             await deleteCloudOriginal(picID: id, in: collectionID)
         }
+    }
+
+    func deleteAllOriginals(in collectionID: String) async {
+        guard isUbiquityAvailable(),
+              let directory = libraryOriginalsDirectory(for: collectionID) else { return }
+        await coordinatedDelete(at: directory)
     }
 
     private func waitForDownload(_ url: URL, timeoutSeconds: Int = 10) async -> Bool {

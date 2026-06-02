@@ -82,6 +82,11 @@ actor SyncMate {
         engine.state.add(pendingRecordZoneChanges: pending)
     }
 
+    func deleteLibraryZone(forLibrary collectionID: String) async {
+        guard let engine else { return }
+        engine.state.add(pendingDatabaseChanges: [.deleteZone(Self.zoneID(for: collectionID))])
+    }
+
     func fetchChanges() async {
         guard let engine else { return }
         try? await engine.fetchChanges()
@@ -99,6 +104,26 @@ actor SyncMate {
     func remoteZoneNames() async -> Set<String>? {
         guard let zones = try? await container.privateCloudDatabase.allRecordZones() else { return nil }
         return Set(zones.map { $0.zoneID.zoneName })
+    }
+
+    @discardableResult
+    func fetchAndApplyRemoteLibraries() async -> Bool {
+        guard let result = try? await container.privateCloudDatabase
+            .recordZoneChanges(inZoneWith: Self.librariesZoneID, since: nil) else {
+            return false
+        }
+        var changed = false
+        for (_, modification) in result.modificationResultsByID {
+            guard let record = try? modification.get().record else { continue }
+            await LibrariesActor.shared.applyRemoteLibrary(LibrarySyncSnapshot(
+                id: record.recordID.recordName,
+                name: record["name"] as? String ?? "",
+                systemFields: Self.encodeSystemFields(record),
+                lastModified: (record.modificationDate ?? Date.now).timeIntervalSince1970
+            ))
+            changed = true
+        }
+        return changed
     }
 
     // MARK: - Zone <-> library mapping

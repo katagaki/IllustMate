@@ -15,10 +15,25 @@ extension AlbumView {
         albumPendingDeletion = album
     }
 
-    func confirmDeleteAlbum() {
+    func confirmDeleteAlbum(deletingContents: Bool) {
         if let albumPendingDeletion {
             Task {
-                await DataActor.shared.deleteAlbum(withID: albumPendingDeletion.id)
+                if deletingContents {
+                    let deletedPicIDs = await DataActor.shared.deleteAlbumAndContents(
+                        withID: albumPendingDeletion.id
+                    )
+                    await PColorActor.shared.deleteColors(forPicIDs: deletedPicIDs)
+                    AlbumCoverCache.shared.removeImages(forAlbumID: albumPendingDeletion.id)
+                    viewer.removePics(withIDs: Set(deletedPicIDs))
+                    let collectionID = DataActor.shared.collectionID
+                    Task.detached {
+                        await OriginalsManager.shared.deleteCloudOriginals(
+                            picIDs: deletedPicIDs, in: collectionID
+                        )
+                    }
+                } else {
+                    await DataActor.shared.deleteAlbum(withID: albumPendingDeletion.id)
+                }
                 await refreshData()
             }
         }

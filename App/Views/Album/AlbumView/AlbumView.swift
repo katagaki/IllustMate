@@ -147,7 +147,7 @@ struct AlbumView: View {
                 albumPendingDeletion: $albumPendingDeletion,
                 picPendingDeletion: $picPendingDeletion,
                 selectedPicsCount: selectedPics.count,
-                onConfirmDeleteAlbum: { confirmDeleteAlbum() },
+                onConfirmDeleteAlbum: { confirmDeleteAlbum(deletingContents: $0) },
                 onConfirmDeletePic: { confirmDeletePic() }
             ))
             .task {

@@ -124,7 +124,7 @@ struct AlbumViewDialogs: ViewModifier {
     @Binding var albumPendingDeletion: Album?
     @Binding var picPendingDeletion: Pic?
     let selectedPicsCount: Int
-    let onConfirmDeleteAlbum: () -> Void
+    let onConfirmDeleteAlbum: (Bool) -> Void
     let onConfirmDeletePic: () -> Void
 
     func body(content: Content) -> some View {
@@ -133,10 +133,13 @@ struct AlbumViewDialogs: ViewModifier {
                 Text("Shared.DeleteConfirmation.Album.\(albumPendingDeletion?.name ?? "")"),
                 isPresented: $isConfirmingDeleteAlbum
             ) {
-                Button("Shared.Yes", role: .destructive) {
-                    onConfirmDeleteAlbum()
+                Button("Shared.DeleteConfirmation.Album.DeleteOnly", role: .destructive) {
+                    onConfirmDeleteAlbum(false)
                 }
-                Button("Shared.No", role: .cancel) {
+                Button("Shared.DeleteConfirmation.Album.DeleteContents", role: .destructive) {
+                    onConfirmDeleteAlbum(true)
+                }
+                Button("Shared.Cancel", role: .cancel) {
                     albumPendingDeletion = nil
                 }
             } message: {

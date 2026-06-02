@@ -236,6 +236,45 @@ extension DataActor {
         notifyLocalMutation()
     }
 
+    @discardableResult
+    func deleteAlbumAndContents(withID albumID: String) -> [String] {
+        var albumIDs = [albumID]
+        var queue = [albumID]
+        while let current = queue.popLast() {
+            let childQuery = albumsTable.filter(albumParentId == current).select(albumId)
+            if let rows = try? database.prepare(childQuery) {
+                for row in rows {
+                    if let childID = try? row.get(albumId) {
+                        albumIDs.append(childID)
+                        queue.append(childID)
+                    }
+                }
+            }
+        }
+
+        let picsQuery = picsTable.filter(albumIDs.contains(picAlbumId)).select(picId)
+        var deletedPicIDs: [String] = []
+        if let rows = try? database.prepare(picsQuery) {
+            for row in rows {
+                if let id = try? row.get(picId) {
+                    deletedPicIDs.append(id)
+                }
+            }
+        }
+        deletePics(withIDs: deletedPicIDs)
+
+        for id in albumIDs where albumWasSynced(id: id) {
+            recordTombstone(id: id, recordType: SyncRecordType.album)
+        }
+        let albumQuery = albumsTable.filter(albumIDs.contains(albumId))
+        _ = try? database.run(albumQuery.delete())
+
+        let prefQuery = preferencesTable.filter(albumIDs.contains(prefAlbumId))
+        _ = try? database.run(prefQuery.delete())
+        notifyLocalMutation()
+        return deletedPicIDs
+    }
+
     func parentAlbumID(forAlbumWithID albumID: String) -> String? {
         let query = albumsTable.filter(albumId == albumID).select(albumParentId)
         return try? database.pluck(query).flatMap { try? $0.get(albumParentId) }

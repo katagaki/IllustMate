@@ -32,6 +32,7 @@ struct EditLibrarySheet: View {
     @State var syncEnabled: Bool = false
     @State var iCloudAvailable: Bool = true
     @State var isShowingiCloudAlert: Bool = false
+    @State var isConfirmingEnableSync: Bool = false
     @State var storageMode: StorageMode = .optimize
     @State var isConfirmingDownloadAll: Bool = false
     @State var isDownloadingAll: Bool = false
@@ -63,21 +64,17 @@ struct EditLibrarySheet: View {
                     Toggle(isOn: Binding(
                         get: { syncEnabled },
                         set: { newValue in
-                            if newValue && !iCloudAvailable {
+                            guard newValue else { return }
+                            if !iCloudAvailable {
                                 isShowingiCloudAlert = true
                                 return
                             }
-                            syncEnabled = newValue
-                            Task {
-                                await LibrariesActor.shared.setSyncEnabled(newValue, forID: library.id)
-                                await libraryManager.reloadList()
-                                await SyncManager.shared.refresh()
-                            }
+                            isConfirmingEnableSync = true
                         }
                     )) {
                         Text("Sync.Title", tableName: "More")
                     }
-                    .disabled(migrationIncomplete)
+                    .disabled(migrationIncomplete || syncEnabled)
                     if syncEnabled {
                         Picker(selection: Binding(
                             get: { storageMode },
@@ -205,6 +202,20 @@ struct EditLibrarySheet: View {
                isPresented: $isShowingiCloudAlert) {
         } message: {
             Text("Sync.iCloudRequired.Message", tableName: "More")
+        }
+        .alert(Text("Sync.EnableConfirm.Title", tableName: "More"),
+               isPresented: $isConfirmingEnableSync) {
+            Button("Shared.Yes") {
+                syncEnabled = true
+                Task {
+                    await LibrariesActor.shared.setSyncEnabled(true, forID: library.id)
+                    await libraryManager.reloadList()
+                    await SyncManager.shared.refresh()
+                }
+            }
+            Button("Shared.No", role: .cancel) { }
+        } message: {
+            Text("Sync.EnableConfirm.Message", tableName: "More")
         }
         .alert(Text("Sync.DownloadAll.Confirm.Title", tableName: "More"),
                isPresented: $isConfirmingDownloadAll) {

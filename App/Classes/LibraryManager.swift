@@ -52,6 +52,10 @@ class LibraryManager: ObservableObject {
             await LibrariesActor.shared.setSyncEnabled(true, forID: PicLibrary.defaultID)
         }
 
+        if remoteZoneNames.contains(SyncMate.librariesZoneName) {
+            await SyncMate.shared.fetchAndApplyRemoteLibraries()
+        }
+
         let localIDs = Set(await LibrariesActor.shared.allLibraryIDs())
         for id in SyncMate.libraryCollectionIDs(fromZoneNames: remoteZoneNames)
         where !localIDs.contains(id) {
@@ -92,7 +96,9 @@ class LibraryManager: ObservableObject {
 
     func deleteLibrary(_ library: PicLibrary) async {
         guard !library.isDefault else { return }
+        await OriginalsManager.shared.deleteAllOriginals(in: library.id)
         await LibrariesActor.shared.deleteLibrary(withID: library.id)
+        await SyncManager.shared.deleteLibraryFromCloud(library.id)
         if currentLibrary.id == library.id {
             let defaultLibrary = PicLibrary()
             switchLibrary(to: defaultLibrary)

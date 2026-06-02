@@ -1104,43 +1104,125 @@
         }
       }
     },
+    "Shared.DeleteConfirmation.Album.DeleteContents" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Album und Inhalte löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Album and Contents"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムと中身を削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앨범과 내용 삭제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除相册和内容"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除相簿和內容"
+          }
+        }
+      }
+    },
+    "Shared.DeleteConfirmation.Album.DeleteOnly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Album löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Album Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アルバムのみを削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앨범만 삭제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅删除相册"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅刪除相簿"
+          }
+        }
+      }
+    },
     "Shared.DeleteConfirmation.Album.Message" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elemente im gelöschten Album werden in das übergeordnete Album verschoben."
+            "value" : "Du kannst nur das Album löschen und seine Inhalte in das übergeordnete Album verschieben oder das Album zusammen mit allen seinen Inhalten löschen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Items contained in the deleted album will be moved to its parent album."
+            "value" : "You can delete only the album and move its contents to the parent album, or delete the album along with all of its contents."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "削除されたアルバム内のアイテムは親アルバムに移動されます。"
+            "value" : "アルバムのみを削除して中身を親アルバムに移動するか、アルバムとそのすべての中身を削除するかを選べます。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "삭제된 앨범에 포함된 항목은 상위 앨범으로 이동됩니다."
+            "value" : "앨범만 삭제하고 내용을 상위 앨범으로 이동하거나, 앨범과 모든 내용을 함께 삭제할 수 있습니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已删除相册中的项目将被移至其上级相册。"
+            "value" : "您可以仅删除相册并将其内容移至上级相册，或删除相册及其所有内容。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已刪除相簿中的項目將被移至其上層相簿。"
+            "value" : "您可以僅刪除相簿並將其內容移至上層相簿，或刪除相簿及其所有內容。"
           }
         }
       }
