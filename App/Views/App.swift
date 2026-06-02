@@ -38,6 +38,7 @@ struct IllustMateApp: App {
     ) var lastVersionPromptedForReview: String = ""
 
     nonisolated static let widgetRefreshTaskID = "com.tsubuzaki.IllustMate.widgetRefresh"
+    nonisolated static let iCloudSyncTaskID = "com.tsubuzaki.IllustMate.iCloudSync"
 
     private var mainContent: some View {
         Group {
@@ -255,6 +256,12 @@ struct IllustMateApp: App {
         try? BGTaskScheduler.shared.submit(request)
     }
 
+    nonisolated func scheduleICloudSync() {
+        let request = BGAppRefreshTaskRequest(identifier: IllustMateApp.iCloudSyncTaskID)
+        request.earliestBeginDate = Calendar.current.date(byAdding: .hour, value: 1, to: .now)
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
     var body: some Scene {
         WindowGroup {
             ZStack {
@@ -271,6 +278,7 @@ struct IllustMateApp: App {
                     WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
                     WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
                     scheduleWidgetRefresh()
+                    scheduleICloudSync()
                     webServer.stop()
                 }
                 if newValue == .active {
@@ -312,6 +320,10 @@ struct IllustMateApp: App {
             WidgetCenter.shared.reloadTimelines(ofKind: "Photostand")
             WidgetCenter.shared.reloadTimelines(ofKind: "PhotoGrid")
             scheduleWidgetRefresh()
+        }
+        .backgroundTask(.appRefresh(IllustMateApp.iCloudSyncTaskID)) {
+            scheduleICloudSync()
+            await SyncManager.shared.backgroundSync()
         }
 #if targetEnvironment(macCatalyst)
         .commands {

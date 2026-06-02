@@ -5,6 +5,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.tsubuzaki.IllustMate.widgetRefresh</string>
+		<string>com.tsubuzaki.IllustMate.iCloudSync</string>
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
