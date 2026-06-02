@@ -1900,43 +1900,43 @@
         }
       }
     },
-    "Shared.KeepOffline" : {
+    "Shared.Download" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offline behalten"
+            "value" : "Herunterladen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep Offline"
+            "value" : "Download"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オフラインで保持"
+            "value" : "ダウンロード"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "오프라인으로 보관"
+            "value" : "다운로드"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保留离线"
+            "value" : "下载"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保留離線"
+            "value" : "下載"
           }
         }
       }

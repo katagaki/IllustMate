@@ -99,7 +99,7 @@ struct AlbumsSection<Content: View>: View {
                         onToggleOffline(album)
                     }
                 } else {
-                    Button("Shared.KeepOffline", systemImage: "arrow.down.circle") {
+                    Button("Shared.Download", systemImage: "arrow.down.circle") {
                         onToggleOffline(album)
                     }
                 }
