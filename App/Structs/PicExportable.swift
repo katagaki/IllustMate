@@ -16,7 +16,7 @@ struct PicImageExportable: Codable, Transferable {
             }
             return SentTransferredFile(url)
         }
-        .suggestedFileName { $0.name }
+        .suggestedFileName { PicOriginalExporter.suggestedImageFilename(forPicID: $0.id, name: $0.name) }
         ProxyRepresentation { (exportable: PicImageExportable) in
             PicTransferable(id: exportable.id)
         }
@@ -36,7 +36,7 @@ struct PicVideoExportable: Codable, Transferable {
             }
             return SentTransferredFile(url)
         }
-        .suggestedFileName { $0.name }
+        .suggestedFileName { PicOriginalExporter.suggestedVideoFilename(forPicID: $0.id, name: $0.name) }
         ProxyRepresentation { (exportable: PicVideoExportable) in
             PicTransferable(id: exportable.id)
         }
@@ -82,14 +82,51 @@ enum PicOriginalExporter {
         }
     }
 
+    static func suggestedImageFilename(forPicID id: String, name: String) -> String {
+        let stem = filenameStem(from: name)
+        let collectionID = DataActor.shared.collectionID
+        let candidates = [
+            DataActor.shared.imagesDirectoryURL().appendingPathComponent(id),
+            OriginalsManager.shared.cloudImageOriginalURL(forPicID: id, in: collectionID)
+        ].compactMap { $0 }
+        for url in candidates {
+            if let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+               let uti = CGImageSourceGetType(source),
+               let type = UTType(uti as String),
+               let ext = type.preferredFilenameExtension {
+                return "\(stem).\(ext)"
+            }
+        }
+        return stem
+    }
+
+    static func suggestedVideoFilename(forPicID id: String, name: String) -> String {
+        let stem = filenameStem(from: name)
+        let directory = DataActor.shared.videosDirectoryURL()
+        if let entries = try? FileManager.default.contentsOfDirectory(atPath: directory.path),
+           let match = entries.first(where: { ($0 as NSString).deletingPathExtension == id }) {
+            let ext = (match as NSString).pathExtension
+            if !ext.isEmpty { return "\(stem).\(ext)" }
+        }
+        let collectionID = DataActor.shared.collectionID
+        if let ext = OriginalsManager.shared.cloudVideoOriginalExtension(forPicID: id, in: collectionID) {
+            return "\(stem).\(ext)"
+        }
+        return stem
+    }
+
     private static func temporaryURL(base: String, ext: String) -> URL {
-        let trimmed = (base as NSString).deletingPathExtension
-        let stem = (trimmed.isEmpty ? base : trimmed)
-            .replacingOccurrences(of: "/", with: "-")
-            .replacingOccurrences(of: ":", with: "-")
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(stem).\(ext)")
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(filenameStem(from: base)).\(ext)")
         try? FileManager.default.removeItem(at: url)
         return url
+    }
+
+    private static func filenameStem(from name: String) -> String {
+        let trimmed = (name as NSString).deletingPathExtension
+        return (trimmed.isEmpty ? name : trimmed)
+            .replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: ":", with: "-")
     }
 
     private static func imageFileExtension(for data: Data) -> String {
