@@ -2963,25 +2963,25 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud同期を強制しますか？"
+            "value" : "今すぐ同期しますか？"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud 동기화를 강제하시겠습니까?"
+            "value" : "지금 동기화하시겠습니까?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "强制 iCloud 同步？"
+            "value" : "立即同步？"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "強制 iCloud 同步？"
+            "value" : "立即同步？"
           }
         }
       }
@@ -3004,25 +3004,25 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud同期を強制"
+            "value" : "今すぐ同期"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud 동기화 강제"
+            "value" : "지금 동기화"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "强制 iCloud 同步"
+            "value" : "立即同步"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "強制 iCloud 同步"
+            "value" : "立即同步"
           }
         }
       }
