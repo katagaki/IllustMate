@@ -16,6 +16,7 @@ struct PicImageExportable: Codable, Transferable {
             }
             return SentTransferredFile(url)
         }
+        .suggestedFileName { $0.name }
         ProxyRepresentation { (exportable: PicImageExportable) in
             PicTransferable(id: exportable.id)
         }
@@ -35,6 +36,7 @@ struct PicVideoExportable: Codable, Transferable {
             }
             return SentTransferredFile(url)
         }
+        .suggestedFileName { $0.name }
         ProxyRepresentation { (exportable: PicVideoExportable) in
             PicTransferable(id: exportable.id)
         }
