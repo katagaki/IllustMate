@@ -216,6 +216,7 @@ extension DataActor {
         let mediaType = MediaType(rawValue: (try? row.get(picMediaType)) ?? 0) ?? .pic
         if mediaType == .video {
             deleteVideoFile(atRelativePath: path)
+            _ = try? database.run(picsTable.filter(picId == picID).update(picFilePath <- nil))
         } else if isImagePath(path) {
             deleteImageFile(atRelativePath: path)
             _ = try? database.run(picsTable.filter(picId == picID).update(picFilePath <- nil))

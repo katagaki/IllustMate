@@ -137,7 +137,7 @@ final class SyncManager {
         await OriginalsManager.shared.resetSyncStateIfContainerChanged()
         for id in enabledIDs {
             await OriginalsManager.shared.uploadMissingOriginals(in: id)
-            await OriginalsManager.shared.reclaimUploadedOriginals(in: id)
+            await OriginalsManager.shared.reclaimUploadedOriginals(in: id, waitForUploads: false)
         }
         for id in await LibrariesActor.shared.downloadAllLibraryIDs() {
             await OriginalsManager.shared.downloadAllOriginals(in: id)

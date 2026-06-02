@@ -14,6 +14,7 @@ actor OriginalsManager {
     static let containerID = "iCloud.com.tsubuzaki.IllustMate"
 
     private var uploadingMissing: Set<String> = []
+    private var reclaiming: Set<String> = []
 
     private let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
     private let containerMarkerKey = "OriginalsContainerID"
@@ -134,14 +135,33 @@ actor OriginalsManager {
         if let sampleError { await SyncMate.shared.debugLog("orig err: \(sampleError)") }
     }
 
-    func reclaimUploadedOriginals(in collectionID: String) async {
+    func reclaimUploadedOriginals(in collectionID: String, waitForUploads: Bool = true) async {
+        guard !reclaiming.contains(collectionID) else { return }
+        reclaiming.insert(collectionID)
+        defer { reclaiming.remove(collectionID) }
         let dataActor = DataActor.instance(for: collectionID)
+        var reclaimed = 0
+        var consecutiveTimeouts = 0
         for id in await dataActor.localOriginalPicIDs() {
             guard let location = await dataActor.originalLocation(forPicWithID: id),
                   location.localURL != nil,
                   let cloudURL = cloudURL(forPicID: id, in: collectionID),
-                  isUploaded(cloudURL) else { continue }
+                  downloadingStatus(cloudURL) != nil else { continue }
+            var uploaded = isUploaded(cloudURL)
+            // Foreground only: wait for the just-mirrored original to finish uploading
+            // before deleting the device-local copy, but stop once uploads clearly
+            // aren't progressing (offline / paused) so this can't hang a large library.
+            // Background sync never waits — it only reclaims already-uploaded copies.
+            if !uploaded, waitForUploads, consecutiveTimeouts < 3 {
+                uploaded = await waitForUpload(cloudURL)
+                consecutiveTimeouts = uploaded ? 0 : consecutiveTimeouts + 1
+            }
+            guard uploaded else { continue }
             await dataActor.evictLocalOriginal(picID: id)
+            reclaimed += 1
+        }
+        if reclaimed > 0 {
+            await SyncMate.shared.debugLog("orig \(collectionID.prefix(4)): reclaimed \(reclaimed) local")
         }
     }
 
@@ -230,8 +250,18 @@ actor OriginalsManager {
     }
 
     private func isUploaded(_ url: URL) -> Bool {
-        (try? url.resourceValues(forKeys: [.ubiquitousItemIsUploadedKey]))?
+        var url = url
+        url.removeAllCachedResourceValues()
+        return (try? url.resourceValues(forKeys: [.ubiquitousItemIsUploadedKey]))?
             .ubiquitousItemIsUploaded ?? false
+    }
+
+    private func waitForUpload(_ url: URL, timeoutSeconds: Int = 8) async -> Bool {
+        for _ in 0..<(timeoutSeconds * 2) {
+            if isUploaded(url) { return true }
+            try? await Task.sleep(for: .milliseconds(500))
+        }
+        return isUploaded(url)
     }
 
     // MARK: - Coordinated I/O
