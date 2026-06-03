@@ -1,5 +1,9 @@
 import Foundation
 
+extension Notification.Name {
+    static let libraryMoveProgress = Notification.Name("LibraryMoveProgress")
+}
+
 enum LibraryMoveError: Error {
     case sameLibrary
     case sourceMissing
@@ -136,6 +140,7 @@ actor LibraryMoveManager {
             await destActor.insertPreferencesForMigration(prefs)
         }
 
+        await postProgress(completed: 0, total: picPlan.count)
         for (record, newAlbumID) in picPlan {
             guard let relocation = await relocatePic(
                 record, sourceID: sourceID, destinationID: destinationID,
@@ -152,6 +157,7 @@ actor LibraryMoveManager {
             if relocation.movedCloud {
                 movedCloudPics.append((record.id, record.resolvedMediaType))
             }
+            await postProgress(completed: insertedPicIDs.count, total: picPlan.count)
         }
 
         let albumIDs = albumPlan.map { $0.0.id }
@@ -223,6 +229,14 @@ actor LibraryMoveManager {
                     from: sourceURL, id: record.id, fileExtension: ext.isEmpty ? "mov" : ext) else { return nil }
                 return Relocation(filePath: path, originalSynced: false, movedCloud: false)
             }
+        }
+    }
+
+    private func postProgress(completed: Int, total: Int) async {
+        await MainActor.run {
+            NotificationCenter.default.post(
+                name: .libraryMoveProgress, object: nil,
+                userInfo: ["completed": completed, "total": total])
         }
     }
 

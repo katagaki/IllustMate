@@ -35,7 +35,7 @@ struct LibraryAlbumPickerView: View {
             Button {
                 onMoveHere()
             } label: {
-                Text("Move.MoveHere", tableName: "Libraries")
+                Text("Move.MoveHere")
                     .bold()
                     .padding(4.0)
                     .frame(maxWidth: .infinity)

@@ -34,6 +34,8 @@ struct MoveToLibrarySheet: View {
     @State private var path: [MoveStep] = []
     @State private var pendingDownloadLibrary: PicLibrary?
     @State private var isMoving: Bool = false
+    @State private var moveCompleted: Int = 0
+    @State private var moveTotal: Int = 0
     @State private var moveError: LibraryMoveError?
 
     var otherLibraries: [PicLibrary] {
@@ -47,7 +49,7 @@ struct MoveToLibrarySheet: View {
     var body: some View {
         NavigationStack(path: $path) {
             libraryList
-                .navigationTitle(Text("Move.SelectLibrary", tableName: "Libraries"))
+                .navigationTitle(Text("Move.SelectLibrary"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -73,7 +75,14 @@ struct MoveToLibrarySheet: View {
                 movingOverlay
             }
         }
-        .alert(Text("Move.DownloadAlert.Title", tableName: "Libraries"),
+        .onReceive(NotificationCenter.default.publisher(for: .libraryMoveProgress)) { note in
+            if let total = note.userInfo?["total"] as? Int,
+               let completed = note.userInfo?["completed"] as? Int {
+                moveTotal = total
+                moveCompleted = completed
+            }
+        }
+        .alert(Text("Move.DownloadAlert.Title"),
                isPresented: Binding(get: { pendingDownloadLibrary != nil },
                                     set: { if !$0 { pendingDownloadLibrary = nil } })) {
             Button("Shared.OK") {
@@ -86,9 +95,9 @@ struct MoveToLibrarySheet: View {
                 pendingDownloadLibrary = nil
             }
         } message: {
-            Text("Move.DownloadAlert.Message", tableName: "Libraries")
+            Text("Move.DownloadAlert.Message")
         }
-        .alert(Text("Move.Error.Title", tableName: "Libraries"),
+        .alert(Text("Move.Error.Title"),
                isPresented: Binding(get: { moveError != nil },
                                     set: { if !$0 { moveError = nil } })) {
             Button("Shared.OK", role: .cancel) {
@@ -96,11 +105,11 @@ struct MoveToLibrarySheet: View {
             }
         } message: {
             if case .originalsNotUploaded = moveError {
-                Text("Move.Error.NotUploaded", tableName: "Libraries")
+                Text("Move.Error.NotUploaded")
             } else if payload.isAlbum {
-                Text("Move.Error.Album", tableName: "Libraries")
+                Text("Move.Error.Album")
             } else {
-                Text("Move.Error.Pics", tableName: "Libraries")
+                Text("Move.Error.Pics")
             }
         }
     }
@@ -108,7 +117,7 @@ struct MoveToLibrarySheet: View {
     var libraryList: some View {
         List {
             if otherLibraries.isEmpty {
-                Text("Move.NoOtherLibraries", tableName: "Libraries")
+                Text("Move.NoOtherLibraries")
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(otherLibraries) { library in
@@ -145,10 +154,20 @@ struct MoveToLibrarySheet: View {
         ZStack {
             Color(uiColor: .systemBackground).opacity(0.9)
             VStack(spacing: 16.0) {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                Text("Move.Moving", tableName: "Libraries")
+                if moveTotal > 0 {
+                    ProgressView(value: Double(moveCompleted), total: Double(moveTotal))
+                        .progressViewStyle(.linear)
+                        .frame(maxWidth: 240.0)
+                    Text("Move.Progress.\(moveCompleted).\(moveTotal)")
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                } else {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
+                Text("Move.Moving")
             }
+            .padding(40.0)
         }
         .ignoresSafeArea()
     }
@@ -169,6 +188,8 @@ struct MoveToLibrarySheet: View {
     }
 
     func execute(destinationID: String, destinationAlbumID: String?) {
+        moveCompleted = 0
+        moveTotal = 0
         isMoving = true
         Task {
             do {
