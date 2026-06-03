@@ -1,5 +1,7 @@
 import SwiftUI
 
+let settingsWindowID = "settings"
+
 struct MoreView: View {
 
     @Environment(\.dismiss) var dismiss
@@ -16,6 +18,8 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var quickImport: Bool = false
     @AppStorage("ShareSheetDefaultAlbum",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var defaultAlbumID: String = ""
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
 
     @State var allAlbums: [Album] = []
 
@@ -29,6 +33,15 @@ struct MoreView: View {
             } footer: {
                 Text("AppLock.Description", tableName: "More")
             }
+            #if targetEnvironment(macCatalyst)
+            Section {
+                Toggle(String(localized: "Window.OpenPicsInNewWindow", table: "More"), isOn: $openPicsInNewWindow)
+            } header: {
+                Text("MacApp", tableName: "More")
+            } footer: {
+                Text("Window.OpenPicsInNewWindow.Description", tableName: "More")
+            }
+            #endif
             Section {
                 Toggle(String(localized: "ShareSheet.OpenSearch", table: "More"), isOn: $openSearchWhenSharing)
                 Toggle(String(localized: "ShareSheet.ShowAnimation", table: "More"), isOn: $showAnimationWhenSaving)
@@ -104,11 +117,13 @@ struct MoreView: View {
         NavigationStack(path: $navigation.moreTabPath) {
             listContent
                 .toolbar {
+#if !targetEnvironment(macCatalyst)
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(role: .close) {
                             dismiss()
                         }
                     }
+#endif
                 }
         }
         .task {

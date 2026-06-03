@@ -171,7 +171,16 @@ extension AlbumView {
                     navigation.push(.picViewer(namespace: namespace), for: .collection)
                 }
             } else {
+#if targetEnvironment(macCatalyst)
+                if openPicsInNewWindow {
+                    openWindow(value: ViewerWindowValue.pic(
+                        selectedID: picCopy.id, siblingIDs: pics.map(\.id)))
+                } else {
+                    viewer.setDisplay(picCopy, in: pics) { }
+                }
+#else
                 viewer.setDisplay(picCopy, in: pics) { }
+#endif
             }
         }
     }

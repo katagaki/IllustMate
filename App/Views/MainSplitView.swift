@@ -21,137 +21,11 @@ struct MainSplitView: View {
     @State var isMoreViewPresenting: Bool = false
     @State var isLibraryManagerPresented: Bool = false
 
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
+
     var body: some View {
-        NavigationSplitView {
-            List(selection: $selectedView) {
-                Section {
-                    LibrarySwitcherMenu(
-                        isLibraryManagerPresented: $isLibraryManagerPresented
-                    )
-                }
-                Section {
-                    NavigationLink(value: ViewPath.collection) {
-                        Label {
-                            Text(isPhotosModeEnabled
-                                 ? String(localized: "ViewTitle.Photos")
-                                 : String(localized: "ViewTitle.Collection"))
-                        } icon: {
-                            Image(systemName: isPhotosModeEnabled ? "photo.on.rectangle" : "house.fill")
-                        }
-                    }
-                    if !isPhotosModeEnabled {
-                        NavigationLink(value: ViewPath.albums) {
-                            Label {
-                                Text("ViewTitle.Albums")
-                            } icon: {
-                                Image(systemName: "rectangle.stack.fill")
-                            }
-                        }
-                        NavigationLink(value: ViewPath.pics) {
-                            Label {
-                                Text("ViewTitle.Pics")
-                            } icon: {
-                                Image(systemName: "photo.on.rectangle.angled")
-                            }
-                        }
-                    }
-                    Button {
-                        isMoreViewPresenting = true
-                    } label: {
-                        Label("ViewTitle.More", systemImage: "ellipsis")
-                    }
-                }
-                if isPhotosModeEnabled {
-                    Section {
-                        ForEach(photosItems) { item in
-                            switch item {
-                            case .album(let collection):
-                                NavigationLink(value: ViewPath.photosAlbum(
-                                    album: PHAssetCollectionWrapper(collection: collection))) {
-                                    Label {
-                                        Text(collection.localizedTitle ?? String(
-                                            localized: "Import.Albums.Untitled", table: "Import"))
-                                    } icon: {
-                                        Image(systemName: "rectangle.stack")
-                                    }
-                                }
-                            case .folder(let folder):
-                                NavigationLink(value: ViewPath.photosFolder(
-                                    folder: PHCollectionListWrapper(collectionList: folder))) {
-                                    Label {
-                                        Text(folder.localizedTitle ?? String(
-                                            localized: "Import.Albums.Untitled", table: "Import"))
-                                    } icon: {
-                                        Image(systemName: "folder")
-                                    }
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Shared.Albums")
-                    }
-                } else {
-                    Section {
-                        ForEach(albums) { album in
-                            NavigationLink(value: ViewPath.album(album: album)) {
-                                Label {
-                                    Text(album.name)
-                                } icon: {
-                                    SidebarAlbumIcon(album: album)
-                                }
-                            }
-                        }
-                    } header: {
-                        Text("Shared.Albums")
-                    }
-                }
-            }
-            .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
-        } content: {
-            Group {
-                switch selectedView {
-                case .collection: CollectionView()
-                case .albums: AlbumsView()
-                case .pics: PicsView()
-                case .album(let album): AlbumNavigationStack(album: album)
-                case .photosAlbum(let wrapper):
-                    NavigationStack {
-                        PhotosAlbumContentView(collection: wrapper.collection)
-                    }
-                case .photosFolder(let wrapper):
-                    NavigationStack {
-                        PhotosFolderView(folder: wrapper.collectionList)
-                            .navigationDestination(for: ViewPath.self) { viewPath in
-                                switch viewPath {
-                                case .photosFolder(let innerWrapper):
-                                    PhotosFolderView(folder: innerWrapper.collectionList)
-                                case .photosAlbum(let innerWrapper):
-                                    PhotosAlbumContentView(collection: innerWrapper.collection)
-                                default: Color.clear
-                                }
-                            }
-                    }
-                default: Color.clear
-                }
-            }
-            .navigationSplitViewColumnWidth(min: 300.0, ideal: 375.0, max: 500.0)
-        } detail: {
-            if isPhotosModeEnabled {
-                if let asset = photosViewer.displayedAsset {
-                    PhotosAssetViewer(asset: asset)
-                        .id(asset.localIdentifier)
-                } else {
-                    ContentUnavailableView("Shared.SelectAPhoto", systemImage: "photo.on.rectangle.angled")
-                }
-            } else {
-                if let pic = viewer.displayedPic {
-                    PicViewer(pic: pic)
-                        .id(pic.id)
-                } else {
-                    ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
-                }
-            }
-        }
+        splitView
         .task {
             if isPhotosModeEnabled {
                 photosItems = photosManager.fetchTopLevelCollections()
@@ -209,6 +83,170 @@ struct MainSplitView: View {
                 .environmentObject(navigation)
                 .environment(concurrency)
                 .environment(imageMigration)
+        }
+    }
+
+    @ViewBuilder var splitView: some View {
+#if targetEnvironment(macCatalyst)
+        if openPicsInNewWindow {
+            NavigationSplitView {
+                sidebar
+                    .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
+            } detail: {
+                content
+            }
+        } else {
+            threeColumnSplit
+        }
+#else
+        threeColumnSplit
+#endif
+    }
+
+    @ViewBuilder var threeColumnSplit: some View {
+        NavigationSplitView {
+            sidebar
+                .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
+        } content: {
+            content
+                .navigationSplitViewColumnWidth(min: 300.0, ideal: 375.0, max: 500.0)
+        } detail: {
+            detail
+        }
+    }
+
+    var sidebar: some View {
+        List(selection: $selectedView) {
+                Section {
+                    LibrarySwitcherMenu(
+                        isLibraryManagerPresented: $isLibraryManagerPresented
+                    )
+                }
+                Section {
+                    NavigationLink(value: ViewPath.collection) {
+                        Label {
+                            Text(isPhotosModeEnabled
+                                 ? String(localized: "ViewTitle.Photos")
+                                 : String(localized: "ViewTitle.Collection"))
+                        } icon: {
+                            Image(systemName: isPhotosModeEnabled ? "photo.on.rectangle" : "house.fill")
+                        }
+                    }
+                    if !isPhotosModeEnabled {
+                        NavigationLink(value: ViewPath.albums) {
+                            Label {
+                                Text("ViewTitle.Albums")
+                            } icon: {
+                                Image(systemName: "rectangle.stack.fill")
+                            }
+                        }
+                        NavigationLink(value: ViewPath.pics) {
+                            Label {
+                                Text("ViewTitle.Pics")
+                            } icon: {
+                                Image(systemName: "photo.on.rectangle.angled")
+                            }
+                        }
+                    }
+#if !targetEnvironment(macCatalyst)
+                    Button {
+                        isMoreViewPresenting = true
+                    } label: {
+                        Label("ViewTitle.More", systemImage: "ellipsis")
+                    }
+#endif
+                }
+                if isPhotosModeEnabled {
+                    Section {
+                        ForEach(photosItems) { item in
+                            switch item {
+                            case .album(let collection):
+                                NavigationLink(value: ViewPath.photosAlbum(
+                                    album: PHAssetCollectionWrapper(collection: collection))) {
+                                    Label {
+                                        Text(collection.localizedTitle ?? String(
+                                            localized: "Import.Albums.Untitled", table: "Import"))
+                                    } icon: {
+                                        Image(systemName: "rectangle.stack")
+                                    }
+                                }
+                            case .folder(let folder):
+                                NavigationLink(value: ViewPath.photosFolder(
+                                    folder: PHCollectionListWrapper(collectionList: folder))) {
+                                    Label {
+                                        Text(folder.localizedTitle ?? String(
+                                            localized: "Import.Albums.Untitled", table: "Import"))
+                                    } icon: {
+                                        Image(systemName: "folder")
+                                    }
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Shared.Albums")
+                    }
+                } else {
+                    Section {
+                        ForEach(albums) { album in
+                            NavigationLink(value: ViewPath.album(album: album)) {
+                                Label {
+                                    Text(album.name)
+                                } icon: {
+                                    SidebarAlbumIcon(album: album)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Shared.Albums")
+                    }
+                }
+            }
+        }
+
+    var content: some View {
+        Group {
+            switch selectedView {
+            case .collection: CollectionView()
+            case .albums: AlbumsView()
+            case .pics: PicsView()
+            case .album(let album): AlbumNavigationStack(album: album)
+            case .photosAlbum(let wrapper):
+                NavigationStack {
+                    PhotosAlbumContentView(collection: wrapper.collection)
+                }
+            case .photosFolder(let wrapper):
+                NavigationStack {
+                    PhotosFolderView(folder: wrapper.collectionList)
+                        .navigationDestination(for: ViewPath.self) { viewPath in
+                            switch viewPath {
+                            case .photosFolder(let innerWrapper):
+                                PhotosFolderView(folder: innerWrapper.collectionList)
+                            case .photosAlbum(let innerWrapper):
+                                PhotosAlbumContentView(collection: innerWrapper.collection)
+                            default: Color.clear
+                            }
+                        }
+                }
+            default: Color.clear
+            }
+        }
+    }
+
+    @ViewBuilder var detail: some View {
+        if isPhotosModeEnabled {
+            if let asset = photosViewer.displayedAsset {
+                PhotosAssetViewer(asset: asset)
+                    .id(asset.localIdentifier)
+            } else {
+                ContentUnavailableView("Shared.SelectAPhoto", systemImage: "photo.on.rectangle.angled")
+            }
+        } else {
+            if let pic = viewer.displayedPic {
+                PicViewer(pic: pic)
+                    .id(pic.id)
+            } else {
+                ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
+            }
         }
     }
 }
