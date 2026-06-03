@@ -95,7 +95,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide the viewer pane in the main window and open each picture in its own window instead."
+            "value" : "Hide the viewer pane in the main window and open each pic in its own window instead."
           }
         },
         "ja" : {
@@ -375,19 +375,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Fotos und Videos werden bei Bedarf heruntergeladen und in einer Sicherungsdatei gespeichert. Lass die App geöffnet, bis der Vorgang abgeschlossen ist."
+            "value" : "Alle Bilder und Videos werden bei Bedarf heruntergeladen und in einer Sicherungsdatei gespeichert. Lass die App geöffnet, bis der Vorgang abgeschlossen ist."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Every photo and video will be downloaded if needed and saved into one backup file. Keep the app open until it finishes."
+            "value" : "Every pic and vid will be downloaded if needed and saved into one backup file. Keep the app open until it finishes."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての写真とビデオが必要に応じてダウンロードされ、1つのバックアップファイルに保存されます。完了するまでAppを開いたままにしてください。"
+            "value" : "すべての画像と動画が必要に応じてダウンロードされ、1つのバックアップファイルに保存されます。完了するまでAppを開いたままにしてください。"
           }
         },
         "ko" : {
@@ -399,13 +399,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有照片和视频将在需要时下载，并保存到一个备份文件中。请在完成前保持 App 打开。"
+            "value" : "所有图片和视频将在需要时下载，并保存到一个备份文件中。请在完成前保持 App 打开。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有相片和影片將在需要時下載，並儲存至一個備份檔案中。請在完成前保持 App 開啟。"
+            "value" : "所有圖片和影片將在需要時下載，並儲存至一個備份檔案中。請在完成前保持 App 開啟。"
           }
         }
       }
@@ -1312,37 +1312,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Präfix in die Zwischenablage kopieren"
+            "value" : "Präfix kopieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copy Prefix to Clipboard"
+            "value" : "Copy Prefix"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "接頭辞をクリップボードにコピー"
+            "value" : "接頭辞をコピー"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "접두사를 클립보드에 복사"
+            "value" : "접두사 복사"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "复制前缀到剪贴板"
+            "value" : "复制前缀"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "複製前綴至剪貼簿"
+            "value" : "複製前綴"
           }
         }
       }
@@ -1353,37 +1353,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Im Fotos-Modus: Wenn ein Ordner ein Album mit „▶︎ “ vor dem Ordnernamen enthält, werden die Fotos dieses Albums zu den eigenen Bildern des Ordners. Die übrigen Alben werden zu verschachtelten Unteralben."
+            "value" : "In der Fotos-Bibliothek: Wenn ein Ordner ein Album mit „▶︎ “ vor dem Ordnernamen enthält, werden die Bilder dieses Albums zu den eigenen Bildern des Ordners. Die übrigen Alben werden zu verschachtelten Unteralben."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In Photos mode, if a folder contains an album with '▶︎ ' before the folder's name, that album's photos become the folder's own pics. Remaining albums become nested sub-albums."
+            "value" : "In Photos mode, if a folder contains an album with '▶︎ ' before the folder's name, that album's images become the folder's own images. Remaining albums become nested sub-albums."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真モードで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの写真がフォルダ自体の写真になります。残りのアルバムはネストされたサブアルバムになります。"
+            "value" : "写真ライブラリで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの画像がフォルダ自体の画像になります。残りのアルバムはネストされたサブアルバムになります。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사진 모드에서 폴더에 '▶︎ ' 접두사가 붙은 앨범이 있으면 해당 앨범의 사진이 폴더 자체의 사진이 됩니다. 나머지 앨범은 하위 앨범이 됩니다."
+            "value" : "사진 라이브러리에서 폴더에 '▶︎ ' 접두사가 붙은 앨범이 있으면 해당 앨범의 사진이 폴더 자체의 사진이 됩니다. 나머지 앨범은 하위 앨범이 됩니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在「照片」模式下，如果文件夹中包含名称前有「▶︎ 」的相册且名称与文件夹相同，该相册的照片将成为文件夹本身的图片。其余相册将成为嵌套子相册。"
+            "value" : "在「照片」模式下，如果文件夹中包含名称前有「▶︎ 」的相册且名称与文件夹相同，该相册的图片将成为文件夹本身的图片。其余相册将成为嵌套子相册。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在「照片」模式下，如果資料夾中包含名稱前有「▶︎ 」的相簿且名稱與資料夾相同，該相簿的照片將成為資料夾本身的圖片。其餘相簿將成為巢狀子相簿。"
+            "value" : "在「照片」模式下，如果資料夾中包含名稱前有「▶︎ 」的相簿且名稱與資料夾相同，該相簿的圖片將成為資料夾本身的圖片。其餘相簿將成為巢狀子相簿。"
           }
         }
       }
@@ -1809,7 +1809,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stores generated images as database blobs instead of files, simulating libraries from older app versions."
+            "value" : "Stores generated pics as database blobs instead of files, simulating libraries from older app versions."
           }
         },
         "ja" : {
@@ -1891,7 +1891,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pictures"
+            "value" : "Pics"
           }
         },
         "ja" : {
@@ -1932,7 +1932,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Generating test data adds a large number of pictures and albums to the current library. This may take a while and cannot be undone."
+            "value" : "Generating test data adds a large number of pics and albums to the current library. This may take a while and cannot be undone."
           }
         },
         "ja" : {
@@ -1973,7 +1973,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copying images…"
+            "value" : "Copying pics…"
           }
         },
         "ja" : {
@@ -2096,7 +2096,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verifying images…"
+            "value" : "Verifying pics…"
           }
         },
         "ja" : {
@@ -2137,7 +2137,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reorganizing your images so your library stays fast and ready to sync."
+            "value" : "Reorganizing your pics so your library stays fast and ready to sync."
           }
         },
         "ja" : {
@@ -2254,37 +2254,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos-Modus"
+            "value" : "Fotos-Bibliothek"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Photos Mode"
+            "value" : "Photos Library"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真モード"
+            "value" : "写真ライブラリ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사진 모드"
+            "value" : "사진 라이브러리"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "照片模式"
+            "value" : "照片图库"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "照片模式"
+            "value" : "照片圖庫"
           }
         }
       }
@@ -2295,19 +2295,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alben und Fotos direkt aus Ihrer Fotomediathek durchsuchen."
+            "value" : "Alben und Bilder direkt aus Ihrer Fotomediathek durchsuchen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Browse albums and photos directly from your Photos library."
+            "value" : "Browse albums and images directly from your Photos library."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真ライブラリのアルバムと写真を直接閲覧します。"
+            "value" : "写真ライブラリのアルバムと画像を直接閲覧します。"
           }
         },
         "ko" : {
@@ -2319,13 +2319,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "直接从您的照片图库浏览相册和照片。"
+            "value" : "直接从您的照片图库浏览相册和图片。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "直接從您的照片圖庫瀏覽相簿和照片。"
+            "value" : "直接從您的照片圖庫瀏覽相簿和圖片。"
           }
         }
       }
@@ -3238,19 +3238,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Synchronisiere deine Alben und Fotodetails auf all deinen Geräten."
+            "value" : "Synchronisiere deine Alben und Bilddetails auf all deinen Geräten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sync your albums and photo details across all your devices."
+            "value" : "Sync your albums and pic details across all your devices."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アルバムと写真の詳細をすべてのデバイスで同期します。"
+            "value" : "アルバムと画像の詳細をすべてのデバイスで同期します。"
           }
         },
         "ko" : {
@@ -3262,13 +3262,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在你的所有设备上同步相簿和照片信息。"
+            "value" : "在你的所有设备上同步相簿和图片信息。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在你的所有裝置上同步相簿和照片資訊。"
+            "value" : "在你的所有裝置上同步相簿和圖片資訊。"
           }
         }
       }

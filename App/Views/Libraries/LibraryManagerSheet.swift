@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct LibraryManagerSheet: View {
 
@@ -11,12 +10,11 @@ struct LibraryManagerSheet: View {
 
     @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var isPhotosModeEnabled: Bool = false
-    @AppStorage("PhotosNestedAlbumsEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
-    var isNestedAlbumsEnabled: Bool = false
 
     @State var isCreatingLibrary: Bool = false
     @State var newLibraryName: String = ""
     @State var libraryToEdit: PicLibrary?
+    @State var isEditingPhotos: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -36,7 +34,6 @@ struct LibraryManagerSheet: View {
                         } label: {
                             Image(systemName: "plus")
                         }
-                        .disabled(isPhotosModeEnabled)
                     }
                 }
                 .alert(String(localized: "Libraries.New", table: "Libraries"),
@@ -53,9 +50,18 @@ struct LibraryManagerSheet: View {
                         .environment(concurrency)
                         .environment(imageMigration)
                 }
+                .sheet(isPresented: $isEditingPhotos) {
+                    PhotosLibrarySheet(dismissAll: {
+                        isEditingPhotos = false
+                        dismiss()
+                    })
+                }
         }
         .phonePresentationDetents([.medium, .large])
         .onChange(of: libraryManager.currentLibrary.id) { _, _ in
+            dismiss()
+        }
+        .onChange(of: isPhotosModeEnabled) { _, _ in
             dismiss()
         }
     }
@@ -69,28 +75,36 @@ struct LibraryManagerSheet: View {
             } header: {
                 Text("Libraries.Section.PicMate", tableName: "Libraries")
             }
-            .disabled(isPhotosModeEnabled)
             Section {
-                Toggle(String(localized: "PhotosMode", table: "More"), isOn: $isPhotosModeEnabled)
-                if isPhotosModeEnabled {
-                    Toggle(String(localized: "Experiments.NestedAlbums", table: "More"),
-                           isOn: $isNestedAlbumsEnabled)
-                    Button(String(localized: "Experiments.NestedAlbums.CopyPrefix", table: "More")) {
-                        UIPasteboard.general.string = "▶︎ "
-                    }
-                    .tint(.primary)
-                    .disabled(!isNestedAlbumsEnabled)
-                }
+                photosRow
             } header: {
                 Text("Libraries.Section.Photos", tableName: "Libraries")
             } footer: {
+                Text("PhotosMode.Description", tableName: "More")
+            }
+        }
+    }
+
+    private var photosRow: some View {
+        Button {
+            isEditingPhotos = true
+        } label: {
+            HStack {
+                Text("PhotosMode", tableName: "More")
+                Spacer()
                 if isPhotosModeEnabled {
-                    Text("Experiments.NestedAlbums.Description", tableName: "More")
-                } else {
-                    Text("PhotosMode.Description", tableName: "More")
+                    Text("Libraries.Active", tableName: "Libraries")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .textCase(.uppercase)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(.accent, in: .capsule)
                 }
             }
         }
+        .tint(.primary)
     }
 
     private func libraryRow(for library: PicLibrary) -> some View {
@@ -115,7 +129,7 @@ struct LibraryManagerSheet: View {
                     }
                 }
                 Spacer()
-                if library.id == libraryManager.currentLibrary.id {
+                if library.id == libraryManager.currentLibrary.id && !isPhotosModeEnabled {
                     Text("Libraries.Active", tableName: "Libraries")
                         .font(.caption2)
                         .fontWeight(.semibold)
@@ -129,7 +143,7 @@ struct LibraryManagerSheet: View {
         }
         .tint(.primary)
         .swipeActions(edge: .leading) {
-            if library.id != libraryManager.currentLibrary.id {
+            if library.id != libraryManager.currentLibrary.id || isPhotosModeEnabled {
                 Button {
                     setLibraryActive(library)
                 } label: {

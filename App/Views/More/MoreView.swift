@@ -91,7 +91,7 @@ struct MoreView: View {
                     HStack {
                         Text(String(localized: "GitHub", table: "More"))
                         Spacer()
-                        Text("katagaki/IllustMate")
+                        Text(verbatim: "katagaki/IllustMate")
                             .foregroundStyle(.secondary)
                     }
                 }

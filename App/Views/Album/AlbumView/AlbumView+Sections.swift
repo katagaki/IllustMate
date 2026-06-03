@@ -74,6 +74,8 @@ extension AlbumView {
                 } moveMenu: { album in
                     AlbumMoveMenu(album: album, totalAlbumCount: totalAlbumCount) {
                         refreshAlbumsAndSet()
+                    } onOtherLibraries: {
+                        movePayload = .album(album)
                     }
                 }
             } else if searchText.isEmpty && !hideSectionHeaders {
@@ -165,6 +167,8 @@ extension AlbumView {
                         totalAlbumCount: totalAlbumCount
                     ) {
                         refreshDataAfterPicMoved()
+                    } onOtherLibraries: {
+                        movePayload = .pics(isSelectingPics ? selectedPics : [pic])
                     }
                 }
             } else if !hasFetchedPicCount {

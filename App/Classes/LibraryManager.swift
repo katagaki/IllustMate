@@ -10,6 +10,9 @@ class LibraryManager: ObservableObject {
     @AppStorage("CurrentCollectionID",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var currentLibraryID: String = PicLibrary.defaultID
+    @AppStorage("PhotosModeEnabled",
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isPhotosModeEnabled: Bool = false
 
     private func sortedByName(_ libraries: [PicLibrary]) -> [PicLibrary] {
         libraries.sorted { lhs, rhs in
@@ -74,6 +77,7 @@ class LibraryManager: ObservableObject {
     }
 
     func switchLibrary(to library: PicLibrary) {
+        isPhotosModeEnabled = false
         currentLibrary = library
         currentLibraryID = library.id
         switchActors(to: library.id)

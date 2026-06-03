@@ -13,7 +13,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can import pictures from your Photos library or from the Files app."
+            "value" : "You can import pics from your Photos library or from the Files app."
           }
         },
         "ja" : {
@@ -54,7 +54,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import Pictures"
+            "value" : "Import Pics"
           }
         },
         "ja" : {
@@ -95,7 +95,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Create multiple libraries to further organize different types and categories of pictures."
+            "value" : "Create multiple libraries to further organize different types and categories of pics."
           }
         },
         "ja" : {
@@ -177,7 +177,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Create new albums to organize your pictures."
+            "value" : "Create new albums to organize your pics."
           }
         },
         "ja" : {

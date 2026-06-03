@@ -9,6 +9,9 @@ struct EditLibrarySheet: View {
     @EnvironmentObject var libraryManager: LibraryManager
     @EnvironmentObject var navigation: NavigationManager
 
+    @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isPhotosModeEnabled: Bool = false
+
     var library: PicLibrary
     var dismissAll: (() -> Void)?
 
@@ -39,7 +42,7 @@ struct EditLibrarySheet: View {
     var body: some View {
         NavigationStack {
             List {
-                if library.id != libraryManager.currentLibrary.id {
+                if library.id != libraryManager.currentLibrary.id || isPhotosModeEnabled {
                     Section {
                         Button(String(localized: "Libraries.SetActive", table: "Libraries")) {
                             withAnimation(.smooth.speed(2.0)) {
@@ -180,6 +183,9 @@ struct EditLibrarySheet: View {
         .onAppear {
             editedName = library.isDefault ? "" : library.name
         }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
         .task {
             await loadCounts()
             migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
@@ -209,9 +215,13 @@ struct EditLibrarySheet: View {
                isPresented: $isConfirmingForceSync) {
             Button("Shared.Yes") {
                 isForceSyncing = true
+                UIApplication.shared.isIdleTimerDisabled = true
                 Task {
                     await SyncManager.shared.forcePush(forLibrary: library.id)
-                    await MainActor.run { isForceSyncing = false }
+                    await MainActor.run {
+                        isForceSyncing = false
+                        UIApplication.shared.isIdleTimerDisabled = false
+                    }
                 }
             }
             Button("Shared.No", role: .cancel) { }
