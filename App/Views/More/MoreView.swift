@@ -117,11 +117,13 @@ struct MoreView: View {
         NavigationStack(path: $navigation.moreTabPath) {
             listContent
                 .toolbar {
+#if !targetEnvironment(macCatalyst)
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(role: .close) {
                             dismiss()
                         }
                     }
+#endif
                 }
         }
         .task {
