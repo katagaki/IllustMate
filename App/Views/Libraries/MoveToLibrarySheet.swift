@@ -95,7 +95,13 @@ struct MoveToLibrarySheet: View {
                 moveError = nil
             }
         } message: {
-            Text(errorMessage, tableName: "Libraries")
+            if case .originalsNotUploaded = moveError {
+                Text("Move.Error.NotUploaded", tableName: "Libraries")
+            } else if payload.isAlbum {
+                Text("Move.Error.Album", tableName: "Libraries")
+            } else {
+                Text("Move.Error.Pics", tableName: "Libraries")
+            }
         }
     }
 
@@ -145,13 +151,6 @@ struct MoveToLibrarySheet: View {
             }
         }
         .ignoresSafeArea()
-    }
-
-    var errorMessage: LocalizedStringKey {
-        switch moveError {
-        case .originalsNotUploaded: return "Move.Error.NotUploaded"
-        default: return payload.isAlbum ? "Move.Error.Album" : "Move.Error.Pics"
-        }
     }
 
     func displayName(forLibraryID id: String) -> String {
