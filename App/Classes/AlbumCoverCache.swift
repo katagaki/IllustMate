@@ -149,6 +149,50 @@ final class AlbumCoverCache {
         }
     }
 
+    /// Loads covers for albums that live in a specific (possibly non-current) library,
+    /// reading thumbnails through that library's DataActor and caching in memory only
+    /// (the on-disk CoverCacheActor is per-current-library and must not be touched here).
+    nonisolated func loadCovers(for albums: [Album], inLibrary libraryID: String) async {
+        let dataActor = DataActor.instance(for: libraryID)
+        let maxConcurrent = 4
+        await withTaskGroup(of: Void.self) { group in
+            var iterator = albums.makeIterator()
+            for _ in 0..<min(maxConcurrent, albums.count) {
+                guard let album = iterator.next() else { break }
+                group.addTask { await self.loadCover(for: album, using: dataActor) }
+            }
+            for await _ in group {
+                if let album = iterator.next() {
+                    group.addTask { await self.loadCover(for: album, using: dataActor) }
+                }
+            }
+        }
+    }
+
+    private nonisolated func loadCover(for album: Album, using dataActor: DataActor) async {
+        guard images(forAlbumID: album.id) == nil else { return }
+        let albumID = album.id
+        let thumbnails = await dataActor.representativeThumbnails(forAlbumWithID: albumID, limit: 3)
+        var coverData: Data?
+        if album.hasCoverPhoto {
+            coverData = await dataActor.albumCoverData(forAlbumWithID: albumID)
+        }
+        var dataBlobs: [Data?] = []
+        if album.hasCoverPhoto, let coverData {
+            dataBlobs.append(coverData)
+        }
+        for data in thumbnails {
+            if dataBlobs.count >= 3 { break }
+            dataBlobs.append(data)
+        }
+        while dataBlobs.count < 3 { dataBlobs.append(nil) }
+        let coverImages = decodeCoverImages(
+            primary: dataBlobs[0], secondary: dataBlobs[1], tertiary: dataBlobs[2]
+        )
+        setImages(coverImages, forAlbumID: albumID)
+        await MainActor.run { scheduleVersionBump() }
+    }
+
     /// Decodes raw JPEG Data blobs into SwiftUI Images.
     /// Forces pixel decompression off the main thread so the render pass doesn't stall.
     private nonisolated func decodeCoverImages(

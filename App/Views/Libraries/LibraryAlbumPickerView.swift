@@ -7,28 +7,42 @@ struct LibraryAlbumPickerView: View {
     let onOpen: (Album) -> Void
     let onMoveHere: () -> Void
 
+    @Namespace private var namespace
     @State private var albums: [Album] = []
     @State private var isLoaded: Bool = false
 
+    private let columnCount = 3
+
     var body: some View {
-        List {
+        ScrollView(.vertical) {
             if isLoaded {
                 if albums.isEmpty {
                     Text("Albums.NoMoreAlbums", tableName: "Albums")
                         .foregroundStyle(.secondary)
+                        .padding(20.0)
                 } else {
-                    ForEach(albums) { album in
-                        Button {
-                            onOpen(album)
-                        } label: {
-                            row(for: album)
+                    LazyVGrid(
+                        columns: Array(repeating: GridItem(.flexible(), spacing: 10.0),
+                                       count: columnCount),
+                        spacing: 12.0
+                    ) {
+                        ForEach(albums) { album in
+                            Button {
+                                onOpen(album)
+                            } label: {
+                                AlbumGridLabel(namespace: namespace, album: album)
+                            }
+                            .buttonStyleAdaptive()
+                            .id(album.identifiableString())
                         }
-                        .buttonStyle(.plain)
                     }
+                    .padding(.horizontal, 14.0)
+                    .padding(.top, 10.0)
                 }
             } else {
                 ProgressView()
-                    .frame(maxWidth: .infinity)
+                    .progressViewStyle(.circular)
+                    .padding(20.0)
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -50,21 +64,6 @@ struct LibraryAlbumPickerView: View {
         }
     }
 
-    func row(for album: Album) -> some View {
-        HStack(spacing: 12.0) {
-            Image(systemName: "rectangle.stack")
-                .foregroundStyle(.secondary)
-            Text(album.name)
-            Spacer()
-            Text(verbatim: "\(album.albumCount() + album.picCount())")
-                .foregroundStyle(.secondary)
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-        }
-        .contentShape(.rect)
-    }
-
     func load() async {
         let loaded = (try? await DataActor.instance(for: libraryID)
             .albumsWithCounts(in: parentAlbum, sortedBy: .nameAscending)) ?? []
@@ -72,5 +71,6 @@ struct LibraryAlbumPickerView: View {
             albums = loaded
             isLoaded = true
         }
+        await AlbumCoverCache.shared.loadCovers(for: loaded, inLibrary: libraryID)
     }
 }
