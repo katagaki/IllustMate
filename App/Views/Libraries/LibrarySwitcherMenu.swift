@@ -1,6 +1,5 @@
 import SwiftUI
 import TipKit
-import UIKit
 
 struct LibrarySwitcherMenu: View {
 
@@ -9,8 +8,6 @@ struct LibrarySwitcherMenu: View {
 
     @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var isPhotosModeEnabled: Bool = false
-    @AppStorage("PhotosNestedAlbumsEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
-    var isNestedAlbumsEnabled: Bool = false
 
     @Binding var isLibraryManagerPresented: Bool
 
@@ -19,11 +16,12 @@ struct LibrarySwitcherMenu: View {
             Section(String(localized: "Libraries.Section.PicMate", table: "Libraries")) {
                 ForEach(libraryManager.libraries) { library in
                     Button {
-                        guard library.id != libraryManager.currentLibrary.id else { return }
+                        guard library.id != libraryManager.currentLibrary.id
+                                || isPhotosModeEnabled else { return }
                         libraryManager.switchLibrary(to: library)
                         navigation.signalDataDeleted()
                     } label: {
-                        if library.id == libraryManager.currentLibrary.id {
+                        if library.id == libraryManager.currentLibrary.id && !isPhotosModeEnabled {
                             Label(libraryManager.displayName(for: library),
                                   systemImage: "checkmark")
                         } else {
@@ -38,24 +36,16 @@ struct LibrarySwitcherMenu: View {
                           systemImage: "slider.horizontal.3")
                 }
             }
-            .disabled(isPhotosModeEnabled)
             Section(String(localized: "Libraries.Section.Photos", table: "Libraries")) {
-                Toggle(isOn: $isPhotosModeEnabled) {
-                    Label(String(localized: "PhotosMode", table: "More"),
-                          systemImage: "photo.on.rectangle")
-                }
-                if isPhotosModeEnabled {
-                    Toggle(isOn: $isNestedAlbumsEnabled) {
-                        Label(String(localized: "Experiments.NestedAlbums", table: "More"),
-                              systemImage: "list.bullet.indent")
+                Button {
+                    isPhotosModeEnabled = true
+                } label: {
+                    if isPhotosModeEnabled {
+                        Label(String(localized: "PhotosMode", table: "More"),
+                              systemImage: "checkmark")
+                    } else {
+                        Text("PhotosMode", tableName: "More")
                     }
-                    Button {
-                        UIPasteboard.general.string = "▶︎ "
-                    } label: {
-                        Label(String(localized: "Experiments.NestedAlbums.CopyPrefix", table: "More"),
-                              systemImage: "doc.on.doc")
-                    }
-                    .disabled(!isNestedAlbumsEnabled)
                 }
             }
         } label: {

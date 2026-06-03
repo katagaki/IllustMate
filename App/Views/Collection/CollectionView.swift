@@ -35,17 +35,20 @@ struct CollectionView: View {
                         }
                         .matchedTransitionSource(id: "moreView", in: sheetNamespace)
                     }
-                    if !isPhotosModeEnabled {
-                        ToolbarSpacer(.fixed, placement: .topBarLeading)
-                        ToolbarItemGroup(placement: .topBarLeading) {
-                            Button {
-                                isLibraryManagerPresented = true
-                            } label: {
+                    ToolbarSpacer(.fixed, placement: .topBarLeading)
+                    ToolbarItemGroup(placement: .topBarLeading) {
+                        Button {
+                            isLibraryManagerPresented = true
+                        } label: {
+                            if isPhotosModeEnabled {
+                                Label(String(localized: "PhotosMode", table: "More"),
+                                      systemImage: "photo.on.rectangle")
+                            } else {
                                 Label(libraryManager.displayName(for: libraryManager.currentLibrary),
                                       systemImage: "square.stack.3d.up")
                             }
-                            .matchedTransitionSource(id: "libraryManager", in: sheetNamespace)
                         }
+                        .matchedTransitionSource(id: "libraryManager", in: sheetNamespace)
                     }
                 }
             }

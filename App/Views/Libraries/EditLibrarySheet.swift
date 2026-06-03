@@ -9,6 +9,9 @@ struct EditLibrarySheet: View {
     @EnvironmentObject var libraryManager: LibraryManager
     @EnvironmentObject var navigation: NavigationManager
 
+    @AppStorage("PhotosModeEnabled", store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var isPhotosModeEnabled: Bool = false
+
     var library: PicLibrary
     var dismissAll: (() -> Void)?
 
@@ -39,7 +42,7 @@ struct EditLibrarySheet: View {
     var body: some View {
         NavigationStack {
             List {
-                if library.id != libraryManager.currentLibrary.id {
+                if library.id != libraryManager.currentLibrary.id || isPhotosModeEnabled {
                     Section {
                         Button(String(localized: "Libraries.SetActive", table: "Libraries")) {
                             withAnimation(.smooth.speed(2.0)) {
