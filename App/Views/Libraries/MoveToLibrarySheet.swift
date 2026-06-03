@@ -82,6 +82,12 @@ struct MoveToLibrarySheet: View {
                 moveCompleted = completed
             }
         }
+        .onChange(of: isMoving) { _, moving in
+            UIApplication.shared.isIdleTimerDisabled = moving
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
         .alert(Text("Move.DownloadAlert.Title"),
                isPresented: Binding(get: { pendingDownloadLibrary != nil },
                                     set: { if !$0 { pendingDownloadLibrary = nil } })) {

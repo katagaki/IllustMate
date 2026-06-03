@@ -180,6 +180,9 @@ struct EditLibrarySheet: View {
         .onAppear {
             editedName = library.isDefault ? "" : library.name
         }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
         .task {
             await loadCounts()
             migrationIncomplete = await !DataActor.instance(for: library.id).isLibraryV2MigrationComplete()
@@ -209,9 +212,13 @@ struct EditLibrarySheet: View {
                isPresented: $isConfirmingForceSync) {
             Button("Shared.Yes") {
                 isForceSyncing = true
+                UIApplication.shared.isIdleTimerDisabled = true
                 Task {
                     await SyncManager.shared.forcePush(forLibrary: library.id)
-                    await MainActor.run { isForceSyncing = false }
+                    await MainActor.run {
+                        isForceSyncing = false
+                        UIApplication.shared.isIdleTimerDisabled = false
+                    }
                 }
             }
             Button("Shared.No", role: .cancel) { }
