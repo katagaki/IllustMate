@@ -55,6 +55,7 @@ struct LibraryAlbumPickerView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.glassProminent)
+            .tint(.accentColor)
             .buttonBorderShape(.capsule)
             .padding(20.0)
         }
