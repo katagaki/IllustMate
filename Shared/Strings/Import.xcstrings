@@ -392,13 +392,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld Foto"
+                  "value" : "%lld Bild"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld Fotos"
+                  "value" : "%lld Bilder"
                 }
               }
             }
@@ -410,13 +410,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld photo"
+                  "value" : "%lld image"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld photos"
+                  "value" : "%lld images"
                 }
               }
             }
@@ -428,7 +428,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "写真%lld件"
+                  "value" : "画像%lld件"
                 }
               }
             }
@@ -452,7 +452,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld 张照片"
+                  "value" : "%lld 张图片"
                 }
               }
             }
@@ -464,7 +464,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld 張照片"
+                  "value" : "%lld 張圖片"
                 }
               }
             }
@@ -517,7 +517,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "ビデオ%lld件"
+                  "value" : "動画%lld件"
                 }
               }
             }
@@ -529,7 +529,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "비디오 %lld개"
+                  "value" : "동영상 %lld개"
                 }
               }
             }
@@ -648,19 +648,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld Alben, %2$lld Fotos"
+            "value" : "%1$lld Alben, %2$lld Bilder"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld albums, %2$lld photos"
+            "value" : "%1$lld albums, %2$lld images"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lldアルバム、%2$lld枚の写真"
+            "value" : "%1$lldアルバム、%2$lld枚の画像"
           }
         },
         "ko" : {
@@ -672,13 +672,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld 个相册，%2$lld 张照片"
+            "value" : "%1$lld 个相册，%2$lld 张图片"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld 個相簿，%2$lld 張照片"
+            "value" : "%1$lld 個相簿，%2$lld 張圖片"
           }
         }
       }
@@ -1301,19 +1301,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos auswählen"
+            "value" : "Bilder auswählen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Photos"
+            "value" : "Select Images"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真を選択"
+            "value" : "画像を選択"
           }
         },
         "ko" : {
@@ -1325,13 +1325,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择照片"
+            "value" : "选择图片"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選擇照片"
+            "value" : "選擇圖片"
           }
         }
       }
@@ -1360,7 +1360,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "비디오 선택"
+            "value" : "동영상 선택"
           }
         },
         "zh-Hans" : {

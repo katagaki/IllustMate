@@ -1233,13 +1233,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Möchten Sie das ausgewählte Foto wirklich löschen?"
+                  "value" : "Möchten Sie das ausgewählte Bild wirklich löschen?"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Möchten Sie die ausgewählten %lld Fotos wirklich löschen?"
+                  "value" : "Möchten Sie die ausgewählten %lld Bilder wirklich löschen?"
                 }
               }
             }
@@ -1251,13 +1251,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Are you sure you want to delete the selected photo?"
+                  "value" : "Are you sure you want to delete the selected image?"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "Are you sure you want to delete the selected %lld photos?"
+                  "value" : "Are you sure you want to delete the selected %lld images?"
                 }
               }
             }
@@ -1269,13 +1269,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "選択した写真を削除してもよろしいですか？"
+                  "value" : "選択した画像を削除してもよろしいですか？"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "選択した%lld枚の写真を削除してもよろしいですか？"
+                  "value" : "選択した%lld枚の画像を削除してもよろしいですか？"
                 }
               }
             }
@@ -1299,7 +1299,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "确定要删除已选中的 %lld 张照片吗？"
+                  "value" : "确定要删除已选中的 %lld 张图片吗？"
                 }
               }
             }
@@ -1311,7 +1311,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "確定要刪除已選取的 %lld 張照片嗎？"
+                  "value" : "確定要刪除已選取的 %lld 張圖片嗎？"
                 }
               }
             }
@@ -2761,19 +2761,19 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wählen Sie ein Foto zur Vorschau."
+            "value" : "Wählen Sie ein Bild zur Vorschau."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select a photo to preview."
+            "value" : "Select an image to preview."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "表示する写真を選択してください。"
+            "value" : "表示する画像を選択してください。"
           }
         },
         "ko" : {
@@ -2785,13 +2785,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择一张照片以预览。"
+            "value" : "选择一张图片以预览。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選擇一張照片以預覽。"
+            "value" : "選擇一張圖片以預覽。"
           }
         }
       }
@@ -4444,7 +4444,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "These pictures cannot be moved."
+            "value" : "These pics cannot be moved."
           }
         },
         "ja" : {

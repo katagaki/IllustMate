@@ -382,7 +382,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comparing images..."
+            "value" : "Comparing pics..."
           }
         },
         "ja" : {
@@ -423,7 +423,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Analyzing images..."
+            "value" : "Analyzing pics..."
           }
         },
         "ja" : {
