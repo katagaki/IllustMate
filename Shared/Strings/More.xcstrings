@@ -1312,37 +1312,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Präfix in die Zwischenablage kopieren"
+            "value" : "Präfix kopieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copy Prefix to Clipboard"
+            "value" : "Copy Prefix"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "接頭辞をクリップボードにコピー"
+            "value" : "接頭辞をコピー"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "접두사를 클립보드에 복사"
+            "value" : "접두사 복사"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "复制前缀到剪贴板"
+            "value" : "复制前缀"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "複製前綴至剪貼簿"
+            "value" : "複製前綴"
           }
         }
       }
@@ -1353,7 +1353,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Im Fotos-Modus: Wenn ein Ordner ein Album mit „▶︎ “ vor dem Ordnernamen enthält, werden die Bilder dieses Albums zu den eigenen Bildern des Ordners. Die übrigen Alben werden zu verschachtelten Unteralben."
+            "value" : "In der Fotos-Bibliothek: Wenn ein Ordner ein Album mit „▶︎ “ vor dem Ordnernamen enthält, werden die Bilder dieses Albums zu den eigenen Bildern des Ordners. Die übrigen Alben werden zu verschachtelten Unteralben."
           }
         },
         "en" : {
@@ -1365,13 +1365,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真モードで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの画像がフォルダ自体の画像になります。残りのアルバムはネストされたサブアルバムになります。"
+            "value" : "写真ライブラリで、フォルダ内にフォルダ名の前に「▶︎ 」が付いたアルバムがある場合、そのアルバムの画像がフォルダ自体の画像になります。残りのアルバムはネストされたサブアルバムになります。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사진 모드에서 폴더에 '▶︎ ' 접두사가 붙은 앨범이 있으면 해당 앨범의 사진이 폴더 자체의 사진이 됩니다. 나머지 앨범은 하위 앨범이 됩니다."
+            "value" : "사진 라이브러리에서 폴더에 '▶︎ ' 접두사가 붙은 앨범이 있으면 해당 앨범의 사진이 폴더 자체의 사진이 됩니다. 나머지 앨범은 하위 앨범이 됩니다."
           }
         },
         "zh-Hans" : {
@@ -2254,37 +2254,37 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fotos-Modus"
+            "value" : "Fotos-Bibliothek"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Photos Mode"
+            "value" : "Photos Library"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "写真モード"
+            "value" : "写真ライブラリ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사진 모드"
+            "value" : "사진 라이브러리"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "照片模式"
+            "value" : "照片图库"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "照片模式"
+            "value" : "照片圖庫"
           }
         }
       }

@@ -51,7 +51,7 @@ struct LibrarySwitcherMenu: View {
         } label: {
             if isPhotosModeEnabled {
                 Label(String(localized: "PhotosMode", table: "More"),
-                      systemImage: "photo.on.rectangle")
+                      systemImage: "square.stack.3d.up")
             } else {
                 Label(libraryManager.displayName(for: libraryManager.currentLibrary),
                       systemImage: "square.stack.3d.up")
