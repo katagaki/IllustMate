@@ -33,6 +33,15 @@ struct MoreView: View {
             } footer: {
                 Text("AppLock.Description", tableName: "More")
             }
+            #if targetEnvironment(macCatalyst)
+            Section {
+                Toggle(String(localized: "Window.OpenPicsInNewWindow", table: "More"), isOn: $openPicsInNewWindow)
+            } header: {
+                Text("MacApp", tableName: "More")
+            } footer: {
+                Text("Window.OpenPicsInNewWindow.Description", tableName: "More")
+            }
+            #endif
             Section {
                 Toggle(String(localized: "ShareSheet.OpenSearch", table: "More"), isOn: $openSearchWhenSharing)
                 Toggle(String(localized: "ShareSheet.ShowAnimation", table: "More"), isOn: $showAnimationWhenSaving)
@@ -64,15 +73,6 @@ struct MoreView: View {
                     Text("ShareSheet.QuickImport.Description", tableName: "More")
                 }
             }
-            #if targetEnvironment(macCatalyst)
-            Section {
-                Toggle(String(localized: "Window.OpenPicsInNewWindow", table: "More"), isOn: $openPicsInNewWindow)
-            } header: {
-                Text("Window", tableName: "More")
-            } footer: {
-                Text("Window.OpenPicsInNewWindow.Description", tableName: "More")
-            }
-            #endif
             WebServerView()
             #if DEBUG
             Section {

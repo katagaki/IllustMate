@@ -1,43 +1,43 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Window" : {
+    "MacApp" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fenster"
+            "value" : "Mac-App"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Window"
+            "value" : "Mac App"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ウインドウ"
+            "value" : "Macアプリ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "윈도우"
+            "value" : "Mac 앱"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "窗口"
+            "value" : "Mac 应用"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "視窗"
+            "value" : "Mac App"
           }
         }
       }
