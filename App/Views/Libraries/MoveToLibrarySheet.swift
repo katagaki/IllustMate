@@ -164,13 +164,13 @@ struct MoveToLibrarySheet: View {
                     ProgressView(value: Double(moveCompleted), total: Double(moveTotal))
                         .progressViewStyle(.linear)
                         .tint(.accent)
-                        .frame(maxWidth: 240.0)
                 } else {
                     ProgressView()
                         .progressViewStyle(.circular)
                 }
                 Text("Move.Moving")
             }
+            .frame(maxWidth: .infinity)
             .padding(40.0)
         }
         .ignoresSafeArea()
