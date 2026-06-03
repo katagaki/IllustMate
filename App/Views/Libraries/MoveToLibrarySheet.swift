@@ -163,7 +163,7 @@ struct MoveToLibrarySheet: View {
                 if moveTotal > 0 {
                     ProgressView(value: Double(moveCompleted), total: Double(moveTotal))
                         .progressViewStyle(.linear)
-                        .tint(.accentColor)
+                        .tint(.accent)
                         .frame(maxWidth: 240.0)
                 } else {
                     ProgressView()
