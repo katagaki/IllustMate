@@ -31,6 +31,16 @@ extension DataActor {
         return try database.safeRows(orderedQuery).map { picFrom(row: $0) }
     }
 
+    func pics(withIDs ids: [String]) throws -> [Pic] {
+        guard !ids.isEmpty else { return [] }
+        let query = picsTable
+            .filter(ids.contains(picId))
+            .select(picListColumns)
+        let fetched = try database.safeRows(query).map { picFrom(row: $0) }
+        let byID = Dictionary(fetched.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return ids.compactMap { byID[$0] }
+    }
+
     func picSkeletons(in album: Album?, order: SortOrder) throws -> [Pic] {
         let baseQuery: SQLite.Table
         if let albumID = album?.id {

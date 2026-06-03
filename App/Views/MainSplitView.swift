@@ -21,9 +21,102 @@ struct MainSplitView: View {
     @State var isMoreViewPresenting: Bool = false
     @State var isLibraryManagerPresented: Bool = false
 
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
+
     var body: some View {
+        splitView
+        .task {
+            if isPhotosModeEnabled {
+                photosItems = photosManager.fetchTopLevelCollections()
+            } else {
+                do {
+                    albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                    await AlbumCoverCache.shared.loadCovers(for: albums)
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+            }
+        }
+        .onChange(of: isPhotosModeEnabled) { _, newValue in
+            selectedView = .collection
+            if newValue {
+                photosItems = photosManager.fetchTopLevelCollections()
+            } else {
+                photosItems = []
+                Task {
+                    do {
+                        albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                        await AlbumCoverCache.shared.loadCovers(for: albums)
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
+                }
+            }
+        }
+        .onChange(of: navigation.dataVersion) { _, _ in
+            albums = []
+            selectedView = .collection
+            viewer.displayedPic = nil
+            viewer.displayedImage = nil
+            viewer.displayedThumbnail = nil
+            viewer.allPics = []
+            Task {
+                if isPhotosModeEnabled {
+                    photosItems = photosManager.fetchTopLevelCollections()
+                } else {
+                    do {
+                        albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
+                        await AlbumCoverCache.shared.loadCovers(for: albums)
+                    } catch {
+                        debugPrint(error.localizedDescription)
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isMoreViewPresenting) {
+            MoreView()
+        }
+        .sheet(isPresented: $isLibraryManagerPresented) {
+            LibraryManagerSheet()
+                .environmentObject(libraryManager)
+                .environmentObject(navigation)
+                .environment(concurrency)
+                .environment(imageMigration)
+        }
+    }
+
+    @ViewBuilder var splitView: some View {
+#if targetEnvironment(macCatalyst)
+        if openPicsInNewWindow {
+            NavigationSplitView {
+                sidebar
+                    .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
+            } detail: {
+                content
+            }
+        } else {
+            threeColumnSplit
+        }
+#else
+        threeColumnSplit
+#endif
+    }
+
+    @ViewBuilder var threeColumnSplit: some View {
         NavigationSplitView {
-            List(selection: $selectedView) {
+            sidebar
+                .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
+        } content: {
+            content
+                .navigationSplitViewColumnWidth(min: 300.0, ideal: 375.0, max: 500.0)
+        } detail: {
+            detail
+        }
+    }
+
+    var sidebar: some View {
+        List(selection: $selectedView) {
                 Section {
                     LibrarySwitcherMenu(
                         isLibraryManagerPresented: $isLibraryManagerPresented
@@ -106,109 +199,52 @@ struct MainSplitView: View {
                     }
                 }
             }
-            .navigationSplitViewColumnWidth(min: 150.0, ideal: 200.0, max: 250.0)
-        } content: {
-            Group {
-                switch selectedView {
-                case .collection: CollectionView()
-                case .albums: AlbumsView()
-                case .pics: PicsView()
-                case .album(let album): AlbumNavigationStack(album: album)
-                case .photosAlbum(let wrapper):
-                    NavigationStack {
-                        PhotosAlbumContentView(collection: wrapper.collection)
-                    }
-                case .photosFolder(let wrapper):
-                    NavigationStack {
-                        PhotosFolderView(folder: wrapper.collectionList)
-                            .navigationDestination(for: ViewPath.self) { viewPath in
-                                switch viewPath {
-                                case .photosFolder(let innerWrapper):
-                                    PhotosFolderView(folder: innerWrapper.collectionList)
-                                case .photosAlbum(let innerWrapper):
-                                    PhotosAlbumContentView(collection: innerWrapper.collection)
-                                default: Color.clear
-                                }
+        }
+
+    var content: some View {
+        Group {
+            switch selectedView {
+            case .collection: CollectionView()
+            case .albums: AlbumsView()
+            case .pics: PicsView()
+            case .album(let album): AlbumNavigationStack(album: album)
+            case .photosAlbum(let wrapper):
+                NavigationStack {
+                    PhotosAlbumContentView(collection: wrapper.collection)
+                }
+            case .photosFolder(let wrapper):
+                NavigationStack {
+                    PhotosFolderView(folder: wrapper.collectionList)
+                        .navigationDestination(for: ViewPath.self) { viewPath in
+                            switch viewPath {
+                            case .photosFolder(let innerWrapper):
+                                PhotosFolderView(folder: innerWrapper.collectionList)
+                            case .photosAlbum(let innerWrapper):
+                                PhotosAlbumContentView(collection: innerWrapper.collection)
+                            default: Color.clear
                             }
-                    }
-                default: Color.clear
+                        }
                 }
+            default: Color.clear
             }
-            .navigationSplitViewColumnWidth(min: 300.0, ideal: 375.0, max: 500.0)
-        } detail: {
-            if isPhotosModeEnabled {
-                if let asset = photosViewer.displayedAsset {
-                    PhotosAssetViewer(asset: asset)
-                        .id(asset.localIdentifier)
-                } else {
-                    ContentUnavailableView("Shared.SelectAPhoto", systemImage: "photo.on.rectangle.angled")
-                }
+        }
+    }
+
+    @ViewBuilder var detail: some View {
+        if isPhotosModeEnabled {
+            if let asset = photosViewer.displayedAsset {
+                PhotosAssetViewer(asset: asset)
+                    .id(asset.localIdentifier)
             } else {
-                if let pic = viewer.displayedPic {
-                    PicViewer(pic: pic)
-                        .id(pic.id)
-                } else {
-                    ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
-                }
+                ContentUnavailableView("Shared.SelectAPhoto", systemImage: "photo.on.rectangle.angled")
             }
-        }
-        .task {
-            if isPhotosModeEnabled {
-                photosItems = photosManager.fetchTopLevelCollections()
+        } else {
+            if let pic = viewer.displayedPic {
+                PicViewer(pic: pic)
+                    .id(pic.id)
             } else {
-                do {
-                    albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
-                    await AlbumCoverCache.shared.loadCovers(for: albums)
-                } catch {
-                    debugPrint(error.localizedDescription)
-                }
+                ContentUnavailableView("Shared.SelectAPic", systemImage: "photo.on.rectangle.angled")
             }
-        }
-        .onChange(of: isPhotosModeEnabled) { _, newValue in
-            selectedView = .collection
-            if newValue {
-                photosItems = photosManager.fetchTopLevelCollections()
-            } else {
-                photosItems = []
-                Task {
-                    do {
-                        albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
-                        await AlbumCoverCache.shared.loadCovers(for: albums)
-                    } catch {
-                        debugPrint(error.localizedDescription)
-                    }
-                }
-            }
-        }
-        .onChange(of: navigation.dataVersion) { _, _ in
-            albums = []
-            selectedView = .collection
-            viewer.displayedPic = nil
-            viewer.displayedImage = nil
-            viewer.displayedThumbnail = nil
-            viewer.allPics = []
-            Task {
-                if isPhotosModeEnabled {
-                    photosItems = photosManager.fetchTopLevelCollections()
-                } else {
-                    do {
-                        albums = try await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)
-                        await AlbumCoverCache.shared.loadCovers(for: albums)
-                    } catch {
-                        debugPrint(error.localizedDescription)
-                    }
-                }
-            }
-        }
-        .sheet(isPresented: $isMoreViewPresenting) {
-            MoreView()
-        }
-        .sheet(isPresented: $isLibraryManagerPresented) {
-            LibraryManagerSheet()
-                .environmentObject(libraryManager)
-                .environmentObject(navigation)
-                .environment(concurrency)
-                .environment(imageMigration)
         }
     }
 }

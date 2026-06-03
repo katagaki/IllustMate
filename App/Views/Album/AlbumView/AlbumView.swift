@@ -8,9 +8,13 @@ struct AlbumView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) var scenePhase
+    @Environment(\.openWindow) var openWindow
     @EnvironmentObject var navigation: NavigationManager
     @EnvironmentObject var libraryManager: LibraryManager
     @Environment(ViewerManager.self) var viewer
+
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
 
     @Namespace var namespace
 

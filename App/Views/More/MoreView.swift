@@ -16,6 +16,8 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var quickImport: Bool = false
     @AppStorage("ShareSheetDefaultAlbum",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var defaultAlbumID: String = ""
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
 
     @State var allAlbums: [Album] = []
 
@@ -60,6 +62,15 @@ struct MoreView: View {
                     Text("ShareSheet.QuickImport.Description", tableName: "More")
                 }
             }
+            #if targetEnvironment(macCatalyst)
+            Section {
+                Toggle(String(localized: "Window.OpenPicsInNewWindow", table: "More"), isOn: $openPicsInNewWindow)
+            } header: {
+                Text("Window", tableName: "More")
+            } footer: {
+                Text("Window.OpenPicsInNewWindow.Description", tableName: "More")
+            }
+            #endif
             WebServerView()
             #if DEBUG
             Section {

@@ -7,11 +7,14 @@ struct PhotosAssetsGrid: View {
     var assets: [PHAsset]
 
     @Environment(PhotosViewerManager.self) var photosViewer
+    @Environment(\.openWindow) var openWindow
 
     private let batchSize = 200
 
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
 
     @State private var displayCount: Int = 200
 
@@ -28,7 +31,17 @@ struct PhotosAssetsGrid: View {
                 Group {
                     if UIDevice.current.userInterfaceIdiom == .pad {
                         Button {
+#if targetEnvironment(macCatalyst)
+                            if openPicsInNewWindow {
+                                openWindow(value: ViewerWindowValue.photo(
+                                    selectedID: asset.localIdentifier,
+                                    siblingIDs: assets.map(\.localIdentifier)))
+                            } else {
+                                photosViewer.setDisplay(asset, in: assets)
+                            }
+#else
                             photosViewer.setDisplay(asset, in: assets)
+#endif
                         } label: {
                             PhotosAssetLabel(asset: asset)
                         }
@@ -74,11 +87,14 @@ struct PhotosFetchResultAssetsGrid: View {
     var fetchResult: PHFetchResult<PHAsset>
 
     @Environment(PhotosViewerManager.self) var photosViewer
+    @Environment(\.openWindow) var openWindow
 
     private let batchSize = 200
 
     @AppStorage(wrappedValue: 4, "PicColumnCount",
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var columnCount: Int
+    @AppStorage(openPicsInNewWindowKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
 
     @State private var displayedAssets: [PHAsset] = []
 
@@ -95,7 +111,17 @@ struct PhotosFetchResultAssetsGrid: View {
                 Group {
                     if UIDevice.current.userInterfaceIdiom == .pad {
                         Button {
+#if targetEnvironment(macCatalyst)
+                            if openPicsInNewWindow {
+                                openWindow(value: ViewerWindowValue.photo(
+                                    selectedID: asset.localIdentifier,
+                                    siblingIDs: displayedAssets.map(\.localIdentifier)))
+                            } else {
+                                photosViewer.setDisplay(asset, in: displayedAssets)
+                            }
+#else
                             photosViewer.setDisplay(asset, in: displayedAssets)
+#endif
                         } label: {
                             PhotosAssetLabel(asset: asset)
                         }

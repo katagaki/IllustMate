@@ -1,6 +1,39 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Window" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Window"
+          }
+        }
+      }
+    },
+    "Window.OpenPicsInNewWindow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Pics in New Window"
+          }
+        }
+      }
+    },
+    "Window.OpenPicsInNewWindow.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide the viewer pane in the main window and open each picture in its own window instead."
+          }
+        }
+      }
+    },
     "Advanced" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -344,5 +344,20 @@ struct IllustMateApp: App {
             }
         }
 #endif
+#if targetEnvironment(macCatalyst)
+        WindowGroup(for: ViewerWindowValue.self) { $value in
+            if let value {
+                ViewerWindowContent(value: value)
+                    .environmentObject(navigation)
+                    .environmentObject(libraryManager)
+                    .environment(concurrency)
+                    .environment(photosManager)
+                    .environment(auth)
+                    .environment(pipManager)
+                    .environment(webServer)
+                    .environment(imageMigration)
+            }
+        }
+#endif
     }
 }
