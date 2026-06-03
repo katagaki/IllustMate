@@ -345,7 +345,7 @@ struct IllustMateApp: App {
             }
         }
 
-        WindowGroup("ViewTitle.More", id: settingsWindowID) {
+        WindowGroup("ViewTitle.Settings", id: settingsWindowID) {
             MoreView()
                 .environmentObject(navigation)
                 .environmentObject(libraryManager)
@@ -373,7 +373,7 @@ struct MacCommands: Commands {
 
     var body: some Commands {
         CommandGroup(replacing: .appSettings) {
-            Button("ViewTitle.More") {
+            Button("ViewTitle.Settings") {
                 openWindow(id: settingsWindowID)
             }
             .keyboardShortcut(",", modifiers: .command)
