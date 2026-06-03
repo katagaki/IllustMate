@@ -8,40 +8,27 @@ struct PicMoveMenu: View {
     var containingAlbum: Album?
     var totalAlbumCount: Int
     var onMoved: () -> Void
+    var onOtherLibraries: () -> Void
 
     @State var rootAlbums: [Album] = []
 
-    var hasNoDestinations: Bool {
-        totalAlbumCount == 0 && containingAlbum == nil
-    }
-
     var body: some View {
-        if hasNoDestinations {
-            Button {
-            } label: {
-                Label("Shared.NoAlbums", systemImage: systemImage)
-            }
-            .disabled(true)
-        } else {
-            Menu(title, systemImage: systemImage) {
-                if containingAlbum != nil {
-                    Section {
-                        Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                            Task {
-                                await DataActor.shared.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
-                                if let containingAlbum {
-                                    AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
-                                }
-                                onMoved()
+        Menu(title, systemImage: systemImage) {
+            if containingAlbum != nil {
+                Section {
+                    Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
+                        Task {
+                            await DataActor.shared.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
+                            if let containingAlbum {
+                                AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
                             }
+                            onMoved()
                         }
-                        Divider()
                     }
                 }
+            }
+            if !rootAlbums.isEmpty {
                 Section {
-                    if rootAlbums.isEmpty {
-                        Text(verbatim: "")
-                    }
                     ForEach(rootAlbums) { album in
                         AlbumHierarchyMenuItem(
                             targetAlbum: album,
@@ -60,9 +47,14 @@ struct PicMoveMenu: View {
                     }
                 }
             }
-            .task {
-                await loadAlbums()
+            Section {
+                Button("Shared.MoveToOtherLibrary", systemImage: "square.stack.3d.up") {
+                    onOtherLibraries()
+                }
             }
+        }
+        .task {
+            await loadAlbums()
         }
     }
 

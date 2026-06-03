@@ -67,6 +67,7 @@ struct AlbumView: View {
     @State var searchTask: Task<Void, Never>?
     @State var isDuplicateCheckerPresented: Bool = false
     @State var hasCompletedInitialLoad: Bool = false
+    @State var movePayload: LibraryMovePayload?
 
     var displayedAlbums: [Album] {
         searchResults ?? albums
@@ -142,6 +143,15 @@ struct AlbumView: View {
             .onChange(of: isDuplicateCheckerPresented) { _, isPresented in
                 if !isPresented {
                     refreshPicsAndSet()
+                }
+            }
+            .sheet(item: $movePayload) { payload in
+                MoveToLibrarySheet(payload: payload,
+                                   sourceID: DataActor.shared.collectionID) {
+                    switch payload {
+                    case .album: refreshAlbumsAndSet()
+                    case .pics: refreshDataAfterPicMoved()
+                    }
                 }
             }
             .modifier(AlbumViewDialogs(

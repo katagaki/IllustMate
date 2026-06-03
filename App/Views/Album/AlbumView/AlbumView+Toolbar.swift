@@ -19,6 +19,8 @@ extension AlbumView {
                             pics: selectedPics, containingAlbum: currentAlbum,
                             totalAlbumCount: totalAlbumCount) {
                     refreshDataAfterPicMoved()
+                } onOtherLibraries: {
+                    movePayload = .pics(selectedPics)
                 }
                 .disabled(selectedPics.isEmpty)
                 Text("Shared.Selected.\(selectedPics.count)")

@@ -5,6 +5,7 @@ struct AlbumMoveMenu: View {
     var album: Album
     var totalAlbumCount: Int
     var onMoved: () -> Void
+    var onOtherLibraries: () -> Void
 
     @State var rootAlbums: [Album] = []
 
@@ -18,9 +19,6 @@ struct AlbumMoveMenu: View {
             }
         }
         Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
-            if rootAlbums.isEmpty {
-                Text(verbatim: "")
-            }
             ForEach(rootAlbums) { rootAlbum in
                 AlbumHierarchyMenuItem(
                     targetAlbum: rootAlbum,
@@ -33,8 +31,11 @@ struct AlbumMoveMenu: View {
                     }
                 }
             }
+            Divider()
+            Button("Shared.MoveToOtherLibrary", systemImage: "square.stack.3d.up") {
+                onOtherLibraries()
+            }
         }
-        .disabled(totalAlbumCount == 0)
         .task {
             await loadAlbums()
         }
