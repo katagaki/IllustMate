@@ -178,4 +178,22 @@ extension DataActor {
             deleteVideoFile(atRelativePath: path)
         }
     }
+
+    func deleteMovedRecords(albumIDs: [String], picIDs: [String]) {
+        if !picIDs.isEmpty {
+            let selectQuery = picsTable.filter(picIDs.contains(picId)).select(picFilePath)
+            if let rows = try? database.safeRows(selectQuery) {
+                for row in rows {
+                    if let path = try? row.get(picFilePath) {
+                        deleteAdoptedFile(atRelativePath: path)
+                    }
+                }
+            }
+            _ = try? database.run(picsTable.filter(picIDs.contains(picId)).delete())
+        }
+        if !albumIDs.isEmpty {
+            _ = try? database.run(albumsTable.filter(albumIDs.contains(albumId)).delete())
+            _ = try? database.run(preferencesTable.filter(albumIDs.contains(prefAlbumId)).delete())
+        }
+    }
 }
