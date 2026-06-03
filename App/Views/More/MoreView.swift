@@ -1,5 +1,7 @@
 import SwiftUI
 
+let settingsWindowID = "settings"
+
 struct MoreView: View {
 
     @Environment(\.dismiss) var dismiss

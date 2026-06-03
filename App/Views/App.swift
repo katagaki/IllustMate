@@ -327,21 +327,7 @@ struct IllustMateApp: App {
         }
 #if targetEnvironment(macCatalyst)
         .commands {
-            CommandGroup(after: .sidebar) {
-                Button("Command.PreviousPic") {
-                    viewer.navigateToPrevious()
-                    photosViewer.navigateToPrevious()
-                }
-                .keyboardShortcut(.leftArrow, modifiers: .command)
-                .disabled(!viewer.hasPrevious && !photosViewer.hasPrevious)
-
-                Button("Command.NextPic") {
-                    viewer.navigateToNext()
-                    photosViewer.navigateToNext()
-                }
-                .keyboardShortcut(.rightArrow, modifiers: .command)
-                .disabled(!viewer.hasNext && !photosViewer.hasNext)
-            }
+            MacCommands(viewer: viewer, photosViewer: photosViewer)
         }
 #endif
 #if targetEnvironment(macCatalyst)
@@ -358,6 +344,55 @@ struct IllustMateApp: App {
                     .environment(imageMigration)
             }
         }
+
+        WindowGroup("ViewTitle.More", id: settingsWindowID) {
+            MoreView()
+                .environmentObject(navigation)
+                .environmentObject(libraryManager)
+                .environment(viewer)
+                .environment(concurrency)
+                .environment(photosManager)
+                .environment(photosViewer)
+                .environment(auth)
+                .environment(pipManager)
+                .environment(webServer)
+                .environment(imageMigration)
+        }
+        .defaultSize(width: 540.0, height: 640.0)
 #endif
     }
 }
+
+#if targetEnvironment(macCatalyst)
+struct MacCommands: Commands {
+
+    var viewer: ViewerManager
+    var photosViewer: PhotosViewerManager
+
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some Commands {
+        CommandGroup(replacing: .appSettings) {
+            Button("ViewTitle.More") {
+                openWindow(id: settingsWindowID)
+            }
+            .keyboardShortcut(",", modifiers: .command)
+        }
+        CommandGroup(after: .sidebar) {
+            Button("Command.PreviousPic") {
+                viewer.navigateToPrevious()
+                photosViewer.navigateToPrevious()
+            }
+            .keyboardShortcut(.leftArrow, modifiers: .command)
+            .disabled(!viewer.hasPrevious && !photosViewer.hasPrevious)
+
+            Button("Command.NextPic") {
+                viewer.navigateToNext()
+                photosViewer.navigateToNext()
+            }
+            .keyboardShortcut(.rightArrow, modifiers: .command)
+            .disabled(!viewer.hasNext && !photosViewer.hasNext)
+        }
+    }
+}
+#endif

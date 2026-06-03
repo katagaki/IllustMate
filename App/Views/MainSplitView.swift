@@ -148,11 +148,13 @@ struct MainSplitView: View {
                             }
                         }
                     }
+#if !targetEnvironment(macCatalyst)
                     Button {
                         isMoreViewPresenting = true
                     } label: {
                         Label("ViewTitle.More", systemImage: "ellipsis")
                     }
+#endif
                 }
                 if isPhotosModeEnabled {
                     Section {
