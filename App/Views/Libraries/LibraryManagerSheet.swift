@@ -61,6 +61,9 @@ struct LibraryManagerSheet: View {
         .onChange(of: libraryManager.currentLibrary.id) { _, _ in
             dismiss()
         }
+        .onChange(of: isPhotosModeEnabled) { _, _ in
+            dismiss()
+        }
     }
 
     private var libraryList: some View {
