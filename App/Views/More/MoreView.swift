@@ -100,7 +100,11 @@ struct MoreView: View {
             }
         }
         .tint(.accent)
+#if targetEnvironment(macCatalyst)
+        .navigationTitle("")
+#else
         .navigationTitle("ViewTitle.More")
+#endif
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: ViewPath.self) { viewPath in
             switch viewPath {

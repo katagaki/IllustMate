@@ -201,7 +201,11 @@ struct MainSplitView: View {
                     }
                 }
             }
-        }
+        .listStyle(.sidebar)
+#if targetEnvironment(macCatalyst)
+        .environment(\.defaultMinListRowHeight, 32.0)
+#endif
+    }
 
     var content: some View {
         Group {
@@ -268,11 +272,11 @@ struct SidebarAlbumIcon: View {
             }
         }
 #if targetEnvironment(macCatalyst)
-        .frame(width: 16.0, height: 16.0)
-        .clipShape(.rect(cornerRadius: 3.0))
-#else
         .frame(width: 28.0, height: 28.0)
         .clipShape(.rect(cornerRadius: 6.0))
+#else
+        .frame(width: 32.0, height: 32.0)
+        .clipShape(.rect(cornerRadius: 7.0))
 #endif
         .onAppear {
             loadFromCache()
