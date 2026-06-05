@@ -153,6 +153,7 @@ struct AlbumView: View {
                     case .pics: refreshDataAfterPicMoved()
                     }
                 }
+                .environmentObject(libraryManager)
             }
             .modifier(AlbumViewDialogs(
                 isConfirmingDeleteAlbum: $isConfirmingDeleteAlbum,
