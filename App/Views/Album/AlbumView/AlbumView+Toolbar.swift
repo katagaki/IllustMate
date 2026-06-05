@@ -6,6 +6,47 @@ extension AlbumView {
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
         if isSelectingPics {
+#if targetEnvironment(macCatalyst)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    startOrStopSelectingPics()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                PicMoveMenu(title: "Shared.Move", systemImage: "tray.full",
+                            pics: selectedPics, containingAlbum: currentAlbum,
+                            totalAlbumCount: totalAlbumCount) {
+                    refreshDataAfterPicMoved()
+                } onOtherLibraries: {
+                    movePayload = .pics(selectedPics)
+                }
+                .disabled(selectedPics.isEmpty)
+                Text("Shared.Selected.\(selectedPics.count)")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+                    .fixedSize()
+                Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                    deletePics()
+                }
+                .disabled(selectedPics.isEmpty)
+                .tint(.red)
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    selectOrDeselectAllPics()
+                } label: {
+                    if pics.count == selectedPics.count {
+                        Label("Shared.DeselectAll", image: "checkmark.circle.slash")
+                    } else {
+                        Label("Shared.SelectAll", systemImage: "checkmark.circle")
+                    }
+                }
+            }
+#else
             ToolbarItemGroup(placement: .bottomBar) {
                 Button {
                     startOrStopSelectingPics()
@@ -45,6 +86,7 @@ extension AlbumView {
                     }
                 }
             }
+#endif
         } else {
             if UIDevice.current.userInterfaceIdiom != .phone {
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -55,6 +97,15 @@ extension AlbumView {
                 }
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
             }
+#if targetEnvironment(macCatalyst)
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"),
+                       systemImage: "photo.stack") {
+                    isDuplicateCheckerPresented = true
+                }
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+#endif
             ToolbarItemGroup(placement: .topBarTrailing) {
                 importMenu
                     .popoverTip(ImportTip(), arrowEdge: .top) { _ in

@@ -370,6 +370,7 @@ struct MacCommands: Commands {
     var photosViewer: PhotosViewerManager
 
     @Environment(\.openWindow) private var openWindow
+    @FocusedValue(\.albumViewOptions) private var albumViewOptions
 
     var body: some Commands {
         CommandGroup(replacing: .appSettings) {
@@ -379,6 +380,17 @@ struct MacCommands: Commands {
             .keyboardShortcut(",", modifiers: .command)
         }
         CommandGroup(after: .sidebar) {
+            if let albumViewOptions {
+                Menu(String(localized: "Albums.Albums", table: "Albums")) {
+                    albumOptions(albumViewOptions)
+                }
+                Menu(String(localized: "Albums.Pics", table: "Albums")) {
+                    picOptions(albumViewOptions)
+                }
+                Toggle(String(localized: "Albums.HideHeaders", table: "Albums"),
+                       isOn: albumViewOptions.hideSectionHeaders)
+                Divider()
+            }
             Button("Command.PreviousPic") {
                 viewer.navigateToPrevious()
                 photosViewer.navigateToPrevious()
@@ -393,6 +405,54 @@ struct MacCommands: Commands {
             .keyboardShortcut(.rightArrow, modifiers: .command)
             .disabled(!viewer.hasNext && !photosViewer.hasNext)
         }
+    }
+
+    @ViewBuilder
+    private func albumOptions(_ options: AlbumViewOptions) -> some View {
+        Picker(String(localized: "Albums.Style", table: "Albums"),
+               selection: options.albumStyle.animation(.smooth.speed(2.0))) {
+            Label(String(localized: "Albums.Style.Grid", table: "Albums"),
+                  systemImage: "square.grid.2x2")
+                .tag(ViewStyle.grid)
+            Label(String(localized: "Albums.Style.List", table: "Albums"),
+                  systemImage: "list.bullet")
+                .tag(ViewStyle.list)
+            Label(String(localized: "Albums.Style.Carousel", table: "Albums"),
+                  systemImage: "rectangle.on.rectangle")
+                .tag(ViewStyle.carousel)
+        }
+        Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: options.albumSort) {
+            Text("Shared.Sort.Name.Ascending")
+                .tag(SortType.nameAscending)
+            Text("Shared.Sort.Name.Descending")
+                .tag(SortType.nameDescending)
+            Text("Shared.Sort.PicCount.Ascending")
+                .tag(SortType.sizeAscending)
+            Text("Shared.Sort.PicCount.Descending")
+                .tag(SortType.sizeDescending)
+        }
+        .pickerStyle(.menu)
+        if options.albumStyle.wrappedValue == .grid {
+            GridSizePicker(selection: options.albumColumnCount, sizes: [2, 3, 4, 5], kind: .album)
+        }
+    }
+
+    @ViewBuilder
+    private func picOptions(_ options: AlbumViewOptions) -> some View {
+        Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: options.picSort) {
+            Text("Shared.Sort.DateAdded.Ascending")
+                .tag(PicSortType.dateAddedAscending)
+            Text("Shared.Sort.DateAdded.Descending")
+                .tag(PicSortType.dateAddedDescending)
+            Text("Shared.Sort.Name.Ascending")
+                .tag(PicSortType.nameAscending)
+            Text("Shared.Sort.Name.Descending")
+                .tag(PicSortType.nameDescending)
+            Text("Shared.Sort.ProminentColor")
+                .tag(PicSortType.prominentColor)
+        }
+        .pickerStyle(.menu)
+        GridSizePicker(selection: options.picColumnCount, sizes: [2, 3, 4, 5, 8], kind: .pics)
     }
 }
 #endif

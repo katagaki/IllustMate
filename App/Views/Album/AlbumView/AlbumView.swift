@@ -235,6 +235,14 @@ struct AlbumView: View {
             .navigationTitle(navigationTitleText)
             .navigationSubtitle(Text(verbatim: navigationSubtitleText))
             .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
+            .modifier(AlbumViewOptionsFocusModifier(options: AlbumViewOptions(
+                albumStyle: $albumStyleState,
+                albumSort: $albumSortState,
+                albumColumnCount: $albumColumnCount,
+                picSort: $picSortType,
+                picColumnCount: $columnCount,
+                hideSectionHeaders: $hideSectionHeaders
+            )))
     }
 
     var mainContent: some View {
