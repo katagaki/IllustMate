@@ -49,7 +49,7 @@ struct PhotostandDatabase {
     static func openDatabase(forLibraryID libraryID: String = defaultLibraryID) -> Connection? {
         guard let url = libraryBaseURL(forLibraryID: libraryID)?
             .appendingPathComponent("Collection.db") else { return nil }
-        return try? Connection(url.path, readonly: true)
+        return try? Connection(url.path)
     }
 
     private static func openLibrariesDatabase() -> Connection? {
