@@ -102,6 +102,7 @@ actor DataActor {
             fatalError("Could not open SQLite database: \(error)")
         }
         self.database = database
+        _ = try? database.execute("PRAGMA journal_mode = WAL;")
         // PRAGMA auto_vacuum reports the requested value immediately, even before
         // a VACUUM applies it, so read the real mode before requesting the change.
         let activeAutoVacuumMode = (try? database.scalar("PRAGMA auto_vacuum")) as? Int64 ?? 0
