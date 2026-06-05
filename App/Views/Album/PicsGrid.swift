@@ -18,6 +18,14 @@ struct PicsGrid<Content: View>: View {
     var onDelete: ((Pic) -> Void)?
     @ViewBuilder var moveMenu: (Pic) -> Content
 
+    private static var selectionSpace: String { "PicsGridSelectionSpace" }
+
+    @State private var gridWidth: CGFloat = 0.0
+    @State private var anchorIndex: Int?
+    @State private var paintSelected: Bool = false
+    @State private var paintedRange: ClosedRange<Int>?
+    @State private var originalSelected: [Int: Bool] = [:]
+
     var body: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
                   spacing: 2.0) {
@@ -38,7 +46,7 @@ struct PicsGrid<Content: View>: View {
                     .onTapGesture {
                         onSelect(pic)
                     }
-                    .modifier(PicExportDraggableModifier(pic: pic))
+                    .modifier(PicExportDraggableModifier(pic: pic, isSelecting: isSelecting))
                     .matchedTransitionSource(id: pic.id, in: namespace)
                     .contextMenu {
                     if !isSelecting {
@@ -106,7 +114,76 @@ struct PicsGrid<Content: View>: View {
                 }
             }
         }
+        .coordinateSpace(.named(Self.selectionSpace))
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            gridWidth = width
+        }
+        .gesture(SelectionPanGesture(isEnabled: isSelecting,
+                                     coordinateSpace: Self.selectionSpace,
+                                     onChange: { updateSelection(at: $0) },
+                                     onEnd: { resetSelectionDrag() }))
         .animation(.smooth.speed(2.0), value: columnCount)
+    }
+
+    private func resetSelectionDrag() {
+        anchorIndex = nil
+        paintedRange = nil
+        originalSelected.removeAll()
+    }
+
+    private func picIndex(at location: CGPoint) -> Int? {
+        guard gridWidth > 0.0, columnCount > 0,
+              location.x >= 0.0, location.y >= 0.0 else {
+            return nil
+        }
+        let spacing = 2.0
+        let itemWidth = (gridWidth - spacing * Double(columnCount - 1)) / Double(columnCount)
+        guard itemWidth > 0.0 else { return nil }
+        let pitch = itemWidth + spacing
+        let column = Int(location.x / pitch)
+        let row = Int(location.y / pitch)
+        guard column >= 0, column < columnCount else { return nil }
+        let index = row * columnCount + column
+        guard index >= 0, index < pics.count else { return nil }
+        return index
+    }
+
+    private func setSelected(_ index: Int, _ selected: Bool) {
+        let pic = pics[index]
+        if (isSelected?(pic) ?? false) != selected {
+            onSelect(pic)
+        }
+    }
+
+    private func updateSelection(at location: CGPoint) {
+        guard let current = picIndex(at: location) else { return }
+        guard let anchor = anchorIndex else {
+            let original = isSelected?(pics[current]) ?? false
+            originalSelected[current] = original
+            paintSelected = !original
+            anchorIndex = current
+            paintedRange = current...current
+            setSelected(current, paintSelected)
+            UISelectionFeedbackGenerator().selectionChanged()
+            return
+        }
+        let newRange = min(anchor, current)...max(anchor, current)
+        if newRange == paintedRange { return }
+        if let old = paintedRange {
+            for index in old where !newRange.contains(index) {
+                setSelected(index, originalSelected[index] ?? false)
+            }
+        }
+        for index in newRange where !(paintedRange?.contains(index) ?? false) {
+            if originalSelected[index] == nil {
+                originalSelected[index] = isSelected?(pics[index]) ?? false
+            }
+            setSelected(index, paintSelected)
+        }
+        paintedRange = newRange
+        UISelectionFeedbackGenerator().selectionChanged()
     }
 }
 

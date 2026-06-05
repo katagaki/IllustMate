@@ -29,19 +29,7 @@ struct PhotosAlbumContentView: View {
                         SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount)
                     } else {
                         SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: assetCount) {
-                            Picker("Shared.GridSize",
-                                   systemImage: "square.grid.2x2",
-                                   selection: $columnCount.animation(.smooth.speed(2.0))) {
-                                Text("Shared.GridSize.3")
-                                    .tag(3)
-                                Text("Shared.GridSize.4")
-                                    .tag(4)
-                                Text("Shared.GridSize.5")
-                                    .tag(5)
-                                Text("Shared.GridSize.8")
-                                    .tag(8)
-                            }
-                            .pickerStyle(.menu)
+                            GridSizePicker(selection: $columnCount, sizes: [3, 4, 5, 8], kind: .pics)
                         }
                     }
                 }
@@ -95,19 +83,7 @@ struct PhotosAlbumContentView: View {
                 isDuplicateCheckerPresented = true
             }
             Section(String(localized: "Albums.Pics", table: "Albums")) {
-                Picker("Shared.GridSize",
-                       systemImage: "square.grid.2x2",
-                       selection: $columnCount.animation(.smooth.speed(2.0))) {
-                    Text("Shared.GridSize.3")
-                        .tag(3)
-                    Text("Shared.GridSize.4")
-                        .tag(4)
-                    Text("Shared.GridSize.5")
-                        .tag(5)
-                    Text("Shared.GridSize.8")
-                        .tag(8)
-                }
-                .pickerStyle(.menu)
+                GridSizePicker(selection: $columnCount, sizes: [3, 4, 5, 8], kind: .pics)
             }
         } label: {
             Label("Shared.Filter", systemImage: "line.3.horizontal.decrease")

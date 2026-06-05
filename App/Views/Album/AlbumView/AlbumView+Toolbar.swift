@@ -110,19 +110,7 @@ extension AlbumView {
                 }
                 .pickerStyle(.menu)
                 if albumStyleState == .grid {
-                    Picker("Shared.GridSize",
-                           systemImage: "square.grid.2x2",
-                           selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
-                        Text("Shared.GridSize.2")
-                            .tag(2)
-                        Text("Shared.GridSize.3")
-                            .tag(3)
-                        Text("Shared.GridSize.4")
-                            .tag(4)
-                        Text("Shared.GridSize.5")
-                            .tag(5)
-                    }
-                    .pickerStyle(.menu)
+                    GridSizePicker(selection: $albumColumnCount, sizes: [2, 3, 4, 5], kind: .album)
                 }
                 Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $albumSortState) {
                     Text("Shared.Sort.Name.Ascending")
@@ -137,21 +125,7 @@ extension AlbumView {
                 .pickerStyle(.menu)
             }
             Section(String(localized: "Albums.Pics", table: "Albums")) {
-                Picker("Shared.GridSize",
-                       systemImage: "square.grid.2x2",
-                       selection: $columnCount.animation(.smooth.speed(2.0))) {
-                    Text("Shared.GridSize.2")
-                        .tag(2)
-                    Text("Shared.GridSize.3")
-                        .tag(3)
-                    Text("Shared.GridSize.4")
-                        .tag(4)
-                    Text("Shared.GridSize.5")
-                        .tag(5)
-                    Text("Shared.GridSize.8")
-                        .tag(8)
-                }
-                .pickerStyle(.menu)
+                GridSizePicker(selection: $columnCount, sizes: [2, 3, 4, 5, 8], kind: .pics)
                 Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $picSortType) {
                     Text("Shared.Sort.DateAdded.Ascending")
                         .tag(PicSortType.dateAddedAscending)

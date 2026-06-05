@@ -26,17 +26,7 @@ extension PhotosFolderView {
                                 .tag(ViewStyle.carousel)
                         }
                         if albumStyleState == .grid {
-                            Picker("Shared.GridSize",
-                                   systemImage: "square.grid.2x2",
-                                   selection: $albumColumnCount.animation(.smooth.speed(2.0))) {
-                                Text("Shared.GridSize.2")
-                                    .tag(2)
-                                Text("Shared.GridSize.3")
-                                    .tag(3)
-                                Text("Shared.GridSize.4")
-                                    .tag(4)
-                            }
-                            .pickerStyle(.menu)
+                            GridSizePicker(selection: $albumColumnCount, sizes: [2, 3, 4], kind: .album)
                         }
                     }
                 }
@@ -71,19 +61,7 @@ extension PhotosFolderView {
                     SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: fetchResult.count)
                 } else {
                     SectionHeader(title: String(localized: "Albums.Pics", table: "Albums"), count: fetchResult.count) {
-                        Picker("Shared.GridSize",
-                               systemImage: "square.grid.2x2",
-                               selection: $picColumnCount.animation(.smooth.speed(2.0))) {
-                            Text("Shared.GridSize.3")
-                                .tag(3)
-                            Text("Shared.GridSize.4")
-                                .tag(4)
-                            Text("Shared.GridSize.5")
-                                .tag(5)
-                            Text("Shared.GridSize.8")
-                                .tag(8)
-                        }
-                        .pickerStyle(.menu)
+                        GridSizePicker(selection: $picColumnCount, sizes: [3, 4, 5, 8], kind: .pics)
                     }
                 }
             }
