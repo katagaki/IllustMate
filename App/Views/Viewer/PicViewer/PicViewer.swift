@@ -214,17 +214,6 @@ struct PicViewer: View {
                 }
             }
         }
-#if targetEnvironment(macCatalyst)
-        .focusable()
-        .onKeyPress(.leftArrow) {
-            viewer.navigateToPrevious()
-            return .handled
-        }
-        .onKeyPress(.rightArrow) {
-            viewer.navigateToNext()
-            return .handled
-        }
-#else
         .gesture(
             MagnifyGesture()
                 .onChanged { gesture in
@@ -244,6 +233,16 @@ struct PicViewer: View {
                     }
                 }
         )
+#if targetEnvironment(macCatalyst)
+        .focusable()
+        .onKeyPress(.leftArrow) {
+            viewer.navigateToPrevious()
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            viewer.navigateToNext()
+            return .handled
+        }
 #endif
     }
 }
