@@ -52,14 +52,14 @@ struct AlbumMoveMenu: View {
         Task {
             await DataActor.shared.addAlbum(withID: album.id,
                                             toAlbumWithID: destinationAlbum.id)
-            LastUsedAlbum.set(destinationAlbum.id)
+            LastUsedAlbum.set(destinationAlbum.id, in: DataActor.shared.collectionID)
             onMoved()
         }
     }
 
     func loadAlbums() async {
         rootAlbums = (try? await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
-        if let id = LastUsedAlbum.id {
+        if let id = LastUsedAlbum.id(in: DataActor.shared.collectionID) {
             lastUsedAlbum = await DataActor.shared.album(for: id)
         } else {
             lastUsedAlbum = nil
