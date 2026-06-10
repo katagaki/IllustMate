@@ -20,6 +20,14 @@ struct MoreView: View {
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var defaultAlbumID: String = ""
     @AppStorage(openPicsInNewWindowKey,
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
+    @AppStorage(viewerFitToScreenKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var fitToScreen: Bool = false
+    @AppStorage(viewerBackgroundTypeKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var viewerBackgroundType: ViewerBackgroundType = .immersive
+    @AppStorage(viewerShowResolutionKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var showResolutionByDefault: Bool = true
 
     @State var allAlbums: [Album] = []
 
@@ -33,15 +41,28 @@ struct MoreView: View {
             } footer: {
                 Text("AppLock.Description", tableName: "More")
             }
-            #if targetEnvironment(macCatalyst)
             Section {
+                Toggle(String(localized: "Viewer.FitToScreen", table: "More"), isOn: $fitToScreen)
+                Picker(String(localized: "Viewer.BackgroundType", table: "More"),
+                       selection: $viewerBackgroundType) {
+                    Text("Viewer.BackgroundType.Immersive", tableName: "More")
+                        .tag(ViewerBackgroundType.immersive)
+                    Text("Viewer.BackgroundType.FollowSystem", tableName: "More")
+                        .tag(ViewerBackgroundType.followSystem)
+                    Text("Viewer.BackgroundType.Dark", tableName: "More")
+                        .tag(ViewerBackgroundType.dark)
+                }
+                Toggle(String(localized: "Viewer.ShowResolution", table: "More"), isOn: $showResolutionByDefault)
+                #if targetEnvironment(macCatalyst)
                 Toggle(String(localized: "Window.OpenPicsInNewWindow", table: "More"), isOn: $openPicsInNewWindow)
+                #endif
             } header: {
-                Text("MacApp", tableName: "More")
+                Text("Viewer", tableName: "More")
             } footer: {
+                #if targetEnvironment(macCatalyst)
                 Text("Window.OpenPicsInNewWindow.Description", tableName: "More")
+                #endif
             }
-            #endif
             Section {
                 Toggle(String(localized: "ShareSheet.OpenSearch", table: "More"), isOn: $openSearchWhenSharing)
                 Toggle(String(localized: "ShareSheet.ShowAnimation", table: "More"), isOn: $showAnimationWhenSaving)

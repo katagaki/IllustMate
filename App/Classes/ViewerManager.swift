@@ -62,6 +62,28 @@ class ViewerManager {
         imageCache.removeAll()
     }
 
+    func previewImage(at index: Int) -> UIImage? {
+        guard index >= 0, index < allPics.count else { return nil }
+        let pic = allPics[index]
+        return imageCache[pic.id]
+            ?? ThumbnailCache.shared.image(forKey: pic.id)
+            ?? pic.thumbnailData.flatMap { UIImage(data: $0) }
+    }
+
+    func removeDisplayedPicAndShowNeighbor() -> Bool {
+        let removedID = displayedPicID
+        let removedIndex = currentIndex
+        allPics.removeAll { $0.id == removedID }
+        imageCache.removeValue(forKey: removedID)
+        prefetchTasks.removeValue(forKey: removedID)?.cancel()
+        guard !allPics.isEmpty else {
+            clearDisplay()
+            return false
+        }
+        navigateTo(index: min(removedIndex, allPics.count - 1))
+        return true
+    }
+
     func removePics(withIDs deletedIDs: Set<String>) {
         if deletedIDs.contains(displayedPicID) {
             clearDisplay()
