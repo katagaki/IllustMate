@@ -56,6 +56,10 @@ struct PicViewer: View {
         mainContent
         .frame(maxHeight: .infinity)
         .background {
+            SwipeBackGestureDisabler()
+                .frame(width: 0.0, height: 0.0)
+        }
+        .background {
             switch backgroundType {
             case .immersive:
                 if let backgroundImage = currentImage {
