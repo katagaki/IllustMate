@@ -93,12 +93,38 @@ struct DatabaseMigrator {
     // MARK: - PColors DB
 
     static func migrateColorDatabase(_ database: Connection, picColorsTable: Table) {
+        let existingColumns = (try? database.safeRows("PRAGMA table_info(\"pic_colors\")"))?
+            .compactMap { $0[1] as? String } ?? []
+
         let colorRed = Expression<Int>("red")
         let colorGreen = Expression<Int>("green")
         let colorBlue = Expression<Int>("blue")
-        _ = try? database.run(picColorsTable.addColumn(colorRed, defaultValue: 0))
-        _ = try? database.run(picColorsTable.addColumn(colorGreen, defaultValue: 0))
-        _ = try? database.run(picColorsTable.addColumn(colorBlue, defaultValue: 0))
+        if !existingColumns.contains("red") {
+            _ = try? database.run(picColorsTable.addColumn(colorRed, defaultValue: 0))
+        }
+        if !existingColumns.contains("green") {
+            _ = try? database.run(picColorsTable.addColumn(colorGreen, defaultValue: 0))
+        }
+        if !existingColumns.contains("blue") {
+            _ = try? database.run(picColorsTable.addColumn(colorBlue, defaultValue: 0))
+        }
+
+        guard !existingColumns.contains("accent_red") else { return }
+
+        let accentRed = Expression<Int>("accent_red")
+        let accentGreen = Expression<Int>("accent_green")
+        let accentBlue = Expression<Int>("accent_blue")
+        let contrastingRed = Expression<Int>("contrasting_red")
+        let contrastingGreen = Expression<Int>("contrasting_green")
+        let contrastingBlue = Expression<Int>("contrasting_blue")
+        _ = try? database.run(picColorsTable.addColumn(accentRed, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(accentGreen, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(accentBlue, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(contrastingRed, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(contrastingGreen, defaultValue: 0))
+        _ = try? database.run(picColorsTable.addColumn(contrastingBlue, defaultValue: 0))
+
+        _ = try? database.run(picColorsTable.delete())
     }
 
     // MARK: - Cover Cache DB

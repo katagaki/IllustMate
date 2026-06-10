@@ -3,10 +3,10 @@ import UIKit
 enum ProminentColor {
 
     // swiftlint:disable function_body_length
-    /// Calculates the most prominent color from thumbnail image data.
-    /// White, black, and near-gray pixels are ignored.
-    /// Returns the average color of the most common color bucket.
-    static func calculate(from thumbnailData: Data) -> RGBColor? {
+    /// Calculates the primary, accent, and contrasting colors from thumbnail image data.
+    /// Primary is the most prominent color overall; accent is the most prominent
+    /// higher-saturation color that isn't the primary; contrasting is the next one after it.
+    static func calculate(from thumbnailData: Data) -> PicColors? {
         guard let image = UIImage(data: thumbnailData),
               let cgImage = image.cgImage else { return nil }
 
@@ -52,18 +52,6 @@ enum ProminentColor {
             // Skip transparent pixels
             guard alpha > 128 else { continue }
 
-            // Skip near-black using perceived luminance
-            let luminance = 0.299 * Double(red) + 0.587 * Double(green) + 0.114 * Double(blue)
-            if luminance < 40 { continue }
-
-            // Skip near-white
-            if luminance > 170 { continue }
-
-            // Skip grays (low chroma)
-            let maxC = max(red, green, blue)
-            let minC = min(red, green, blue)
-            if maxC - minC < 15 { continue }
-
             let bucketR = red >> shift
             let bucketG = green >> shift
             let bucketB = blue >> shift
@@ -75,24 +63,45 @@ enum ProminentColor {
             bucketSumB[bucketIndex] += blue
         }
 
-        // Find the bucket with the most pixels
-        var bestBucket = -1
-        var bestCount = 0
-        for idx in 0..<bucketCount where bucketCounts[idx] > bestCount {
-            bestCount = bucketCounts[idx]
-            bestBucket = idx
+        let averageColor: (Int) -> RGBColor = { bucket in
+            let count = bucketCounts[bucket]
+            return RGBColor(red: bucketSumR[bucket] / count,
+                            green: bucketSumG[bucket] / count,
+                            blue: bucketSumB[bucket] / count)
         }
 
-        guard bestBucket >= 0, bestCount > 0 else {
-            return RGBColor(red: 128, green: 128, blue: 128)
+        // Primary: the most populated bucket overall
+        var primaryBucket = -1
+        var primaryCount = 0
+        for idx in 0..<bucketCount where bucketCounts[idx] > primaryCount {
+            primaryCount = bucketCounts[idx]
+            primaryBucket = idx
         }
 
-        // Average color of the most common bucket
-        let avgR = bucketSumR[bestBucket] / bestCount
-        let avgG = bucketSumG[bestBucket] / bestCount
-        let avgB = bucketSumB[bestBucket] / bestCount
+        guard primaryBucket >= 0 else {
+            let gray = RGBColor(red: 128, green: 128, blue: 128)
+            return PicColors(primary: gray, accent: gray, contrasting: gray)
+        }
 
-        return RGBColor(red: avgR, green: avgG, blue: avgB)
+        let primary = averageColor(primaryBucket)
+
+        // Accent and contrasting: the most populated higher-saturation buckets
+        // that aren't the primary, in descending order of prominence.
+        let saturationThreshold = 0.35
+        var saturatedBuckets: [(bucket: Int, count: Int)] = []
+        for idx in 0..<bucketCount where idx != primaryBucket && bucketCounts[idx] > 0 {
+            if averageColor(idx).saturation >= saturationThreshold {
+                saturatedBuckets.append((bucket: idx, count: bucketCounts[idx]))
+            }
+        }
+        saturatedBuckets.sort { $0.count > $1.count }
+
+        let accent = saturatedBuckets.first.map { averageColor($0.bucket) } ?? primary
+        let contrasting = saturatedBuckets.count > 1
+            ? averageColor(saturatedBuckets[1].bucket)
+            : accent
+
+        return PicColors(primary: primary, accent: accent, contrasting: contrasting)
     }
     // swiftlint:enable function_body_length
 }

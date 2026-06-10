@@ -27,6 +27,12 @@ actor PColorActor {
     let colorRed = Expression<Int>("red")
     let colorGreen = Expression<Int>("green")
     let colorBlue = Expression<Int>("blue")
+    let colorAccentRed = Expression<Int>("accent_red")
+    let colorAccentGreen = Expression<Int>("accent_green")
+    let colorAccentBlue = Expression<Int>("accent_blue")
+    let colorContrastingRed = Expression<Int>("contrasting_red")
+    let colorContrastingGreen = Expression<Int>("contrasting_green")
+    let colorContrastingBlue = Expression<Int>("contrasting_blue")
 
     init(collectionID: String) {
         self.collectionID = collectionID
@@ -61,6 +67,12 @@ actor PColorActor {
                 table.column(colorRed)
                 table.column(colorGreen)
                 table.column(colorBlue)
+                table.column(colorAccentRed, defaultValue: 0)
+                table.column(colorAccentGreen, defaultValue: 0)
+                table.column(colorAccentBlue, defaultValue: 0)
+                table.column(colorContrastingRed, defaultValue: 0)
+                table.column(colorContrastingGreen, defaultValue: 0)
+                table.column(colorContrastingBlue, defaultValue: 0)
             })
             if DatabaseMigrator.migrationNeeded() {
                 DatabaseMigrator.migrateColorDatabase(database, picColorsTable: picColorsTable)
@@ -72,44 +84,64 @@ actor PColorActor {
 
     // MARK: - Read
 
-    func cachedColor(forPicWithID picID: String) -> RGBColor? {
+    func cachedColor(forPicWithID picID: String) -> PicColors? {
         let query = picColorsTable.filter(colorPicId == picID)
-            .select(colorRed, colorGreen, colorBlue)
         guard let row = try? database.pluck(query),
-              let red = try? row.get(colorRed),
-              let green = try? row.get(colorGreen),
-              let blue = try? row.get(colorBlue) else { return nil }
-        return RGBColor(red: red, green: green, blue: blue)
+              let primary = try? RGBColor(red: row.get(colorRed),
+                                          green: row.get(colorGreen),
+                                          blue: row.get(colorBlue)),
+              let accent = try? RGBColor(red: row.get(colorAccentRed),
+                                         green: row.get(colorAccentGreen),
+                                         blue: row.get(colorAccentBlue)),
+              let contrasting = try? RGBColor(red: row.get(colorContrastingRed),
+                                              green: row.get(colorContrastingGreen),
+                                              blue: row.get(colorContrastingBlue)) else { return nil }
+        return PicColors(primary: primary, accent: accent, contrasting: contrasting)
     }
 
-    func allCachedColors() -> [String: RGBColor] {
-        let query = picColorsTable.select(colorPicId, colorRed, colorGreen, colorBlue)
+    func allCachedColors() -> [String: PicColors] {
+        let query = picColorsTable.select(
+            colorPicId, colorRed, colorGreen, colorBlue,
+            colorAccentRed, colorAccentGreen, colorAccentBlue,
+            colorContrastingRed, colorContrastingGreen, colorContrastingBlue
+        )
         guard let rows = try? database.safeRows(query) else { return [:] }
-        var result: [String: RGBColor] = [:]
+        var result: [String: PicColors] = [:]
         for row in rows {
             guard let picID = try? row.get(colorPicId),
-                  let red = try? row.get(colorRed),
-                  let green = try? row.get(colorGreen),
-                  let blue = try? row.get(colorBlue) else { continue }
-            result[picID] = RGBColor(red: red, green: green, blue: blue)
+                  let primary = try? RGBColor(red: row.get(colorRed),
+                                              green: row.get(colorGreen),
+                                              blue: row.get(colorBlue)),
+                  let accent = try? RGBColor(red: row.get(colorAccentRed),
+                                             green: row.get(colorAccentGreen),
+                                             blue: row.get(colorAccentBlue)),
+                  let contrasting = try? RGBColor(red: row.get(colorContrastingRed),
+                                                  green: row.get(colorContrastingGreen),
+                                                  blue: row.get(colorContrastingBlue)) else { continue }
+            result[picID] = PicColors(primary: primary, accent: accent, contrasting: contrasting)
         }
         return result
     }
 
-    func cachedColors(forPicIDs picIDs: [String]) -> [String: RGBColor] {
+    func cachedColors(forPicIDs picIDs: [String]) -> [String: PicColors] {
         guard !picIDs.isEmpty else { return [:] }
         let placeholders = picIDs.map { _ in "?" }.joined(separator: ", ")
-        let sql = "SELECT pic_id, red, green, blue FROM pic_colors WHERE pic_id IN (\(placeholders))"
+        let sql = """
+        SELECT pic_id, red, green, blue, accent_red, accent_green, accent_blue, \
+        contrasting_red, contrasting_green, contrasting_blue \
+        FROM pic_colors WHERE pic_id IN (\(placeholders))
+        """
         let bindings: [Binding?] = picIDs.map { $0 as Binding? }
         guard let stmt = try? database.safeRows(sql, bindings) else { return [:] }
-        var result: [String: RGBColor] = [:]
+        var result: [String: PicColors] = [:]
         for row in stmt {
-            if let picID = row[0] as? String,
-               let red = row[1] as? Int64,
-               let green = row[2] as? Int64,
-               let blue = row[3] as? Int64 {
-                result[picID] = RGBColor(red: Int(red), green: Int(green), blue: Int(blue))
-            }
+            guard let picID = row[0] as? String else { continue }
+            let values = (1...9).map { (row[$0] as? Int64).map(Int.init) ?? 0 }
+            result[picID] = PicColors(
+                primary: RGBColor(red: values[0], green: values[1], blue: values[2]),
+                accent: RGBColor(red: values[3], green: values[4], blue: values[5]),
+                contrasting: RGBColor(red: values[6], green: values[7], blue: values[8])
+            )
         }
         return result
     }
@@ -128,27 +160,34 @@ actor PColorActor {
 
     // MARK: - Write
 
-    func storeColor(red: Int, green: Int, blue: Int, forPicWithID picID: String) {
-        _ = try? database.run(picColorsTable.insert(or: .replace,
-            colorPicId <- picID,
-            colorRed <- red,
-            colorGreen <- green,
-            colorBlue <- blue
-        ))
+    func storeColor(_ colors: PicColors, forPicWithID picID: String) {
+        _ = try? database.run(picColorsTable.insert(or: .replace, setters(for: picID, colors: colors)))
     }
 
-    func storeColors(_ colors: [(picID: String, color: RGBColor)]) {
+    func storeColors(_ colors: [(picID: String, colors: PicColors)]) {
         guard !colors.isEmpty else { return }
         _ = try? database.transaction {
             for entry in colors {
-                _ = try? database.run(picColorsTable.insert(or: .replace,
-                    colorPicId <- entry.picID,
-                    colorRed <- entry.color.red,
-                    colorGreen <- entry.color.green,
-                    colorBlue <- entry.color.blue
-                ))
+                _ = try? database.run(
+                    picColorsTable.insert(or: .replace, setters(for: entry.picID, colors: entry.colors))
+                )
             }
         }
+    }
+
+    private func setters(for picID: String, colors: PicColors) -> [Setter] {
+        [
+            colorPicId <- picID,
+            colorRed <- colors.primary.red,
+            colorGreen <- colors.primary.green,
+            colorBlue <- colors.primary.blue,
+            colorAccentRed <- colors.accent.red,
+            colorAccentGreen <- colors.accent.green,
+            colorAccentBlue <- colors.accent.blue,
+            colorContrastingRed <- colors.contrasting.red,
+            colorContrastingGreen <- colors.contrasting.green,
+            colorContrastingBlue <- colors.contrasting.blue
+        ]
     }
 
     // MARK: - Delete
