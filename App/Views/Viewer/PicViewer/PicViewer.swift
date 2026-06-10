@@ -33,8 +33,10 @@ struct PicViewer: View {
     @State var displayedPicName: String = ""
     @State var videoResolution: CGSize?
     @State var swipeOffset: CGFloat = 0.0
+    @State var swipeBase: CGFloat = 0.0
     @State var isSwipeTracking: Bool = false
     @State var swipeContentWidth: CGFloat = 0.0
+    @State var pendingSwipeTarget: Int?
 
     var isLandscape: Bool {
         verticalSizeClass == .compact

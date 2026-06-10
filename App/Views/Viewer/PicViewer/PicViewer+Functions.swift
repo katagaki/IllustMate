@@ -91,10 +91,13 @@ extension PicViewer {
                 guard magnification == 1.0 else { return }
                 if !isSwipeTracking {
                     guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                    finalizePendingSwipe()
+                    swipeBase = swipeOffset
                     isSwipeTracking = true
                 }
-                var offset = value.translation.width
-                if (!viewer.hasPrevious && offset > 0.0) || (!viewer.hasNext && offset < 0.0) {
+                var offset = swipeBase + value.translation.width
+                if swipeBase == 0.0,
+                   (!viewer.hasPrevious && offset > 0.0) || (!viewer.hasNext && offset < 0.0) {
                     offset /= 3.0
                 }
                 swipeOffset = offset
@@ -102,48 +105,55 @@ extension PicViewer {
             .onEnded { value in
                 guard isSwipeTracking else { return }
                 isSwipeTracking = false
-                endSwipe(predictedTranslation: value.predictedEndTranslation.width,
-                         velocity: value.velocity.width)
+                let predictedOffset = swipeOffset + (value.predictedEndTranslation.width - value.translation.width)
+                endSwipe(predictedOffset: predictedOffset, velocity: value.velocity.width)
             }
     }
 
-    func endSwipe(predictedTranslation: CGFloat, velocity: CGFloat) {
+    func endSwipe(predictedOffset: CGFloat, velocity: CGFloat) {
         let threshold = swipeSlideDistance / 3.0
-        if predictedTranslation < -threshold, viewer.hasNext {
-            commitSwipe(advancing: true, velocity: velocity)
-        } else if predictedTranslation > threshold, viewer.hasPrevious {
-            commitSwipe(advancing: false, velocity: velocity)
+        if predictedOffset < -threshold, viewer.hasNext {
+            commitSwipe(destination: -swipeSlideDistance, target: viewer.currentIndex + 1, velocity: velocity)
+        } else if predictedOffset > threshold, viewer.hasPrevious {
+            commitSwipe(destination: swipeSlideDistance, target: viewer.currentIndex - 1, velocity: velocity)
         } else {
-            animateSwipe(velocity: velocity)
+            animateSwipe(to: 0.0, velocity: velocity)
         }
     }
 
-    func commitSwipe(advancing: Bool, velocity: CGFloat) {
-        // Advance the index immediately so a follow-up swipe targets the new pic, then keep the
-        // just-revealed neighbor exactly where it was on screen and settle it to center. The zero
-        // duration animation commits the reposition for one frame before the spring runs, so the
-        // swapped pic doesn't jump.
-        withAnimation(.linear(duration: 0.0)) {
-            if advancing {
-                viewer.navigateToNext()
-                swipeOffset += swipeSlideDistance
-            } else {
-                viewer.navigateToPrevious()
-                swipeOffset -= swipeSlideDistance
-            }
-        } completion: {
-            animateSwipe(velocity: velocity)
+    func commitSwipe(destination: CGFloat, target: Int, velocity: CGFloat) {
+        // Slide to the off-screen target immediately so the spring starts the moment the finger
+        // lifts. The index swap is deferred to finalizePendingSwipe, which runs either when this
+        // animation completes or as soon as the next drag begins, so rapid swipes never act on a
+        // stale index.
+        pendingSwipeTarget = target
+        animateSwipe(to: destination, velocity: velocity) {
+            finalizePendingSwipe()
         }
     }
 
-    func animateSwipe(velocity: CGFloat) {
-        let distance = -swipeOffset
+    func finalizePendingSwipe() {
+        guard let target = pendingSwipeTarget else { return }
+        pendingSwipeTarget = nil
+        let advancing = target > viewer.currentIndex
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            viewer.navigateTo(index: target)
+            swipeOffset += advancing ? swipeSlideDistance : -swipeSlideDistance
+        }
+    }
+
+    func animateSwipe(to destination: CGFloat, velocity: CGFloat, completion: (() -> Void)? = nil) {
+        let distance = destination - swipeOffset
         // interpolatingSpring expects initialVelocity normalized as a fraction of the
         // remaining distance per second, so the gesture velocity carries into the animation
         let initialVelocity = abs(distance) > 0.1 ? velocity / distance : 0.0
         withAnimation(.interpolatingSpring(stiffness: 280.0, damping: 30.0,
                                            initialVelocity: initialVelocity)) {
-            swipeOffset = 0.0
+            swipeOffset = destination
+        } completion: {
+            completion?()
         }
     }
 
