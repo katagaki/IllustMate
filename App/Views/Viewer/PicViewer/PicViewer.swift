@@ -5,9 +5,19 @@ struct PicViewer: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.verticalSizeClass) var verticalSizeClass
+    @Environment(\.dismiss) var dismiss
     @Environment(ViewerManager.self) var viewer
     @EnvironmentObject var navigation: NavigationManager
     @Environment(PictureInPictureManager.self) var pipManager
+
+    @AppStorage(viewerFitToScreenKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var fitToScreen: Bool = false
+    @AppStorage(viewerBackgroundTypeKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var backgroundType: ViewerBackgroundType = .immersive
+    @AppStorage(viewerShowResolutionKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var showResolutionByDefault: Bool = true
 
     var pic: Pic
 
@@ -18,9 +28,13 @@ struct PicViewer: View {
     @State var showImageSize: Bool = true
     @State var showDownloadFailedPopover: Bool = false
     @State var isRenamePicPresented: Bool = false
+    @State var isConfirmingDeletePic: Bool = false
     @State var renamePicText: String = ""
     @State var displayedPicName: String = ""
     @State var videoResolution: CGSize?
+    @State var swipeOffset: CGFloat = 0.0
+    @State var isSwipeTracking: Bool = false
+    @State var swipeContentWidth: CGFloat = 0.0
 
     var isLandscape: Bool {
         verticalSizeClass == .compact
@@ -42,26 +56,35 @@ struct PicViewer: View {
         mainContent
         .frame(maxHeight: .infinity)
         .background {
-            if let backgroundImage = currentImage {
-                Canvas { context, size in
-                    context.addFilter(.blur(radius: 40))
-                    context.addFilter(.brightness(colorScheme == .dark ? -0.5 : 0.1))
-                    let image = Image(uiImage: backgroundImage)
-                    let imageSize = backgroundImage.size
-                    let scaleX = size.width / imageSize.width
-                    let scaleY = size.height / imageSize.height
-                    let scale = max(scaleX, scaleY)
-                    let drawWidth = imageSize.width * scale
-                    let drawHeight = imageSize.height * scale
-                    let drawRect = CGRect(
-                        x: (size.width - drawWidth) / 2,
-                        y: (size.height - drawHeight) / 2,
-                        width: drawWidth,
-                        height: drawHeight
-                    )
-                    context.draw(image, in: drawRect)
+            switch backgroundType {
+            case .immersive:
+                if let backgroundImage = currentImage {
+                    Canvas { context, size in
+                        context.addFilter(.blur(radius: 40))
+                        context.addFilter(.brightness(colorScheme == .dark ? -0.5 : 0.1))
+                        let image = Image(uiImage: backgroundImage)
+                        let imageSize = backgroundImage.size
+                        let scaleX = size.width / imageSize.width
+                        let scaleY = size.height / imageSize.height
+                        let scale = max(scaleX, scaleY)
+                        let drawWidth = imageSize.width * scale
+                        let drawHeight = imageSize.height * scale
+                        let drawRect = CGRect(
+                            x: (size.width - drawWidth) / 2,
+                            y: (size.height - drawHeight) / 2,
+                            width: drawWidth,
+                            height: drawHeight
+                        )
+                        context.draw(image, in: drawRect)
+                    }
+                    .ignoresSafeArea()
                 }
-                .ignoresSafeArea()
+            case .followSystem:
+                Color(uiColor: .systemBackground)
+                    .ignoresSafeArea()
+            case .dark:
+                Color.black
+                    .ignoresSafeArea()
             }
         }
         .navigationTitle(displayedPicName)
@@ -84,6 +107,12 @@ struct PicViewer: View {
                 }
             }
             Button("Shared.Cancel", role: .cancel) { }
+        }
+        .alert("Shared.DeleteConfirmation.Pic", isPresented: $isConfirmingDeletePic) {
+            Button("Shared.Yes", role: .destructive) {
+                deleteDisplayedPic()
+            }
+            Button("Shared.No", role: .cancel) { }
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -183,8 +212,23 @@ struct PicViewer: View {
                     }
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu("Shared.More", systemImage: "ellipsis") {
+                    Button("Shared.Rename", systemImage: "pencil") {
+                        renamePicText = displayedPicName
+                        isRenamePicPresented = true
+                    }
+                    Divider()
+                    Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                        isConfirmingDeletePic = true
+                    }
+                }
+            }
         }
         .toolbar(isLandscape ? .hidden : .automatic, for: .bottomBar)
+        .onAppear {
+            showImageSize = showResolutionByDefault
+        }
         .task(id: viewer.displayedPicID) {
             displayedPicName = viewer.displayedPic?.name ?? pic.name
             containingAlbumName = nil
