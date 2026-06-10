@@ -113,16 +113,15 @@ extension AlbumView {
     // swiftlint:disable:next cyclomatic_complexity
     func sortPicsByProminentColor(_ pics: [Pic]) async -> [Pic] {
         let picIDs = pics.map(\.id)
-        let cachedColors = await PColorActor.shared.cachedColors(forPicIDs: picIDs)
+        var colorsMap = await PColorActor.shared.cachedColors(forPicIDs: picIDs)
 
-        var colorsMap = cachedColors
         let uncachedPics = pics.filter { colorsMap[$0.id] == nil && $0.thumbnailData != nil }
 
         if !uncachedPics.isEmpty {
             let maxConcurrent = 8
-            let newColors: [(picID: String, color: RGBColor)] = await withTaskGroup(
-                of: (String, RGBColor?).self,
-                returning: [(picID: String, color: RGBColor)].self
+            let newColors: [(picID: String, colors: PicColors)] = await withTaskGroup(
+                of: (String, PicColors?).self,
+                returning: [(picID: String, colors: PicColors)].self
             ) { group in
                 var iterator = uncachedPics.makeIterator()
 
@@ -130,39 +129,36 @@ extension AlbumView {
                     guard let pic = iterator.next() else { break }
                     group.addTask {
                         guard let thumbnailData = pic.thumbnailData else { return (pic.id, nil) }
-                        let color = ProminentColor.calculate(from: thumbnailData)
-                        return (pic.id, color)
+                        let colors = ProminentColor.calculate(from: thumbnailData)
+                        return (pic.id, colors)
                     }
                 }
 
-                var results: [(picID: String, color: RGBColor)] = []
-                for await (picID, color) in group {
-                    if let color {
-                        results.append((picID: picID, color: color))
+                var results: [(picID: String, colors: PicColors)] = []
+                for await (picID, colors) in group {
+                    if let colors {
+                        results.append((picID: picID, colors: colors))
                     }
                     if let pic = iterator.next() {
                         group.addTask {
                             guard let thumbnailData = pic.thumbnailData else { return (pic.id, nil) }
-                            let color = ProminentColor.calculate(from: thumbnailData)
-                            return (pic.id, color)
+                            let colors = ProminentColor.calculate(from: thumbnailData)
+                            return (pic.id, colors)
                         }
                     }
                 }
                 return results
             }
             for entry in newColors {
-                colorsMap[entry.picID] = entry.color
+                colorsMap[entry.picID] = entry.colors
             }
             await PColorActor.shared.storeColors(newColors)
         }
 
-        let defaultColor = RGBColor(red: 128, green: 128, blue: 128)
+        let gray = RGBColor(red: 128, green: 128, blue: 128)
+        let defaultColors = PicColors(primary: gray, accent: gray, contrasting: gray)
         return pics.sorted { lhs, rhs in
-            let colorA = colorsMap[lhs.id] ?? defaultColor
-            let colorB = colorsMap[rhs.id] ?? defaultColor
-            if colorA.red != colorB.red { return colorA.red < colorB.red }
-            if colorA.green != colorB.green { return colorA.green < colorB.green }
-            return colorA.blue < colorB.blue
+            (colorsMap[lhs.id] ?? defaultColors) < (colorsMap[rhs.id] ?? defaultColors)
         }
     }
 
