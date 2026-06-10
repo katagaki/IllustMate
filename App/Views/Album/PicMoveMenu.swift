@@ -11,6 +11,7 @@ struct PicMoveMenu: View {
     var onOtherLibraries: () -> Void
 
     @State var rootAlbums: [Album] = []
+    @State var lastUsedAlbum: Album?
 
     var body: some View {
         Menu(title, systemImage: systemImage) {
@@ -27,6 +28,13 @@ struct PicMoveMenu: View {
                     }
                 }
             }
+            if let lastUsedAlbum, lastUsedAlbum.id != containingAlbum?.id {
+                Section {
+                    Button(lastUsedAlbum.name, systemImage: "clock.arrow.circlepath") {
+                        move(to: lastUsedAlbum)
+                    }
+                }
+            }
             if !rootAlbums.isEmpty {
                 Section {
                     ForEach(rootAlbums) { album in
@@ -34,15 +42,7 @@ struct PicMoveMenu: View {
                             targetAlbum: album,
                             excludingAlbumID: containingAlbum?.id ?? ""
                         ) { destinationAlbum in
-                            Task {
-                                await DataActor.shared.addPics(withIDs: pics.map { $0.id },
-                                                               toAlbumWithID: destinationAlbum.id)
-                                if let containingAlbum {
-                                    AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
-                                }
-                                AlbumCoverCache.shared.removeImages(forAlbumID: destinationAlbum.id)
-                                onMoved()
-                            }
+                            move(to: destinationAlbum)
                         }
                     }
                 }
@@ -58,7 +58,25 @@ struct PicMoveMenu: View {
         }
     }
 
+    func move(to destinationAlbum: Album) {
+        Task {
+            await DataActor.shared.addPics(withIDs: pics.map { $0.id },
+                                           toAlbumWithID: destinationAlbum.id)
+            if let containingAlbum {
+                AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
+            }
+            AlbumCoverCache.shared.removeImages(forAlbumID: destinationAlbum.id)
+            LastUsedAlbum.set(destinationAlbum.id)
+            onMoved()
+        }
+    }
+
     func loadAlbums() async {
         rootAlbums = (try? await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+        if let id = LastUsedAlbum.id {
+            lastUsedAlbum = await DataActor.shared.album(for: id)
+        } else {
+            lastUsedAlbum = nil
+        }
     }
 }

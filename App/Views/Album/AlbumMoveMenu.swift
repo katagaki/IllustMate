@@ -8,6 +8,7 @@ struct AlbumMoveMenu: View {
     var onOtherLibraries: () -> Void
 
     @State var rootAlbums: [Album] = []
+    @State var lastUsedAlbum: Album?
 
     var body: some View {
         if album.parentAlbumID != nil {
@@ -19,21 +20,27 @@ struct AlbumMoveMenu: View {
             }
         }
         Menu("Shared.MoveTo", systemImage: "tray.and.arrow.down") {
-            ForEach(rootAlbums) { rootAlbum in
-                AlbumHierarchyMenuItem(
-                    targetAlbum: rootAlbum,
-                    excludingAlbumID: album.id
-                ) { destinationAlbum in
-                    Task {
-                        await DataActor.shared.addAlbum(withID: album.id,
-                                             toAlbumWithID: destinationAlbum.id)
-                        onMoved()
+            if let lastUsedAlbum, lastUsedAlbum.id != album.id {
+                Section {
+                    Button(lastUsedAlbum.name, systemImage: "clock.arrow.circlepath") {
+                        move(to: lastUsedAlbum)
                     }
                 }
             }
-            Divider()
-            Button("Shared.MoveToOtherLibrary", systemImage: "square.stack.3d.up") {
-                onOtherLibraries()
+            Section {
+                ForEach(rootAlbums) { rootAlbum in
+                    AlbumHierarchyMenuItem(
+                        targetAlbum: rootAlbum,
+                        excludingAlbumID: album.id
+                    ) { destinationAlbum in
+                        move(to: destinationAlbum)
+                    }
+                }
+            }
+            Section {
+                Button("Shared.MoveToOtherLibrary", systemImage: "square.stack.3d.up") {
+                    onOtherLibraries()
+                }
             }
         }
         .task {
@@ -41,8 +48,22 @@ struct AlbumMoveMenu: View {
         }
     }
 
+    func move(to destinationAlbum: Album) {
+        Task {
+            await DataActor.shared.addAlbum(withID: album.id,
+                                            toAlbumWithID: destinationAlbum.id)
+            LastUsedAlbum.set(destinationAlbum.id)
+            onMoved()
+        }
+    }
+
     func loadAlbums() async {
         rootAlbums = (try? await DataActor.shared.albumsWithCounts(in: nil, sortedBy: .nameAscending)) ?? []
+        if let id = LastUsedAlbum.id {
+            lastUsedAlbum = await DataActor.shared.album(for: id)
+        } else {
+            lastUsedAlbum = nil
+        }
     }
 }
 
