@@ -17,20 +17,20 @@ extension RGBColor {
     }
 
     var hue: Double {
-        let r = Double(red) / 255.0
-        let g = Double(green) / 255.0
-        let b = Double(blue) / 255.0
-        let maxC = max(r, g, b)
-        let minC = min(r, g, b)
+        let red = Double(red) / 255.0
+        let green = Double(green) / 255.0
+        let blue = Double(blue) / 255.0
+        let maxC = max(red, green, blue)
+        let minC = min(red, green, blue)
         let delta = maxC - minC
         guard delta > 0 else { return 0 }
         var hue: Double
-        if maxC == r {
-            hue = (g - b) / delta
-        } else if maxC == g {
-            hue = 2 + (b - r) / delta
+        if maxC == red {
+            hue = (green - blue) / delta
+        } else if maxC == green {
+            hue = 2 + (blue - red) / delta
         } else {
-            hue = 4 + (r - g) / delta
+            hue = 4 + (red - green) / delta
         }
         hue *= 60
         if hue < 0 { hue += 360 }
