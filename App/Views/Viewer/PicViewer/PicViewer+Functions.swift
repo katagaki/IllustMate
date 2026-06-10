@@ -110,30 +110,40 @@ extension PicViewer {
     func endSwipe(predictedTranslation: CGFloat, velocity: CGFloat) {
         let threshold = swipeSlideDistance / 3.0
         if predictedTranslation < -threshold, viewer.hasNext {
-            animateSwipe(to: -swipeSlideDistance, velocity: velocity) {
-                viewer.navigateToNext()
-                swipeOffset = 0.0
-            }
+            commitSwipe(advancing: true, velocity: velocity)
         } else if predictedTranslation > threshold, viewer.hasPrevious {
-            animateSwipe(to: swipeSlideDistance, velocity: velocity) {
-                viewer.navigateToPrevious()
-                swipeOffset = 0.0
-            }
+            commitSwipe(advancing: false, velocity: velocity)
         } else {
-            animateSwipe(to: 0.0, velocity: velocity, completion: nil)
+            animateSwipe(velocity: velocity)
         }
     }
 
-    func animateSwipe(to target: CGFloat, velocity: CGFloat, completion: (() -> Void)?) {
-        let distance = target - swipeOffset
+    func commitSwipe(advancing: Bool, velocity: CGFloat) {
+        // Advance the index immediately so a follow-up swipe targets the new pic, then keep the
+        // just-revealed neighbor exactly where it was on screen and settle it to center. The zero
+        // duration animation commits the reposition for one frame before the spring runs, so the
+        // swapped pic doesn't jump.
+        withAnimation(.linear(duration: 0.0)) {
+            if advancing {
+                viewer.navigateToNext()
+                swipeOffset += swipeSlideDistance
+            } else {
+                viewer.navigateToPrevious()
+                swipeOffset -= swipeSlideDistance
+            }
+        } completion: {
+            animateSwipe(velocity: velocity)
+        }
+    }
+
+    func animateSwipe(velocity: CGFloat) {
+        let distance = -swipeOffset
         // interpolatingSpring expects initialVelocity normalized as a fraction of the
         // remaining distance per second, so the gesture velocity carries into the animation
         let initialVelocity = abs(distance) > 0.1 ? velocity / distance : 0.0
         withAnimation(.interpolatingSpring(stiffness: 280.0, damping: 30.0,
                                            initialVelocity: initialVelocity)) {
-            swipeOffset = target
-        } completion: {
-            completion?()
+            swipeOffset = 0.0
         }
     }
 
