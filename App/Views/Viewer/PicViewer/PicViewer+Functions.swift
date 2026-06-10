@@ -21,6 +21,7 @@ extension PicViewer {
 
                 if viewer.allPics.count > 1 {
                     PicCarouselStrip()
+                        .padding(.top, fitToScreen ? 12.0 : 0.0)
                         .padding(.horizontal, fitToScreen ? 0.0 : -20.0)
                 }
             }
