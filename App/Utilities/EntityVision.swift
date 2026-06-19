@@ -14,8 +14,6 @@ enum EntityVision {
     static let saliencyAreaCropThreshold: CGFloat = 0.6
     static let saliencyMinimumConfidence: Float = 0.5
     static let minimumCropFloor: CGFloat = 64.0
-    static let maximumLabelCount = 3
-    static let minimumLabelConfidence: Float = 0.1
 
     static func featurePrint(fromThumbnailData data: Data) -> Result? {
         guard let image = UIImage(data: data), let cgImage = image.cgImage else { return nil }
@@ -25,38 +23,46 @@ enum EntityVision {
     static func featurePrint(from cgImage: CGImage) -> Result? {
         let saliencyRequest = VNGenerateAttentionBasedSaliencyImageRequest()
         let printRequest = VNGenerateImageFeaturePrintRequest()
-        let classifyRequest = VNClassifyImageRequest()
 
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-        try? handler.perform([saliencyRequest, classifyRequest])
+        try? handler.perform([saliencyRequest, printRequest])
 
-        let inputImage = croppedForSalientSubject(cgImage, using: saliencyRequest.results?.first)
+        // The common case (full-bleed art) needs no crop, so the print computed
+        // alongside saliency above is reused; only crop-worthy subjects pay for a
+        // second feature-print pass.
+        if let cropped = cropForSalientSubject(cgImage, using: saliencyRequest.results?.first) {
+            let cropHandler = VNImageRequestHandler(cgImage: cropped, options: [:])
+            let cropPrintRequest = VNGenerateImageFeaturePrintRequest()
+            if (try? cropHandler.perform([cropPrintRequest])) != nil,
+               let cropObservation = cropPrintRequest.results?.first {
+                let cropVector = floats(from: cropObservation)
+                if !cropVector.isEmpty {
+                    return Result(vector: cropVector, labels: [],
+                                  visionRevision: cropPrintRequest.revision)
+                }
+            }
+        }
 
-        let printHandler = VNImageRequestHandler(cgImage: inputImage, options: [:])
-        guard (try? printHandler.perform([printRequest])) != nil,
-              let observation = printRequest.results?.first else { return nil }
-
+        guard let observation = printRequest.results?.first else { return nil }
         let vector = floats(from: observation)
         guard !vector.isEmpty else { return nil }
-
-        let labels = dominantLabels(from: classifyRequest.results)
-        return Result(vector: vector, labels: labels, visionRevision: printRequest.revision)
+        return Result(vector: vector, labels: [], visionRevision: printRequest.revision)
     }
 
     // MARK: - Saliency crop
 
-    private static func croppedForSalientSubject(
+    private static func cropForSalientSubject(
         _ cgImage: CGImage, using observation: VNSaliencyImageObservation?
-    ) -> CGImage {
+    ) -> CGImage? {
         guard let salientObject = observation?.salientObjects?.max(by: { $0.confidence < $1.confidence }),
               salientObject.confidence >= saliencyMinimumConfidence else {
-            return cgImage
+            return nil
         }
 
         let box = salientObject.boundingBox
         guard box.width > 0, box.height > 0,
               box.width * box.height < saliencyAreaCropThreshold else {
-            return cgImage
+            return nil
         }
 
         let width = CGFloat(cgImage.width)
@@ -70,20 +76,9 @@ enum EntityVision {
 
         guard min(cropRect.width, cropRect.height) >= minimumCropFloor,
               let cropped = cgImage.cropping(to: cropRect) else {
-            return cgImage
+            return nil
         }
         return cropped
-    }
-
-    // MARK: - Labels
-
-    private static func dominantLabels(from observations: [VNClassificationObservation]?) -> [String] {
-        guard let observations else { return [] }
-        return observations
-            .filter { $0.confidence >= minimumLabelConfidence }
-            .sorted { $0.confidence > $1.confidence }
-            .prefix(maximumLabelCount)
-            .map { $0.identifier }
     }
 
     // MARK: - Vector extraction

@@ -102,8 +102,15 @@ struct IntelligentSortView: View {
                            currentCount: sortManager.progress,
                            totalCount: sortManager.total)
             default:
-                StatusView(type: .inProgress,
-                           title: .intelligentSortBuildingModels)
+                if sortManager.total > 0 {
+                    StatusView(type: .inProgress,
+                               title: .intelligentSortBuildingModels,
+                               currentCount: sortManager.progress,
+                               totalCount: sortManager.total)
+                } else {
+                    StatusView(type: .inProgress,
+                               title: .intelligentSortBuildingModels)
+                }
             }
         }
     }

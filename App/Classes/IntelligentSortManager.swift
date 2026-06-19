@@ -125,12 +125,21 @@ class IntelligentSortManager {
         var idsNeedingPrints = Set(sourceIDs)
         for album in stale { idsNeedingPrints.formUnion(album.memberIDs) }
 
-        withAnimation(.smooth.speed(2.0)) { phase = .analyzingPics }
-        await computeMissingPrints(forPicIDs: Array(idsNeedingPrints),
-                                   using: dataActor, featureActor: featureActor)
+        let alreadyCached = await featureActor.picIDsWithCachedPrint()
+        let missing = Array(idsNeedingPrints.subtracting(alreadyCached))
+        withAnimation(.smooth.speed(2.0)) {
+            phase = .analyzingPics
+            progress = 0
+            total = missing.count
+        }
+        await analyzePrints(missing, using: dataActor, featureActor: featureActor)
         if Task.isCancelled { return finish(cancelled: true) }
 
-        withAnimation(.smooth.speed(2.0)) { phase = .buildingAlbumModels }
+        withAnimation(.smooth.speed(2.0)) {
+            phase = .buildingAlbumModels
+            progress = 0
+            total = stale.count
+        }
         await buildStaleModels(stale, into: &models, featureActor: featureActor, modelActor: modelActor)
         if Task.isCancelled { return finish(cancelled: true) }
 
@@ -190,10 +199,12 @@ class IntelligentSortManager {
                 guard let print = stored[id] else { return nil }
                 return PrintMember(picID: id, vector: print.vector, labels: print.labels)
             }
-            guard !members.isEmpty else { continue }
-            let model = Self.buildAlbumModel(members: members, totalMemberCount: album.memberIDs.count)
-            models[album.album.id] = model
-            await modelActor.storeModel(model, signature: album.signature, forAlbumWithID: album.album.id)
+            if !members.isEmpty {
+                let model = Self.buildAlbumModel(members: members, totalMemberCount: album.memberIDs.count)
+                models[album.album.id] = model
+                await modelActor.storeModel(model, signature: album.signature, forAlbumWithID: album.album.id)
+            }
+            progress += 1
         }
     }
 
@@ -256,23 +267,24 @@ class IntelligentSortManager {
 
     // MARK: - Print computation (bounded parallelism, off-main Vision)
 
-    private func computeMissingPrints(
-        forPicIDs picIDs: [String], using dataActor: DataActor, featureActor: FeaturePrintActor
+    /// `missing` is the already-filtered set of pics without a cached print, and
+    /// `total` is set by the caller so the progress bar shows the right
+    /// denominator from the first frame. Concurrency is capped one below the
+    /// core count so the synchronous Vision work can't starve the executor
+    /// servicing actor hops and progress updates.
+    private func analyzePrints(
+        _ missing: [String], using dataActor: DataActor, featureActor: FeaturePrintActor
     ) async {
-        let cached = await featureActor.picIDsWithCachedPrint()
-        let missing = picIDs.filter { !cached.contains($0) }
-        total = missing.count
-        progress = 0
         guard !missing.isEmpty else { return }
 
-        let limit = max(2, ProcessInfo.processInfo.activeProcessorCount)
+        let limit = max(2, ProcessInfo.processInfo.activeProcessorCount - 1)
         await withTaskGroup(of: (String, StoredFeaturePrint?).self) { group in
             var index = 0
             func addNext() {
                 guard index < missing.count else { return }
                 let picID = missing[index]
                 index += 1
-                group.addTask {
+                group.addTask(priority: .userInitiated) {
                     let data = await dataActor.thumbnailData(forPicWithID: picID)
                     let result: EntityVision.Result? = data.flatMap { bytes in
                         autoreleasepool { EntityVision.featurePrint(fromThumbnailData: bytes) }
