@@ -37,6 +37,12 @@ extension IntelligentSortManager {
         }
     }
 
+    func deselectAll() {
+        for suggestion in suggestions {
+            suggestion.selectedAlbumID = nil
+        }
+    }
+
     func commit() async {
         let dataActor = self.dataActor
         var moves: [CommittedMove] = []

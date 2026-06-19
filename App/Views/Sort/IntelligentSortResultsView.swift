@@ -51,6 +51,10 @@ struct IntelligentSortResultsView: View {
         sortManager.suggestions.contains { $0.topMatch?.confidence == .strong }
     }
 
+    private var hasSelections: Bool {
+        sortManager.suggestions.contains { $0.selectedAlbumID != nil }
+    }
+
     var body: some View {
         Group {
             if sortManager.targetAlbumCount == 0 {
@@ -86,6 +90,14 @@ struct IntelligentSortResultsView: View {
                         }
                     }
                     .tint(.accent)
+                    Button(String(localized: "Sort.DeselectAllInGroup", table: "Photos")) {
+                        withAnimation(.smooth.speed(2.0)) {
+                            for item in group.items {
+                                item.selectedAlbumID = nil
+                            }
+                        }
+                    }
+                    .tint(.secondary)
                 } header: {
                     HStack {
                         Text(verbatim: group.albumName)
@@ -123,6 +135,14 @@ struct IntelligentSortResultsView: View {
                         }
                     }
                 }
+            }
+            ToolbarItem(placement: .bottomBar) {
+                Button(String(localized: "Sort.DeselectAll", table: "Photos"), role: .destructive) {
+                    withAnimation(.smooth.speed(2.0)) {
+                        sortManager.deselectAll()
+                    }
+                }
+                .disabled(!hasSelections)
             }
         }
         .alert(
@@ -204,12 +224,6 @@ struct SuggestionCard: View {
                         .font(.caption)
                         .lineLimit(1)
                     confidenceLabel
-                    if let chosen = chosenMatch {
-                        Text("Sort.MovesTo.\(chosen.albumName)", tableName: "Photos")
-                            .font(.caption2)
-                            .foregroundStyle(.accent)
-                            .lineLimit(1)
-                    }
                 }
             }
             .frame(width: 120.0)
