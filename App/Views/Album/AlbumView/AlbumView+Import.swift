@@ -3,6 +3,7 @@ import Photos
 import PhotosUI
 import SwiftUI
 import UniformTypeIdentifiers
+import UserNotifications
 
 extension AlbumView {
 
@@ -24,17 +25,16 @@ extension AlbumView {
                     importCurrentCount += 1
                 }
             }
+            let count = items.count
+            await sendImportNotification(count: count, albumName: currentAlbum?.name)
             await MainActor.run {
                 if let currentAlbum {
                     AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
                 }
                 UIApplication.shared.isIdleTimerDisabled = false
-                importCompletedCount = items.count
                 selectedPhotoItems = []
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                doWithAnimation {
-                    isImportCompleted = true
-                }
+                isImportingPhotos = false
             }
         }
     }
@@ -57,17 +57,16 @@ extension AlbumView {
                     importCurrentCount += 1
                 }
             }
+            let count = items.count
+            await sendImportNotification(count: count, albumName: currentAlbum?.name)
             await MainActor.run {
                 if let currentAlbum {
                     AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
                 }
                 UIApplication.shared.isIdleTimerDisabled = false
-                importCompletedCount = items.count
                 selectedVideoItems = []
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                doWithAnimation {
-                    isImportCompleted = true
-                }
+                isImportingPhotos = false
             }
         }
     }
@@ -144,22 +143,23 @@ extension AlbumView {
                     importCurrentCount += 1
                 }
             }
+            let count = files.count
+            await sendImportNotification(count: count, albumName: currentAlbum?.name)
             await MainActor.run {
                 if let currentAlbum {
                     AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
                 }
                 UIApplication.shared.isIdleTimerDisabled = false
-                importCompletedCount = files.count
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                doWithAnimation {
-                    isImportCompleted = true
-                }
+                isImportingPhotos = false
             }
         }
     }
 
     func importDroppedImages(_ images: [Image], into album: Album? = nil) {
-        let targetAlbumID = (album ?? currentAlbum)?.id
+        let targetAlbum = album ?? currentAlbum
+        let targetAlbumID = targetAlbum?.id
+        let targetAlbumName = targetAlbum?.name
         isImportingPhotos = true
         importTotalCount = images.count
         importCurrentCount = 0
@@ -177,23 +177,23 @@ extension AlbumView {
                     importCurrentCount += 1
                 }
             }
+            await sendImportNotification(count: importedCount, albumName: targetAlbumName)
             await MainActor.run {
                 if let targetAlbumID {
                     AlbumCoverCache.shared.removeImages(forAlbumID: targetAlbumID)
                 }
                 UIApplication.shared.isIdleTimerDisabled = false
-                importCompletedCount = importedCount
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                doWithAnimation {
-                    isImportCompleted = true
-                }
+                isImportingPhotos = false
             }
         }
     }
 
     // swiftlint:disable:next function_body_length
     func importFiles(_ urls: [URL], into album: Album? = nil) {
-        let targetAlbumID = (album ?? currentAlbum)?.id
+        let targetAlbum = album ?? currentAlbum
+        let targetAlbumID = targetAlbum?.id
+        let targetAlbumName = targetAlbum?.name
         isImportingPhotos = true
         importTotalCount = urls.count
         importCurrentCount = 0
@@ -217,6 +217,7 @@ extension AlbumView {
                     loadedImageFiles.append((filename: fileURL.lastPathComponent, data: data))
                 }
             }
+            cleanUpTempDropFiles(urls)
             for file in loadedImageFiles {
                 await DataActor.shared.createPic(file.filename, data: file.data,
                                                  inAlbumWithID: targetAlbumID)
@@ -235,18 +236,55 @@ extension AlbumView {
                     importCurrentCount += 1
                 }
             }
+            let count = loadedImageFiles.count + loadedVideoFiles.count
+            await sendImportNotification(count: count, albumName: targetAlbumName)
             await MainActor.run {
                 if let targetAlbumID {
                     AlbumCoverCache.shared.removeImages(forAlbumID: targetAlbumID)
                 }
                 UIApplication.shared.isIdleTimerDisabled = false
-                importCompletedCount = loadedImageFiles.count + loadedVideoFiles.count
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                doWithAnimation {
-                    isImportCompleted = true
-                }
+                isImportingPhotos = false
             }
         }
+    }
+
+    private nonisolated func cleanUpTempDropFiles(_ urls: [URL]) {
+        let tempBase = FileManager.default.temporaryDirectory.standardized
+        for fileURL in urls {
+            let parent = fileURL.deletingLastPathComponent().standardized
+            if parent.path.hasPrefix(tempBase.path), parent.path != tempBase.path {
+                try? FileManager.default.removeItem(at: parent)
+            }
+        }
+    }
+
+    private func sendImportNotification(count: Int, albumName: String?) async {
+        guard showImportNotification else { return }
+        let center = UNUserNotificationCenter.current()
+        let status = await center.notificationSettings().authorizationStatus
+        if status == .notDetermined {
+            _ = try? await center.requestAuthorization(options: [.alert])
+        }
+        let freshStatus = await center.notificationSettings().authorizationStatus
+        guard freshStatus == .authorized || freshStatus == .provisional else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "ViewTitle.Import")
+        if count == 0 {
+            content.body = String(localized: "Import.Notification.Empty", table: "Import")
+        } else if let albumName {
+            content.body = String(localized: "Import.Notification.Body.\(count).\(albumName)", table: "Import")
+        } else {
+            content.body = String(localized: "Import.Completed.Text.\(count)", table: "Import")
+        }
+
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: nil
+        )
+        try? await center.add(request)
     }
 }
 

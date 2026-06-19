@@ -28,6 +28,9 @@ struct MoreView: View {
     @AppStorage(viewerShowResolutionKey,
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var showResolutionByDefault: Bool = true
+    @AppStorage(importShowNotificationKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var showImportNotification: Bool = true
 
     @State var allAlbums: [Album] = []
 
@@ -93,6 +96,14 @@ struct MoreView: View {
                 } else {
                     Text("ShareSheet.QuickImport.Description", tableName: "More")
                 }
+            }
+            Section {
+                Toggle(String(localized: "Import.ShowNotification", table: "More"),
+                       isOn: $showImportNotification)
+            } header: {
+                Text("Import", tableName: "More")
+            } footer: {
+                Text("Import.ShowNotification.Description", tableName: "More")
             }
             WebServerView()
             #if DEBUG

@@ -1,6 +1,7 @@
 import CoreTransferable
 import Foundation
 import SwiftUI
+import UniformTypeIdentifiers
 
 enum Drop: Transferable {
     case album(AlbumTransferable)
@@ -12,6 +13,12 @@ enum Drop: Transferable {
         ProxyRepresentation { Drop.album($0) }
         ProxyRepresentation { Drop.pic($0) }
         ProxyRepresentation { Drop.file($0) }
+        FileRepresentation(importedContentType: .image) { received in
+            Drop.file(try tempCopy(of: received.file))
+        }
+        FileRepresentation(importedContentType: .movie) { received in
+            Drop.file(try tempCopy(of: received.file))
+        }
         ProxyRepresentation { Drop.importedPhoto($0) }
     }
 
@@ -33,5 +40,14 @@ enum Drop: Transferable {
     var importedPhoto: Image? {
         if case .importedPhoto(let importedPhoto) = self { return importedPhoto }
         return nil
+    }
+
+    private static func tempCopy(of source: URL) throws -> URL {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let dest = dir.appendingPathComponent(source.lastPathComponent)
+        try FileManager.default.copyItem(at: source, to: dest)
+        return dest
     }
 }

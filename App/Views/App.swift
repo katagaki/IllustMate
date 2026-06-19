@@ -3,6 +3,7 @@ import Combine
 import StoreKit
 import SwiftUI
 import TipKit
+import UserNotifications
 import WidgetKit
 
 @main
@@ -84,6 +85,7 @@ struct IllustMateApp: App {
             pipManager.setup()
         }
         .task {
+            UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
             await libraryManager.loadLibraries()
             await imageMigration.runPendingMigrations()
             presentWelcomeIfNeeded()
