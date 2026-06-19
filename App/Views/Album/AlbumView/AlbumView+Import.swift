@@ -271,7 +271,9 @@ extension AlbumView {
 
         let content = UNMutableNotificationContent()
         content.title = String(localized: "ViewTitle.Import")
-        if let albumName {
+        if count == 0 {
+            content.body = String(localized: "Import.Notification.Empty", table: "Import")
+        } else if let albumName {
             content.body = String(localized: "Import.Notification.Body.\(count).\(albumName)", table: "Import")
         } else {
             content.body = String(localized: "Import.Completed.Text.\(count)", table: "Import")
