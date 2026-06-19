@@ -259,7 +259,7 @@ extension AlbumView {
         let center = UNUserNotificationCenter.current()
         let status = await center.notificationSettings().authorizationStatus
         if status == .notDetermined {
-            _ = try? await center.requestAuthorization(options: [.alert, .sound])
+            _ = try? await center.requestAuthorization(options: [.alert])
         }
         let freshStatus = await center.notificationSettings().authorizationStatus
         guard freshStatus == .authorized || freshStatus == .provisional else { return }
@@ -267,7 +267,6 @@ extension AlbumView {
         let content = UNMutableNotificationContent()
         content.title = String(localized: "ViewTitle.Import")
         content.body = String(localized: "Import.Completed.Text.\(count)", table: "Import")
-        content.sound = .default
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,

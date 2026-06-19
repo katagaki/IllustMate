@@ -8,6 +8,6 @@ final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate, Se
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        completionHandler([.banner, .sound])
+        completionHandler([.banner])
     }
 }
