@@ -205,3 +205,10 @@ actor `init`s, assign stored properties via locals only (per CLAUDE.md).
   models are cached, pin a single suggested album to the top of *Move To* (which
   already shows last-used album, per #120). Reuses cached models with no new
   modal flow; the highest day-to-day value, deferred to a later PR.
+- **Larger cached analysis thumbnail (opportunistic).** The ~120px thumbnail is
+  the guaranteed baseline (always available, always comparable). If real-world
+  testing shows 120px is marginal for distinguishing similar entities, generate
+  a slightly larger analysis thumbnail (e.g. ~256px) once and cache it in
+  `FeaturePrints.db`. This is only derivable when an original happens to be
+  on-device, so it can never be the universal path — it stays an opportunistic
+  enhancement layered on top of the 120px baseline, not a replacement for it.
