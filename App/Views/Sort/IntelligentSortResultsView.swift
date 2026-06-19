@@ -136,6 +136,7 @@ struct IntelligentSortResultsView: View {
                     }
                 }
             }
+            ToolbarSpacer(.fixed, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button(String(localized: "Sort.DeselectAll", table: "Photos"), role: .destructive) {
                     withAnimation(.smooth.speed(2.0)) {
