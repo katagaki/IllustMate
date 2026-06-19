@@ -77,30 +77,27 @@ struct IntelligentSortResultsView: View {
         List {
             ForEach(suggestionGroups) { group in
                 Section {
-                    ForEach(group.items) { suggestion in
-                        SuggestionRow(suggestion: suggestion, dataActor: sortManager.dataActor)
+                    carousel(for: group.items)
+                    Button(String(localized: "Sort.AcceptAllInGroup", table: "Photos")) {
+                        withAnimation(.smooth.speed(2.0)) {
+                            for item in group.items {
+                                item.selectedAlbumID = item.topMatch?.albumID
+                            }
+                        }
                     }
+                    .tint(.accent)
                 } header: {
                     HStack {
                         Text(verbatim: group.albumName)
                         Spacer()
-                        Button(String(localized: "Sort.AcceptAllInGroup", table: "Photos")) {
-                            withAnimation(.smooth.speed(2.0)) {
-                                for item in group.items {
-                                    item.selectedAlbumID = item.topMatch?.albumID
-                                }
-                            }
-                        }
-                        .font(.caption)
-                        .textCase(nil)
+                        Text("Duplicates.GroupCount.\(group.items.count)", tableName: "Photos")
                     }
+                    .textCase(nil)
                 }
             }
             if !needsReview.isEmpty {
                 Section {
-                    ForEach(needsReview) { suggestion in
-                        SuggestionRow(suggestion: suggestion, dataActor: sortManager.dataActor)
-                    }
+                    carousel(for: needsReview)
                 } header: {
                     Text("Sort.NeedsReview", tableName: "Photos")
                 }
@@ -110,17 +107,16 @@ struct IntelligentSortResultsView: View {
         .listSectionSpacing(.compact)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(
-                    String(localized: "Sort.MovePics.\(sortManager.pendingMoveCount)", table: "Photos"),
-                    systemImage: "tray.full"
-                ) {
+                Button(role: .confirm) {
                     isConfirmingMove = true
                 }
-                .tint(.accent)
+                .accessibilityLabel(
+                    Text("Sort.MovePics.\(sortManager.pendingMoveCount)", tableName: "Photos")
+                )
                 .disabled(sortManager.pendingMoveCount == 0)
             }
             if hasStrongMatches {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .bottomBar) {
                     Button(String(localized: "Sort.AcceptAllStrong", table: "Photos")) {
                         withAnimation(.smooth.speed(2.0)) {
                             sortManager.acceptAllStrongMatches()
@@ -159,11 +155,24 @@ struct IntelligentSortResultsView: View {
             Button("Shared.No", role: .cancel) {}
         }
     }
+
+    private func carousel(for items: [EntitySuggestion]) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(alignment: .top, spacing: 12.0) {
+                ForEach(items) { suggestion in
+                    SuggestionCard(suggestion: suggestion, dataActor: sortManager.dataActor)
+                }
+            }
+            .padding(.vertical, 4.0)
+            .padding(.horizontal, 18.0)
+        }
+        .listRowInsets(EdgeInsets(top: 14.0, leading: 0, bottom: 14.0, trailing: 0))
+    }
 }
 
-// MARK: - Suggestion Row
+// MARK: - Suggestion Card
 
-struct SuggestionRow: View {
+struct SuggestionCard: View {
 
     @Bindable var suggestion: EntitySuggestion
     var dataActor: DataActor
@@ -176,34 +185,61 @@ struct SuggestionRow: View {
     private var isIncluded: Bool { suggestion.selectedAlbumID != nil }
 
     var body: some View {
-        HStack(spacing: 12.0) {
-            PicLabel(pic: suggestion.pic)
-                .frame(width: 52.0, height: 52.0)
-                .clipShape(.rect(cornerRadius: 8.0))
+        Button {
+            withAnimation(.smooth.speed(2.0)) { toggleInclusion() }
+        } label: {
+            VStack(spacing: 6.0) {
+                PicLabel(pic: suggestion.pic)
+                    .frame(width: 120.0, height: 120.0)
+                    .clipShape(.rect(cornerRadius: 10.0))
+                    .overlay {
+                        if !suggestion.matches.isEmpty {
+                            SelectionOverlay(isIncluded)
+                        }
+                    }
+                    .overlay(alignment: .topLeading) { medoidBadge }
 
-            VStack(alignment: .leading, spacing: 3.0) {
-                Text(suggestion.pic.name)
-                    .lineLimit(1)
-                confidenceLabel
-                if let chosen = chosenMatch {
-                    Text("Sort.MovesTo.\(chosen.albumName)", tableName: "Photos")
+                VStack(spacing: 2.0) {
+                    Text(suggestion.pic.name)
                         .font(.caption)
-                        .foregroundStyle(.accent)
                         .lineLimit(1)
+                    confidenceLabel
+                    if let chosen = chosenMatch {
+                        Text("Sort.MovesTo.\(chosen.albumName)", tableName: "Photos")
+                            .font(.caption2)
+                            .foregroundStyle(.accent)
+                            .lineLimit(1)
+                    }
                 }
             }
-
-            Spacer(minLength: 8.0)
-
-            if let medoidID = chosenMatch?.medoidPicID ?? suggestion.topMatch?.medoidPicID {
-                MedoidThumbnail(picID: medoidID, dataActor: dataActor)
-                    .frame(width: 40.0, height: 40.0)
-                    .clipShape(.rect(cornerRadius: 6.0))
-            }
-
-            destinationMenu
+            .frame(width: 120.0)
         }
-        .opacity(isIncluded || !suggestion.isUnanalyzable ? 1.0 : 0.6)
+        .buttonStyle(.plain)
+        .disabled(suggestion.matches.isEmpty)
+        .contextMenu { destinationMenuContent }
+    }
+
+    private func toggleInclusion() {
+        if isIncluded {
+            suggestion.selectedAlbumID = nil
+        } else {
+            suggestion.selectedAlbumID = suggestion.topMatch?.albumID
+        }
+    }
+
+    @ViewBuilder
+    private var medoidBadge: some View {
+        if let medoidID = chosenMatch?.medoidPicID ?? suggestion.topMatch?.medoidPicID {
+            MedoidThumbnail(picID: medoidID, dataActor: dataActor)
+                .frame(width: 30.0, height: 30.0)
+                .clipShape(.rect(cornerRadius: 6.0))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6.0)
+                        .strokeBorder(.white, lineWidth: 1.5)
+                )
+                .shadow(color: .black.opacity(0.3), radius: 2.0, x: 0, y: 1.0)
+                .padding(6.0)
+        }
     }
 
     @ViewBuilder
@@ -211,43 +247,39 @@ struct SuggestionRow: View {
         if suggestion.isUnanalyzable {
             Label(String(localized: "Sort.Unanalyzable", table: "Photos"),
                   systemImage: "questionmark.square.dashed")
-                .font(.caption)
+                .font(.caption2)
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
         } else {
             let confidence = suggestion.topMatch?.confidence ?? .none
             Label(confidenceText(confidence), systemImage: confidenceIcon(confidence))
-                .font(.caption)
+                .font(.caption2)
                 .foregroundStyle(confidenceColor(confidence))
+                .lineLimit(1)
         }
     }
 
-    private var destinationMenu: some View {
-        Menu {
-            ForEach(suggestion.matches) { match in
-                Button {
-                    suggestion.selectedAlbumID = match.albumID
-                } label: {
-                    if suggestion.selectedAlbumID == match.albumID {
-                        Label(match.albumName, systemImage: "checkmark")
-                    } else {
-                        Text(verbatim: match.albumName)
-                    }
+    @ViewBuilder
+    private var destinationMenuContent: some View {
+        ForEach(suggestion.matches) { match in
+            Button {
+                suggestion.selectedAlbumID = match.albumID
+            } label: {
+                if suggestion.selectedAlbumID == match.albumID {
+                    Label(match.albumName, systemImage: "checkmark")
+                } else {
+                    Text(verbatim: match.albumName)
                 }
             }
-            if !suggestion.matches.isEmpty {
-                Divider()
-            }
+        }
+        if !suggestion.matches.isEmpty {
+            Divider()
             Button(role: .destructive) {
                 suggestion.selectedAlbumID = nil
             } label: {
                 Label(String(localized: "Sort.Skip", table: "Photos"), systemImage: "xmark")
             }
-        } label: {
-            Image(systemName: isIncluded ? "checkmark.circle.fill" : "circle")
-                .font(.title2)
-                .foregroundStyle(isIncluded ? Color.accent : Color.secondary)
         }
-        .disabled(suggestion.matches.isEmpty)
     }
 
     private func confidenceText(_ confidence: SortConfidence) -> String {
