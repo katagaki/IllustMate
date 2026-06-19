@@ -52,8 +52,6 @@ struct AlbumView: View {
     @State var isImportingPhotos: Bool = false
     @State var importCurrentCount: Int = 0
     @State var importTotalCount: Int = 0
-    @State var importCompletedCount: Int = 0
-    @State var isImportCompleted: Bool = false
     @State var picSortType: PicSortType = .dateAddedDescending
     @State var columnCount: Int = 4
     @State var albumColumnCount: Int = 4
@@ -97,10 +95,8 @@ struct AlbumView: View {
                 isBrowsingAlbums: $isBrowsingAlbums,
                 isBrowsingFolders: $isBrowsingFolders,
                 isImportingPhotos: $isImportingPhotos,
-                isImportCompleted: $isImportCompleted,
                 importCurrentCount: importCurrentCount,
                 importTotalCount: importTotalCount,
-                importCompletedCount: importCompletedCount,
                 currentAlbum: currentAlbum,
                 onAlbumDismiss: { refreshAlbumsAndSet() },
                 onBrowseAlbumsDismiss: {
@@ -109,10 +105,8 @@ struct AlbumView: View {
                     }
                 },
                 onImportDismiss: {
-                    isImportCompleted = false
                     importCurrentCount = 0
                     importTotalCount = 0
-                    importCompletedCount = 0
                     Task.detached(priority: .userInitiated) {
                         await refreshData()
                     }

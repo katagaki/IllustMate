@@ -8,10 +8,8 @@ struct AlbumViewSheets: ViewModifier {
     @Binding var isBrowsingAlbums: Bool
     @Binding var isBrowsingFolders: Bool
     @Binding var isImportingPhotos: Bool
-    @Binding var isImportCompleted: Bool
     let importCurrentCount: Int
     let importTotalCount: Int
-    let importCompletedCount: Int
     let currentAlbum: Album?
     let onAlbumDismiss: () -> Void
     let onBrowseAlbumsDismiss: () -> Void
@@ -108,10 +106,8 @@ struct AlbumViewSheets: ViewModifier {
                 onImportDismiss()
             } content: {
                 ImportProgressView(
-                    isImportCompleted: $isImportCompleted,
                     importCurrentCount: importCurrentCount,
-                    importTotalCount: importTotalCount,
-                    importCompletedCount: importCompletedCount
+                    importTotalCount: importTotalCount
                 )
             }
     }
