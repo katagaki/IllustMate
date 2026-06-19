@@ -17,7 +17,7 @@ class DuplicateScanManager {
 
     var duplicateGroups: [DuplicateGroup] = []
 
-    var hammingThreshold: Int = 8
+    var hammingThreshold: Double = 8
 
     let collectionID: String?
 
@@ -86,7 +86,7 @@ class DuplicateScanManager {
         let scopedIDSet = Set(allScopedIDs)
         let scopedHashes = allHashes.filter { scopedIDSet.contains($0.0) }
 
-        let groups = findDuplicateGroups(hashes: scopedHashes, threshold: hammingThreshold)
+        let groups = findDuplicateGroups(hashes: scopedHashes, threshold: Int(hammingThreshold.rounded()))
 
         var resultGroups: [DuplicateGroup] = []
         for group in groups where group.count >= 2 {

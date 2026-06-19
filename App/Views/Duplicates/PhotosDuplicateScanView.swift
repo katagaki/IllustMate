@@ -61,11 +61,8 @@ struct PhotosDuplicateScanView: View {
             Section {
                 VStack(alignment: .leading, spacing: 8.0) {
                     Text("Duplicates.Sensitivity", tableName: "Photos")
-                    Slider(value: .init(
-                        get: { Double(scanManager.hammingThreshold) },
-                        set: { scanManager.hammingThreshold = Int($0) }
-                    ), in: 1...15, step: 1)
-                    .tint(.accent)
+                    Slider(value: $scanManager.hammingThreshold, in: 1...15)
+                        .tint(.accent)
                     HStack {
                         Text("Duplicates.Sensitivity.Strict", tableName: "Photos")
                             .font(.caption)
