@@ -26,7 +26,7 @@ extension AlbumView {
                 }
             }
             let count = items.count
-            await sendImportNotification(count: count)
+            await sendImportNotification(count: count, albumName: currentAlbum?.name)
             await MainActor.run {
                 if let currentAlbum {
                     AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
@@ -58,7 +58,7 @@ extension AlbumView {
                 }
             }
             let count = items.count
-            await sendImportNotification(count: count)
+            await sendImportNotification(count: count, albumName: currentAlbum?.name)
             await MainActor.run {
                 if let currentAlbum {
                     AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
@@ -144,7 +144,7 @@ extension AlbumView {
                 }
             }
             let count = files.count
-            await sendImportNotification(count: count)
+            await sendImportNotification(count: count, albumName: currentAlbum?.name)
             await MainActor.run {
                 if let currentAlbum {
                     AlbumCoverCache.shared.removeImages(forAlbumID: currentAlbum.id)
@@ -157,7 +157,9 @@ extension AlbumView {
     }
 
     func importDroppedImages(_ images: [Image], into album: Album? = nil) {
-        let targetAlbumID = (album ?? currentAlbum)?.id
+        let targetAlbum = album ?? currentAlbum
+        let targetAlbumID = targetAlbum?.id
+        let targetAlbumName = targetAlbum?.name
         isImportingPhotos = true
         importTotalCount = images.count
         importCurrentCount = 0
@@ -175,7 +177,7 @@ extension AlbumView {
                     importCurrentCount += 1
                 }
             }
-            await sendImportNotification(count: importedCount)
+            await sendImportNotification(count: importedCount, albumName: targetAlbumName)
             await MainActor.run {
                 if let targetAlbumID {
                     AlbumCoverCache.shared.removeImages(forAlbumID: targetAlbumID)
@@ -189,7 +191,9 @@ extension AlbumView {
 
     // swiftlint:disable:next function_body_length
     func importFiles(_ urls: [URL], into album: Album? = nil) {
-        let targetAlbumID = (album ?? currentAlbum)?.id
+        let targetAlbum = album ?? currentAlbum
+        let targetAlbumID = targetAlbum?.id
+        let targetAlbumName = targetAlbum?.name
         isImportingPhotos = true
         importTotalCount = urls.count
         importCurrentCount = 0
@@ -233,7 +237,7 @@ extension AlbumView {
                 }
             }
             let count = loadedImageFiles.count + loadedVideoFiles.count
-            await sendImportNotification(count: count)
+            await sendImportNotification(count: count, albumName: targetAlbumName)
             await MainActor.run {
                 if let targetAlbumID {
                     AlbumCoverCache.shared.removeImages(forAlbumID: targetAlbumID)
@@ -255,7 +259,8 @@ extension AlbumView {
         }
     }
 
-    private func sendImportNotification(count: Int) async {
+    private func sendImportNotification(count: Int, albumName: String?) async {
+        guard showImportNotification else { return }
         let center = UNUserNotificationCenter.current()
         let status = await center.notificationSettings().authorizationStatus
         if status == .notDetermined {
@@ -266,7 +271,11 @@ extension AlbumView {
 
         let content = UNMutableNotificationContent()
         content.title = String(localized: "ViewTitle.Import")
-        content.body = String(localized: "Import.Completed.Text.\(count)", table: "Import")
+        if let albumName {
+            content.body = String(localized: "Import.Notification.Body.\(count).\(albumName)", table: "Import")
+        } else {
+            content.body = String(localized: "Import.Completed.Text.\(count)", table: "Import")
+        }
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,

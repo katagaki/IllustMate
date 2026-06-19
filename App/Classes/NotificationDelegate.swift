@@ -1,5 +1,7 @@
 import UserNotifications
 
+let importShowNotificationKey = "ImportShowNotificationWhenComplete"
+
 final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate, Sendable {
     static let shared = NotificationDelegate()
 

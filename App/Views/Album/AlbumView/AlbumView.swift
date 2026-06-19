@@ -15,6 +15,9 @@ struct AlbumView: View {
 
     @AppStorage(openPicsInNewWindowKey,
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
+    @AppStorage(importShowNotificationKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
+    var showImportNotification: Bool = true
 
     @Namespace var namespace
 
