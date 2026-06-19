@@ -226,7 +226,7 @@ class IntelligentSortManager {
                 continue
             }
             let matches = rankedMatches(for: stored.vector, albums: modeledAlbums, models: models)
-            let preselect = matches.first.map { $0.confidence == .strong || $0.confidence == .likely } ?? false
+            let preselect = matches.first?.confidence == .strong
             built.append(EntitySuggestion(pic: pic, originalAlbumID: pic.containingAlbumID,
                                           matches: matches, isUnanalyzable: false,
                                           selectedAlbumID: preselect ? matches.first?.albumID : nil))
