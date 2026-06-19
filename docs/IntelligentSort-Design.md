@@ -72,14 +72,22 @@ changes.
 
 ## Per-pic entity-print pipeline
 
-1. Load image, **downscaling at decode time** via
-   `CGImageSourceCreateThumbnailAtIndex` with `kCGImageSourceThumbnailMaxPixelSize`
-   (~299–512px). Prefer the cached 120px thumbnail (already in SQLite, zero disk
-   I/O) and escalate to the original only when the (cropped) input is too small
-   to be reliable. Videos use the existing video thumbnail frame.
+1. **Always analyze the cached thumbnail** (`Pic.thumbnailData`, ~120px JPEG in
+   SQLite), never the original. With iCloud library support the original is
+   often not on-device, and loading it would trigger an iCloud download (slow,
+   data/battery cost, fails offline). The thumbnail is always present and synced.
+   Using a uniform input size for every pic also keeps the resulting feature
+   vectors directly comparable — mixing originals and thumbnails would produce
+   vectors at different scales that don't compare cleanly. Videos use the
+   existing video thumbnail frame. Pics with no thumbnail data are skipped and
+   marked unanalyzable.
 2. **One decode, batched requests:** run saliency + feature-print (+ optional
    classify) through a single `VNImageRequestHandler.perform([…])`.
-3. Apply the conditional saliency crop (Domain note 3).
+3. Apply the conditional saliency crop (Domain note 3), with a **minimum crop
+   size floor**: because the source is only ~120px, never feed a tiny sliver to
+   the feature-print pass — skip the crop (use the whole thumbnail) when the
+   salient region would fall below the floor, and upscale the crop to the floor
+   otherwise.
 4. Convert the `VNFeaturePrintObservation` to a raw `Float32` vector at the
    actor boundary (the observation is **not** `Sendable`; the vector is).
 
@@ -134,9 +142,8 @@ cheap.
 - **Bounded parallelism:** compute prints in a `TaskGroup` capped at
   ≈`activeProcessorCount` (never unbounded — that risks jetsam on large
   libraries). Each image wrapped in an autorelease scope.
-- **Decode-time downscale** (above) avoids full-res decode cost and memory
-  spikes.
-- **Prefer cached thumbnails** to avoid disk I/O.
+- **Thumbnail-only input** (above) means no full-res decode, no disk I/O, and
+  no iCloud downloads — analysis works whether or not originals are on-device.
 - **Cheap matching:** candidates × albums × ≤K prototypes of cosine sims is
   trivial even for thousands of pics.
 - **First-run vs warm-run:** the first invocation computes everything (slow —
