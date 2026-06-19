@@ -16,7 +16,6 @@ struct IntelligentSortResultsView: View {
     var sortManager: IntelligentSortManager
 
     @State private var isConfirmingMove: Bool = false
-    @State private var didCommit: Bool = false
 
     private var needsReview: [EntitySuggestion] {
         sortManager.suggestions.filter { ($0.topMatch?.confidence ?? .none) == .none }
@@ -54,9 +53,7 @@ struct IntelligentSortResultsView: View {
 
     var body: some View {
         Group {
-            if didCommit {
-                committedContent
-            } else if sortManager.targetAlbumCount == 0 {
+            if sortManager.targetAlbumCount == 0 {
                 ContentUnavailableView {
                     Label(String(localized: "Sort.NoTargets", table: "Photos"),
                           systemImage: "rectangle.stack.badge.xmark")
@@ -145,50 +142,22 @@ struct IntelligentSortResultsView: View {
             Button("Shared.Yes") {
                 Task {
                     await sortManager.commit()
-                    withAnimation(.smooth.speed(2.0)) {
-                        didCommit = true
-                    }
+                    let moves = sortManager.committedMoves
+                    let collectionID = sortManager.collectionID
+                    let message = await IntelligentSortManager.moveSummaryMessage(
+                        for: moves, collectionID: collectionID
+                    )
+                    ToastManager.shared.show(ToastItem(
+                        message: message,
+                        undo: moves.isEmpty ? nil : {
+                            await IntelligentSortManager.revert(moves, collectionID: collectionID)
+                        }
+                    ))
+                    dismiss()
                 }
             }
             Button("Shared.No", role: .cancel) {}
         }
-    }
-
-    private var committedContent: some View {
-        VStack(alignment: .center, spacing: 20.0) {
-            Spacer()
-            Image(systemName: "checkmark.circle.fill")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 64.0, height: 64.0)
-                .symbolRenderingMode(.multicolor)
-            Text("Sort.Moved.\(sortManager.committedMoves.count)", tableName: "Photos")
-                .bold()
-                .multilineTextAlignment(.center)
-            VStack(spacing: 12.0) {
-                Button {
-                    Task {
-                        await sortManager.undo()
-                        dismiss()
-                    }
-                } label: {
-                    Label(String(localized: "Sort.Undo", table: "Photos"), systemImage: "arrow.uturn.backward")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                Button {
-                    dismiss()
-                } label: {
-                    Text("Shared.OK")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            .padding(.horizontal, 40.0)
-            Spacer()
-        }
-        .padding(20.0)
-        .frame(maxWidth: .infinity)
     }
 }
 

@@ -68,6 +68,11 @@ struct IllustMateApp: App {
             SyncDebugOverlay()
             #endif
         }
+        .overlay(alignment: .top) {
+            ToastOverlayView {
+                navigation.signalDataChanged()
+            }
+        }
         .onAppear {
             pipManager.setup()
         }

@@ -51,16 +51,30 @@ extension IntelligentSortManager {
         committedMoves = moves
     }
 
-    func undo() async {
-        let dataActor = self.dataActor
-        for move in committedMoves {
+    /// Reverses a committed set of moves. Captured into the toast so undo
+    /// outlives the sort sheet and its manager.
+    nonisolated static func revert(_ moves: [CommittedMove], collectionID: String?) async {
+        let dataActor = collectionID.map { DataActor.instance(for: $0) } ?? DataActor.shared
+        for move in moves {
             if let from = move.fromAlbumID {
                 await dataActor.addPic(withID: move.picID, toAlbumWithID: from)
             } else {
                 await dataActor.removeParentAlbum(forPicsWithIDs: [move.picID])
             }
         }
-        committedMoves = []
+    }
+
+    nonisolated static func moveSummaryMessage(
+        for moves: [CommittedMove], collectionID: String?
+    ) async -> String {
+        let count = moves.count
+        let destinations = Set(moves.map { $0.toAlbumID })
+        if destinations.count == 1, let albumID = destinations.first {
+            let dataActor = collectionID.map { DataActor.instance(for: $0) } ?? DataActor.shared
+            let name = await dataActor.album(for: albumID)?.name ?? ""
+            return String(localized: "Toast.MovedToAlbum.\(count)-\(name)", table: "Photos")
+        }
+        return String(localized: "Toast.MovedToAlbums.\(count)-\(destinations.count)", table: "Photos")
     }
 
     // MARK: - Pure model building
