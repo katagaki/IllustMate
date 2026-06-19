@@ -103,6 +103,10 @@ extension AlbumView {
                        systemImage: "photo.stack") {
                     isDuplicateCheckerPresented = true
                 }
+                Button(String(localized: "Sort.SortIntelligently", table: "Photos"),
+                       systemImage: "wand.and.stars") {
+                    isIntelligentSortPresented = true
+                }
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
 #endif
@@ -144,6 +148,10 @@ extension AlbumView {
             Button(String(localized: "Duplicates.FindDuplicates", table: "Photos"),
                    systemImage: "photo.stack") {
                 isDuplicateCheckerPresented = true
+            }
+            Button(String(localized: "Sort.SortIntelligently", table: "Photos"),
+                   systemImage: "wand.and.stars") {
+                isIntelligentSortPresented = true
             }
             Section(String(localized: "Albums.Albums", table: "Albums")) {
                 Picker(String(localized: "Albums.Style", table: "Albums"),

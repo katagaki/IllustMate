@@ -115,6 +115,8 @@ class LibraryManager: ObservableObject {
         HashActor.switchLibrary(to: libraryID)
         CoverCacheActor.switchLibrary(to: libraryID)
         PColorActor.switchLibrary(to: libraryID)
+        FeaturePrintActor.switchLibrary(to: libraryID)
+        AlbumModelActor.switchLibrary(to: libraryID)
     }
 
     func displayName(for library: PicLibrary) -> String {

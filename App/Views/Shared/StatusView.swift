@@ -18,6 +18,9 @@ struct StatusView: View {
         // Photos table
         case duplicatesScanningComputingHashes
         case duplicatesScanningComparing
+        case intelligentSortBuildingModels
+        case intelligentSortAnalyzing
+        case intelligentSortMatching
 
         // Import table
         case importImporting
@@ -39,6 +42,12 @@ struct StatusView: View {
                 Text("Duplicates.Scanning.ComputingHashes", tableName: "Photos")
             case .duplicatesScanningComparing:
                 Text("Duplicates.Scanning.Comparing", tableName: "Photos")
+            case .intelligentSortBuildingModels:
+                Text("Sort.BuildingModels", tableName: "Photos")
+            case .intelligentSortAnalyzing:
+                Text("Sort.Analyzing", tableName: "Photos")
+            case .intelligentSortMatching:
+                Text("Sort.Matching", tableName: "Photos")
             case .importImporting:
                 Text("Import.Importing", tableName: "Import")
             case .importCompleted(let count):

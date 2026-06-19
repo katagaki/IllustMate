@@ -102,6 +102,12 @@ extension AlbumView {
                             ) {
                                 isDuplicateCheckerPresented = true
                             }
+                            Button(
+                                String(localized: "Sort.SortIntelligently", table: "Photos"),
+                                systemImage: "wand.and.stars"
+                            ) {
+                                isIntelligentSortPresented = true
+                            }
                             Divider()
                             Picker("Shared.Sort", systemImage: "arrow.up.arrow.down", selection: $picSortType) {
                                 Text("Shared.Sort.DateAdded.Ascending")
