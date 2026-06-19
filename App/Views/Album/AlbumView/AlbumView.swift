@@ -87,6 +87,21 @@ struct AlbumView: View {
     }
 
     var body: some View {
+        contentWithObservers
+            .navigationTitle(navigationTitleText)
+            .navigationSubtitle(Text(verbatim: navigationSubtitleText))
+            .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
+            .modifier(AlbumViewOptionsFocusModifier(options: AlbumViewOptions(
+                albumStyle: $albumStyleState,
+                albumSort: $albumSortState,
+                albumColumnCount: $albumColumnCount,
+                picSort: $picSortType,
+                picColumnCount: $columnCount,
+                hideSectionHeaders: $hideSectionHeaders
+            )))
+    }
+
+    var contentWithSheets: some View {
         mainContent
             .toolbar {
                 toolbarContent
@@ -179,6 +194,10 @@ struct AlbumView: View {
                 onConfirmDeleteAlbum: { confirmDeleteAlbum(deletingContents: $0) },
                 onConfirmDeletePic: { confirmDeletePic() }
             ))
+    }
+
+    var contentWithObservers: some View {
+        contentWithSheets
             .task {
                 await loadPreferences()
                 albumStyleState = albumStyle
@@ -246,17 +265,6 @@ struct AlbumView: View {
                     }
                 }
             }
-            .navigationTitle(navigationTitleText)
-            .navigationSubtitle(Text(verbatim: navigationSubtitleText))
-            .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
-            .modifier(AlbumViewOptionsFocusModifier(options: AlbumViewOptions(
-                albumStyle: $albumStyleState,
-                albumSort: $albumSortState,
-                albumColumnCount: $albumColumnCount,
-                picSort: $picSortType,
-                picColumnCount: $columnCount,
-                hideSectionHeaders: $hideSectionHeaders
-            )))
     }
 
     var mainContent: some View {
