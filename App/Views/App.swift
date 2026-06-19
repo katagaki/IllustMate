@@ -36,6 +36,13 @@ struct IllustMateApp: App {
         "LastVersionPromptedForReview",
         store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
     ) var lastVersionPromptedForReview: String = ""
+    @AppStorage(
+        "LastWelcomedVersion",
+        store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+    ) var lastWelcomedVersion: String = ""
+
+    @State var isShowingWelcome: Bool = false
+    @State var welcomeVersion: String = ""
 
     nonisolated static let widgetRefreshTaskID = "com.tsubuzaki.IllustMate.widgetRefresh"
     nonisolated static let iCloudSyncTaskID = "com.tsubuzaki.IllustMate.iCloudSync"
@@ -68,12 +75,18 @@ struct IllustMateApp: App {
             SyncDebugOverlay()
             #endif
         }
+        .overlay(alignment: .top) {
+            ToastOverlayView {
+                navigation.signalDataChanged()
+            }
+        }
         .onAppear {
             pipManager.setup()
         }
         .task {
             await libraryManager.loadLibraries()
             await imageMigration.runPendingMigrations()
+            presentWelcomeIfNeeded()
             do {
                 // TODO: Tips are broken in iOS 26 thanks to SwiftUI bug
                 //       Will include everything for now until Apple fixes it
@@ -127,6 +140,9 @@ struct IllustMateApp: App {
             if url.scheme == "picmate", url.host == "entrophyrocks" {
                 handleSampleDataURL(url)
             }
+            if url.scheme == "picmate", url.host == "reonboard" {
+                presentWelcome()
+            }
         }
         .onChange(of: importedURL) { _, newValue in
             if newValue != nil {
@@ -169,6 +185,12 @@ struct IllustMateApp: App {
         )) {
             ImageMigrationView(manager: imageMigration)
         }
+        .sheet(isPresented: $isShowingWelcome) {
+            WelcomeView {
+                lastWelcomedVersion = welcomeVersion
+                isShowingWelcome = false
+            }
+        }
     }
 
     func handleSampleDataURL(_ url: URL) {
@@ -195,59 +217,6 @@ struct IllustMateApp: App {
             isSeedingData = false
             navigation.signalDataDeleted()
         }
-    }
-
-    func migratePreferencesFromUserDefaults() async {
-        let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
-        guard let defaults else { return }
-
-        let hasAlbumSort = defaults.object(forKey: "AlbumSort") != nil
-        let hasPicSort = defaults.object(forKey: "PicSortType") != nil
-        let hasAlbumStyle = defaults.object(forKey: "AlbumViewStyle") != nil
-        let hasAlbumColumnCount = defaults.object(forKey: "AlbumColumnCount") != nil
-        let hasPicColumnCount = defaults.object(forKey: "PicColumnCount") != nil
-        let hasHideSectionHeaders = defaults.object(forKey: "HideSectionHeaders") != nil
-
-        guard hasAlbumSort || hasPicSort || hasAlbumStyle
-                || hasAlbumColumnCount || hasPicColumnCount
-                || hasHideSectionHeaders else {
-            return
-        }
-
-        let albumSort = defaults.string(forKey: "AlbumSort") ?? AlbumPreferences.defaults.albumSort
-        let albumViewStyle = defaults.string(forKey: "AlbumViewStyle") ?? AlbumPreferences.defaults.albumViewStyle
-        let albumColumnCount = hasAlbumColumnCount
-            ? defaults.integer(forKey: "AlbumColumnCount")
-            : AlbumPreferences.defaults.albumColumnCount
-        let picSort = defaults.string(forKey: "PicSortType") ?? AlbumPreferences.defaults.picSort
-        let picColumnCount = hasPicColumnCount
-            ? defaults.integer(forKey: "PicColumnCount")
-            : AlbumPreferences.defaults.picColumnCount
-        let hideSectionHeaders = hasHideSectionHeaders
-            ? defaults.bool(forKey: "HideSectionHeaders")
-            : AlbumPreferences.defaults.hideSectionHeaders
-
-        var albumIDs = await DataActor.shared.allAlbumIDs()
-        albumIDs.insert("__root__", at: 0)
-        for albumID in albumIDs {
-            let prefs = AlbumPreferences(
-                albumID: albumID,
-                albumSort: albumSort,
-                albumViewStyle: albumViewStyle,
-                albumColumnCount: albumColumnCount,
-                picSort: picSort,
-                picColumnCount: picColumnCount,
-                hideSectionHeaders: hideSectionHeaders
-            )
-            await DataActor.shared.insertPreferencesForMigration(prefs)
-        }
-
-        defaults.removeObject(forKey: "AlbumSort")
-        defaults.removeObject(forKey: "PicSortType")
-        defaults.removeObject(forKey: "AlbumViewStyle")
-        defaults.removeObject(forKey: "AlbumColumnCount")
-        defaults.removeObject(forKey: "PicColumnCount")
-        defaults.removeObject(forKey: "HideSectionHeaders")
     }
 
     nonisolated func scheduleWidgetRefresh() {
@@ -360,6 +329,80 @@ struct IllustMateApp: App {
         }
         .defaultSize(width: 540.0, height: 640.0)
 #endif
+    }
+}
+
+extension IllustMateApp {
+
+    func presentWelcomeIfNeeded() {
+        let currentVersion = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? ""
+        guard WelcomeView.shouldShow(
+            currentVersion: currentVersion,
+            lastSeenVersion: lastWelcomedVersion
+        ) else { return }
+        presentWelcome()
+    }
+
+    func presentWelcome() {
+        welcomeVersion = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? ""
+        isShowingWelcome = true
+    }
+
+    func migratePreferencesFromUserDefaults() async {
+        let defaults = UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")
+        guard let defaults else { return }
+
+        let hasAlbumSort = defaults.object(forKey: "AlbumSort") != nil
+        let hasPicSort = defaults.object(forKey: "PicSortType") != nil
+        let hasAlbumStyle = defaults.object(forKey: "AlbumViewStyle") != nil
+        let hasAlbumColumnCount = defaults.object(forKey: "AlbumColumnCount") != nil
+        let hasPicColumnCount = defaults.object(forKey: "PicColumnCount") != nil
+        let hasHideSectionHeaders = defaults.object(forKey: "HideSectionHeaders") != nil
+
+        guard hasAlbumSort || hasPicSort || hasAlbumStyle
+                || hasAlbumColumnCount || hasPicColumnCount
+                || hasHideSectionHeaders else {
+            return
+        }
+
+        let albumSort = defaults.string(forKey: "AlbumSort") ?? AlbumPreferences.defaults.albumSort
+        let albumViewStyle = defaults.string(forKey: "AlbumViewStyle") ?? AlbumPreferences.defaults.albumViewStyle
+        let albumColumnCount = hasAlbumColumnCount
+            ? defaults.integer(forKey: "AlbumColumnCount")
+            : AlbumPreferences.defaults.albumColumnCount
+        let picSort = defaults.string(forKey: "PicSortType") ?? AlbumPreferences.defaults.picSort
+        let picColumnCount = hasPicColumnCount
+            ? defaults.integer(forKey: "PicColumnCount")
+            : AlbumPreferences.defaults.picColumnCount
+        let hideSectionHeaders = hasHideSectionHeaders
+            ? defaults.bool(forKey: "HideSectionHeaders")
+            : AlbumPreferences.defaults.hideSectionHeaders
+
+        var albumIDs = await DataActor.shared.allAlbumIDs()
+        albumIDs.insert("__root__", at: 0)
+        for albumID in albumIDs {
+            let prefs = AlbumPreferences(
+                albumID: albumID,
+                albumSort: albumSort,
+                albumViewStyle: albumViewStyle,
+                albumColumnCount: albumColumnCount,
+                picSort: picSort,
+                picColumnCount: picColumnCount,
+                hideSectionHeaders: hideSectionHeaders
+            )
+            await DataActor.shared.insertPreferencesForMigration(prefs)
+        }
+
+        defaults.removeObject(forKey: "AlbumSort")
+        defaults.removeObject(forKey: "PicSortType")
+        defaults.removeObject(forKey: "AlbumViewStyle")
+        defaults.removeObject(forKey: "AlbumColumnCount")
+        defaults.removeObject(forKey: "PicColumnCount")
+        defaults.removeObject(forKey: "HideSectionHeaders")
     }
 }
 

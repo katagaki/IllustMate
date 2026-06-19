@@ -323,6 +323,15 @@ extension DataActor {
         return sortAlbum(albums, sortedBy: sortType)
     }
 
+    func descendantAlbums(ofAlbumWithID albumID: String?) -> [Album] {
+        let ids = descendantAlbumIDs(of: albumID)
+        guard !ids.isEmpty else { return [] }
+        let query = albumsTable.filter(ids.contains(albumId))
+        let albums = (try? database.safeRows(query).map { albumFrom(row: $0, loadChildren: false) }) ?? []
+        populateCounts(for: albums)
+        return albums
+    }
+
     private func descendantAlbumIDs(of parentID: String?) -> [String] {
         // Iterative BFS: one query per level instead of one query per node
         let firstQuery: QueryType

@@ -9,6 +9,7 @@ struct SelectionOverlay: View {
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
+            Color.clear
             if isSelected {
                 Color.black.opacity(0.3)
                     .clipShape(.rect(cornerRadius: 4.0))

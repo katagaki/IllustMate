@@ -66,6 +66,7 @@ struct AlbumView: View {
     @State var searchResults: [Album]?
     @State var searchTask: Task<Void, Never>?
     @State var isDuplicateCheckerPresented: Bool = false
+    @State var isIntelligentSortPresented: Bool = false
     @State var hasCompletedInitialLoad: Bool = false
     @State var movePayload: LibraryMovePayload?
 
@@ -141,6 +142,22 @@ struct AlbumView: View {
                 .interactiveDismissDisabled()
             }
             .onChange(of: isDuplicateCheckerPresented) { _, isPresented in
+                if !isPresented {
+                    refreshPicsAndSet()
+                }
+            }
+            .sheet(isPresented: $isIntelligentSortPresented) {
+                Group {
+                    if let currentAlbum {
+                        IntelligentSortView(scope: .album(currentAlbum))
+                    } else {
+                        IntelligentSortView(scope: .root)
+                    }
+                }
+                .phonePresentationDetents([.medium, .large])
+                .interactiveDismissDisabled()
+            }
+            .onChange(of: isIntelligentSortPresented) { _, isPresented in
                 if !isPresented {
                     refreshPicsAndSet()
                 }

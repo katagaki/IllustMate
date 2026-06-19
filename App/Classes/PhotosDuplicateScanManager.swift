@@ -18,7 +18,7 @@ class PhotosDuplicateScanManager {
 
     var duplicateGroups: [PhotosDuplicateGroup] = []
 
-    var hammingThreshold: Int = 8
+    var hammingThreshold: Double = 8
 
     enum ScanPhase {
         case idle
@@ -68,7 +68,7 @@ class PhotosDuplicateScanManager {
         let scopedIDSet = Set(assets.map(\.localIdentifier))
         let scopedHashes = allHashes.filter { scopedIDSet.contains($0.0) }
 
-        let groups = findDuplicateGroups(hashes: scopedHashes, threshold: hammingThreshold)
+        let groups = findDuplicateGroups(hashes: scopedHashes, threshold: Int(hammingThreshold.rounded()))
 
         let assetsByID = Dictionary(uniqueKeysWithValues: assets.map { ($0.localIdentifier, $0) })
 
