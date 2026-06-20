@@ -26,11 +26,26 @@ final class ToastManager {
     private init() {}
 
     func show(_ item: ToastItem) {
-        dismissTask?.cancel()
         withAnimation(.smooth(duration: 0.35)) {
             current = item
         }
-        let id = item.id
+        scheduleAutoDismiss()
+    }
+
+    func pauseAutoDismiss() {
+        dismissTask?.cancel()
+        dismissTask = nil
+    }
+
+    func resumeAutoDismiss() {
+        guard current != nil else { return }
+        scheduleAutoDismiss()
+    }
+
+    private func scheduleAutoDismiss() {
+        dismissTask?.cancel()
+        guard let current else { return }
+        let id = current.id
         let interval = autoDismissInterval
         dismissTask = Task { [weak self] in
             try? await Task.sleep(for: interval)

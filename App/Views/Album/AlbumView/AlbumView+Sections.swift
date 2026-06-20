@@ -60,8 +60,8 @@ extension AlbumView {
                     albumToRename = album
                 } onDelete: { album in
                     deleteAlbum(album)
-                } onDrop: { transferable, album in
-                    moveDropToAlbum(transferable, to: album)
+                } onDrop: { drops, album in
+                    moveDropToAlbum(drops, to: album)
                 } onDropFiles: { urls, album in
                     importFiles(urls, into: album)
                 } moveMenu: { album in

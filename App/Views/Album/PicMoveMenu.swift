@@ -15,16 +15,10 @@ struct PicMoveMenu: View {
 
     var body: some View {
         Menu(title, systemImage: systemImage) {
-            if containingAlbum != nil {
+            if let containingAlbum {
                 Section {
                     Button("Shared.MoveOutOfAlbum", systemImage: "tray.and.arrow.up") {
-                        Task {
-                            await DataActor.shared.removeParentAlbum(forPicsWithIDs: pics.map({ $0.id }))
-                            if let containingAlbum {
-                                AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
-                            }
-                            onMoved()
-                        }
+                        moveOutOfAlbum(from: containingAlbum)
                     }
                 }
             }
@@ -59,15 +53,38 @@ struct PicMoveMenu: View {
     }
 
     func move(to destinationAlbum: Album) {
+        let dataActor = DataActor.shared
+        let picIDs = pics.map { $0.id }
+        let fromAlbumID = containingAlbum?.id
+        let destinationID = destinationAlbum.id
         Task {
-            await DataActor.shared.addPics(withIDs: pics.map { $0.id },
-                                           toAlbumWithID: destinationAlbum.id)
-            if let containingAlbum {
-                AlbumCoverCache.shared.removeImages(forAlbumID: containingAlbum.id)
+            await dataActor.addPics(withIDs: picIDs, toAlbumWithID: destinationID)
+            if let fromAlbumID {
+                AlbumCoverCache.shared.removeImages(forAlbumID: fromAlbumID)
             }
-            AlbumCoverCache.shared.removeImages(forAlbumID: destinationAlbum.id)
-            LastUsedAlbum.set(destinationAlbum.id, in: DataActor.shared.collectionID)
+            AlbumCoverCache.shared.removeImages(forAlbumID: destinationID)
+            LastUsedAlbum.set(destinationID, in: dataActor.collectionID)
             onMoved()
+            MovedToast.showMoved(picIDs: picIDs, to: destinationAlbum,
+                                 from: fromAlbumID, using: dataActor)
+        }
+    }
+
+    func moveOutOfAlbum(from album: Album) {
+        let dataActor = DataActor.shared
+        let picIDs = pics.map { $0.id }
+        let fromAlbumID = album.id
+        Task {
+            await dataActor.removeParentAlbum(forPicsWithIDs: picIDs)
+            AlbumCoverCache.shared.removeImages(forAlbumID: fromAlbumID)
+            onMoved()
+            ToastManager.shared.show(ToastItem(
+                message: String(localized: "Toast.MovedOutOfAlbum.\(picIDs.count)", table: "Photos"),
+                undo: {
+                    await dataActor.addPics(withIDs: picIDs, toAlbumWithID: fromAlbumID)
+                    AlbumCoverCache.shared.removeImages(forAlbumID: fromAlbumID)
+                }
+            ))
         }
     }
 

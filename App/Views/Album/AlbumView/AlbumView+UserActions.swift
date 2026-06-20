@@ -115,18 +115,27 @@ extension AlbumView {
         return false
     }
 
-    func moveDropToAlbum(_ drop: Drop, to album: Album) {
+    func moveDropToAlbum(_ drops: [Drop], to album: Album) {
+        let fromAlbumID = currentAlbum?.id
         Task {
-            if let transferable = drop.pic {
-                await movePicToAlbum(transferable.id, to: album)
-            } else if let transferable = drop.album {
-                if transferable.id != album.id {
-                    await moveAlbumToAlbum(transferable.id, to: album)
+            var movedPicIDs: [String] = []
+            for drop in drops {
+                if let transferable = drop.pic {
+                    await movePicToAlbum(transferable.id, to: album)
+                    movedPicIDs.append(transferable.id)
+                } else if let transferable = drop.album {
+                    if transferable.id != album.id {
+                        await moveAlbumToAlbum(transferable.id, to: album)
+                    }
+                } else if let transferable = drop.importedPhoto {
+                    await importPhotoToAlbum(transferable, to: album)
                 }
-            } else if let transferable = drop.importedPhoto {
-                await importPhotoToAlbum(transferable, to: album)
             }
             await refreshData()
+            if !movedPicIDs.isEmpty {
+                MovedToast.showMoved(picIDs: movedPicIDs, to: album,
+                                     from: fromAlbumID, using: DataActor.shared)
+            }
         }
     }
 

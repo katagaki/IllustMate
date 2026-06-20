@@ -13,7 +13,7 @@ struct ToastOverlayView: View {
             if let item = manager.current {
                 toast(item)
                     .id(item.id)
-                    .padding(.top, 50.0)
+                    .padding(.top, 56.0)
                     .padding(.horizontal, 16.0)
                     .transition(.move(edge: .top).combined(with: .blurReplace))
             }
@@ -24,7 +24,7 @@ struct ToastOverlayView: View {
     private func toast(_ item: ToastItem) -> some View {
         HStack(spacing: 8.0) {
             Image(systemName: item.systemImage)
-                .foregroundStyle(.green)
+                .foregroundStyle(.primary)
             Text(item.message)
                 .font(.subheadline.weight(.medium))
                 .lineLimit(1)
@@ -36,11 +36,13 @@ struct ToastOverlayView: View {
         }
         .padding(.horizontal, 16.0)
         .padding(.vertical, 12.0)
-        .glassEffect(.regular.interactive(), in: .capsule)
+        .glassEffect(.regular.tint(.green.opacity(0.2)).interactive(), in: .capsule)
+        .contentShape(.capsule)
         .offset(y: dragOffset)
         .gesture(dragGesture)
         .onTapGesture {
             if item.undo != nil {
+                manager.pauseAutoDismiss()
                 isShowingUndoConfirmation = true
             }
         }
@@ -55,7 +57,9 @@ struct ToastOverlayView: View {
                     manager.dismiss()
                 }
             }
-            Button("Shared.No", role: .cancel) {}
+            Button("Shared.No", role: .cancel) {
+                manager.resumeAutoDismiss()
+            }
         }
     }
 

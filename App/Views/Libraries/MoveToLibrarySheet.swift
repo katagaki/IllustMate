@@ -210,6 +210,17 @@ struct MoveToLibrarySheet: View {
                 await MainActor.run {
                     onMoved()
                     dismiss()
+                    let libraryName = displayName(forLibraryID: destinationID)
+                    switch payload {
+                    case .album(let album):
+                        ToastManager.shared.show(ToastItem(
+                            message: String(localized: "Toast.MovedAlbumToLibrary.\(album.name)-\(libraryName)",
+                                            table: "Photos")))
+                    case .pics(let pics):
+                        ToastManager.shared.show(ToastItem(
+                            message: String(localized: "Toast.MovedToLibrary.\(pics.count)-\(libraryName)",
+                                            table: "Photos")))
+                    }
                 }
             } catch {
                 await MainActor.run {

@@ -15,7 +15,7 @@ struct AlbumsSection<Content: View>: View {
     var onToggleOffline: ((Album) -> Void)?
     var onRename: ((Album) -> Void)?
     var onDelete: ((Album) -> Void)?
-    var onDrop: ((Drop, Album) -> Void)?
+    var onDrop: (([Drop], Album) -> Void)?
     var onDropFiles: (([URL], Album) -> Void)?
     @ViewBuilder var moveMenu: (Album) -> Content
 
