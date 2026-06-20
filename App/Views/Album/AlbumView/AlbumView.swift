@@ -18,6 +18,8 @@ struct AlbumView: View {
     @AppStorage(importShowNotificationKey,
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate"))
     var showImportNotification: Bool = true
+    @AppStorage(picViewStyleKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var picViewStyle: ViewStyle = .grid
 
     @Namespace var namespace
 
@@ -97,6 +99,7 @@ struct AlbumView: View {
                 albumColumnCount: $albumColumnCount,
                 picSort: $picSortType,
                 picColumnCount: $columnCount,
+                picStyle: $picViewStyle,
                 hideSectionHeaders: $hideSectionHeaders
             )))
     }

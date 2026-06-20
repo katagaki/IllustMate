@@ -122,6 +122,17 @@ extension AlbumView {
                                     .tag(PicSortType.prominentColor)
                             }
                             .pickerStyle(.menu)
+                            Picker(String(localized: "Albums.Style", table: "Albums"),
+                                   systemImage: "paintbrush",
+                                   selection: $picViewStyle.animation(.smooth.speed(2.0))) {
+                                Label(String(localized: "Albums.Style.Grid", table: "Albums"),
+                                      systemImage: "square.grid.2x2")
+                                    .tag(ViewStyle.grid)
+                                Label(String(localized: "Albums.Style.Masonry", table: "Albums"),
+                                      systemImage: "rectangle.3.offgrid")
+                                    .tag(ViewStyle.masonry)
+                            }
+                            .pickerStyle(.menu)
                             GridSizePicker(selection: $columnCount, sizes: [2, 3, 4, 5, 8], kind: .pics)
                         }
                     }
@@ -140,7 +151,8 @@ extension AlbumView {
                 PicsGrid(namespace: namespace, pics: pics,
                          placeholderCount: max(picCount - pics.count, 0),
                          isSelecting: $isSelectingPics,
-                         columnCount: columnCount) { pic in
+                         columnCount: columnCount,
+                         style: picViewStyle) { pic in
                     selectedPics.contains(pic)
                 } onSelect: { pic in
                     selectOrDeselectPic(pic)

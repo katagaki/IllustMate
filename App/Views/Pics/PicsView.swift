@@ -9,6 +9,8 @@ struct PicsView: View {
 
     @AppStorage(openPicsInNewWindowKey,
                 store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var openPicsInNewWindow: Bool = false
+    @AppStorage(picViewStyleKey,
+                store: UserDefaults(suiteName: "group.com.tsubuzaki.IllustMate")) var picViewStyle: ViewStyle = .grid
 
     @Namespace var namespace
 
@@ -23,7 +25,8 @@ struct PicsView: View {
                     PicsGrid(namespace: namespace,
                              pics: pics,
                              isSelecting: .constant(false),
-                             enableSelection: false) { pic in
+                             enableSelection: false,
+                             style: picViewStyle) { pic in
                         if UIDevice.current.userInterfaceIdiom == .phone {
                             viewer.setDisplay(pic, in: pics) { [navigation] in
                                 navigation.push(.picViewer(namespace: namespace), for: .pics)

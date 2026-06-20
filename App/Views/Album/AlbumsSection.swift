@@ -22,7 +22,7 @@ struct AlbumsSection<Content: View>: View {
     var body: some View {
         Group {
             switch style {
-            case .grid:
+            case .grid, .masonry:
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10.0), count: columnCount),
                           spacing: 12.0) {
                     ForEach(albums) { album in

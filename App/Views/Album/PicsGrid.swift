@@ -11,6 +11,7 @@ struct PicsGrid<Content: View>: View {
     @Binding var isSelecting: Bool
     @State var enableSelection: Bool = true
     var columnCount: Int = 4
+    var style: ViewStyle = .grid
     var isSelected: ((Pic) -> Bool)?
     var onSelect: (Pic) -> Void
     var selectedCount: () -> Int
@@ -25,93 +26,14 @@ struct PicsGrid<Content: View>: View {
     @State private var paintSelected: Bool = false
     @State private var paintedRange: ClosedRange<Int>?
     @State private var originalSelected: [Int: Bool] = [:]
+    @State private var aspectRatios: [String: CGFloat] = [:]
 
     var body: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
-                  spacing: 2.0) {
-            ForEach(pics) { pic in
-                PicLabel(pic: pic)
-                    .overlay {
-                        if isSelecting {
-                            if let isSelected {
-                                ZStack(alignment: .bottomTrailing) {
-                                    SelectionOverlay(isSelected(pic))
-                                    Color.clear
-                                }
-                                .transition(.opacity.animation(.smooth.speed(2.0)))
-                            }
-                        }
-                    }
-                    .contentShape(.rect)
-                    .onTapGesture {
-                        onSelect(pic)
-                    }
-                    .modifier(PicExportDraggableModifier(pic: pic, isSelecting: isSelecting))
-                    .matchedTransitionSource(id: pic.id, in: namespace)
-                    .contextMenu {
-                    if !isSelecting {
-                        if enableSelection {
-                            Button("Shared.Select", systemImage: "checkmark.circle") {
-                                doWithAnimation {
-                                    isSelecting = true
-                                    onSelect(pic)
-                                }
-                            }
-                            Divider()
-                        }
-                        Button("Shared.Copy", systemImage: "doc.on.doc") {
-                            Task {
-                                if let data = await DataActor.shared.imageData(forPicWithID: pic.id),
-                                   let image = UIImage(data: data) {
-                                    UIPasteboard.general.image = image
-                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                                }
-                            }
-                        }
-                        ShareLink(item: PicShareable(picID: pic.id),
-                                  preview: SharePreview(pic.name,
-                                                        image: PicShareable(picID: pic.id))) {
-                            Label("Shared.Share", systemImage: "square.and.arrow.up")
-                        }
-                        if let onRename {
-                            Divider()
-                            Button("Shared.Rename", systemImage: "pencil") {
-                                onRename(pic)
-                            }
-                        }
-                        Divider()
-                        if let albumID = pic.containingAlbumID {
-                            Button("Shared.SetAsCover", systemImage: "photo") {
-                                Task {
-                                    await DataActor.shared.setAsAlbumCover(for: pic.id)
-                                    AlbumCoverCache.shared.removeImages(forAlbumID: albumID)
-                                }
-                            }
-                        }
-                        Divider()
-                        moveMenu(pic)
-                        if let onDelete {
-                            Divider()
-                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                onDelete(pic)
-                            }
-                        }
-                    }
-                } preview: {
-                    PicPreview(picID: pic.id)
-                }
-#if targetEnvironment(macCatalyst)
-                .hoverEffect(.highlight)
-#endif
-            }
-            if placeholderCount > 0 {
-                let visiblePlaceholders = min(placeholderCount, columnCount * 10)
-                ForEach(0..<visiblePlaceholders, id: \.self) { _ in
-                    Rectangle()
-                        .fill(.primary.opacity(0.05))
-                        .aspectRatio(1.0, contentMode: .fit)
-                        .clipShape(.rect(cornerRadius: 4.0))
-                }
+        Group {
+            if style == .masonry {
+                masonryGrid
+            } else {
+                squareGrid
             }
         }
         .coordinateSpace(.named(Self.selectionSpace))
@@ -120,11 +42,158 @@ struct PicsGrid<Content: View>: View {
         } action: { width in
             gridWidth = width
         }
-        .gesture(SelectionPanGesture(isEnabled: isSelecting,
+        .gesture(SelectionPanGesture(isEnabled: isSelecting && style != .masonry,
                                      coordinateSpace: Self.selectionSpace,
                                      onChange: { updateSelection(at: $0) },
                                      onEnd: { resetSelectionDrag() }))
         .animation(.smooth.speed(2.0), value: columnCount)
+    }
+
+    private var squareGrid: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 2.0), count: columnCount),
+                  spacing: 2.0) {
+            ForEach(pics) { pic in
+                picCell(for: pic, maintainsAspectRatio: false)
+            }
+            if placeholderCount > 0 {
+                let visiblePlaceholders = min(placeholderCount, columnCount * 10)
+                ForEach(0..<visiblePlaceholders, id: \.self) { _ in
+                    placeholderCell
+                }
+            }
+        }
+    }
+
+    private var masonryGrid: some View {
+        HStack(alignment: .top, spacing: 2.0) {
+            ForEach(Array(masonryColumns.enumerated()), id: \.offset) { column in
+                LazyVStack(spacing: 2.0) {
+                    ForEach(column.element) { entry in
+                        if let pic = entry.pic {
+                            picCell(for: pic, maintainsAspectRatio: true)
+                                .aspectRatio(entry.aspectRatio, contentMode: .fit)
+                        } else {
+                            placeholderCell
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .top)
+            }
+        }
+    }
+
+    private var placeholderCell: some View {
+        Rectangle()
+            .fill(.primary.opacity(0.05))
+            .aspectRatio(1.0, contentMode: .fit)
+            .clipShape(.rect(cornerRadius: 4.0))
+    }
+
+    private var masonryColumns: [[MasonryEntry]] {
+        let count = max(columnCount, 1)
+        var columns = Array(repeating: [MasonryEntry](), count: count)
+        var heights = Array(repeating: 0.0, count: count)
+        func place(_ entry: MasonryEntry) {
+            var target = 0
+            for index in 1..<count where heights[index] < heights[target] {
+                target = index
+            }
+            columns[target].append(entry)
+            heights[target] += 1.0 / max(entry.aspectRatio, 0.01)
+        }
+        for pic in pics {
+            place(MasonryEntry(id: pic.id, pic: pic, aspectRatio: aspectRatios[pic.id] ?? 1.0))
+        }
+        if placeholderCount > 0 {
+            let visiblePlaceholders = min(placeholderCount, count * 10)
+            for index in 0..<visiblePlaceholders {
+                place(MasonryEntry(id: "placeholder-\(index)", pic: nil, aspectRatio: 1.0))
+            }
+        }
+        return columns
+    }
+
+    @ViewBuilder
+    private func picCell(for pic: Pic, maintainsAspectRatio: Bool) -> some View {
+        PicLabel(pic: pic,
+                 maintainsAspectRatio: maintainsAspectRatio,
+                 onAspectRatio: maintainsAspectRatio ? { ratio in
+                     if aspectRatios[pic.id] != ratio {
+                         aspectRatios[pic.id] = ratio
+                     }
+                 } : nil)
+            .overlay {
+                if isSelecting {
+                    if let isSelected {
+                        ZStack(alignment: .bottomTrailing) {
+                            SelectionOverlay(isSelected(pic))
+                            Color.clear
+                        }
+                        .transition(.opacity.animation(.smooth.speed(2.0)))
+                    }
+                }
+            }
+            .contentShape(.rect)
+            .onTapGesture {
+                onSelect(pic)
+            }
+            .modifier(PicExportDraggableModifier(pic: pic, isSelecting: isSelecting))
+            .matchedTransitionSource(id: pic.id, in: namespace)
+            .contextMenu {
+                if !isSelecting {
+                    if enableSelection {
+                        Button("Shared.Select", systemImage: "checkmark.circle") {
+                            doWithAnimation {
+                                isSelecting = true
+                                onSelect(pic)
+                            }
+                        }
+                        Divider()
+                    }
+                    Button("Shared.Copy", systemImage: "doc.on.doc") {
+                        Task {
+                            if let data = await DataActor.shared.imageData(forPicWithID: pic.id),
+                               let image = UIImage(data: data) {
+                                UIPasteboard.general.image = image
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            }
+                        }
+                    }
+                    ShareLink(item: PicShareable(picID: pic.id),
+                              preview: SharePreview(pic.name,
+                                                    image: PicShareable(picID: pic.id))) {
+                        Label("Shared.Share", systemImage: "square.and.arrow.up")
+                    }
+                    if let onRename {
+                        Divider()
+                        Button("Shared.Rename", systemImage: "pencil") {
+                            onRename(pic)
+                        }
+                    }
+                    Divider()
+                    if let albumID = pic.containingAlbumID {
+                        Button("Shared.SetAsCover", systemImage: "photo") {
+                            Task {
+                                await DataActor.shared.setAsAlbumCover(for: pic.id)
+                                AlbumCoverCache.shared.removeImages(forAlbumID: albumID)
+                            }
+                        }
+                    }
+                    Divider()
+                    moveMenu(pic)
+                    if let onDelete {
+                        Divider()
+                        Button("Shared.Delete", systemImage: "trash", role: .destructive) {
+                            onDelete(pic)
+                        }
+                    }
+                }
+            } preview: {
+                PicPreview(picID: pic.id)
+            }
+#if targetEnvironment(macCatalyst)
+            .hoverEffect(.highlight)
+#endif
     }
 
     private func resetSelectionDrag() {
@@ -185,6 +254,12 @@ struct PicsGrid<Content: View>: View {
         paintedRange = newRange
         UISelectionFeedbackGenerator().selectionChanged()
     }
+}
+
+struct MasonryEntry: Identifiable {
+    let id: String
+    let pic: Pic?
+    let aspectRatio: CGFloat
 }
 
 struct PicShareable: Transferable {

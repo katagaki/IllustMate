@@ -22,14 +22,54 @@ final class ThumbnailCache: @unchecked Sendable {
 struct PicLabel: View {
 
     var pic: Pic
+    var maintainsAspectRatio: Bool = false
+    var onAspectRatio: ((CGFloat) -> Void)?
 
     @State var isThumbnailReadyToPresent: Bool = false
     @State var thumbnail: Image?
 
     var body: some View {
+        base
+            .clipped()
+            .contentShape(.rect)
+            .clipShape(.rect(cornerRadius: 4.0))
+            .task(id: pic.id) {
+                let picID = pic.id
+                if let cached = ThumbnailCache.shared.image(forKey: picID) {
+                    reportAspectRatio(for: cached)
+                    thumbnail = Image(uiImage: cached)
+                    isThumbnailReadyToPresent = true
+                    return
+                }
+                var thumbData = pic.thumbnailData
+                if thumbData == nil {
+                    thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID)
+                }
+                if let thumbData,
+                   let uiImage = UIImage(data: thumbData),
+                   let prepared = await uiImage.byPreparingForDisplay() {
+                    guard !Task.isCancelled else { return }
+                    ThumbnailCache.shared.setImage(prepared, forKey: picID)
+                    reportAspectRatio(for: prepared)
+                    thumbnail = Image(uiImage: prepared)
+                }
+                isThumbnailReadyToPresent = true
+            }
+    }
+
+    @ViewBuilder
+    private var base: some View {
+        if maintainsAspectRatio {
+            rectangle
+        } else {
+            rectangle
+                .aspectRatio(1.0, contentMode: .fit)
+        }
+    }
+
+    private var rectangle: some View {
         Rectangle()
             .fill(.primary.opacity(0.05))
-            .aspectRatio(1.0, contentMode: .fit)
             .overlay(alignment: .top) {
                 if isThumbnailReadyToPresent, let thumbnail {
                     thumbnail
@@ -61,28 +101,10 @@ struct PicLabel: View {
                         .padding(4)
                 }
             }
-            .clipped()
-            .contentShape(.rect)
-            .clipShape(.rect(cornerRadius: 4.0))
-            .task(id: pic.id) {
-                let picID = pic.id
-                if let cached = ThumbnailCache.shared.image(forKey: picID) {
-                    thumbnail = Image(uiImage: cached)
-                    isThumbnailReadyToPresent = true
-                    return
-                }
-                var thumbData = pic.thumbnailData
-                if thumbData == nil {
-                    thumbData = await DataActor.shared.thumbnailData(forPicWithID: picID)
-                }
-                if let thumbData,
-                   let uiImage = UIImage(data: thumbData),
-                   let prepared = await uiImage.byPreparingForDisplay() {
-                    guard !Task.isCancelled else { return }
-                    ThumbnailCache.shared.setImage(prepared, forKey: picID)
-                    thumbnail = Image(uiImage: prepared)
-                }
-                isThumbnailReadyToPresent = true
-            }
+    }
+
+    private func reportAspectRatio(for image: UIImage) {
+        guard maintainsAspectRatio, image.size.height > 0.0 else { return }
+        onAspectRatio?(image.size.width / image.size.height)
     }
 }

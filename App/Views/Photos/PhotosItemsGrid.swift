@@ -21,7 +21,7 @@ struct PhotosAlbumsSection: View {
     var body: some View {
         Group {
             switch style {
-            case .grid:
+            case .grid, .masonry:
                 LazyVGrid(
                     columns: Array(repeating: GridItem(.flexible(), spacing: 20.0), count: columnCount),
                     spacing: 20.0
