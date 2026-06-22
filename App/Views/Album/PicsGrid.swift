@@ -156,6 +156,7 @@ struct PicsGrid<Content: View>: View {
                                let image = UIImage(data: data) {
                                 UIPasteboard.general.image = image
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                CopiedToast.showCopied()
                             }
                         }
                     }

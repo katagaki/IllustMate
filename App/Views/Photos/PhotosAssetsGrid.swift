@@ -199,6 +199,9 @@ struct PhotosAssetContextMenu: View {
                         DispatchQueue.main.async {
                             UIPasteboard.general.image = result
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            MainActor.assumeIsolated {
+                                CopiedToast.showCopied()
+                            }
                         }
                     }
                 }
