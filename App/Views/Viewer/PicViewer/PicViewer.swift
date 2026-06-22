@@ -162,6 +162,7 @@ struct PicViewer: View {
                             if let image = currentImage {
                                 UIPasteboard.general.image = image
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                CopiedToast.showCopied()
                             }
                         }
                         .disabled(currentImage == nil)
@@ -203,6 +204,7 @@ struct PicViewer: View {
                             if let image = currentImage {
                                 UIPasteboard.general.image = image
                                 UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                CopiedToast.showCopied()
                             }
                         }
                         .disabled(currentImage == nil)
