@@ -4,11 +4,14 @@ struct ToastItem: Identifiable {
     let id = UUID()
     let message: String
     let systemImage: String
+    let tint: Color?
     let undo: (() async -> Void)?
 
-    init(message: String, systemImage: String = "checkmark.circle.fill", undo: (() async -> Void)? = nil) {
+    init(message: String, systemImage: String = "checkmark.circle.fill",
+         tint: Color? = .green, undo: (() async -> Void)? = nil) {
         self.message = message
         self.systemImage = systemImage
+        self.tint = tint
         self.undo = undo
     }
 }
@@ -22,8 +25,23 @@ final class ToastManager {
     var autoDismissInterval: Duration = .seconds(3)
 
     private var dismissTask: Task<Void, Never>?
+    private var presenters: [(id: UUID, priority: Int)] = []
 
     private init() {}
+
+    func registerPresenter(id: UUID, priority: Int) {
+        presenters.removeAll { $0.id == id }
+        presenters.append((id: id, priority: priority))
+    }
+
+    func unregisterPresenter(id: UUID) {
+        presenters.removeAll { $0.id == id }
+    }
+
+    func isActivePresenter(_ id: UUID) -> Bool {
+        guard let topPriority = presenters.map(\.priority).max() else { return false }
+        return presenters.last { $0.priority == topPriority }?.id == id
+    }
 
     func show(_ item: ToastItem) {
         withAnimation(.smooth(duration: 0.35)) {

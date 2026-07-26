@@ -93,6 +93,11 @@ struct PicViewer: View {
                     .ignoresSafeArea()
             }
         }
+        .overlay(alignment: .top) {
+            ToastOverlayView(priority: 1) {
+                navigation.signalDataChanged()
+            }
+        }
         .navigationTitle(displayedPicName)
         .navigationBarTitleDisplayMode(.inline)
         .alert("ViewTitle.Pics.Rename", isPresented: $isRenamePicPresented) {

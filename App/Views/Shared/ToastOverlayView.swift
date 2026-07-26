@@ -2,23 +2,34 @@ import SwiftUI
 
 struct ToastOverlayView: View {
 
-    var onUndoComplete: () -> Void
+    var priority: Int = 0
+    var topPadding: CGFloat = 16.0
+    var onUndoComplete: () -> Void = {}
 
     @State private var manager = ToastManager.shared
+    @State private var presenterID = UUID()
     @State private var dragOffset: CGFloat = 0
     @State private var isShowingUndoConfirmation = false
 
     var body: some View {
-        Group {
-            if let item = manager.current {
+        // A ZStack, not a Group: Group forwards onAppear to its children, so an empty
+        // toast slot would never register itself as a presenter.
+        ZStack(alignment: .top) {
+            if manager.isActivePresenter(presenterID), let item = manager.current {
                 toast(item)
                     .id(item.id)
-                    .padding(.top, 56.0)
+                    .padding(.top, topPadding)
                     .padding(.horizontal, 16.0)
                     .transition(.move(edge: .top).combined(with: .blurReplace))
             }
         }
         .animation(.smooth(duration: 0.35), value: manager.current?.id)
+        .onAppear {
+            manager.registerPresenter(id: presenterID, priority: priority)
+        }
+        .onDisappear {
+            manager.unregisterPresenter(id: presenterID)
+        }
     }
 
     private func toast(_ item: ToastItem) -> some View {
@@ -36,7 +47,7 @@ struct ToastOverlayView: View {
         }
         .padding(.horizontal, 16.0)
         .padding(.vertical, 12.0)
-        .glassEffect(.regular.tint(.green.opacity(0.2)).interactive(), in: .capsule)
+        .glassEffect(.regular.tint(item.tint?.opacity(0.2)).interactive(), in: .capsule)
         .contentShape(.capsule)
         .offset(y: dragOffset)
         .gesture(dragGesture)

@@ -73,6 +73,11 @@ struct PhotosAssetViewer: View {
                     .ignoresSafeArea()
             }
         }
+        .overlay(alignment: .top) {
+            ToastOverlayView(priority: 1) {
+                navigation.signalDataChanged()
+            }
+        }
         .navigationTitle(displayName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

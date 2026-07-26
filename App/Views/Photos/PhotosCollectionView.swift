@@ -55,6 +55,9 @@ struct PhotosCollectionView: View {
                     }
             }
         }
+        .overlay(alignment: .top) {
+            ToastOverlayView(priority: 0)
+        }
         .navigationTitle(String(localized: "ViewTitle.Photos"))
         .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))
         .onChange(of: searchText) { _, newValue in

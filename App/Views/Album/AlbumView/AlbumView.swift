@@ -90,6 +90,11 @@ struct AlbumView: View {
 
     var body: some View {
         contentWithObservers
+            .overlay(alignment: .top) {
+                ToastOverlayView(priority: 0) {
+                    navigation.signalDataChanged()
+                }
+            }
             .navigationTitle(navigationTitleText)
             .navigationSubtitle(Text(verbatim: navigationSubtitleText))
             .searchable(text: $searchText, prompt: Text("Albums.Search.Prompt", tableName: "Albums"))

@@ -77,7 +77,7 @@ struct IllustMateApp: App {
             #endif
         }
         .overlay(alignment: .top) {
-            ToastOverlayView {
+            ToastOverlayView(priority: -1, topPadding: 56.0) {
                 navigation.signalDataChanged()
             }
         }
