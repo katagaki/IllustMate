@@ -318,7 +318,11 @@ extension PicViewer {
         }
     }
 
-    func startPictureInPicture() {
+    func togglePictureInPicture() {
+        guard !pipManager.isActive else {
+            pipManager.stop()
+            return
+        }
         guard let image = currentImage else { return }
 
         let picToRestore = viewer.displayedPic

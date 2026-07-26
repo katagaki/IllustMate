@@ -16,7 +16,6 @@ class PictureInPictureManager: NSObject {
     @ObservationIgnored private var playerLooper: AVPlayerLooper?
     @ObservationIgnored private(set) var playerLayer = AVPlayerLayer()
     @ObservationIgnored private var pipPossibleObservation: NSKeyValueObservation?
-    @ObservationIgnored private var isSwapping: Bool = false
 
     var isPossible: Bool {
         AVPictureInPictureController.isPictureInPictureSupported()
@@ -47,16 +46,11 @@ class PictureInPictureManager: NSObject {
         #endif
     }
 
-    // swiftlint:disable:next function_body_length
     func start(with image: UIImage, restore: @escaping @MainActor () -> Void) {
-        guard pipController != nil, player != nil else { return }
-
-        let alreadyActive = isActive
+        guard pipController != nil, player != nil, !isActive else { return }
 
         onRestore = restore
-        if !alreadyActive {
-            isPreparing = true
-        }
+        isPreparing = true
 
         do {
             let session = AVAudioSession.sharedInstance()
@@ -77,24 +71,6 @@ class PictureInPictureManager: NSObject {
 
                 let asset = AVURLAsset(url: videoURL)
                 let item = AVPlayerItem(asset: asset)
-
-                if alreadyActive {
-                    // Replace the player entirely to avoid AVQueuePlayer queue conflicts.
-                    // isSwapping stays true until PiP is restarted from the delegate.
-                    self.isSwapping = true
-                    self.playerLooper?.disableLooping()
-                    self.playerLooper = nil
-                    player.pause()
-
-                    let newPlayer = AVQueuePlayer()
-                    newPlayer.isMuted = true
-                    newPlayer.allowsExternalPlayback = false
-                    self.player = newPlayer
-                    self.playerLayer.player = newPlayer
-                    self.playerLooper = AVPlayerLooper(player: newPlayer, templateItem: item)
-                    newPlayer.play()
-                    return
-                }
 
                 player.removeAllItems()
                 self.playerLooper = AVPlayerLooper(player: player, templateItem: item)
@@ -129,7 +105,6 @@ class PictureInPictureManager: NSObject {
     private func didStop() {
         isActive = false
         isPreparing = false
-        isSwapping = false
         onRestore = nil
         pipPossibleObservation = nil
         player?.pause()
@@ -265,25 +240,6 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
         _ pictureInPictureController: AVPictureInPictureController
     ) {
         Task { @MainActor in
-            if isSwapping {
-                // PiP stopped because we swapped the player — restart it.
-                isSwapping = false
-                if pipController?.isPictureInPicturePossible == true {
-                    pipController?.startPictureInPicture()
-                } else {
-                    self.pipPossibleObservation = pipController?.observe(
-                        \.isPictureInPicturePossible,
-                        options: [.new]
-                    ) { [weak self] _, change in
-                        guard change.newValue == true else { return }
-                        Task { @MainActor [weak self] in
-                            self?.pipPossibleObservation = nil
-                            self?.pipController?.startPictureInPicture()
-                        }
-                    }
-                }
-                return
-            }
             didStop()
         }
     }
@@ -294,10 +250,6 @@ extension PictureInPictureManager: AVPictureInPictureControllerDelegate {
     ) {
         nonisolated(unsafe) let handler = completionHandler
         Task { @MainActor in
-            guard !isSwapping else {
-                handler(false)
-                return
-            }
             onRestore?()
             handler(true)
         }

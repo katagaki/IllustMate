@@ -101,8 +101,9 @@ struct PhotosAssetViewer: View {
                         }
                     } else {
                         if pipManager.isPossible {
-                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                                startPictureInPicture()
+                            Button("Shared.PictureInPicture",
+                                   systemImage: pipManager.isActive ? "pip.exit" : "pip.enter") {
+                                togglePictureInPicture()
                             }
                             .disabled(currentImage == nil)
                         }
@@ -140,8 +141,9 @@ struct PhotosAssetViewer: View {
                 } else {
                     if pipManager.isPossible {
                         ToolbarItemGroup(placement: .bottomBar) {
-                            Button("Shared.PictureInPicture", systemImage: "pip.enter") {
-                                startPictureInPicture()
+                            Button("Shared.PictureInPicture",
+                                   systemImage: pipManager.isActive ? "pip.exit" : "pip.enter") {
+                                togglePictureInPicture()
                             }
                             .disabled(currentImage == nil)
                         }
