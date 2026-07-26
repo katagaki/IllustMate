@@ -58,7 +58,9 @@ extension PicViewer {
         } action: { newWidth in
             swipeContentWidth = newWidth
         }
-        .simultaneousGesture(swipeGesture)
+        .gesture(HorizontalSwipeGesture(onChanged: trackSwipe) { translation, predicted, velocity in
+            endSwipeTracking(translation: translation, predictedTranslation: predicted, velocity: velocity)
+        })
     }
 
     @ViewBuilder
@@ -85,29 +87,25 @@ extension PicViewer {
         max(swipeContentWidth, 1.0) + 32.0
     }
 
-    var swipeGesture: some Gesture {
-        DragGesture(minimumDistance: 15.0)
-            .onChanged { value in
-                guard magnification == 1.0 else { return }
-                if !isSwipeTracking {
-                    guard abs(value.translation.width) > abs(value.translation.height) else { return }
-                    finalizePendingSwipe()
-                    swipeBase = swipeOffset
-                    isSwipeTracking = true
-                }
-                var offset = swipeBase + value.translation.width
-                if swipeBase == 0.0,
-                   (!viewer.hasPrevious && offset > 0.0) || (!viewer.hasNext && offset < 0.0) {
-                    offset /= 3.0
-                }
-                swipeOffset = offset
-            }
-            .onEnded { value in
-                guard isSwipeTracking else { return }
-                isSwipeTracking = false
-                let predictedOffset = swipeOffset + (value.predictedEndTranslation.width - value.translation.width)
-                endSwipe(predictedOffset: predictedOffset, velocity: value.velocity.width)
-            }
+    func trackSwipe(translation: CGFloat) {
+        guard magnification == 1.0 else { return }
+        if !isSwipeTracking {
+            finalizePendingSwipe()
+            swipeBase = swipeOffset
+            isSwipeTracking = true
+        }
+        var offset = swipeBase + translation
+        if swipeBase == 0.0,
+           (!viewer.hasPrevious && offset > 0.0) || (!viewer.hasNext && offset < 0.0) {
+            offset /= 3.0
+        }
+        swipeOffset = offset
+    }
+
+    func endSwipeTracking(translation: CGFloat, predictedTranslation: CGFloat, velocity: CGFloat) {
+        guard isSwipeTracking else { return }
+        isSwipeTracking = false
+        endSwipe(predictedOffset: swipeOffset + (predictedTranslation - translation), velocity: velocity)
     }
 
     func endSwipe(predictedOffset: CGFloat, velocity: CGFloat) {
