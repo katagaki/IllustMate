@@ -24,6 +24,7 @@ struct MoreBackupView: View {
     @State private var failureTitle: StatusView.StatusTitle =
         .custom("Backup.Error.Destination", tableName: "More")
     @State private var freeSpaceKnown: Bool = true
+    @State private var missingOriginals: Int = 0
 
     private var hasEnoughSpace: Bool {
         !freeSpaceKnown
@@ -43,9 +44,11 @@ struct MoreBackupView: View {
                     StatusView(type: .inProgress, title: .backupExporting,
                                currentCount: progressCurrent, totalCount: progressTotal)
                 case .completed:
-                    completion(title: .backupExportCompleted, isError: false)
+                    completion(title: .backupExportCompleted, isError: false,
+                               message: missingOriginals > 0
+                                   ? .backupExportPartial(missing: missingOriginals) : nil)
                 case .failed:
-                    completion(title: failureTitle, isError: true)
+                    completion(title: failureTitle, isError: true, message: nil)
                 }
             }
             .padding(20.0)
@@ -110,9 +113,10 @@ struct MoreBackupView: View {
     }
 
     @ViewBuilder
-    private func completion(title: StatusView.StatusTitle, isError: Bool) -> some View {
+    private func completion(title: StatusView.StatusTitle, isError: Bool,
+                            message: StatusView.StatusTitle?) -> some View {
         VStack(alignment: .center, spacing: 16.0) {
-            StatusView(type: isError ? .error : .success, title: title)
+            StatusView(type: isError ? .error : .success, title: title, message: message)
             Button { dismiss() } label: {
                 Text("Shared.OK").bold().padding(4.0).frame(maxWidth: .infinity)
             }
@@ -158,7 +162,7 @@ struct MoreBackupView: View {
         let dataActor = DataActor.instance(for: collectionID)
         let cid = collectionID
         do {
-            try await dataActor.backupDatabase(
+            missingOriginals = try await dataActor.backupDatabase(
                 to: destinationURL,
                 libraryName: libraryName,
                 originalProvider: { picID in

@@ -20,7 +20,7 @@ extension DataActor {
     func backupDatabase(to destinationDirectoryURL: URL, libraryName: String,
                         originalProvider: (@Sendable (String) async -> Data?)? = nil,
                         sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
-                        progress: (@MainActor (Int, Int) -> Void)? = nil) async throws {
+                        progress: (@MainActor (Int, Int) -> Void)? = nil) async throws -> Int {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
         }
@@ -37,8 +37,8 @@ extension DataActor {
         )
         try snapshotDatabase(to: destinationURL)
         do {
-            try await inlineOriginals(intoBackupAt: destinationURL,
-                                      originalProvider: originalProvider, progress: progress)
+            return try await inlineOriginals(intoBackupAt: destinationURL,
+                                             originalProvider: originalProvider, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -96,7 +96,7 @@ extension DataActor {
 
     private func inlineOriginals(intoBackupAt url: URL,
                                  originalProvider: (@Sendable (String) async -> Data?)?,
-                                 progress: (@MainActor (Int, Int) -> Void)?) async throws {
+                                 progress: (@MainActor (Int, Int) -> Void)?) async throws -> Int {
         let backupDB = try Connection(url.path)
         _ = try? backupDB.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
         let query = picsTable
@@ -109,13 +109,16 @@ extension DataActor {
                                        path: (try? row.get(picFilePath)) ?? nil))
         }
         let total = work.count
+        var missing = 0
         await progress?(0, total)
         for (index, item) in work.enumerated() {
             guard let blob = await originalBytes(picID: item.id,
                                                  mediaType: item.mediaType,
                                                  filePath: item.path,
                                                  originalProvider: originalProvider) else {
-                throw BackupError.originalUnavailable
+                missing += 1
+                await progress?(index + 1, total)
+                continue
             }
             let isVideo = item.mediaType == MediaType.video.rawValue
             try backupDB.run(picsTable.filter(picId == item.id).update(
@@ -124,6 +127,8 @@ extension DataActor {
             ))
             await progress?(index + 1, total)
         }
+        guard total == 0 || missing < total else { throw BackupError.originalUnavailable }
+        return missing
     }
 
     private func originalBytes(picID: String, mediaType: Int, filePath: String?,
