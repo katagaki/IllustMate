@@ -152,6 +152,7 @@ struct IllustMateApp: App {
             }
         }
         .sheet(isPresented: $isImportingBackup) {
+            if let importedURL { discardInboxCopy(of: importedURL) }
             importedURL = nil
         } content: {
             if let importedURL {
@@ -193,6 +194,19 @@ struct IllustMateApp: App {
                 isShowingWelcome = false
             }
         }
+    }
+
+    func discardInboxCopy(of url: URL) {
+        // Backups handed over without in-place access are copied into Documents/Inbox
+        // and left there forever, so a multi-gigabyte restore silently doubles on disk.
+        guard let documents = try? FileManager.default.url(for: .documentDirectory,
+                                                           in: .userDomainMask,
+                                                           appropriateFor: nil, create: false) else {
+            return
+        }
+        let inbox = documents.appendingPathComponent("Inbox").standardizedFileURL.path
+        guard url.standardizedFileURL.deletingLastPathComponent().path == inbox else { return }
+        try? FileManager.default.removeItem(at: url)
     }
 
     func handleSampleDataURL(_ url: URL) {
