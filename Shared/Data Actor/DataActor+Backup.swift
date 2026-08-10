@@ -175,35 +175,47 @@ extension DataActor {
         return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
     }
 
-    func importFromBackup(at url: URL, targetAlbumID: String?) throws {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
+    @discardableResult
+    func importFromBackup(at url: URL, targetAlbumID: String?) throws -> Int {
+        // A backup the system hands over by copying it into the app (anything not
+        // opened in place) is readable but not security scoped, and asking to access
+        // it reports false — treating that as fatal made every such restore a no-op.
+        let isScoped = url.startAccessingSecurityScopedResource()
+        defer { if isScoped { url.stopAccessingSecurityScopedResource() } }
 
+        guard FileManager.default.isReadableFile(atPath: url.path) else {
+            throw BackupError.sourceUnreadable
+        }
         let foreignDB = try Connection(url.path)
+        let imported: Int
         if let targetAlbumID {
-            try importIntoAlbum(targetAlbumID, from: foreignDB)
+            imported = try importIntoAlbum(targetAlbumID, from: foreignDB)
         } else {
-            try mergeBackup(from: foreignDB)
+            imported = try mergeBackup(from: foreignDB)
         }
         notifyLocalMutation()
+        guard imported > 0 else { throw BackupError.nothingRestored }
+        return imported
     }
 
     // MARK: - Import strategies
 
-    private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws {
+    private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws -> Int {
+        var imported = 0
         var albumIDMap: [String: String] = [:]
         for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? UUID().uuidString
             let newID = UUID().uuidString
             albumIDMap[oldID] = newID
             let oldParentID = try? foreignAlbum.get(albumParentId)
-            _ = try? database.run(albumsTable.insert(
+            let insert = albumsTable.insert(
                 albumId <- newID,
                 albumName <- (try? foreignAlbum.get(albumName)) ?? "",
                 albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
                 albumParentId <- oldParentID == nil ? targetAlbumID : nil,
                 albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
-            ))
+            )
+            if (try? database.run(insert)) != nil { imported += 1 }
         }
         for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? ""
@@ -216,32 +228,39 @@ extension DataActor {
         for foreignPic in try foreignDB.safeRows(picsTable) {
             let oldAlbumID = try? foreignPic.get(picAlbumId)
             let mappedAlbumID = oldAlbumID.flatMap { albumIDMap[$0] } ?? targetAlbumID
-            importForeignPic(foreignPic, newID: UUID().uuidString, albumID: mappedAlbumID)
+            if importForeignPic(foreignPic, newID: UUID().uuidString, albumID: mappedAlbumID) {
+                imported += 1
+            }
         }
+        return imported
     }
 
-    private func mergeBackup(from foreignDB: Connection) throws {
+    private func mergeBackup(from foreignDB: Connection) throws -> Int {
+        var imported = 0
         for foreignAlbum in try foreignDB.safeRows(albumsTable) {
-            _ = try? database.run(albumsTable.insert(or: .ignore,
+            let insert = albumsTable.insert(or: .ignore,
                 albumId <- (try? foreignAlbum.get(albumId)) ?? UUID().uuidString,
                 albumName <- (try? foreignAlbum.get(albumName)) ?? "",
                 albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
                 albumParentId <- (try? foreignAlbum.get(albumParentId)),
                 albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
-            ))
+            )
+            if (try? database.run(insert)) != nil { imported += 1 }
         }
         for foreignPic in try foreignDB.safeRows(picsTable) {
             let id = (try? foreignPic.get(picId)) ?? UUID().uuidString
             if ((try? database.scalar(picsTable.filter(picId == id).count)) ?? 0) > 0 { continue }
             let albumID = try? foreignPic.get(picAlbumId)
-            importForeignPic(foreignPic, newID: id, albumID: albumID)
+            if importForeignPic(foreignPic, newID: id, albumID: albumID) { imported += 1 }
         }
+        return imported
     }
 
-    private func importForeignPic(_ row: Row, newID: String, albumID: String?) {
+    @discardableResult
+    private func importForeignPic(_ row: Row, newID: String, albumID: String?) -> Bool {
         let mediaType = (try? row.get(picMediaType)) ?? 0
         let foreignFilePath = try? row.get(picFilePath)
-        guard let blob = try? row.get(picData) else { return }
+        guard let blob = try? row.get(picData) else { return false }
         let relativePath: String?
         if mediaType == MediaType.video.rawValue {
             let ext = foreignFilePath.flatMap { ($0 as NSString).pathExtension }
@@ -250,8 +269,8 @@ extension DataActor {
         } else {
             relativePath = saveImageFile(blob, id: newID)
         }
-        guard let relativePath else { return }
-        _ = try? database.run(picsTable.insert(or: .ignore,
+        guard let relativePath else { return false }
+        let insert = picsTable.insert(or: .ignore,
             picId <- newID,
             picName <- (try? row.get(picName)) ?? Pic.newFilename(),
             picAlbumId <- albumID,
@@ -260,6 +279,19 @@ extension DataActor {
             picMediaType <- mediaType,
             picDuration <- (try? row.get(picDuration)) ?? nil,
             picFilePath <- relativePath
-        ))
+        )
+        guard (try? database.run(insert)) != nil else {
+            deleteStoredFile(atRelativePath: relativePath, isVideo: mediaType == MediaType.video.rawValue)
+            return false
+        }
+        return true
+    }
+
+    private func deleteStoredFile(atRelativePath path: String, isVideo: Bool) {
+        if isVideo {
+            deleteVideoFile(atRelativePath: path)
+        } else {
+            deleteImageFile(atRelativePath: path)
+        }
     }
 }
