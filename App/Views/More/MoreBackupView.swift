@@ -11,6 +11,27 @@ struct MoreBackupView: View {
         case failed
     }
 
+    enum Format: String, CaseIterable, Identifiable {
+        case archive
+        case folders
+
+        var id: String { rawValue }
+
+        var title: LocalizedStringKey {
+            switch self {
+            case .archive: "Backup.Format.Archive"
+            case .folders: "Backup.Format.Folders"
+            }
+        }
+
+        var description: LocalizedStringKey {
+            switch self {
+            case .archive: "Backup.Format.Archive.Description"
+            case .folders: "Backup.Format.Folders.Description"
+            }
+        }
+    }
+
     @Environment(\.dismiss) var dismiss
     var destinationURL: URL
     var collectionID: String
@@ -25,6 +46,7 @@ struct MoreBackupView: View {
         .custom("Backup.Error.Destination", tableName: "More")
     @State private var freeSpaceKnown: Bool = true
     @State private var missingOriginals: Int = 0
+    @State private var format: Format = .archive
 
     private var hasEnoughSpace: Bool {
         !freeSpaceKnown
@@ -71,6 +93,19 @@ struct MoreBackupView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+            VStack(spacing: 6.0) {
+                Picker("Backup.Format", selection: $format) {
+                    ForEach(Format.allCases) { option in
+                        Text(option.title, tableName: "More").tag(option)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                Text(format.description, tableName: "More")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
             VStack(spacing: 6.0) {
                 summaryRow("Backup.Confirm.Size", value: byteString(estimatedBytes))
                 if freeSpaceKnown {
@@ -161,21 +196,31 @@ struct MoreBackupView: View {
         defer { UIApplication.shared.isIdleTimerDisabled = false }
         let dataActor = DataActor.instance(for: collectionID)
         let cid = collectionID
+        let originalProvider: @Sendable (String) async -> Data? = { picID in
+            await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid)
+        }
+        let sizeProvider: @Sendable (String) async -> Int64? = { picID in
+            await OriginalsManager.shared.originalSize(picID: picID, in: cid)
+        }
+        let onProgress: @MainActor (Int, Int) -> Void = { current, total in
+            progressCurrent = current
+            progressTotal = total
+        }
         do {
-            missingOriginals = try await dataActor.backupDatabase(
-                to: destinationURL,
-                libraryName: libraryName,
-                originalProvider: { picID in
-                    await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid)
-                },
-                sizeProvider: { picID in
-                    await OriginalsManager.shared.originalSize(picID: picID, in: cid)
-                },
-                progress: { current, total in
-                    progressCurrent = current
-                    progressTotal = total
-                }
-            )
+            switch format {
+            case .archive:
+                missingOriginals = try await dataActor.backupDatabase(
+                    to: destinationURL, libraryName: libraryName,
+                    originalProvider: originalProvider, sizeProvider: sizeProvider,
+                    progress: onProgress
+                )
+            case .folders:
+                missingOriginals = try await dataActor.exportFolderArchive(
+                    to: destinationURL, libraryName: libraryName,
+                    originalProvider: originalProvider, sizeProvider: sizeProvider,
+                    progress: onProgress
+                )
+            }
             withAnimation(.smooth.speed(2.0)) { phase = .completed }
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         } catch let error as BackupError {
