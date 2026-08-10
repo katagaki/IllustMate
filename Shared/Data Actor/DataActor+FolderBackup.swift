@@ -5,6 +5,11 @@ import UniformTypeIdentifiers
 
 extension DataActor {
 
+    private struct FolderBackupSource {
+        let url: URL?
+        let data: Data?
+    }
+
     private struct FolderBackupPic {
         let id: String
         let name: String
@@ -17,6 +22,7 @@ extension DataActor {
     func exportFolderArchive(to destinationDirectoryURL: URL, libraryName: String,
                              originalProvider: (@Sendable (String) async -> Data?)? = nil,
                              sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
+                             prefetch: (@Sendable ([String]) async -> Void)? = nil,
                              progress: (@MainActor (Int, Int) -> Void)? = nil) async throws -> Int {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
@@ -35,7 +41,7 @@ extension DataActor {
             return try await writeFolderArchive(at: destinationURL,
                                                 rootName: (fileName as NSString).deletingPathExtension,
                                                 originalProvider: originalProvider,
-                                                progress: progress)
+                                                prefetch: prefetch, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -44,6 +50,7 @@ extension DataActor {
 
     private func writeFolderArchive(at url: URL, rootName: String,
                                     originalProvider: (@Sendable (String) async -> Data?)?,
+                                    prefetch: (@Sendable ([String]) async -> Void)?,
                                     progress: (@MainActor (Int, Int) -> Void)?) async throws -> Int {
         let albumPaths = albumFolderPaths(rootName: rootName)
         let pics = folderBackupPics()
@@ -57,24 +64,18 @@ extension DataActor {
         var missing = 0
         let total = pics.count
         await progress?(0, total)
+        // Requested together so iCloud downloads them in parallel while the archive is
+        // being written, rather than each one starting cold when its turn comes up.
+        await prefetch?(pics.filter { !hasLocalOriginal($0) }.map(\.id))
         for (index, pic) in pics.enumerated() {
             let directory = pic.albumID.flatMap { albumPaths[$0] } ?? rootName
-            let isVideo = pic.mediaType == MediaType.video.rawValue
-            let localURL = pic.filePath.map {
-                isVideo ? videoFileURL(forRelativePath: $0) : imageFileURL(forRelativePath: $0)
-            }
-            var sourceURL: URL?
-            var sourceData: Data?
-            if let localURL, FileManager.default.fileExists(atPath: localURL.path) {
-                sourceURL = localURL
-            } else {
-                sourceData = await originalProvider?(pic.id)
-            }
-            guard sourceURL != nil || sourceData != nil else {
+            guard let source = await originalSource(for: pic, originalProvider: originalProvider) else {
                 missing += 1
                 await progress?(index + 1, total)
                 continue
             }
+            let (sourceURL, sourceData) = (source.url, source.data)
+            let isVideo = pic.mediaType == MediaType.video.rawValue
             let fileExtension = Self.fileExtension(forVideo: isVideo, filePath: pic.filePath,
                                                    localURL: sourceURL, data: sourceData)
             let fileName = Self.uniqueName(Self.sanitizedComponent(pic.name, fallback: pic.id),
@@ -100,6 +101,28 @@ extension DataActor {
         try writer.finish()
         guard total == 0 || missing < total else { throw BackupError.originalUnavailable }
         return missing
+    }
+
+    private func originalSource(
+        for pic: FolderBackupPic,
+        originalProvider: (@Sendable (String) async -> Data?)?
+    ) async -> FolderBackupSource? {
+        if hasLocalOriginal(pic), let path = pic.filePath {
+            let localURL = pic.mediaType == MediaType.video.rawValue
+                ? videoFileURL(forRelativePath: path)
+                : imageFileURL(forRelativePath: path)
+            return FolderBackupSource(url: localURL, data: nil)
+        }
+        guard let data = await originalProvider?(pic.id) else { return nil }
+        return FolderBackupSource(url: nil, data: data)
+    }
+
+    private func hasLocalOriginal(_ pic: FolderBackupPic) -> Bool {
+        guard let path = pic.filePath else { return false }
+        let localURL = pic.mediaType == MediaType.video.rawValue
+            ? videoFileURL(forRelativePath: path)
+            : imageFileURL(forRelativePath: path)
+        return FileManager.default.fileExists(atPath: localURL.path)
     }
 
     // MARK: - Layout

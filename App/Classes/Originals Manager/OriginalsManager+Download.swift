@@ -2,6 +2,14 @@ import Foundation
 
 extension OriginalsManager {
 
+    struct DownloadState {
+        let status: URLUbiquitousItemDownloadingStatus?
+        let isDownloading: Bool
+        let error: NSError?
+    }
+
+    static let downloadTickCap = 1200
+
     private func isMaterialized(_ url: URL) -> Bool {
         downloadingStatus(url) == .current
     }
@@ -75,13 +83,23 @@ extension OriginalsManager {
         }
     }
 
-    func fetchOriginal(picID: String, in collectionID: String) async -> Data? {
+    func prefetchOriginals(picIDs: [String], in collectionID: String) async {
+        for picID in picIDs {
+            guard let url = cloudURL(forPicID: picID, in: collectionID),
+                  !isMaterialized(url) else { continue }
+            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        }
+        await SyncMate.shared.debugLog("prefetch: requested \(picIDs.count)")
+    }
+
+    func fetchOriginal(picID: String, in collectionID: String,
+                       timeoutSeconds: Int = 10) async -> Data? {
         guard let cloudURL = cloudURL(forPicID: picID, in: collectionID) else {
             await SyncMate.shared.debugLog("fetch: no container")
             return nil
         }
         try? FileManager.default.startDownloadingUbiquitousItem(at: cloudURL)
-        guard await waitForDownload(cloudURL) else {
+        guard await waitForDownload(cloudURL, timeoutSeconds: timeoutSeconds) else {
             await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): timeout \(statusLabel(cloudURL))")
             return nil
         }
@@ -109,12 +127,43 @@ extension OriginalsManager {
     }
 
     private func waitForDownload(_ url: URL, timeoutSeconds: Int = 10) async -> Bool {
-        for _ in 0..<(timeoutSeconds * 2) {
-            if downloadingStatus(url) == .current { return true }
-            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        if downloadingStatus(url) == .current { return true }
+        // A nil status means iCloud has no such item, so no amount of waiting will
+        // ever produce one — bail instead of burning the whole timeout on it.
+        guard downloadingStatus(url) != nil else { return false }
+        try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        let idleLimit = timeoutSeconds * 2
+        var idleTicks = 0
+        var elapsedTicks = 0
+        while idleTicks < idleLimit && elapsedTicks < Self.downloadTickCap {
             try? await Task.sleep(for: .milliseconds(500))
+            elapsedTicks += 1
+            let state = downloadState(url)
+            if state.status == .current { return true }
+            guard state.status != nil, state.error == nil else { return false }
+            if state.isDownloading {
+                idleTicks = 0
+            } else {
+                idleTicks += 1
+                if idleTicks.isMultiple(of: 10) {
+                    try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+                }
+            }
         }
         return downloadingStatus(url) == .current
+    }
+
+    private func downloadState(_ url: URL) -> DownloadState {
+        var url = url
+        url.removeAllCachedResourceValues()
+        let values = try? url.resourceValues(forKeys: [
+            .ubiquitousItemDownloadingStatusKey,
+            .ubiquitousItemIsDownloadingKey,
+            .ubiquitousItemDownloadingErrorKey
+        ])
+        return DownloadState(status: values?.ubiquitousItemDownloadingStatus,
+                             isDownloading: values?.ubiquitousItemIsDownloading ?? false,
+                             error: values?.ubiquitousItemDownloadingError)
     }
 
     private func statusLabel(_ url: URL) -> String {

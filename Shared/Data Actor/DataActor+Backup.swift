@@ -20,6 +20,7 @@ extension DataActor {
     func backupDatabase(to destinationDirectoryURL: URL, libraryName: String,
                         originalProvider: (@Sendable (String) async -> Data?)? = nil,
                         sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
+                        prefetch: (@Sendable ([String]) async -> Void)? = nil,
                         progress: (@MainActor (Int, Int) -> Void)? = nil) async throws -> Int {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
@@ -38,7 +39,8 @@ extension DataActor {
         try snapshotDatabase(to: destinationURL)
         do {
             return try await inlineOriginals(intoBackupAt: destinationURL,
-                                             originalProvider: originalProvider, progress: progress)
+                                             originalProvider: originalProvider,
+                                             prefetch: prefetch, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -96,6 +98,7 @@ extension DataActor {
 
     private func inlineOriginals(intoBackupAt url: URL,
                                  originalProvider: (@Sendable (String) async -> Data?)?,
+                                 prefetch: (@Sendable ([String]) async -> Void)?,
                                  progress: (@MainActor (Int, Int) -> Void)?) async throws -> Int {
         let backupDB = try Connection(url.path)
         _ = try? backupDB.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
@@ -111,6 +114,10 @@ extension DataActor {
         let total = work.count
         var missing = 0
         await progress?(0, total)
+        // Every cloud-only original is requested up front so iCloud downloads them in
+        // parallel; waiting on them one at a time means each starts from cold and the
+        // whole backup fails together when the first ones time out.
+        await prefetch?(work.filter { !hasLocalOriginal($0) }.map(\.id))
         for (index, item) in work.enumerated() {
             guard let blob = await originalBytes(picID: item.id,
                                                  mediaType: item.mediaType,
@@ -129,6 +136,14 @@ extension DataActor {
         }
         guard total == 0 || missing < total else { throw BackupError.originalUnavailable }
         return missing
+    }
+
+    private func hasLocalOriginal(_ item: BackupOriginal) -> Bool {
+        guard let path = item.path else { return false }
+        let localURL = item.mediaType == MediaType.video.rawValue
+            ? videoFileURL(forRelativePath: path)
+            : imageFileURL(forRelativePath: path)
+        return FileManager.default.fileExists(atPath: localURL.path)
     }
 
     func originalBytes(picID: String, mediaType: Int, filePath: String?,

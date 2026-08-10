@@ -197,7 +197,11 @@ struct MoreBackupView: View {
         let dataActor = DataActor.instance(for: collectionID)
         let cid = collectionID
         let originalProvider: @Sendable (String) async -> Data? = { picID in
-            await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid)
+            await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid,
+                                                        timeoutSeconds: 60)
+        }
+        let prefetch: @Sendable ([String]) async -> Void = { picIDs in
+            await OriginalsManager.shared.prefetchOriginals(picIDs: picIDs, in: cid)
         }
         let sizeProvider: @Sendable (String) async -> Int64? = { picID in
             await OriginalsManager.shared.originalSize(picID: picID, in: cid)
@@ -212,13 +216,13 @@ struct MoreBackupView: View {
                 missingOriginals = try await dataActor.backupDatabase(
                     to: destinationURL, libraryName: libraryName,
                     originalProvider: originalProvider, sizeProvider: sizeProvider,
-                    progress: onProgress
+                    prefetch: prefetch, progress: onProgress
                 )
             case .folders:
                 missingOriginals = try await dataActor.exportFolderArchive(
                     to: destinationURL, libraryName: libraryName,
                     originalProvider: originalProvider, sizeProvider: sizeProvider,
-                    progress: onProgress
+                    prefetch: prefetch, progress: onProgress
                 )
             }
             withAnimation(.smooth.speed(2.0)) { phase = .completed }
