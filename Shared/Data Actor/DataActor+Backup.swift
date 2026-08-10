@@ -48,9 +48,8 @@ extension DataActor {
     }
 
     private func snapshotDatabase(to url: URL) throws {
-        // The database runs in WAL mode, so copying Collection.db alone leaves behind
-        // every change still sitting in the -wal sidecar. VACUUM INTO writes a single
-        // self-contained file holding the full committed state instead.
+        // Copying Collection.db alone omits the -wal sidecar the database writes in WAL
+        // mode; VACUUM INTO writes the full committed state as one self-contained file.
         let escapedPath = url.path.replacingOccurrences(of: "'", with: "''")
         try database.execute("VACUUM INTO '\(escapedPath)'")
     }
@@ -114,9 +113,6 @@ extension DataActor {
         let total = work.count
         var missing = 0
         await progress?(0, total)
-        // Every cloud-only original is requested up front so iCloud downloads them in
-        // parallel; waiting on them one at a time means each starts from cold and the
-        // whole backup fails together when the first ones time out.
         await prefetch?(work.filter { !hasLocalOriginal($0) }.map(\.id))
         for (index, item) in work.enumerated() {
             guard let blob = await originalBytes(picID: item.id,
@@ -197,9 +193,8 @@ extension DataActor {
 
     @discardableResult
     func importFromBackup(at url: URL, targetAlbumID: String?) throws -> Int {
-        // A backup the system hands over by copying it into the app (anything not
-        // opened in place) is readable but not security scoped, and asking to access
-        // it reports false — treating that as fatal made every such restore a no-op.
+        // A backup the system copies into the app instead of opening in place is
+        // readable, but startAccessingSecurityScopedResource() still reports false.
         let isScoped = url.startAccessingSecurityScopedResource()
         defer { if isScoped { url.stopAccessingSecurityScopedResource() } }
 

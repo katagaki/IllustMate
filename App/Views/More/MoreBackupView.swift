@@ -198,7 +198,7 @@ struct MoreBackupView: View {
         let cid = collectionID
         let originalProvider: @Sendable (String) async -> Data? = { picID in
             await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid,
-                                                        timeoutSeconds: 60)
+                                                        timeoutSeconds: 60, retries: 3)
         }
         let prefetch: @Sendable ([String]) async -> Void = { picIDs in
             await OriginalsManager.shared.prefetchOriginals(picIDs: picIDs, in: cid)

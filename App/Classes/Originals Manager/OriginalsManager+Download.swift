@@ -2,6 +2,12 @@ import Foundation
 
 extension OriginalsManager {
 
+    enum DownloadOutcome {
+        case downloaded
+        case timedOut
+        case unavailable
+    }
+
     struct DownloadState {
         let status: URLUbiquitousItemDownloadingStatus?
         let isDownloading: Bool
@@ -19,7 +25,7 @@ extension OriginalsManager {
         guard let url = cloudURL(forPicID: picID, in: collectionID) else { return false }
         if isMaterialized(url) { return true }
         try? FileManager.default.startDownloadingUbiquitousItem(at: url)
-        return await waitForDownload(url)
+        return await waitForDownload(url) == .downloaded
     }
 
     func picIDsNotMaterialized(in collectionID: String) async -> [String] {
@@ -93,22 +99,35 @@ extension OriginalsManager {
     }
 
     func fetchOriginal(picID: String, in collectionID: String,
-                       timeoutSeconds: Int = 10) async -> Data? {
+                       timeoutSeconds: Int = 10, retries: Int = 0,
+                       retryDelaySeconds: Int = 3) async -> Data? {
         guard let cloudURL = cloudURL(forPicID: picID, in: collectionID) else {
             await SyncMate.shared.debugLog("fetch: no container")
             return nil
         }
-        try? FileManager.default.startDownloadingUbiquitousItem(at: cloudURL)
-        guard await waitForDownload(cloudURL, timeoutSeconds: timeoutSeconds) else {
-            await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): timeout \(statusLabel(cloudURL))")
-            return nil
+        for attempt in 0...max(retries, 0) {
+            if attempt > 0 {
+                try? await Task.sleep(for: .seconds(retryDelaySeconds))
+                await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): retry \(attempt)")
+            }
+            try? FileManager.default.startDownloadingUbiquitousItem(at: cloudURL)
+            let outcome = await waitForDownload(cloudURL, timeoutSeconds: timeoutSeconds)
+            guard outcome != .unavailable else {
+                await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): unavailable")
+                return nil
+            }
+            guard outcome == .downloaded else {
+                await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): timeout \(statusLabel(cloudURL))")
+                continue
+            }
+            guard let data = await coordinatedReadData(at: cloudURL) else {
+                await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): read fail")
+                continue
+            }
+            await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): ok \(data.count / 1024)KB")
+            return data
         }
-        guard let data = await coordinatedReadData(at: cloudURL) else {
-            await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): read fail")
-            return nil
-        }
-        await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): ok \(data.count / 1024)KB")
-        return data
+        return nil
     }
 
     func materializedVideoURL(picID: String, in collectionID: String) async -> URL? {
@@ -118,7 +137,7 @@ extension OriginalsManager {
         }
         if isMaterialized(url) { return url }
         try? FileManager.default.startDownloadingUbiquitousItem(at: url)
-        if await waitForDownload(url) {
+        if await waitForDownload(url) == .downloaded {
             await SyncMate.shared.debugLog("video \(picID.prefix(6)): ok")
             return url
         }
@@ -126,11 +145,11 @@ extension OriginalsManager {
         return nil
     }
 
-    private func waitForDownload(_ url: URL, timeoutSeconds: Int = 10) async -> Bool {
-        if downloadingStatus(url) == .current { return true }
-        // A nil status means iCloud has no such item, so no amount of waiting will
-        // ever produce one — bail instead of burning the whole timeout on it.
-        guard downloadingStatus(url) != nil else { return false }
+    private func waitForDownload(_ url: URL, timeoutSeconds: Int = 10) async -> DownloadOutcome {
+        if downloadingStatus(url) == .current { return .downloaded }
+        // A nil downloading status means iCloud holds no such item at all, so waiting
+        // can never produce one.
+        guard downloadingStatus(url) != nil else { return .unavailable }
         try? FileManager.default.startDownloadingUbiquitousItem(at: url)
         let idleLimit = timeoutSeconds * 2
         var idleTicks = 0
@@ -139,8 +158,9 @@ extension OriginalsManager {
             try? await Task.sleep(for: .milliseconds(500))
             elapsedTicks += 1
             let state = downloadState(url)
-            if state.status == .current { return true }
-            guard state.status != nil, state.error == nil else { return false }
+            if state.status == .current { return .downloaded }
+            guard state.status != nil else { return .unavailable }
+            if state.error != nil { return .timedOut }
             if state.isDownloading {
                 idleTicks = 0
             } else {
@@ -150,7 +170,7 @@ extension OriginalsManager {
                 }
             }
         }
-        return downloadingStatus(url) == .current
+        return downloadingStatus(url) == .current ? .downloaded : .timedOut
     }
 
     private func downloadState(_ url: URL) -> DownloadState {

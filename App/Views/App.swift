@@ -197,8 +197,7 @@ struct IllustMateApp: App {
     }
 
     func discardInboxCopy(of url: URL) {
-        // Backups handed over without in-place access are copied into Documents/Inbox
-        // and left there forever, so a multi-gigabyte restore silently doubles on disk.
+        // Files the system copies into Documents/Inbox are never cleaned up for us.
         guard let documents = try? FileManager.default.url(for: .documentDirectory,
                                                            in: .userDomainMask,
                                                            appropriateFor: nil, create: false) else {

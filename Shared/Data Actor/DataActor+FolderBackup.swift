@@ -64,8 +64,6 @@ extension DataActor {
         var missing = 0
         let total = pics.count
         await progress?(0, total)
-        // Requested together so iCloud downloads them in parallel while the archive is
-        // being written, rather than each one starting cold when its turn comes up.
         await prefetch?(pics.filter { !hasLocalOriginal($0) }.map(\.id))
         for (index, pic) in pics.enumerated() {
             let directory = pic.albumID.flatMap { albumPaths[$0] } ?? rootName
@@ -90,9 +88,6 @@ extension DataActor {
                                        modified: pic.dateAdded)
                 }
             } catch {
-                // writeEntry rewinds the archive before rethrowing, so a source that
-                // can't be read only costs its own entry; a destination that can't be
-                // written fails the rewind and aborts the export instead.
                 debugPrint("Skipped \(pic.id) in folder backup: \(error)")
                 missing += 1
             }

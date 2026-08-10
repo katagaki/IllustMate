@@ -88,16 +88,11 @@ final class ZIPArchiveWriter {
             }
             guard written == size else { throw ZIPArchiveError.sizeMismatch }
         } catch {
-            // The header promises exactly `size` bytes, so a source that fails or
-            // changes length partway through would leave an unreadable entry behind.
             try handle.truncate(atOffset: offset)
             try handle.seek(toOffset: offset)
             throw error
         }
         if size > 0 {
-            // The CRC is only known once the whole entry has streamed past, so the
-            // placeholder in the local header is patched in afterwards rather than
-            // buffering the entry or reading it a second time.
             let end = try handle.offset()
             try handle.seek(toOffset: offset + 14)
             try handle.write(contentsOf: crc.littleEndianData)
