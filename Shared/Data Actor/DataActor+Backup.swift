@@ -68,8 +68,8 @@ extension DataActor {
         return candidate
     }
 
-    private func ensureFreeSpace(at directory: URL,
-                                 sizeProvider: (@Sendable (String) async -> Int64?)?) async throws {
+    func ensureFreeSpace(at directory: URL,
+                         sizeProvider: (@Sendable (String) async -> Int64?)?) async throws {
         let payload = await backupEstimate(sizeProvider: sizeProvider).bytes
         let required = Self.requiredFreeSpace(forBackupPayload: payload)
         let values = try? directory.resourceValues(forKeys: [
@@ -83,7 +83,7 @@ extension DataActor {
         }
     }
 
-    private func backupFileName(for libraryName: String) -> String {
+    func backupFileName(for libraryName: String, fileExtension: String = "pics") -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
         let timestamp = dateFormatter.string(from: Date())
@@ -91,7 +91,7 @@ extension DataActor {
             let invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
             return String(char).unicodeScalars.allSatisfy(invalid.contains) ? "_" : char
         })
-        return "Backup-\(sanitized)-\(timestamp).pics"
+        return "Backup-\(sanitized)-\(timestamp).\(fileExtension)"
     }
 
     private func inlineOriginals(intoBackupAt url: URL,
@@ -131,8 +131,8 @@ extension DataActor {
         return missing
     }
 
-    private func originalBytes(picID: String, mediaType: Int, filePath: String?,
-                               originalProvider: (@Sendable (String) async -> Data?)?) async -> Data? {
+    func originalBytes(picID: String, mediaType: Int, filePath: String?,
+                       originalProvider: (@Sendable (String) async -> Data?)?) async -> Data? {
         let isVideo = mediaType == MediaType.video.rawValue
         if let filePath {
             let localURL = isVideo
@@ -175,7 +175,7 @@ extension DataActor {
         payloadBytes + payloadBytes / 10 + 50_000_000
     }
 
-    private func fileSize(at url: URL) -> Int64 {
+    func fileSize(at url: URL) -> Int64 {
         let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
         return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
     }

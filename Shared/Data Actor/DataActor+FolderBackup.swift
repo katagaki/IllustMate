@@ -1,0 +1,190 @@
+import Foundation
+import ImageIO
+@preconcurrency import SQLite
+import UniformTypeIdentifiers
+
+extension DataActor {
+
+    private struct FolderBackupPic {
+        let id: String
+        let name: String
+        let albumID: String?
+        let mediaType: Int
+        let filePath: String?
+        let dateAdded: Date
+    }
+
+    func exportFolderArchive(to destinationDirectoryURL: URL, libraryName: String,
+                             originalProvider: (@Sendable (String) async -> Data?)? = nil,
+                             sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
+                             progress: (@MainActor (Int, Int) -> Void)? = nil) async throws -> Int {
+        guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
+            throw BackupError.destinationInaccessible
+        }
+        defer { destinationDirectoryURL.stopAccessingSecurityScopedResource() }
+
+        try await ensureFreeSpace(at: destinationDirectoryURL, sizeProvider: sizeProvider)
+
+        let fileManager = FileManager.default
+        if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
+            try fileManager.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: true)
+        }
+        let fileName = backupFileName(for: libraryName, fileExtension: "zip")
+        let destinationURL = Self.uniqueURL(in: destinationDirectoryURL, fileName: fileName)
+        do {
+            return try await writeFolderArchive(at: destinationURL,
+                                                rootName: (fileName as NSString).deletingPathExtension,
+                                                originalProvider: originalProvider,
+                                                progress: progress)
+        } catch {
+            try? fileManager.removeItem(at: destinationURL)
+            throw error
+        }
+    }
+
+    private func writeFolderArchive(at url: URL, rootName: String,
+                                    originalProvider: (@Sendable (String) async -> Data?)?,
+                                    progress: (@MainActor (Int, Int) -> Void)?) async throws -> Int {
+        let albumPaths = albumFolderPaths(rootName: rootName)
+        let pics = folderBackupPics()
+        let writer = try ZIPArchiveWriter(url: url)
+        try writer.addDirectory(rootName)
+        for path in Set(albumPaths.values).sorted() {
+            try writer.addDirectory(path)
+        }
+
+        var usedNames: [String: Set<String>] = [:]
+        var missing = 0
+        let total = pics.count
+        await progress?(0, total)
+        for (index, pic) in pics.enumerated() {
+            let directory = pic.albumID.flatMap { albumPaths[$0] } ?? rootName
+            let isVideo = pic.mediaType == MediaType.video.rawValue
+            let localURL = pic.filePath.map {
+                isVideo ? videoFileURL(forRelativePath: $0) : imageFileURL(forRelativePath: $0)
+            }
+            var sourceURL: URL?
+            var sourceData: Data?
+            if let localURL, FileManager.default.fileExists(atPath: localURL.path) {
+                sourceURL = localURL
+            } else {
+                sourceData = await originalProvider?(pic.id)
+            }
+            guard sourceURL != nil || sourceData != nil else {
+                missing += 1
+                await progress?(index + 1, total)
+                continue
+            }
+            let fileExtension = Self.fileExtension(forVideo: isVideo, filePath: pic.filePath,
+                                                   localURL: sourceURL, data: sourceData)
+            let fileName = Self.uniqueName(Self.sanitizedComponent(pic.name, fallback: pic.id),
+                                           fileExtension: fileExtension,
+                                           taken: &usedNames[directory, default: []])
+            if let sourceURL {
+                try writer.addFile("\(directory)/\(fileName)", contentsOf: sourceURL,
+                                   modified: pic.dateAdded)
+            } else if let sourceData {
+                try writer.addFile("\(directory)/\(fileName)", data: sourceData,
+                                   modified: pic.dateAdded)
+            }
+            await progress?(index + 1, total)
+        }
+        try writer.finish()
+        guard total == 0 || missing < total else { throw BackupError.originalUnavailable }
+        return missing
+    }
+
+    // MARK: - Layout
+
+    private func albumFolderPaths(rootName: String) -> [String: String] {
+        var names: [String: String] = [:]
+        var parents: [String: String] = [:]
+        let query = albumsTable.select(albumId, albumName, albumParentId)
+        for row in (try? database.safeRows(query)) ?? [] {
+            let id = (try? row.get(albumId)) ?? ""
+            guard !id.isEmpty else { continue }
+            names[id] = Self.sanitizedComponent((try? row.get(albumName)) ?? "", fallback: id)
+            if let parent = (try? row.get(albumParentId)) ?? nil, !parent.isEmpty {
+                parents[id] = parent
+            }
+        }
+        var children: [String: [String]] = [:]
+        for id in names.keys {
+            let parent = parents[id].flatMap { names[$0] != nil ? $0 : nil } ?? ""
+            children[parent, default: []].append(id)
+        }
+        var paths: [String: String] = [:]
+        var visited: Set<String> = []
+        var pending: [(parent: String, prefix: String)] = [("", rootName)]
+        while let level = pending.popLast() {
+            var taken: Set<String> = []
+            let sorted = (children[level.parent] ?? []).sorted { (names[$0] ?? "") < (names[$1] ?? "") }
+            for id in sorted where !visited.contains(id) {
+                visited.insert(id)
+                let component = Self.uniqueName(names[id] ?? id, fileExtension: nil, taken: &taken)
+                let path = "\(level.prefix)/\(component)"
+                paths[id] = path
+                pending.append((id, path))
+            }
+        }
+        for id in names.keys where paths[id] == nil {
+            paths[id] = rootName
+        }
+        return paths
+    }
+
+    private func folderBackupPics() -> [FolderBackupPic] {
+        let query = picsTable.select(picId, picName, picAlbumId, picMediaType, picFilePath, picDateAdded)
+        return ((try? database.safeRows(query)) ?? []).map { row in
+            FolderBackupPic(id: (try? row.get(picId)) ?? "",
+                            name: (try? row.get(picName)) ?? "",
+                            albumID: (try? row.get(picAlbumId)) ?? nil,
+                            mediaType: (try? row.get(picMediaType)) ?? 0,
+                            filePath: (try? row.get(picFilePath)) ?? nil,
+                            dateAdded: Date(timeIntervalSince1970: (try? row.get(picDateAdded)) ?? 0))
+        }
+    }
+
+    // MARK: - Naming
+
+    private static func fileExtension(forVideo isVideo: Bool, filePath: String?,
+                                      localURL: URL?, data: Data?) -> String {
+        if isVideo {
+            let stored = filePath.map { ($0 as NSString).pathExtension } ?? ""
+            return stored.isEmpty ? "mov" : stored
+        }
+        let source = localURL.flatMap { CGImageSourceCreateWithURL($0 as CFURL, nil) }
+            ?? data.flatMap { CGImageSourceCreateWithData($0 as CFData, nil) }
+        guard let source, let identifier = CGImageSourceGetType(source),
+              let type = UTType(identifier as String),
+              let fileExtension = type.preferredFilenameExtension else {
+            return "png"
+        }
+        return fileExtension
+    }
+
+    private static func sanitizedComponent(_ name: String, fallback: String) -> String {
+        let stripped = name.map { character -> Character in
+            character == "/" || character == ":" || character.unicodeScalars.contains(where: {
+                CharacterSet.controlCharacters.contains($0)
+            }) ? "_" : character
+        }
+        let trimmed = String(stripped).trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty || trimmed == "." || trimmed == ".." { return fallback }
+        return String(trimmed.prefix(120))
+    }
+
+    private static func uniqueName(_ stem: String, fileExtension: String?,
+                                   taken: inout Set<String>) -> String {
+        let base = (stem as NSString).deletingPathExtension.isEmpty
+            ? stem : (stem as NSString).deletingPathExtension
+        var candidate = fileExtension.map { "\(base).\($0)" } ?? base
+        var suffix = 2
+        while taken.contains(candidate.lowercased()) {
+            candidate = fileExtension.map { "\(base) \(suffix).\($0)" } ?? "\(base) \(suffix)"
+            suffix += 1
+        }
+        taken.insert(candidate.lowercased())
+        return candidate
+    }
+}
