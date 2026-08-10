@@ -191,7 +191,7 @@ struct MoreBackupView: View {
             .custom("Backup.Error.InsufficientSpace", tableName: "More")
         case .originalUnavailable:
             .custom("Backup.Error.Incomplete", tableName: "More")
-        case .destinationInaccessible:
+        case .destinationInaccessible, .sourceUnreadable, .nothingRestored:
             .custom("Backup.Error.Destination", tableName: "More")
         }
     }

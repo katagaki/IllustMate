@@ -5,6 +5,8 @@ enum BackupError: Error {
     case destinationInaccessible
     case insufficientSpace(required: Int64, available: Int64)
     case originalUnavailable
+    case sourceUnreadable
+    case nothingRestored
 }
 
 extension DataActor {
@@ -30,9 +32,10 @@ extension DataActor {
         if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
             try fileManager.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: true)
         }
-        let destinationURL = destinationDirectoryURL
-            .appendingPathComponent(backupFileName(for: libraryName))
-        try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
+        let destinationURL = Self.uniqueURL(
+            in: destinationDirectoryURL, fileName: backupFileName(for: libraryName)
+        )
+        try snapshotDatabase(to: destinationURL)
         do {
             try await inlineOriginals(intoBackupAt: destinationURL,
                                       originalProvider: originalProvider, progress: progress)
@@ -40,6 +43,29 @@ extension DataActor {
             try? fileManager.removeItem(at: destinationURL)
             throw error
         }
+    }
+
+    private func snapshotDatabase(to url: URL) throws {
+        // The database runs in WAL mode, so copying Collection.db alone leaves behind
+        // every change still sitting in the -wal sidecar. VACUUM INTO writes a single
+        // self-contained file holding the full committed state instead.
+        let escapedPath = url.path.replacingOccurrences(of: "'", with: "''")
+        try database.execute("VACUUM INTO '\(escapedPath)'")
+    }
+
+    static func uniqueURL(in directory: URL, fileName: String) -> URL {
+        let fileManager = FileManager.default
+        var candidate = directory.appendingPathComponent(fileName)
+        guard fileManager.fileExists(atPath: candidate.path) else { return candidate }
+        let stem = (fileName as NSString).deletingPathExtension
+        let ext = (fileName as NSString).pathExtension
+        var suffix = 2
+        repeat {
+            let name = ext.isEmpty ? "\(stem) \(suffix)" : "\(stem) \(suffix).\(ext)"
+            candidate = directory.appendingPathComponent(name)
+            suffix += 1
+        } while fileManager.fileExists(atPath: candidate.path)
+        return candidate
     }
 
     private func ensureFreeSpace(at directory: URL,
