@@ -80,12 +80,20 @@ extension DataActor {
             let fileName = Self.uniqueName(Self.sanitizedComponent(pic.name, fallback: pic.id),
                                            fileExtension: fileExtension,
                                            taken: &usedNames[directory, default: []])
-            if let sourceURL {
-                try writer.addFile("\(directory)/\(fileName)", contentsOf: sourceURL,
-                                   modified: pic.dateAdded)
-            } else if let sourceData {
-                try writer.addFile("\(directory)/\(fileName)", data: sourceData,
-                                   modified: pic.dateAdded)
+            do {
+                if let sourceURL {
+                    try writer.addFile("\(directory)/\(fileName)", contentsOf: sourceURL,
+                                       modified: pic.dateAdded)
+                } else if let sourceData {
+                    try writer.addFile("\(directory)/\(fileName)", data: sourceData,
+                                       modified: pic.dateAdded)
+                }
+            } catch {
+                // writeEntry rewinds the archive before rethrowing, so a source that
+                // can't be read only costs its own entry; a destination that can't be
+                // written fails the rewind and aborts the export instead.
+                debugPrint("Skipped \(pic.id) in folder backup: \(error)")
+                missing += 1
             }
             await progress?(index + 1, total)
         }

@@ -30,6 +30,10 @@ final class ZIPArchiveWriter {
         handle = try FileHandle(forWritingTo: url)
     }
 
+    deinit {
+        try? handle.close()
+    }
+
     func addDirectory(_ path: String, modified: Date = Date()) throws {
         let name = path.hasSuffix("/") ? path : path + "/"
         try writeEntry(name: name, size: 0, isDirectory: true, modified: modified) { _ in }
@@ -76,12 +80,20 @@ final class ZIPArchiveWriter {
                                                  modified: modified, needsZIP64: needsZIP64))
         var crc: UInt32 = 0
         var written: UInt64 = 0
-        try body { chunk in
-            crc = CRC32.update(crc, with: chunk)
-            written += UInt64(chunk.count)
-            try self.handle.write(contentsOf: chunk)
+        do {
+            try body { chunk in
+                crc = CRC32.update(crc, with: chunk)
+                written += UInt64(chunk.count)
+                try self.handle.write(contentsOf: chunk)
+            }
+            guard written == size else { throw ZIPArchiveError.sizeMismatch }
+        } catch {
+            // The header promises exactly `size` bytes, so a source that fails or
+            // changes length partway through would leave an unreadable entry behind.
+            try handle.truncate(atOffset: offset)
+            try handle.seek(toOffset: offset)
+            throw error
         }
-        guard written == size else { throw ZIPArchiveError.sizeMismatch }
         if size > 0 {
             // The CRC is only known once the whole entry has streamed past, so the
             // placeholder in the local header is patched in afterwards rather than
