@@ -9,6 +9,12 @@ enum BackupError: Error {
     case nothingRestored
 }
 
+struct BackupPreflight: Sendable {
+    let count: Int
+    let bytes: Int64
+    let unavailablePicIDs: [String]
+}
+
 extension DataActor {
 
     private struct BackupOriginal {
@@ -21,6 +27,7 @@ extension DataActor {
                         originalProvider: (@Sendable (String) async -> Data?)? = nil,
                         sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
                         prefetch: (@Sendable ([String]) async -> Void)? = nil,
+                        skipping: Set<String> = [],
                         progress: (@MainActor (Int, Int) -> Void)? = nil) async throws {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
@@ -40,7 +47,7 @@ extension DataActor {
         do {
             try await inlineOriginals(intoBackupAt: destinationURL,
                                       originalProvider: originalProvider,
-                                      prefetch: prefetch, progress: progress)
+                                      prefetch: prefetch, skipping: skipping, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -98,6 +105,7 @@ extension DataActor {
     private func inlineOriginals(intoBackupAt url: URL,
                                  originalProvider: (@Sendable (String) async -> Data?)?,
                                  prefetch: (@Sendable ([String]) async -> Void)?,
+                                 skipping: Set<String>,
                                  progress: (@MainActor (Int, Int) -> Void)?) async throws {
         let backupDB = try Connection(url.path)
         _ = try? backupDB.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
@@ -112,8 +120,13 @@ extension DataActor {
         }
         let total = work.count
         await progress?(0, total)
-        await prefetch?(work.filter { !hasLocalOriginal($0) }.map(\.id))
+        await prefetch?(work.filter { !hasLocalOriginal($0) && !skipping.contains($0.id) }.map(\.id))
         for (index, item) in work.enumerated() {
+            if skipping.contains(item.id) {
+                try backupDB.run(picsTable.filter(picId == item.id).delete())
+                await progress?(index + 1, total)
+                continue
+            }
             guard let blob = await originalBytes(picID: item.id,
                                                  mediaType: item.mediaType,
                                                  filePath: item.path,
@@ -152,8 +165,10 @@ extension DataActor {
         return await originalProvider?(picID)
     }
 
-    func backupEstimate(sizeProvider: (@Sendable (String) async -> Int64?)?) async -> (count: Int, bytes: Int64) {
+    func backupEstimate(sizeProvider: (@Sendable (String) async -> Int64?)?,
+                        availability: (@Sendable (String) async -> Bool)? = nil) async -> BackupPreflight {
         var bytes = fileSize(at: databaseURL)
+        var unavailable: [String] = []
         var rows: [(id: String, mediaType: Int, path: String?)] = []
         if let prepared = try? database.safeRows(picsTable.select(picId, picMediaType, picFilePath)) {
             for row in prepared {
@@ -173,8 +188,11 @@ extension DataActor {
                 }
             }
             if let size = await sizeProvider?(row.id) { bytes += size }
+            if let availability, await availability(row.id) == false {
+                unavailable.append(row.id)
+            }
         }
-        return (rows.count, bytes)
+        return BackupPreflight(count: rows.count, bytes: bytes, unavailablePicIDs: unavailable)
     }
 
     static func requiredFreeSpace(forBackupPayload payloadBytes: Int64) -> Int64 {

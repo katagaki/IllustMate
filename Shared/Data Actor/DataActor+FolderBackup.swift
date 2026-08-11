@@ -5,6 +5,13 @@ import UniformTypeIdentifiers
 
 extension DataActor {
 
+    private struct FolderBackupOptions {
+        let originalProvider: (@Sendable (String) async -> Data?)?
+        let prefetch: (@Sendable ([String]) async -> Void)?
+        let skipping: Set<String>
+        let progress: (@MainActor (Int, Int) -> Void)?
+    }
+
     private struct FolderBackupSource {
         let url: URL?
         let data: Data?
@@ -23,6 +30,7 @@ extension DataActor {
                              originalProvider: (@Sendable (String) async -> Data?)? = nil,
                              sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
                              prefetch: (@Sendable ([String]) async -> Void)? = nil,
+                             skipping: Set<String> = [],
                              progress: (@MainActor (Int, Int) -> Void)? = nil) async throws {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
@@ -38,10 +46,12 @@ extension DataActor {
         let fileName = backupFileName(for: libraryName, fileExtension: "zip")
         let destinationURL = Self.uniqueURL(in: destinationDirectoryURL, fileName: fileName)
         do {
-            try await writeFolderArchive(at: destinationURL,
-                                         rootName: (fileName as NSString).deletingPathExtension,
-                                         originalProvider: originalProvider,
-                                         prefetch: prefetch, progress: progress)
+            try await writeFolderArchive(
+                at: destinationURL,
+                rootName: (fileName as NSString).deletingPathExtension,
+                options: FolderBackupOptions(originalProvider: originalProvider, prefetch: prefetch,
+                                             skipping: skipping, progress: progress)
+            )
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -49,9 +59,9 @@ extension DataActor {
     }
 
     private func writeFolderArchive(at url: URL, rootName: String,
-                                    originalProvider: (@Sendable (String) async -> Data?)?,
-                                    prefetch: (@Sendable ([String]) async -> Void)?,
-                                    progress: (@MainActor (Int, Int) -> Void)?) async throws {
+                                    options: FolderBackupOptions) async throws {
+        let progress = options.progress
+        let skipping = options.skipping
         let albumPaths = albumFolderPaths(rootName: rootName)
         let pics = folderBackupPics()
         let writer = try ZIPArchiveWriter(url: url)
@@ -63,10 +73,15 @@ extension DataActor {
         var usedNames: [String: Set<String>] = [:]
         let total = pics.count
         await progress?(0, total)
-        await prefetch?(pics.filter { !hasLocalOriginal($0) }.map(\.id))
+        await options.prefetch?(pics.filter { !hasLocalOriginal($0) && !skipping.contains($0.id) }.map(\.id))
         for (index, pic) in pics.enumerated() {
+            if skipping.contains(pic.id) {
+                await progress?(index + 1, total)
+                continue
+            }
             let directory = pic.albumID.flatMap { albumPaths[$0] } ?? rootName
-            guard let source = await originalSource(for: pic, originalProvider: originalProvider) else {
+            guard let source = await originalSource(for: pic,
+                                                    originalProvider: options.originalProvider) else {
                 throw BackupError.originalUnavailable
             }
             let (sourceURL, sourceData) = (source.url, source.data)
