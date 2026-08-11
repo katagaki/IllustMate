@@ -10,6 +10,8 @@ struct RestoreBackupView: View {
     @State var isCompleted: Bool = false
     @State var isError: Bool = false
     @State var rootAlbums: [Album] = []
+    @State var importedCount: Int = 0
+    @State var errorMessage: StatusView.StatusTitle?
 
     @State var fileSize: String?
 
@@ -19,9 +21,9 @@ struct RestoreBackupView: View {
                 if isImporting {
                     StatusView(type: .inProgress, title: .backupRestoring)
                 } else if isCompleted {
-                    StatusView(type: .success, title: .backupRestoreCompleted)
+                    StatusView(type: .success, title: .backupRestoreCompleted(count: importedCount))
                 } else if isError {
-                    StatusView(type: .error, title: .backupRestoreError)
+                    StatusView(type: .error, title: .backupRestoreError, message: errorMessage)
                 } else {
                     VStack(alignment: .leading, spacing: 20.0) {
                         HStack(alignment: .top) {
@@ -128,6 +130,17 @@ struct RestoreBackupView: View {
         }
     }
 
+    static func message(for error: Error) -> StatusView.StatusTitle {
+        switch error {
+        case BackupError.sourceUnreadable:
+            .custom("Backup.Restore.Error.Unreadable", tableName: "More")
+        case BackupError.nothingRestored:
+            .custom("Backup.Restore.Error.Empty", tableName: "More")
+        default:
+            .custom(LocalizedStringKey(error.localizedDescription))
+        }
+    }
+
     func startImport(targetAlbumID: String?) {
         withAnimation(.smooth.speed(2.0)) {
             isImporting = true
@@ -135,8 +148,11 @@ struct RestoreBackupView: View {
         } completion: {
             Task {
                 do {
-                    try await DataActor.shared.importFromBackup(at: backupURL, targetAlbumID: targetAlbumID)
+                    let imported = try await DataActor.shared.importFromBackup(
+                        at: backupURL, targetAlbumID: targetAlbumID
+                    )
                     await MainActor.run {
+                        importedCount = imported
                         isImporting = false
                         isCompleted = true
                         navigation.dataVersion += 1
@@ -144,7 +160,9 @@ struct RestoreBackupView: View {
                         UIApplication.shared.isIdleTimerDisabled = false
                     }
                 } catch {
+                    let message = Self.message(for: error)
                     await MainActor.run {
+                        errorMessage = message
                         isImporting = false
                         isError = true
                         UINotificationFeedbackGenerator().notificationOccurred(.error)

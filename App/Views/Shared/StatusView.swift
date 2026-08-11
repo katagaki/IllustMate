@@ -4,7 +4,7 @@ struct StatusView: View {
 
     var type: StatusType
     var title: StatusTitle
-    var message: LocalizedStringKey?
+    var message: StatusTitle?
     var currentCount: Int?
     var totalCount: Int?
 
@@ -30,7 +30,7 @@ struct StatusView: View {
         case backupExporting
         case backupExportCompleted
         case backupRestoring
-        case backupRestoreCompleted
+        case backupRestoreCompleted(count: Int)
         case backupRestoreError
 
         // Custom (for dynamic strings like error messages)
@@ -58,8 +58,8 @@ struct StatusView: View {
                 Text("Backup.Export.Completed", tableName: "More")
             case .backupRestoring:
                 Text("Backup.Restoring", tableName: "More")
-            case .backupRestoreCompleted:
-                Text("Backup.Restore.Completed", tableName: "More")
+            case .backupRestoreCompleted(let count):
+                Text("Backup.Restore.Completed.Text.\(count)", tableName: "More")
             case .backupRestoreError:
                 Text("Backup.Restore.Error", tableName: "More")
             case .custom(let key, let tableName):
@@ -106,7 +106,7 @@ struct StatusView: View {
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                     if let message {
-                        Text(message)
+                        message.text
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
@@ -125,7 +125,7 @@ struct StatusView: View {
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                     if let message {
-                        Text(message)
+                        message.text
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)

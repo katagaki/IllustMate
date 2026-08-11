@@ -152,6 +152,7 @@ struct IllustMateApp: App {
             }
         }
         .sheet(isPresented: $isImportingBackup) {
+            if let importedURL { discardInboxCopy(of: importedURL) }
             importedURL = nil
         } content: {
             if let importedURL {
@@ -193,6 +194,18 @@ struct IllustMateApp: App {
                 isShowingWelcome = false
             }
         }
+    }
+
+    func discardInboxCopy(of url: URL) {
+        // Files the system copies into Documents/Inbox are never cleaned up for us.
+        guard let documents = try? FileManager.default.url(for: .documentDirectory,
+                                                           in: .userDomainMask,
+                                                           appropriateFor: nil, create: false) else {
+            return
+        }
+        let inbox = documents.appendingPathComponent("Inbox").standardizedFileURL.path
+        guard url.standardizedFileURL.deletingLastPathComponent().path == inbox else { return }
+        try? FileManager.default.removeItem(at: url)
     }
 
     func handleSampleDataURL(_ url: URL) {

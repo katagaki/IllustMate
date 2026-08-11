@@ -5,6 +5,14 @@ enum BackupError: Error {
     case destinationInaccessible
     case insufficientSpace(required: Int64, available: Int64)
     case originalUnavailable
+    case sourceUnreadable
+    case nothingRestored
+}
+
+struct BackupPreflight: Sendable {
+    let count: Int
+    let bytes: Int64
+    let unavailablePicIDs: [String]
 }
 
 extension DataActor {
@@ -18,6 +26,8 @@ extension DataActor {
     func backupDatabase(to destinationDirectoryURL: URL, libraryName: String,
                         originalProvider: (@Sendable (String) async -> Data?)? = nil,
                         sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
+                        prefetch: (@Sendable ([String]) async -> Void)? = nil,
+                        skipping: Set<String> = [],
                         progress: (@MainActor (Int, Int) -> Void)? = nil) async throws {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
@@ -30,20 +40,44 @@ extension DataActor {
         if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
             try fileManager.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: true)
         }
-        let destinationURL = destinationDirectoryURL
-            .appendingPathComponent(backupFileName(for: libraryName))
-        try fileManager.copyItem(at: self.databaseURL, to: destinationURL)
+        let destinationURL = Self.uniqueURL(
+            in: destinationDirectoryURL, fileName: backupFileName(for: libraryName)
+        )
+        try snapshotDatabase(to: destinationURL)
         do {
             try await inlineOriginals(intoBackupAt: destinationURL,
-                                      originalProvider: originalProvider, progress: progress)
+                                      originalProvider: originalProvider,
+                                      prefetch: prefetch, skipping: skipping, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
         }
     }
 
-    private func ensureFreeSpace(at directory: URL,
-                                 sizeProvider: (@Sendable (String) async -> Int64?)?) async throws {
+    private func snapshotDatabase(to url: URL) throws {
+        // Copying Collection.db alone omits the -wal sidecar the database writes in WAL
+        // mode; VACUUM INTO writes the full committed state as one self-contained file.
+        let escapedPath = url.path.replacingOccurrences(of: "'", with: "''")
+        try database.execute("VACUUM INTO '\(escapedPath)'")
+    }
+
+    static func uniqueURL(in directory: URL, fileName: String) -> URL {
+        let fileManager = FileManager.default
+        var candidate = directory.appendingPathComponent(fileName)
+        guard fileManager.fileExists(atPath: candidate.path) else { return candidate }
+        let stem = (fileName as NSString).deletingPathExtension
+        let ext = (fileName as NSString).pathExtension
+        var suffix = 2
+        repeat {
+            let name = ext.isEmpty ? "\(stem) \(suffix)" : "\(stem) \(suffix).\(ext)"
+            candidate = directory.appendingPathComponent(name)
+            suffix += 1
+        } while fileManager.fileExists(atPath: candidate.path)
+        return candidate
+    }
+
+    func ensureFreeSpace(at directory: URL,
+                         sizeProvider: (@Sendable (String) async -> Int64?)?) async throws {
         let payload = await backupEstimate(sizeProvider: sizeProvider).bytes
         let required = Self.requiredFreeSpace(forBackupPayload: payload)
         let values = try? directory.resourceValues(forKeys: [
@@ -57,7 +91,7 @@ extension DataActor {
         }
     }
 
-    private func backupFileName(for libraryName: String) -> String {
+    func backupFileName(for libraryName: String, fileExtension: String = "pics") -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMMdd-HHmmss"
         let timestamp = dateFormatter.string(from: Date())
@@ -65,11 +99,13 @@ extension DataActor {
             let invalid = CharacterSet(charactersIn: "/\\:*?\"<>|")
             return String(char).unicodeScalars.allSatisfy(invalid.contains) ? "_" : char
         })
-        return "Backup-\(sanitized)-\(timestamp).pics"
+        return "Backup-\(sanitized)-\(timestamp).\(fileExtension)"
     }
 
     private func inlineOriginals(intoBackupAt url: URL,
                                  originalProvider: (@Sendable (String) async -> Data?)?,
+                                 prefetch: (@Sendable ([String]) async -> Void)?,
+                                 skipping: Set<String>,
                                  progress: (@MainActor (Int, Int) -> Void)?) async throws {
         let backupDB = try Connection(url.path)
         _ = try? backupDB.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
@@ -84,7 +120,13 @@ extension DataActor {
         }
         let total = work.count
         await progress?(0, total)
+        await prefetch?(work.filter { !hasLocalOriginal($0) && !skipping.contains($0.id) }.map(\.id))
         for (index, item) in work.enumerated() {
+            if skipping.contains(item.id) {
+                try backupDB.run(picsTable.filter(picId == item.id).delete())
+                await progress?(index + 1, total)
+                continue
+            }
             guard let blob = await originalBytes(picID: item.id,
                                                  mediaType: item.mediaType,
                                                  filePath: item.path,
@@ -100,8 +142,16 @@ extension DataActor {
         }
     }
 
-    private func originalBytes(picID: String, mediaType: Int, filePath: String?,
-                               originalProvider: (@Sendable (String) async -> Data?)?) async -> Data? {
+    private func hasLocalOriginal(_ item: BackupOriginal) -> Bool {
+        guard let path = item.path else { return false }
+        let localURL = item.mediaType == MediaType.video.rawValue
+            ? videoFileURL(forRelativePath: path)
+            : imageFileURL(forRelativePath: path)
+        return FileManager.default.fileExists(atPath: localURL.path)
+    }
+
+    func originalBytes(picID: String, mediaType: Int, filePath: String?,
+                       originalProvider: (@Sendable (String) async -> Data?)?) async -> Data? {
         let isVideo = mediaType == MediaType.video.rawValue
         if let filePath {
             let localURL = isVideo
@@ -115,8 +165,10 @@ extension DataActor {
         return await originalProvider?(picID)
     }
 
-    func backupEstimate(sizeProvider: (@Sendable (String) async -> Int64?)?) async -> (count: Int, bytes: Int64) {
+    func backupEstimate(sizeProvider: (@Sendable (String) async -> Int64?)?,
+                        availability: (@Sendable (String) async -> Bool)? = nil) async -> BackupPreflight {
         var bytes = fileSize(at: databaseURL)
+        var unavailable: [String] = []
         var rows: [(id: String, mediaType: Int, path: String?)] = []
         if let prepared = try? database.safeRows(picsTable.select(picId, picMediaType, picFilePath)) {
             for row in prepared {
@@ -136,48 +188,62 @@ extension DataActor {
                 }
             }
             if let size = await sizeProvider?(row.id) { bytes += size }
+            if let availability, await availability(row.id) == false {
+                unavailable.append(row.id)
+            }
         }
-        return (rows.count, bytes)
+        return BackupPreflight(count: rows.count, bytes: bytes, unavailablePicIDs: unavailable)
     }
 
     static func requiredFreeSpace(forBackupPayload payloadBytes: Int64) -> Int64 {
         payloadBytes + payloadBytes / 10 + 50_000_000
     }
 
-    private func fileSize(at url: URL) -> Int64 {
+    func fileSize(at url: URL) -> Int64 {
         let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
         return (attributes?[.size] as? NSNumber)?.int64Value ?? 0
     }
 
-    func importFromBackup(at url: URL, targetAlbumID: String?) throws {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
+    @discardableResult
+    func importFromBackup(at url: URL, targetAlbumID: String?) throws -> Int {
+        // A backup the system copies into the app instead of opening in place is
+        // readable, but startAccessingSecurityScopedResource() still reports false.
+        let isScoped = url.startAccessingSecurityScopedResource()
+        defer { if isScoped { url.stopAccessingSecurityScopedResource() } }
 
+        guard FileManager.default.isReadableFile(atPath: url.path) else {
+            throw BackupError.sourceUnreadable
+        }
         let foreignDB = try Connection(url.path)
+        let imported: Int
         if let targetAlbumID {
-            try importIntoAlbum(targetAlbumID, from: foreignDB)
+            imported = try importIntoAlbum(targetAlbumID, from: foreignDB)
         } else {
-            try mergeBackup(from: foreignDB)
+            imported = try mergeBackup(from: foreignDB)
         }
         notifyLocalMutation()
+        guard imported > 0 else { throw BackupError.nothingRestored }
+        return imported
     }
 
     // MARK: - Import strategies
 
-    private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws {
+    private func importIntoAlbum(_ targetAlbumID: String, from foreignDB: Connection) throws -> Int {
+        var imported = 0
         var albumIDMap: [String: String] = [:]
         for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? UUID().uuidString
             let newID = UUID().uuidString
             albumIDMap[oldID] = newID
             let oldParentID = try? foreignAlbum.get(albumParentId)
-            _ = try? database.run(albumsTable.insert(
+            let insert = albumsTable.insert(
                 albumId <- newID,
                 albumName <- (try? foreignAlbum.get(albumName)) ?? "",
                 albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
                 albumParentId <- oldParentID == nil ? targetAlbumID : nil,
                 albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
-            ))
+            )
+            if (try? database.run(insert)) != nil { imported += 1 }
         }
         for foreignAlbum in try foreignDB.safeRows(albumsTable) {
             let oldID = (try? foreignAlbum.get(albumId)) ?? ""
@@ -190,32 +256,39 @@ extension DataActor {
         for foreignPic in try foreignDB.safeRows(picsTable) {
             let oldAlbumID = try? foreignPic.get(picAlbumId)
             let mappedAlbumID = oldAlbumID.flatMap { albumIDMap[$0] } ?? targetAlbumID
-            importForeignPic(foreignPic, newID: UUID().uuidString, albumID: mappedAlbumID)
+            if importForeignPic(foreignPic, newID: UUID().uuidString, albumID: mappedAlbumID) {
+                imported += 1
+            }
         }
+        return imported
     }
 
-    private func mergeBackup(from foreignDB: Connection) throws {
+    private func mergeBackup(from foreignDB: Connection) throws -> Int {
+        var imported = 0
         for foreignAlbum in try foreignDB.safeRows(albumsTable) {
-            _ = try? database.run(albumsTable.insert(or: .ignore,
+            let insert = albumsTable.insert(or: .ignore,
                 albumId <- (try? foreignAlbum.get(albumId)) ?? UUID().uuidString,
                 albumName <- (try? foreignAlbum.get(albumName)) ?? "",
                 albumCoverPhoto <- (try? foreignAlbum.get(albumCoverPhoto)),
                 albumParentId <- (try? foreignAlbum.get(albumParentId)),
                 albumDateCreated <- (try? foreignAlbum.get(albumDateCreated)) ?? Date.now.timeIntervalSince1970
-            ))
+            )
+            if (try? database.run(insert)) != nil { imported += 1 }
         }
         for foreignPic in try foreignDB.safeRows(picsTable) {
             let id = (try? foreignPic.get(picId)) ?? UUID().uuidString
             if ((try? database.scalar(picsTable.filter(picId == id).count)) ?? 0) > 0 { continue }
             let albumID = try? foreignPic.get(picAlbumId)
-            importForeignPic(foreignPic, newID: id, albumID: albumID)
+            if importForeignPic(foreignPic, newID: id, albumID: albumID) { imported += 1 }
         }
+        return imported
     }
 
-    private func importForeignPic(_ row: Row, newID: String, albumID: String?) {
+    @discardableResult
+    private func importForeignPic(_ row: Row, newID: String, albumID: String?) -> Bool {
         let mediaType = (try? row.get(picMediaType)) ?? 0
         let foreignFilePath = try? row.get(picFilePath)
-        guard let blob = try? row.get(picData) else { return }
+        guard let blob = try? row.get(picData) else { return false }
         let relativePath: String?
         if mediaType == MediaType.video.rawValue {
             let ext = foreignFilePath.flatMap { ($0 as NSString).pathExtension }
@@ -224,8 +297,8 @@ extension DataActor {
         } else {
             relativePath = saveImageFile(blob, id: newID)
         }
-        guard let relativePath else { return }
-        _ = try? database.run(picsTable.insert(or: .ignore,
+        guard let relativePath else { return false }
+        let insert = picsTable.insert(or: .ignore,
             picId <- newID,
             picName <- (try? row.get(picName)) ?? Pic.newFilename(),
             picAlbumId <- albumID,
@@ -234,6 +307,19 @@ extension DataActor {
             picMediaType <- mediaType,
             picDuration <- (try? row.get(picDuration)) ?? nil,
             picFilePath <- relativePath
-        ))
+        )
+        guard (try? database.run(insert)) != nil else {
+            deleteStoredFile(atRelativePath: relativePath, isVideo: mediaType == MediaType.video.rawValue)
+            return false
+        }
+        return true
+    }
+
+    private func deleteStoredFile(atRelativePath path: String, isVideo: Bool) {
+        if isVideo {
+            deleteVideoFile(atRelativePath: path)
+        } else {
+            deleteImageFile(atRelativePath: path)
+        }
     }
 }

@@ -56,6 +56,11 @@ extension OriginalsManager {
         cloudURL(forPicID: picID, in: collectionID)?.lastPathComponent
     }
 
+    func hasCloudOriginal(picID: String, in collectionID: String) -> Bool {
+        guard let url = cloudURL(forPicID: picID, in: collectionID) else { return false }
+        return downloadingStatus(url) != nil
+    }
+
     func originalSize(picID: String, in collectionID: String) async -> Int64? {
         guard let url = cloudURL(forPicID: picID, in: collectionID) else { return nil }
         let values = try? url.resourceValues(forKeys: [.fileSizeKey, .totalFileSizeKey])

@@ -24,10 +24,17 @@ struct MoreBackupView: View {
     @State private var failureTitle: StatusView.StatusTitle =
         .custom("Backup.Error.Destination", tableName: "More")
     @State private var freeSpaceKnown: Bool = true
+    @State private var format: BackupFormat = .archive
+    @State private var unavailablePicIDs: [String] = []
+    @State private var isSkipApproved: Bool = false
 
     private var hasEnoughSpace: Bool {
         !freeSpaceKnown
             || availableBytes >= DataActor.requiredFreeSpace(forBackupPayload: estimatedBytes)
+    }
+
+    private var canStart: Bool {
+        hasEnoughSpace && (unavailablePicIDs.isEmpty || isSkipApproved)
     }
 
     var body: some View {
@@ -43,9 +50,9 @@ struct MoreBackupView: View {
                     StatusView(type: .inProgress, title: .backupExporting,
                                currentCount: progressCurrent, totalCount: progressTotal)
                 case .completed:
-                    completion(title: .backupExportCompleted, isError: false)
+                    completion(title: .backupExportCompleted, isError: false, message: nil)
                 case .failed:
-                    completion(title: failureTitle, isError: true)
+                    completion(title: failureTitle, isError: true, message: nil)
                 }
             }
             .padding(20.0)
@@ -69,6 +76,19 @@ struct MoreBackupView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             VStack(spacing: 6.0) {
+                Picker("Backup.Format", selection: $format) {
+                    ForEach(BackupFormat.allCases) { option in
+                        Text(option.title, tableName: "More").tag(option)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                Text(format.description, tableName: "More")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            VStack(spacing: 6.0) {
                 summaryRow("Backup.Confirm.Size", value: byteString(estimatedBytes))
                 if freeSpaceKnown {
                     summaryRow("Backup.Confirm.Available", value: byteString(availableBytes))
@@ -81,6 +101,9 @@ struct MoreBackupView: View {
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
             }
+            if !unavailablePicIDs.isEmpty {
+                unavailableConsent
+            }
             Spacer()
             Button {
                 Task { await runBackup() }
@@ -91,13 +114,26 @@ struct MoreBackupView: View {
             .tint(.accent)
             .buttonStyle(.glassProminent)
             .buttonBorderShape(.capsule)
-            .disabled(!hasEnoughSpace)
+            .disabled(!canStart)
             Button { dismiss() } label: {
                 Text("Shared.Cancel").padding(4.0).frame(maxWidth: .infinity)
             }
             .tint(.secondary)
             .buttonStyle(.bordered)
             .buttonBorderShape(.capsule)
+        }
+    }
+
+    private var unavailableConsent: some View {
+        VStack(alignment: .center, spacing: 8.0) {
+            Text("Backup.Unavailable.Message.\(unavailablePicIDs.count)", tableName: "More")
+                .font(.caption)
+                .foregroundStyle(.orange)
+                .multilineTextAlignment(.center)
+            Toggle(isOn: $isSkipApproved) {
+                Text("Backup.Unavailable.Skip", tableName: "More")
+                    .font(.callout)
+            }
         }
     }
 
@@ -110,9 +146,10 @@ struct MoreBackupView: View {
     }
 
     @ViewBuilder
-    private func completion(title: StatusView.StatusTitle, isError: Bool) -> some View {
+    private func completion(title: StatusView.StatusTitle, isError: Bool,
+                            message: StatusView.StatusTitle?) -> some View {
         VStack(alignment: .center, spacing: 16.0) {
-            StatusView(type: isError ? .error : .success, title: title)
+            StatusView(type: isError ? .error : .success, title: title, message: message)
             Button { dismiss() } label: {
                 Text("Shared.OK").bold().padding(4.0).frame(maxWidth: .infinity)
             }
@@ -132,6 +169,8 @@ struct MoreBackupView: View {
         let cid = collectionID
         let estimate = await dataActor.backupEstimate(sizeProvider: { picID in
             await OriginalsManager.shared.originalSize(picID: picID, in: cid)
+        }, availability: { picID in
+            await OriginalsManager.shared.hasCloudOriginal(picID: picID, in: cid)
         })
         let accessed = destinationURL.startAccessingSecurityScopedResource()
         let values = try? destinationURL.resourceValues(forKeys: [
@@ -139,6 +178,7 @@ struct MoreBackupView: View {
         ])
         if accessed { destinationURL.stopAccessingSecurityScopedResource() }
         estimatedBytes = estimate.bytes
+        unavailablePicIDs = estimate.unavailablePicIDs
         if let important = values?.volumeAvailableCapacityForImportantUsage {
             availableBytes = important
             freeSpaceKnown = true
@@ -157,21 +197,36 @@ struct MoreBackupView: View {
         defer { UIApplication.shared.isIdleTimerDisabled = false }
         let dataActor = DataActor.instance(for: collectionID)
         let cid = collectionID
+        let originalProvider: @Sendable (String) async -> Data? = { picID in
+            await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid,
+                                                        timeoutSeconds: 60, retries: 3)
+        }
+        let prefetch: @Sendable ([String]) async -> Void = { picIDs in
+            await OriginalsManager.shared.prefetchOriginals(picIDs: picIDs, in: cid)
+        }
+        let sizeProvider: @Sendable (String) async -> Int64? = { picID in
+            await OriginalsManager.shared.originalSize(picID: picID, in: cid)
+        }
+        let skipped = Set(unavailablePicIDs)
+        let onProgress: @MainActor (Int, Int) -> Void = { current, total in
+            progressCurrent = current
+            progressTotal = total
+        }
         do {
-            try await dataActor.backupDatabase(
-                to: destinationURL,
-                libraryName: libraryName,
-                originalProvider: { picID in
-                    await OriginalsManager.shared.fetchOriginal(picID: picID, in: cid)
-                },
-                sizeProvider: { picID in
-                    await OriginalsManager.shared.originalSize(picID: picID, in: cid)
-                },
-                progress: { current, total in
-                    progressCurrent = current
-                    progressTotal = total
-                }
-            )
+            switch format {
+            case .archive:
+                try await dataActor.backupDatabase(
+                    to: destinationURL, libraryName: libraryName,
+                    originalProvider: originalProvider, sizeProvider: sizeProvider,
+                    prefetch: prefetch, skipping: skipped, progress: onProgress
+                )
+            case .folders:
+                try await dataActor.exportFolderArchive(
+                    to: destinationURL, libraryName: libraryName,
+                    originalProvider: originalProvider, sizeProvider: sizeProvider,
+                    prefetch: prefetch, skipping: skipped, progress: onProgress
+                )
+            }
             withAnimation(.smooth.speed(2.0)) { phase = .completed }
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         } catch let error as BackupError {
@@ -191,7 +246,7 @@ struct MoreBackupView: View {
             .custom("Backup.Error.InsufficientSpace", tableName: "More")
         case .originalUnavailable:
             .custom("Backup.Error.Incomplete", tableName: "More")
-        case .destinationInaccessible:
+        case .destinationInaccessible, .sourceUnreadable, .nothingRestored:
             .custom("Backup.Error.Destination", tableName: "More")
         }
     }
