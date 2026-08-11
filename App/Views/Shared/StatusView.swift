@@ -29,7 +29,6 @@ struct StatusView: View {
         // More table
         case backupExporting
         case backupExportCompleted
-        case backupExportPartial(missing: Int)
         case backupRestoring
         case backupRestoreCompleted(count: Int)
         case backupRestoreError
@@ -57,8 +56,6 @@ struct StatusView: View {
                 Text("Backup.Exporting", tableName: "More")
             case .backupExportCompleted:
                 Text("Backup.Export.Completed", tableName: "More")
-            case .backupExportPartial(let missing):
-                Text("Backup.Export.Completed.Partial.\(missing)", tableName: "More")
             case .backupRestoring:
                 Text("Backup.Restoring", tableName: "More")
             case .backupRestoreCompleted(let count):

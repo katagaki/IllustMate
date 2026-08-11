@@ -45,7 +45,6 @@ struct MoreBackupView: View {
     @State private var failureTitle: StatusView.StatusTitle =
         .custom("Backup.Error.Destination", tableName: "More")
     @State private var freeSpaceKnown: Bool = true
-    @State private var missingOriginals: Int = 0
     @State private var format: Format = .archive
 
     private var hasEnoughSpace: Bool {
@@ -66,9 +65,7 @@ struct MoreBackupView: View {
                     StatusView(type: .inProgress, title: .backupExporting,
                                currentCount: progressCurrent, totalCount: progressTotal)
                 case .completed:
-                    completion(title: .backupExportCompleted, isError: false,
-                               message: missingOriginals > 0
-                                   ? .backupExportPartial(missing: missingOriginals) : nil)
+                    completion(title: .backupExportCompleted, isError: false, message: nil)
                 case .failed:
                     completion(title: failureTitle, isError: true, message: nil)
                 }
@@ -213,13 +210,13 @@ struct MoreBackupView: View {
         do {
             switch format {
             case .archive:
-                missingOriginals = try await dataActor.backupDatabase(
+                try await dataActor.backupDatabase(
                     to: destinationURL, libraryName: libraryName,
                     originalProvider: originalProvider, sizeProvider: sizeProvider,
                     prefetch: prefetch, progress: onProgress
                 )
             case .folders:
-                missingOriginals = try await dataActor.exportFolderArchive(
+                try await dataActor.exportFolderArchive(
                     to: destinationURL, libraryName: libraryName,
                     originalProvider: originalProvider, sizeProvider: sizeProvider,
                     prefetch: prefetch, progress: onProgress

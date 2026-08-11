@@ -21,7 +21,7 @@ extension DataActor {
                         originalProvider: (@Sendable (String) async -> Data?)? = nil,
                         sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
                         prefetch: (@Sendable ([String]) async -> Void)? = nil,
-                        progress: (@MainActor (Int, Int) -> Void)? = nil) async throws -> Int {
+                        progress: (@MainActor (Int, Int) -> Void)? = nil) async throws {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
         }
@@ -38,9 +38,9 @@ extension DataActor {
         )
         try snapshotDatabase(to: destinationURL)
         do {
-            return try await inlineOriginals(intoBackupAt: destinationURL,
-                                             originalProvider: originalProvider,
-                                             prefetch: prefetch, progress: progress)
+            try await inlineOriginals(intoBackupAt: destinationURL,
+                                      originalProvider: originalProvider,
+                                      prefetch: prefetch, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -98,7 +98,7 @@ extension DataActor {
     private func inlineOriginals(intoBackupAt url: URL,
                                  originalProvider: (@Sendable (String) async -> Data?)?,
                                  prefetch: (@Sendable ([String]) async -> Void)?,
-                                 progress: (@MainActor (Int, Int) -> Void)?) async throws -> Int {
+                                 progress: (@MainActor (Int, Int) -> Void)?) async throws {
         let backupDB = try Connection(url.path)
         _ = try? backupDB.execute("ALTER TABLE \"pics\" ADD COLUMN \"data\" BLOB")
         let query = picsTable
@@ -111,7 +111,6 @@ extension DataActor {
                                        path: (try? row.get(picFilePath)) ?? nil))
         }
         let total = work.count
-        var missing = 0
         await progress?(0, total)
         await prefetch?(work.filter { !hasLocalOriginal($0) }.map(\.id))
         for (index, item) in work.enumerated() {
@@ -119,9 +118,7 @@ extension DataActor {
                                                  mediaType: item.mediaType,
                                                  filePath: item.path,
                                                  originalProvider: originalProvider) else {
-                missing += 1
-                await progress?(index + 1, total)
-                continue
+                throw BackupError.originalUnavailable
             }
             let isVideo = item.mediaType == MediaType.video.rawValue
             try backupDB.run(picsTable.filter(picId == item.id).update(
@@ -130,8 +127,6 @@ extension DataActor {
             ))
             await progress?(index + 1, total)
         }
-        guard total == 0 || missing < total else { throw BackupError.originalUnavailable }
-        return missing
     }
 
     private func hasLocalOriginal(_ item: BackupOriginal) -> Bool {

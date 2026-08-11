@@ -23,7 +23,7 @@ extension DataActor {
                              originalProvider: (@Sendable (String) async -> Data?)? = nil,
                              sizeProvider: (@Sendable (String) async -> Int64?)? = nil,
                              prefetch: (@Sendable ([String]) async -> Void)? = nil,
-                             progress: (@MainActor (Int, Int) -> Void)? = nil) async throws -> Int {
+                             progress: (@MainActor (Int, Int) -> Void)? = nil) async throws {
         guard destinationDirectoryURL.startAccessingSecurityScopedResource() else {
             throw BackupError.destinationInaccessible
         }
@@ -38,10 +38,10 @@ extension DataActor {
         let fileName = backupFileName(for: libraryName, fileExtension: "zip")
         let destinationURL = Self.uniqueURL(in: destinationDirectoryURL, fileName: fileName)
         do {
-            return try await writeFolderArchive(at: destinationURL,
-                                                rootName: (fileName as NSString).deletingPathExtension,
-                                                originalProvider: originalProvider,
-                                                prefetch: prefetch, progress: progress)
+            try await writeFolderArchive(at: destinationURL,
+                                         rootName: (fileName as NSString).deletingPathExtension,
+                                         originalProvider: originalProvider,
+                                         prefetch: prefetch, progress: progress)
         } catch {
             try? fileManager.removeItem(at: destinationURL)
             throw error
@@ -51,7 +51,7 @@ extension DataActor {
     private func writeFolderArchive(at url: URL, rootName: String,
                                     originalProvider: (@Sendable (String) async -> Data?)?,
                                     prefetch: (@Sendable ([String]) async -> Void)?,
-                                    progress: (@MainActor (Int, Int) -> Void)?) async throws -> Int {
+                                    progress: (@MainActor (Int, Int) -> Void)?) async throws {
         let albumPaths = albumFolderPaths(rootName: rootName)
         let pics = folderBackupPics()
         let writer = try ZIPArchiveWriter(url: url)
@@ -61,16 +61,13 @@ extension DataActor {
         }
 
         var usedNames: [String: Set<String>] = [:]
-        var missing = 0
         let total = pics.count
         await progress?(0, total)
         await prefetch?(pics.filter { !hasLocalOriginal($0) }.map(\.id))
         for (index, pic) in pics.enumerated() {
             let directory = pic.albumID.flatMap { albumPaths[$0] } ?? rootName
             guard let source = await originalSource(for: pic, originalProvider: originalProvider) else {
-                missing += 1
-                await progress?(index + 1, total)
-                continue
+                throw BackupError.originalUnavailable
             }
             let (sourceURL, sourceData) = (source.url, source.data)
             let isVideo = pic.mediaType == MediaType.video.rawValue
@@ -79,23 +76,16 @@ extension DataActor {
             let fileName = Self.uniqueName(Self.sanitizedComponent(pic.name, fallback: pic.id),
                                            fileExtension: fileExtension,
                                            taken: &usedNames[directory, default: []])
-            do {
-                if let sourceURL {
-                    try writer.addFile("\(directory)/\(fileName)", contentsOf: sourceURL,
-                                       modified: pic.dateAdded)
-                } else if let sourceData {
-                    try writer.addFile("\(directory)/\(fileName)", data: sourceData,
-                                       modified: pic.dateAdded)
-                }
-            } catch {
-                debugPrint("Skipped \(pic.id) in folder backup: \(error)")
-                missing += 1
+            if let sourceURL {
+                try writer.addFile("\(directory)/\(fileName)", contentsOf: sourceURL,
+                                   modified: pic.dateAdded)
+            } else if let sourceData {
+                try writer.addFile("\(directory)/\(fileName)", data: sourceData,
+                                   modified: pic.dateAdded)
             }
             await progress?(index + 1, total)
         }
         try writer.finish()
-        guard total == 0 || missing < total else { throw BackupError.originalUnavailable }
-        return missing
     }
 
     private func originalSource(
