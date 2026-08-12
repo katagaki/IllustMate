@@ -63,7 +63,8 @@ extension OriginalsManager {
 
     func originalSize(picID: String, in collectionID: String) async -> Int64? {
         guard let url = cloudURL(forPicID: picID, in: collectionID) else { return nil }
-        let values = try? url.resourceValues(forKeys: [.fileSizeKey, .totalFileSizeKey])
+        let values = try? placeholderAwareURL(url)
+            .resourceValues(forKeys: [.fileSizeKey, .totalFileSizeKey])
         if let total = values?.totalFileSize { return Int64(total) }
         if let size = values?.fileSize { return Int64(size) }
         return nil

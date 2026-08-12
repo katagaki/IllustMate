@@ -24,7 +24,7 @@ extension OriginalsManager {
     func materializeOriginal(picID: String, in collectionID: String) async -> Bool {
         guard let url = cloudURL(forPicID: picID, in: collectionID) else { return false }
         if isMaterialized(url) { return true }
-        try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        requestDownload(url)
         return await waitForDownload(url) == .downloaded
     }
 
@@ -40,7 +40,7 @@ extension OriginalsManager {
         let ids = await DataActor.instance(for: collectionID).allOriginalPicIDs()
         for id in ids {
             guard let url = cloudURL(forPicID: id, in: collectionID), !isMaterialized(url) else { continue }
-            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+            requestDownload(url)
         }
     }
 
@@ -48,7 +48,7 @@ extension OriginalsManager {
         let ids = await DataActor.instance(for: collectionID).allOriginalPicIDs(inAlbum: albumID)
         for id in ids {
             guard let url = cloudURL(forPicID: id, in: collectionID), !isMaterialized(url) else { continue }
-            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+            requestDownload(url)
         }
     }
 
@@ -93,7 +93,7 @@ extension OriginalsManager {
         for picID in picIDs {
             guard let url = cloudURL(forPicID: picID, in: collectionID),
                   !isMaterialized(url) else { continue }
-            try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+            requestDownload(url)
         }
         await SyncMate.shared.debugLog("prefetch: requested \(picIDs.count)")
     }
@@ -110,7 +110,7 @@ extension OriginalsManager {
                 try? await Task.sleep(for: .seconds(retryDelaySeconds))
                 await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): retry \(attempt)")
             }
-            try? FileManager.default.startDownloadingUbiquitousItem(at: cloudURL)
+            requestDownload(cloudURL)
             let outcome = await waitForDownload(cloudURL, timeoutSeconds: timeoutSeconds)
             guard outcome != .unavailable else {
                 await SyncMate.shared.debugLog("fetch \(picID.prefix(6)): unavailable")
@@ -136,7 +136,7 @@ extension OriginalsManager {
             return nil
         }
         if isMaterialized(url) { return url }
-        try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        requestDownload(url)
         if await waitForDownload(url) == .downloaded {
             await SyncMate.shared.debugLog("video \(picID.prefix(6)): ok")
             return url
@@ -150,7 +150,7 @@ extension OriginalsManager {
         // A nil downloading status means iCloud holds no such item at all, so waiting
         // can never produce one.
         guard downloadingStatus(url) != nil else { return .unavailable }
-        try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+        requestDownload(url)
         let idleLimit = timeoutSeconds * 2
         var idleTicks = 0
         var elapsedTicks = 0
@@ -166,7 +166,7 @@ extension OriginalsManager {
             } else {
                 idleTicks += 1
                 if idleTicks.isMultiple(of: 10) {
-                    try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+                    requestDownload(url)
                 }
             }
         }
@@ -174,7 +174,7 @@ extension OriginalsManager {
     }
 
     private func downloadState(_ url: URL) -> DownloadState {
-        var url = url
+        var url = placeholderAwareURL(url)
         url.removeAllCachedResourceValues()
         let values = try? url.resourceValues(forKeys: [
             .ubiquitousItemDownloadingStatusKey,

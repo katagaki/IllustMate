@@ -95,7 +95,7 @@ extension OriginalsManager {
     }
 
     func isUploaded(_ url: URL) -> Bool {
-        var url = url
+        var url = placeholderAwareURL(url)
         url.removeAllCachedResourceValues()
         return (try? url.resourceValues(forKeys: [.ubiquitousItemIsUploadedKey]))?
             .ubiquitousItemIsUploaded ?? false

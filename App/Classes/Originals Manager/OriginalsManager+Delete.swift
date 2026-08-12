@@ -5,7 +5,7 @@ extension OriginalsManager {
     func deleteCloudOriginal(picID: String, in collectionID: String) async {
         guard isUbiquityAvailable(),
               let cloudURL = cloudURL(forPicID: picID, in: collectionID) else { return }
-        await coordinatedDelete(at: cloudURL)
+        await coordinatedDelete(at: placeholderAwareURL(cloudURL))
     }
 
     func deleteCloudOriginals(picIDs: [String], in collectionID: String) async {
