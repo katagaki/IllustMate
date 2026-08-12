@@ -37,10 +37,25 @@ actor OriginalsManager {
         try? FileManager.default.startDownloadingUbiquitousItem(at: placeholderAwareURL(url))
     }
 
+    // Direct resource-value reads fail for cloud-only items that fileproviderd has not
+    // materialized locally; a coordinated read with .immediatelyAvailableMetadataOnly
+    // asks the file provider for the item's metadata without downloading it.
+    func cloudResourceValues(at url: URL, keys: Set<URLResourceKey>) -> URLResourceValues? {
+        let coordinator = NSFileCoordinator()
+        var coordinationError: NSError?
+        var values: URLResourceValues?
+        coordinator.coordinate(readingItemAt: placeholderAwareURL(url),
+                               options: .immediatelyAvailableMetadataOnly,
+                               error: &coordinationError) { readURL in
+            var readURL = readURL
+            readURL.removeAllCachedResourceValues()
+            values = try? readURL.resourceValues(forKeys: keys)
+        }
+        return values
+    }
+
     func downloadingStatus(_ url: URL) -> URLUbiquitousItemDownloadingStatus? {
-        var url = placeholderAwareURL(url)
-        url.removeAllCachedResourceValues()
-        return try? url.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
+        cloudResourceValues(at: url, keys: [.ubiquitousItemDownloadingStatusKey])?
             .ubiquitousItemDownloadingStatus
     }
 }

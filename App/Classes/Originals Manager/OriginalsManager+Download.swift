@@ -174,9 +174,7 @@ extension OriginalsManager {
     }
 
     private func downloadState(_ url: URL) -> DownloadState {
-        var url = placeholderAwareURL(url)
-        url.removeAllCachedResourceValues()
-        let values = try? url.resourceValues(forKeys: [
+        let values = cloudResourceValues(at: url, keys: [
             .ubiquitousItemDownloadingStatusKey,
             .ubiquitousItemIsDownloadingKey,
             .ubiquitousItemDownloadingErrorKey
